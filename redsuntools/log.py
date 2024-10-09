@@ -1,7 +1,7 @@
 import inspect
 import logging
 import weakref
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 # Base logger for the entire system
 core_logger = logging.getLogger('redsun')
@@ -11,11 +11,20 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(mes
 loggers = weakref.WeakValueDictionary()
 
 class RedSunLogger(logging.LoggerAdapter):
-    """
-    A custom LoggerAdapter that allows dynamically injecting prefixes like plugin name and class name into log messages.
-    """
+    """ A custom LoggerAdapter that allows dynamically injecting prefixes like plugin name and class name into log messages.
 
-    def __init__(self, logger, prefixes, reference):
+    Parameters
+    ----------
+    logger : logging.Logger
+        Logger object.
+
+    prefixes : List
+        A list of prefixes such as plugin name and class name.
+    
+    reference : weakref.ReferenceType
+        A weak reference to the object using the logger.
+    """
+    def __init__(self, logger: logging.Logger, prefixes: List, reference: weakref.ReferenceType):
         super().__init__(logger, {})
         self.prefixes = prefixes  # A list of prefixes such as plugin name and class name
         self.reference = reference  # A weak reference to the object using the logger
@@ -51,7 +60,7 @@ class RedSunLogger(logging.LoggerAdapter):
         return processedMsg, kwargs
 
 
-def setup_logger(obj: Union[object, str], *, name: Optional[str] = None, inherit_parent: bool = False):
+def setup_logger(obj: Union[object, str], *, instance_name: Optional[str] = None, inherit_parent: bool = False):
     """
     Initializes a logger for the specified object (class, object, or string).
 
@@ -89,17 +98,17 @@ def setup_logger(obj: Union[object, str], *, name: Optional[str] = None, inherit
     if logger is None:
         # Create a new logger
         if inspect.isclass(obj):
-            name = obj.__name__  # If it's a class, use its name
+            obj_name = obj.__name__  # If it's a class, use its name
             reference = weakref.ref(obj)
         elif isinstance(obj, str):
-            name = obj  # If it's a string, treat it as a static name (e.g., for plugins)
+            obj_name = obj  # If it's a string, treat it as a static name (e.g., for plugins)
             reference = None
         else:
-            name = obj.__class__.__name__  # For objects, use the class name
+            obj_name = obj.__class__.__name__  # For objects, use the class name
             reference = weakref.ref(obj)
 
-        # Prefixes include the plugin name (name) and optionally the name
-        prefixes = [name, name] if name else [name]
+        # Prefixes include the plugin name (obj_name) and optionally the name of the instance
+        prefixes = [obj_name, instance_name] if instance_name else [obj_name]
         logger = RedSunLogger(core_logger, prefixes, reference)
 
         # Save the logger in the weak reference dictionary if it's tied to an object
