@@ -1,78 +1,109 @@
+import inspect
 import logging
-import sys
-import coloredlogs
-from typing import TYPE_CHECKING
+import weakref
+from typing import Optional, Union
 
-if TYPE_CHECKING:
-    from logging import Logger
+# Base logger for the entire system
+core_logger = logging.getLogger('redsun')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 
-_logger: "Logger" = None  # Global logger instance
+# Dictionary to keep weak references to logger objects
+loggers = weakref.WeakValueDictionary()
 
-def setup_logger(component: str, log_file: str = "app.log", level: int = logging.INFO) -> "Logger":
+class RedSunLogger(logging.LoggerAdapter):
     """
-    Setup a single logger instance with two streams: stdout (with colored logs) and file.
-    The format is dynamically set based on the provided component (e.g., Core, PluginA).
-    
+    A custom LoggerAdapter that allows dynamically injecting prefixes like plugin name and class name into log messages.
+    """
+
+    def __init__(self, logger, prefixes, reference):
+        super().__init__(logger, {})
+        self.prefixes = prefixes  # A list of prefixes such as plugin name and class name
+        self.reference = reference  # A weak reference to the object using the logger
+
+    def process(self, msg, kwargs):
+        """
+        Processes the log message by prepending the plugin and class names to the message.
+
+        Parameters
+        ----------
+        msg : str
+            The original log message.
+        kwargs : dict
+            Additional keyword arguments passed to the logger call.
+
+        Returns
+        -------
+        tuple
+            The processed log message and kwargs.
+        """
+        processedPrefixes = []
+        for prefix in self.prefixes:
+            if callable(prefix):
+                try:
+                    processedPrefixes.append(prefix(self.reference()))  # Use callable to retrieve class name
+                except Exception:
+                    pass  # If the object is garbage collected, we pass
+            else:
+                processedPrefixes.append(prefix)  # Otherwise, directly use the static value
+
+        # Format the message with the prefixes
+        processedMsg = f'[{" -> ".join(processedPrefixes)}] {msg}'
+        return processedMsg, kwargs
+
+
+def setup_logger(obj: Union[object, str], *, name: Optional[str] = None, inherit_parent: bool = False):
+    """
+    Initializes a logger for the specified object (class, object, or string).
+
     Parameters
     ----------
-    component : str
-        Name of the component (e.g., Core, PluginA) to include in the log format.
-    log_file : str
-        Path to the log file.
-    level : int
-        Logging level (e.g., logging.INFO, logging.DEBUG).
-    
-    Returns
-    -------
-    Logger
-        Configured logger instance.
-    """
-    global _logger
-    if _logger is None:
-        _logger = logging.getLogger("central_logger")
-        _logger.setLevel(level)
-
-        # Console Handler (with colored logs)
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(level)
-
-        # File Handler
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(level)
-
-        # Formatter with dynamic component name (e.g., Core, PluginA)
-        log_format = f'[ %(asctime)s ][ {component} -> %(funcName)s ]: %(message)s'
-        date_format = '%Y-%m-%d %H:%M:%S'
-
-        # Colored logs setup
-        coloredlogs.install(
-            level=level,
-            logger=_logger,
-            fmt=log_format,
-            datefmt=date_format,
-            stream=sys.stdout
-        )
-
-        # File formatter without coloredlogs (standard file logging)
-        file_formatter = logging.Formatter(log_format, datefmt=date_format)
-        file_handler.setFormatter(file_formatter)
-
-        _logger.addHandler(console_handler)
-        _logger.addHandler(file_handler)
-
-    return _logger
-
-def get_logger() -> "Logger":
-    """
-    Get the shared logger instance.
+    obj : object or str
+        The object or class for which to initialize the logger.
+    name : str, optional
+        An additional name to include in the logger (for instance-specific loggers).
+    inherit_parent : bool, optional
+        If True, attempts to inherit the logger from a parent class or object.
 
     Returns
     -------
-    Logger
-        Shared logger instance.
+    LoggerAdapter
+        A customized logger adapter for the object or class.
     """
-    global _logger
-    if _logger is None:
-        raise RuntimeError("Logger has not been initialized. Call setup_logger first.")
-    
-    return _logger
+    logger = None
+
+    # If inherit_parent is True, look for a logger from a parent object in the call stack
+    if inherit_parent:
+        for frameInfo in inspect.stack():
+            frameLocals = frameInfo[0].f_locals
+            if 'self' not in frameLocals:
+                continue
+
+            parent = frameLocals['self']
+            parentRef = weakref.ref(parent)
+            if parentRef not in loggers:
+                continue
+
+            logger = loggers[parentRef]
+            break
+
+    if logger is None:
+        # Create a new logger
+        if inspect.isclass(obj):
+            name = obj.__name__  # If it's a class, use its name
+            reference = weakref.ref(obj)
+        elif isinstance(obj, str):
+            name = obj  # If it's a string, treat it as a static name (e.g., for plugins)
+            reference = None
+        else:
+            name = obj.__class__.__name__  # For objects, use the class name
+            reference = weakref.ref(obj)
+
+        # Prefixes include the plugin name (name) and optionally the name
+        prefixes = [name, name] if name else [name]
+        logger = RedSunLogger(core_logger, prefixes, reference)
+
+        # Save the logger in the weak reference dictionary if it's tied to an object
+        if reference is not None:
+            loggers[reference] = logger
+
+    return logger
