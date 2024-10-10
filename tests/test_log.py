@@ -2,10 +2,6 @@ import logging
 import pytest
 from redsuntools.log import setup_logger, core_logger
 
-@pytest.fixture
-def enable_log_debug():
-    logging.getLogger().setLevel(logging.DEBUG)
-
 class MockPlugin:
     def __init__(self, instance_name: str = None) -> None:
         self.logger = setup_logger(self, instance_name=instance_name)
