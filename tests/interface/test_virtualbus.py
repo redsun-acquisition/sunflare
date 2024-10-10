@@ -1,9 +1,12 @@
 from redsuntools.interface import Signal, VirtualBus
 from numpy import ndarray
-from typing import Union, Tuple
+from typing import Union, Tuple, TYPE_CHECKING
 from types import MappingProxyType
 import numpy as np
 import pytest
+
+if TYPE_CHECKING:
+    from logging import LogRecord
 
 class MockVirtualBus(VirtualBus):
 
@@ -110,6 +113,14 @@ def test_virtual_bus_signal_creation():
     mock_bus.sigDataSignal2.emit("stop", 42, np.array([1, 2, 3]))
 
     assert_equal(dest, ("stop", 42, np.array([1, 2, 3])))
+
+def test_virtual_bus_warning_signal_registration(caplog: "LogRecord", enable_log_debug):
+    """ Test the warning message when registering an existing signal.
+    """
+
+    mock_bus = MockVirtualBus()
+    mock_bus.register_signal('sigMyOtherSignal', int)
+    assert "Signal sigMyOtherSignal already exists in MockVirtualBus." in caplog.text
 
 def test_virtual_bus_fail_signal_registration():
     """ Tests the failure of registering a signal with an invalid name.
