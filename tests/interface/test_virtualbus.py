@@ -78,7 +78,7 @@ def test_virtual_bus_signal_creation():
     assert type(mock_bus.sigDataSignal2) == Signal
 
     mock_bus.sigAttributeSignal = Signal(int)
-    assert len(mock_bus.signals) == 3
+    assert len(mock_bus.signals) == 4
 
     # check that sigDataSignal works
     mock_bus.sigDataSignal.connect(my_slot)
@@ -102,11 +102,11 @@ def test_virtual_bus_signal_creation():
     assert dest == "start"
 
     # check that sigDataSignal2 works
-    def mySlot2(*data: Tuple[Union[str, int, np.ndarray], ...]) -> None:
+    def my_slot2(*data: Tuple[Union[str, int, np.ndarray], ...]) -> None:
         nonlocal dest
         dest = data
 
-    mock_bus.sigDataSignal2.connect(mySlot2)
+    mock_bus.sigDataSignal2.connect(my_slot2)
     mock_bus.sigDataSignal2.emit("stop", 42, np.array([1, 2, 3]))
 
     assert_equal(dest, ("stop", 42, np.array([1, 2, 3])))
@@ -125,7 +125,10 @@ def test_big_virtual_bus_construction():
 
     mock_bus = BigMockVirtualBus()
 
-    for i in range(1, 21):
+    # we have 18 signals numered from 1 to 18
+    # in the `BigMockVirtualBus` class; the + 1 is 
+    # just to make the range inclusive
+    for i in range(1, 18 + 1):
         assert hasattr(mock_bus, f"sigSignal{i}")
         assert type(getattr(mock_bus, f"sigSignal{i}")) == Signal
 

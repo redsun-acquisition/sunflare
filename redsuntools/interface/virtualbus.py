@@ -49,30 +49,24 @@ class VirtualBus(ABC):
         self._signal_registry = {key : value for key, value in type(self).__dict__.items() if key.startswith('sig') and isinstance(value, Signal)}
         self.__logger = setup_logger(self)
     
-    def __set__(self, name: str, value: "Any") -> None:
-        """
-        Overloads `__set__` to allow registering signals attributes.
-        
-        If the attribute name starts with 'sig' and the value is a `Signal` object, and it is not an existing class attribute,
-        it will be added in the signal registry. Otherwise, it will be registered as a 
-        regular attribute.
+    def __setattr__(self, name: str, value: 'Any') -> None:
+        """ Overloads `__setattr__` to allow registering new signals attributes.
+        If the attribute name starts with 'sig' and the value is a `Signal` object, it will be added as 
+        instance attribute and added to the signal registry.
+        Otherwise, it will be registered as a regular attribute.
 
-        Parameters
-        ----------
-        name : str
-            The name of the attribute to set.
-        value : Any
-            The value of the attribute to set.
-
+        Args:
+            name (`str`): attribute name.
+            value (`Any`): attribute value.
         """
         if name.startswith('sig') and isinstance(value, Signal):
             if not hasattr(self, name) and not name in self._signal_registry:
-                self._signal_registry.update({name: value})
-                super().__set__(name, value)
+                self._signal_registry[name] = value
+                super().__setattr__(name, value)
             else:
                 self.__logger.warning(f"Signal {name} already exists in {self.__class__.__name__}.")
         else:
-            super().__set__(name, value)
+            super().__setattr__(name, value)
     
     def register_signal(self, name: str, *args, **kwargs) -> None:
         """ Creates a new `Signal` object with the given name and arguments,
@@ -108,7 +102,7 @@ class VirtualBus(ABC):
             else:
                 info = "RedSun signal"
             signal = Signal(*args, info=info, **kwargs)
-        self.__set__(self, name, signal)
+        setattr(self, name, signal)
     
     @property
     def signals(self) -> 'MappingProxyType[str, Signal]':
