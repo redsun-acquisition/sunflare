@@ -6,15 +6,15 @@ from typing import TYPE_CHECKING, Tuple
 from exengine.backends.micromanager import MicroManagerCamera as ExEngineMMCamera
 from exengine.device_types import Detector as ExEngineDetector
 
-from redsun.toolkit.config import PixelPhotometricTypes
-from redsun.toolkit.engine.detector import DetectorModel
+from sunflare.config import PixelPhotometricTypes
+from sunflare.engine.detector import DetectorModel
 
 if TYPE_CHECKING:
     from typing import Any, Dict, Optional, Union
 
     import numpy.typing as npt
 
-    from redsun.toolkit.config import DetectorModelInfo
+    from sunflare.config import DetectorModelInfo
 
 
 class ExEngineDetectorModel(DetectorModel, ExEngineDetector):  # type: ignore[misc]

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from numpy import ndarray
 
-from redsun.toolkit.virtualbus import Signal, VirtualBus
+from sunflare.virtualbus import Signal, VirtualBus
 
 if TYPE_CHECKING:
     from logging import LogRecord

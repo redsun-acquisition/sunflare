@@ -4,13 +4,13 @@ from abc import ABC, abstractmethod
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
-from redsun.toolkit.log import Loggable
-from redsun.toolkit.utils import create_evented_dataclass
+from sunflare.log import Loggable
+from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
     from typing import Any, Dict, List, Union
 
-    from redsun.toolkit.config import (
+    from sunflare.config import (
         AcquisitionEngineTypes,
         LightModelInfo,
         LightModelTypes,

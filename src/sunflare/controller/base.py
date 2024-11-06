@@ -9,18 +9,18 @@ Two controller types are defined: `DeviceController` and `ComputationalControlle
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from redsun.toolkit.config import ControllerInfo
-from redsun.toolkit.engine import EngineHandler
-from redsun.toolkit.log import Loggable
-from redsun.toolkit.utils import create_evented_dataclass
-from redsun.toolkit.virtualbus import VirtualBus
+from sunflare.config import ControllerInfo
+from sunflare.engine import EngineHandler
+from sunflare.log import Loggable
+from sunflare.utils import create_evented_dataclass
+from sunflare.virtualbus import VirtualBus
 
 if TYPE_CHECKING:
     from typing import Any, Dict, List
 
-    from redsun.toolkit.config import ControllerInfo
-    from redsun.toolkit.engine import EngineHandler
-    from redsun.toolkit.virtualbus import VirtualBus
+    from sunflare.config import ControllerInfo
+    from sunflare.engine import EngineHandler
+    from sunflare.virtualbus import VirtualBus
 
 
 class BaseController(ABC, Loggable):

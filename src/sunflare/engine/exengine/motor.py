@@ -11,8 +11,8 @@ from exengine.device_types import (
     TriggerableSingleAxisPositioner as ExEngineSingleMotor,
 )
 
-from redsun.toolkit.config import MotorModelInfo
-from redsun.toolkit.engine.motor import MotorModel
+from sunflare.config import MotorModelInfo
+from sunflare.engine.motor import MotorModel
 
 
 class ExEngineSingleMotorModel(MotorModel, ExEngineSingleMotor):  # type: ignore[misc]  # noqa: D101

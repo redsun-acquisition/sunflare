@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from redsun.toolkit.log import Loggable, get_logger
+from sunflare.log import Loggable, get_logger
 
 if TYPE_CHECKING:
     from pytest import LogCaptureFixture

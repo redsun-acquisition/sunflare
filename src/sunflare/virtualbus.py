@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING
 
 from psygnal import SignalInstance
 
-from redsun.toolkit.log import Loggable
+from sunflare.log import Loggable
 
 if TYPE_CHECKING:
     from typing import Any, Tuple, Dict

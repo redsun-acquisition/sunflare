@@ -3,13 +3,13 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from redsun.toolkit.log import Loggable
+from sunflare.log import Loggable
 
 if TYPE_CHECKING:
     from typing import Any, Dict, Generator, Iterable, Union
 
-    from redsun.toolkit.config import RedSunInstanceInfo
-    from redsun.toolkit.virtualbus import VirtualBus
+    from sunflare.config import RedSunInstanceInfo
+    from sunflare.virtualbus import VirtualBus
 
 
 class EngineHandler(ABC, Loggable):

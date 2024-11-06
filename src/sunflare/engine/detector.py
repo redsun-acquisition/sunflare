@@ -4,14 +4,14 @@ from abc import ABC, abstractmethod
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
-from redsun.toolkit.config import PixelPhotometricTypes
-from redsun.toolkit.log import Loggable
-from redsun.toolkit.utils import create_evented_dataclass
+from sunflare.config import PixelPhotometricTypes
+from sunflare.log import Loggable
+from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
     from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-    from redsun.toolkit.config import AcquisitionEngineTypes, DetectorModelInfo
+    from sunflare.config import AcquisitionEngineTypes, DetectorModelInfo
 
 
 class DetectorModel(ABC, Loggable):
