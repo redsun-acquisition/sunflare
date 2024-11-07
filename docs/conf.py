@@ -47,7 +47,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "RedSun"
+project = "SunFlare"
 copyright = "2024, Jacopo Abramo"
 author = "Jacopo Abramo"
 
@@ -101,7 +101,7 @@ html_static_path = ["_static"]
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "redsundoc"
+htmlhelp_basename = "sunflaredoc"
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -125,7 +125,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "sunflare.tex", "RedSun Documentation", "Jacopo Abramo", "manual"),
+    (master_doc, "sunflare.tex", "SunFlare Documentation", "Jacopo Abramo", "manual"),
 ]
 
 
@@ -133,7 +133,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "sunflare", "RedSun Documentation", [author], 1)]
+man_pages = [(master_doc, "sunflare", "SunFlare Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -145,7 +145,7 @@ texinfo_documents = [
     (
         master_doc,
         "sunflare",
-        "RedSun Documentation",
+        "SunFlare Documentation",
         author,
         "sunflare",
         "One line description of project.",
