@@ -3,14 +3,14 @@ SunFlare
 ======
 
 
-.. image:: https://img.shields.io/pypi/v/redsun.svg
-        :target: https://pypi.python.org/pypi/redsun
+.. image:: https://img.shields.io/pypi/v/sunflare.svg
+        :target: https://pypi.python.org/pypi/sunflare
 
-.. image:: https://img.shields.io/travis/jacopoabramo/redsun.svg
-        :target: https://travis-ci.com/jacopoabramo/redsun
+.. image:: https://img.shields.io/travis/jacopoabramo/sunflare.svg
+        :target: https://travis-ci.com/jacopoabramo/sunflare
 
-.. image:: https://readthedocs.org/projects/redsun/badge/?version=latest
-        :target: https://redsun.readthedocs.io/en/latest/?version=latest
+.. image:: https://readthedocs.org/projects/sunflare/badge/?version=latest
+        :target: https://sunflare.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
 
@@ -20,7 +20,7 @@ RedSun toolkit for building and deploying acquisition plugins.
 
 
 * Free software: BSD 3-Clause license
-* Documentation: https://redsun.readthedocs.io.
+* Documentation: https://sunflare.readthedocs.io.
 
 
 Features

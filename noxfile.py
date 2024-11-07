@@ -17,7 +17,7 @@ def lint(session: "Session") -> None:
 def mypy(session: "Session") -> None:
     requirements : "List[str]" = nox.project.load_toml("pyproject.toml")["project"]["dependencies"]
     session.install(*requirements, "mypy")
-    session.run("mypy", "redsun", "--disable-error-code=import-untyped")
+    session.run("mypy", "sunflare", "--disable-error-code=import-untyped")
 
 @nox.session(venv_backend="mamba", python=python_versions)
 def test(session: "Session") -> None:

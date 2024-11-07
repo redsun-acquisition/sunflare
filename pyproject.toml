@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "redsun"
+name = "sunflare"
 dynamic = ["version"]
 description = "Event-driven data acquisition software for scientific applications."
 readme = "README.rst"
@@ -26,9 +26,9 @@ dependencies = [
 
 [project.urls]
 
-bugs = "https://github.com/jacopoabramo/redsun/issues"
-changelog = "https://github.com/jacopoabramo/redsun/blob/master/changelog.md"
-homepage = "https://github.com/jacopoabramo/redsun"
+bugs = "https://github.com/jacopoabramo/sunflare/issues"
+changelog = "https://github.com/jacopoabramo/sunflare/blob/master/changelog.md"
+homepage = "https://github.com/jacopoabramo/sunflare"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -37,7 +37,7 @@ package-dir = {"" = "src"}
 "*" = ["*.*"]
 
 [tool.setuptools.dynamic]
-version = {attr = "redsun.__version__"}
+version = {attr = "sunflare.__version__"}
 
 
 # Mypy

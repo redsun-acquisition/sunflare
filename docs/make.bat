@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=redsun
+set SPHINXPROJ=sunflare
 
 if "%1" == "" goto help
 

@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/jacopoabramo/redsun/issues.
+Report bugs at https://github.com/jacopoabramo/sunflare/issues.
 
 If you are reporting a bug, please include:
 
@@ -45,7 +45,7 @@ articles, and such.
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/jacopoabramo/redsun/issues.
+The best way to send feedback is to file an issue at https://github.com/jacopoabramo/sunflare/issues.
 
 If you are proposing a feature:
 
@@ -57,9 +57,9 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `redsun` for local development.
+Ready to contribute? Here's how to set up `sunflare` for local development.
 
-1. Fork the `redsun` repo on GitHub.
+1. Fork the `sunflare` repo on GitHub.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/redsun.git
