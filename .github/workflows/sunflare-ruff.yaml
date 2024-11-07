@@ -1,4 +1,4 @@
-name: Codebase ruff check
+name: sunflare-ruff-check
 
 on: [push, pull_request]
 
