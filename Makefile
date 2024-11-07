@@ -48,17 +48,16 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint/flake8: ## check style with flake8
-	flake8 sunflare tests
+lint/ruff: ## check style with ruff
+	ruff check
 
-
-lint: lint/flake8 ## check style
+lint: lint/ruff ## check style
 
 test: ## run tests quickly with the default Python
 	pytest
 
-test-all: ## run tests on every Python version with tox
-	tox
+test-all: ## run tests on every Python version with nox
+	nox
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source sunflare -m pytest
