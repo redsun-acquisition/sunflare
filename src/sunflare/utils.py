@@ -6,7 +6,7 @@ from psygnal import evented
 from pydantic.dataclasses import dataclass
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Optional
+    from typing import Any, Optional
 
 __all__ = ["create_evented_dataclass"]
 
@@ -14,8 +14,8 @@ __all__ = ["create_evented_dataclass"]
 def create_evented_dataclass(
     cls_name: str,
     original_cls: type,
-    types: "Optional[Dict[str, Any]]" = {},
-    values: "Optional[Dict[str, Any]]" = {},
+    types: "Optional[dict[str, Any]]" = {},
+    values: "Optional[dict[str, Any]]" = {},
 ) -> type:
     """
     Create a new evented dataclass from the original provided one.

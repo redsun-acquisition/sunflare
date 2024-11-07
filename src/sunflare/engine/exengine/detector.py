@@ -10,7 +10,7 @@ from sunflare.config import PixelPhotometricTypes
 from sunflare.engine.detector import DetectorModel
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Optional, Union
+    from typing import Any, Optional, Union
 
     import numpy.typing as npt
 
@@ -65,7 +65,7 @@ class ExEngineDetectorModel(DetectorModel, ExEngineDetector):  # type: ignore[mi
     @abstractmethod
     def pop_data(  # noqa: D102
         self, timeout: Optional[float] = None
-    ) -> "Tuple[npt.NDArray[Any], Dict[str, Any]]": ...
+    ) -> "Tuple[npt.NDArray[Any], dict[str, Any]]": ...
 
 
 class ExEngineMMCameraModel(DetectorModel, ExEngineMMCamera):  # type: ignore[misc]  # noqa: D101

@@ -17,7 +17,7 @@ __all__ = ["Loggable", "get_logger"]
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Optional
+    from typing import Any, Optional
 
 
 class ClassFormatter(logging.Formatter):
@@ -83,7 +83,7 @@ class Loggable(ABC):
     All methods allow to forward extra arguments to the logger calls as documented in the `logging` module.
     """
 
-    def _extend(self, kwargs: "Dict[str, Any]") -> "Dict[str, Any]":
+    def _extend(self, kwargs: "dict[str, Any]") -> "dict[str, Any]":
         """
         Enrich kwargs with class name and user-defined ID.
 

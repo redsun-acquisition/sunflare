@@ -12,7 +12,7 @@ from sunflare.log import Loggable
 from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List
+    from typing import Any
 
     from sunflare.config import (
         AcquisitionEngineTypes,
@@ -21,9 +21,9 @@ if TYPE_CHECKING:
     )
 
 
-class MotorModel(ABC, Loggable):
+class MotorModel(Loggable):
     """
-    `MotorModel` abstract base class. Implements `Loggable` protocol.
+    `MotorModel` abstract base class. Supports logging via the `Loggable` metaclass.
 
     The `MotorModel` is the base class from which all motors, regardless of the supported engine, must inherit.
     It provides the basic information about the motor model and the properties exposable to the upper layers for user interaction.
@@ -72,7 +72,7 @@ class MotorModel(ABC, Loggable):
         return self._modelInfo.modelName  # type: ignore[no-any-return]
 
     @property
-    def modelParams(self) -> "Dict[str, Any]":
+    def modelParams(self) -> "dict[str, Any]":
         """Motor model parameters dictionary."""
         return self._modelInfo.modelParams  # type: ignore[no-any-return]
 
@@ -87,7 +87,7 @@ class MotorModel(ABC, Loggable):
         return self._modelInfo.serialNumber  # type: ignore[no-any-return]
 
     @property
-    def supportedEngines(self) -> "List[AcquisitionEngineTypes]":
+    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
         """Supported acquisition engines list."""
         return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
 
@@ -107,7 +107,7 @@ class MotorModel(ABC, Loggable):
         return self._modelInfo.stepSize  # type: ignore[no-any-return]
 
     @property
-    def axes(self) -> "List[str]":
+    def axes(self) -> "list[str]":
         """Motor axes list."""
         return self._modelInfo.axes  # type: ignore[no-any-return]
 

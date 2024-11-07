@@ -1,7 +1,7 @@
 """RedSun configuration dataclasses and enums."""
 
 from enum import Enum
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 from pydantic import Field
 from pydantic.dataclasses import dataclass
@@ -138,7 +138,7 @@ class ControllerInfo:
     supportedEngines: list[AcquisitionEngineTypes] = Field(
         default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
     )
-    controllerParams: Dict[str, Any] = Field(default_factory=dict)
+    controllerParams: dict[str, Any] = Field(default_factory=dict)
 
 
 @dataclass
@@ -160,7 +160,7 @@ class DeviceModelInfo:
     """
 
     modelName: str
-    modelParams: Dict[str, Union[str, int, float]]
+    modelParams: dict[str, Union[str, int, float]]
     supportedEngines: list[AcquisitionEngineTypes] = Field(
         default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
     )
@@ -297,8 +297,8 @@ class RedSunInstanceInfo:
     """
 
     engine: "AcquisitionEngineTypes" = AcquisitionEngineTypes.EXENGINE
-    controllers: "Optional[Dict[str, ControllerInfo]]" = Field(default_factory=dict)
-    detectors: "Optional[Dict[str, DetectorModelInfo]]" = Field(default_factory=dict)
-    lights: "Optional[Dict[str, LightModelInfo]]" = Field(default_factory=dict)
-    motors: "Optional[Dict[str, MotorModelInfo]]" = Field(default_factory=dict)
-    scanners: "Optional[Dict[str, ScannerModelInfo]]" = Field(default_factory=dict)
+    controllers: "Optional[dict[str, ControllerInfo]]" = Field(default_factory=dict)
+    detectors: "Optional[dict[str, DetectorModelInfo]]" = Field(default_factory=dict)
+    lights: "Optional[dict[str, LightModelInfo]]" = Field(default_factory=dict)
+    motors: "Optional[dict[str, MotorModelInfo]]" = Field(default_factory=dict)
+    scanners: "Optional[dict[str, ScannerModelInfo]]" = Field(default_factory=dict)

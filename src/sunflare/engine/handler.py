@@ -6,14 +6,14 @@ from typing import TYPE_CHECKING
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Generator, Iterable, Union
+    from typing import Any, Generator, Iterable, Union
 
     from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
 
 
-class EngineHandler(ABC, Loggable):
-    """`EngineHandler` abstract base class. Implements `Loggable` protocol.
+class EngineHandler(Loggable):
+    """`EngineHandler` abstract base class. Supports logging via the `Loggable` metaclass.
 
     The `EngineHandler` class is a singleton that stores all the devices currently
     deployed within a RedSun hardware module. It provides access to the rest of the controller layer
@@ -49,7 +49,7 @@ class EngineHandler(ABC, Loggable):
         Inter-module virtual bus.
     """
 
-    _workflows: Dict[str, "Union[Generator[Any, None, None], Iterable[Any]]"] = {}
+    _workflows: "dict[str, Union[Generator[Any, None, None], Iterable[Any]]]" = {}
 
     @abstractmethod
     def __init__(
@@ -116,31 +116,31 @@ class EngineHandler(ABC, Loggable):
 
     @abstractmethod
     @property
-    def detectors(self) -> "Dict[str, Any]":
+    def detectors(self) -> "dict[str, Any]":
         """Detectors dictionary. Device class type is engine-specific and must inherit from `DetectorModel`."""
         ...
 
     @abstractmethod
     @property
-    def motors(self) -> "Dict[str, Any]":
+    def motors(self) -> "dict[str, Any]":
         """Motors dictionary. Device class type is engine-specific and must inherit from `MotorModel`."""
         ...
 
     @abstractmethod
     @property
-    def lights(self) -> "Dict[str, Any]":
+    def lights(self) -> "dict[str, Any]":
         """Lights dictionary. Device class type is engine-specific and must inherit from `LightModel`."""
         ...
 
     @abstractmethod
     @property
-    def scanners(self) -> "Dict[str, Any]":
+    def scanners(self) -> "dict[str, Any]":
         """Scanners dictionary. Device class type is engine-specific and must inherit from `ScannerModel`."""
         ...
 
     @property
     def workflows(
         self,
-    ) -> "Dict[str, Union[Generator[Any, None, None], Iterable[Any]]]":
+    ) -> "dict[str, Union[Generator[Any, None, None], Iterable[Any]]]":
         """Workflows dictionary."""
         return self._workflows

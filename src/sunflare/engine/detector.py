@@ -9,14 +9,14 @@ from sunflare.log import Loggable
 from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List, Optional, Set, Tuple, Union
+    from typing import Any, Optional, Tuple, Union
 
     from sunflare.config import AcquisitionEngineTypes, DetectorModelInfo
 
 
-class DetectorModel(ABC, Loggable):
+class DetectorModel(Loggable):
     """
-    `DetectorModel` abstract base class. Implements `Loggable` protocol.
+    `DetectorModel` abstract base class. Supports logging via the `Loggable` metaclass.
 
     The `DetectorModel` is the base class from which all detectors, regardless of the supported engine, must inherit.
     It provides the basic information about the detector model and the properties exposable to the upper layers for user interaction.
@@ -104,7 +104,7 @@ class DetectorModel(ABC, Loggable):
         return self._modelInfo.modelName  # type: ignore[no-any-return]
 
     @property
-    def modelParams(self) -> "Dict[str, Any]":
+    def modelParams(self) -> "dict[str, Any]":
         """Detector model parameters dictionary."""
         return self._modelInfo.modelParams  # type: ignore[no-any-return]
 
@@ -119,7 +119,7 @@ class DetectorModel(ABC, Loggable):
         return self._modelInfo.serialNumber  # type: ignore[no-any-return]
 
     @property
-    def supportedEngines(self) -> "List[AcquisitionEngineTypes]":
+    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
         """Supported acquisition engines list."""
         return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
 
@@ -144,17 +144,17 @@ class DetectorModel(ABC, Loggable):
         return self._modelInfo.exposureEGU  # type: ignore[no-any-return]
 
     @property
-    def pixelPhotometric(self) -> "List[PixelPhotometricTypes]":
+    def pixelPhotometric(self) -> "list[PixelPhotometricTypes]":
         """List of supported pixel colors."""
         return self._modelInfo.pixelPhotometric  # type: ignore[no-any-return]
 
     @property
-    def bitsPerPixel(self) -> "Set[int]":
+    def bitsPerPixel(self) -> "set[int]":
         """Set of supported values for pixel width in bits."""
         return self._modelInfo.bitsPerPixel  # type: ignore[no-any-return]
 
     @property
-    def binning(self) -> "List[int]":
+    def binning(self) -> "list[int]":
         """List of supported binning values."""
         return self._modelInfo.binning  # type: ignore[no-any-return]
 

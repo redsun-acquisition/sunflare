@@ -8,7 +8,7 @@ from sunflare.log import Loggable
 from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List, Union
+    from typing import Any, Union
 
     from sunflare.config import (
         AcquisitionEngineTypes,
@@ -17,9 +17,9 @@ if TYPE_CHECKING:
     )
 
 
-class LightModel(ABC, Loggable):
+class LightModel(Loggable):
     """
-    `LightModel` abstract base class. Implements `Loggable` protocol.
+    `LightModel` abstract base class. Supports logging via the `Loggable` metaclass.
 
     The `LightModel` is the base class from which all light sources, regardless of the supported engine, must inherit.
     It provides the basic information about the light source model and the properties exposable to the upper layers for user interaction.
@@ -59,7 +59,7 @@ class LightModel(ABC, Loggable):
         return self._modelInfo.modelName  # type: ignore[no-any-return]
 
     @property
-    def modelParams(self) -> "Dict[str, Any]":
+    def modelParams(self) -> "dict[str, Any]":
         """Light source model parameters."""
         return self._modelInfo.modelParams  # type: ignore[no-any-return]
 
@@ -74,7 +74,7 @@ class LightModel(ABC, Loggable):
         return self._modelInfo.serialNumber  # type: ignore[no-any-return]
 
     @property
-    def supportedEngines(self) -> "List[AcquisitionEngineTypes]":
+    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported acquisition engines."""
         return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
 

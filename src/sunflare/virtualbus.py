@@ -20,7 +20,7 @@ from psygnal import SignalInstance
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Tuple, Dict
+    from typing import Any, Tuple
 
 __all__ = ["Signal", "VirtualBus"]
 
@@ -48,10 +48,10 @@ class Signal(SignalInstance):
         return self._info
 
 
-class VirtualBus(ABC, Loggable):
+class VirtualBus(Loggable):
     """
 
-    VirtualBus base class.
+    VirtualBus base class. Supports logging via the `Loggable` metaclass.
 
     The VirtualBus is a mechanism to exchange data between different parts of the system.
 
@@ -60,7 +60,7 @@ class VirtualBus(ABC, Loggable):
     VirtualBus' signals are implemented using the `psygnal` library; they can be dynamically registered as class attributes, and accessed as a read-only dictionary.
     """
 
-    _signal_registry: "Dict[str, Signal]" = {}
+    _signal_registry: "dict[str, Signal]" = {}
 
     def __init__(self) -> None:
         # pre-register signals added as attributes in the class definition

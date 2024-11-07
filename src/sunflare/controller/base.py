@@ -16,15 +16,15 @@ from sunflare.utils import create_evented_dataclass
 from sunflare.virtualbus import VirtualBus
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List
+    from typing import Any, Dict
 
     from sunflare.config import ControllerInfo
     from sunflare.engine import EngineHandler
     from sunflare.virtualbus import VirtualBus
 
 
-class BaseController(ABC, Loggable):
-    """Base controller class. Implements `Loggable` protocol.
+class BaseController(Loggable):
+    """Base controller class. Supports logging via the `Loggable` metaclass.
 
     Parameters
     ----------
@@ -69,7 +69,7 @@ class BaseController(ABC, Loggable):
         return self._modelInfo.controllerName  # type: ignore[no-any-return]
 
     @property
-    def supportedEngines(self) -> "List[str]":
+    def supportedEngines(self) -> "list[str]":
         """List of supported engines."""
         return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
 
