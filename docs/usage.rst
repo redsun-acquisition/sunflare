@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use RedSun in a project::
+To use SunFlare in a project::
 
     import redsun

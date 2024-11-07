@@ -1,4 +1,4 @@
-* RedSun version:
+* SunFlare version:
 * Python version:
 * Operating System:
 

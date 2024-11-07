@@ -1,4 +1,4 @@
-Welcome to RedSun's documentation!
+Welcome to SunFlare's documentation!
 ======================================
 
 .. toctree::
