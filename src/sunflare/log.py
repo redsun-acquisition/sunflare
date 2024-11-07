@@ -81,12 +81,6 @@ class Loggable(Protocol):
     Models and controllers can inherit from this class to have a consistent log format.
 
     All methods allow to forward extra arguments to the logger calls as documented in the `logging` module.
-
-    Properties
-    ----------
-    name : str
-        The user defined ID of the instance.
-        This property should be provided by the models inheriting from this class.
     """
 
     def _extend(self, kwargs: "Dict[str, Any]") -> "Dict[str, Any]":
