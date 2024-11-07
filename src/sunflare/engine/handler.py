@@ -57,7 +57,7 @@ class EngineHandler(Loggable):
         config_options: "RedSunInstanceInfo",
         virtual_bus: "VirtualBus",
         module_bus: "VirtualBus",
-    ):
+    ) -> None:
         self.config = config_options
         self.virtual_bus = virtual_bus
         self.module_bus = module_bus
