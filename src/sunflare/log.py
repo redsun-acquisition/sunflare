@@ -17,7 +17,7 @@ __all__ = ["Loggable", "get_logger"]
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Union
+    from typing import Any, Dict, Optional
 
 
 class ClassFormatter(logging.Formatter):
@@ -202,7 +202,7 @@ class Loggable(Protocol):
         return self.__class__.__name__
 
     @property
-    def name(self) -> "Union[str, None]":
+    def name(self) -> "Optional[str]":
         """Class instance unique identifier."""
         # This property should be implemented by
         # all model and controller classes by default
