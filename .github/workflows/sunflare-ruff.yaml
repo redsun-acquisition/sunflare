@@ -14,3 +14,5 @@ jobs:
         with:
           version: 0.7.2
           changed-files: true
+          src: "src/sunflare"
+          args: check --extend-exclude=["tests"]
