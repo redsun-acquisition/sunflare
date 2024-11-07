@@ -16,7 +16,7 @@ SunFlare
 
 
 
-Event-driven data acquisition software for scientific applications.
+RedSun toolkit for building and deploying acquisition plugins.
 
 
 * Free software: BSD 3-Clause license
