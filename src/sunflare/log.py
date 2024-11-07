@@ -8,7 +8,7 @@ All classes implementing the `Logging` protocol can use the logger to log messag
 
 import logging
 import logging.config
-from typing import Protocol
+from abc import ABC
 
 from typing_extensions import override
 
@@ -74,9 +74,9 @@ logging.config.dictConfig(config)
 logger = logging.getLogger("redsun")
 
 
-class Loggable(Protocol):
+class Loggable(ABC):
     """
-    Protocol to extend log records with the class name and the user defined ID.
+    Metaclass to extend log records with the class name and the user defined ID.
 
     Models and controllers can inherit from this class to have a consistent log format.
 
