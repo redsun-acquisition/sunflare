@@ -6,7 +6,7 @@ This toolkit section provides RedSun developers with the necessary base classes 
 Two controller types are defined: `DeviceController` and `ComputationalController`.
 """
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
 from sunflare.config import ControllerInfo
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from sunflare.virtualbus import VirtualBus
 
 
-class BaseController(Loggable):
+class BaseController(Loggable, metaclass=ABCMeta):
     """Base controller class. Supports logging via `Loggable`.
 
     Parameters

@@ -1,6 +1,6 @@
 """Detector model abstract base class definition."""
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from sunflare.config import AcquisitionEngineTypes, DetectorModelInfo
 
 
-class DetectorModel(Loggable):
+class DetectorModel(Loggable, metaclass=ABCMeta):
     """
     `DetectorModel` abstract base class. Supports logging via `Loggable`.
 

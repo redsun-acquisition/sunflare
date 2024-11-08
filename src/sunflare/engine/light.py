@@ -1,6 +1,6 @@
 """Light source model abstract base class definition."""
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     )
 
 
-class LightModel(Loggable):
+class LightModel(Loggable, metaclass=ABCMeta):
     """
     `LightModel` abstract base class. Supports logging via `Loggable`.
 

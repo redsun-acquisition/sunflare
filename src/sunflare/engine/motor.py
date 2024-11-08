@@ -4,7 +4,7 @@ Motors are a category of hardware devices capable of moving objects in a control
 Belonging to this category fall devices such as stage axis, focusing units, generic stepper motors, and so on.
 """
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     )
 
 
-class MotorModel(Loggable):
+class MotorModel(Loggable, metaclass=ABCMeta):
     """
     `MotorModel` abstract base class. Supports logging via `Loggable`.
 
