@@ -22,7 +22,7 @@ from sunflare.log import Loggable
 if TYPE_CHECKING:
     from typing import Any, Tuple
 
-__all__ = ["Signal", "VirtualBus", "ModuleVirtualBus", "module_bus"]
+__all__ = ["Signal", "VirtualBus", "module_bus"]
 
 
 class Signal(SignalInstance):
@@ -137,7 +137,7 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
 
 
 @final
-class ModuleVirtualBus(VirtualBus):
+class _ModuleVirtualBus(VirtualBus):
     """
     Inter-module virtual bus.
 
@@ -147,4 +147,4 @@ class ModuleVirtualBus(VirtualBus):
     ...
 
 
-module_bus = ModuleVirtualBus()
+module_bus = _ModuleVirtualBus()
