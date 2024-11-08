@@ -138,3 +138,26 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
     def signals(self) -> "MappingProxyType[str, Signal]":
         """A read-only dictionary with the registered signals."""
         return MappingProxyType(self._signal_registry)
+
+
+@final
+class ModuleVirtualBus(VirtualBus):
+    """
+    Inter-module virtual bus.
+
+    Communication between modules passes via this virtual bus. There can be only one instance of this class within a RedSun application.
+    """
+
+    _instance = None
+
+    def __new__(cls) -> "ModuleVirtualBus":
+        """
+        Singleton pattern.
+
+        Creates a new instance of the class if it does not exist.
+        Otherwise, returns the existing instance.
+        """
+        # singleton pattern
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+        return cls._instance
