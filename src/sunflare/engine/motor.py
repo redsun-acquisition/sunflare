@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 class MotorModel(Loggable):
     """
-    `MotorModel` abstract base class. Supports logging via the `Loggable` metaclass.
+    `MotorModel` abstract base class. Supports logging via `Loggable`.
 
     The `MotorModel` is the base class from which all motors, regardless of the supported engine, must inherit.
     It provides the basic information about the motor model and the properties exposable to the upper layers for user interaction.

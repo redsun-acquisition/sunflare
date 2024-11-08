@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class EngineHandler(Loggable, metaclass=ABCMeta):
-    """`EngineHandler` abstract base class. Supports logging via the `Loggable` metaclass.
+    """`EngineHandler` abstract base class. Supports logging via `Loggable`.
 
     The `EngineHandler` class is a singleton that stores all the devices currently
     deployed within a RedSun hardware module. It provides access to the rest of the controller layer

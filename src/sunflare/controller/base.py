@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 
 class BaseController(Loggable):
-    """Base controller class. Supports logging via the `Loggable` metaclass.
+    """Base controller class. Supports logging via `Loggable`.
 
     Parameters
     ----------

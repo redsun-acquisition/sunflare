@@ -51,7 +51,7 @@ class Signal(SignalInstance):
 class VirtualBus(Loggable):
     """
 
-    VirtualBus base class. Supports logging via the `Loggable` metaclass.
+    VirtualBus base class. Supports logging via `Loggable`.
 
     The VirtualBus is a mechanism to exchange data between different parts of the system.
 

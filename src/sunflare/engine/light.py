@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 class LightModel(Loggable):
     """
-    `LightModel` abstract base class. Supports logging via the `Loggable` metaclass.
+    `LightModel` abstract base class. Supports logging via `Loggable`.
 
     The `LightModel` is the base class from which all light sources, regardless of the supported engine, must inherit.
     It provides the basic information about the light source model and the properties exposable to the upper layers for user interaction.

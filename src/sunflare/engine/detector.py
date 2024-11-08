@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class DetectorModel(Loggable):
     """
-    `DetectorModel` abstract base class. Supports logging via the `Loggable` metaclass.
+    `DetectorModel` abstract base class. Supports logging via `Loggable`.
 
     The `DetectorModel` is the base class from which all detectors, regardless of the supported engine, must inherit.
     It provides the basic information about the detector model and the properties exposable to the upper layers for user interaction.
