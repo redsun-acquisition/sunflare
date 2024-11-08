@@ -4,7 +4,7 @@ Motors are a category of hardware devices capable of moving objects in a control
 Belonging to this category fall devices such as stage axis, focusing units, generic stepper motors, and so on.
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
