@@ -1,6 +1,6 @@
 """`EngineHandler` abstract base class."""
 
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
 from sunflare.log import Loggable
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sunflare.virtualbus import VirtualBus
 
 
-class EngineHandler(Loggable):
+class EngineHandler(Loggable, metaclass=ABCMeta):
     """`EngineHandler` abstract base class. Supports logging via the `Loggable` metaclass.
 
     The `EngineHandler` class is a singleton that stores all the devices currently
