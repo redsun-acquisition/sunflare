@@ -41,7 +41,7 @@ homepage = "https://github.com/jacopoabramo/sunflare"
 package-dir = {"" = "src"}
 
 [tool.setuptools.package-data]
-"*" = ["*.*"]
+"sunflare" = ["py.typed"]
 
 [tool.setuptools.dynamic]
 version = {attr = "sunflare.__version__"}
