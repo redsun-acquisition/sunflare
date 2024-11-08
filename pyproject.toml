@@ -59,6 +59,7 @@ disable_error_code = ["import-untyped"]
 strict = true
 warn_unreachable = true
 warn_no_return = true
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 # Don't require test functions to include types
