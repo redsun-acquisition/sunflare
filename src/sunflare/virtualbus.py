@@ -28,6 +28,10 @@ __all__ = ["Signal", "VirtualBus", "module_bus"]
 class Signal(SignalInstance):
     """Small wrapper around `psygnal.SignalInstance`."""
 
+    # TODO: https://github.com/pyapp-kit/psygnal/issues/330
+    # subclassing SignalInstance creates performance losses;
+    # we keep Signal as it is for now but an alternative
+    # implementation should be provided once this issue is resolved.
     def __init__(
         self, *argtypes: "Any", info: str = "RedSun signal", **kwargs: "Any"
     ) -> None:
