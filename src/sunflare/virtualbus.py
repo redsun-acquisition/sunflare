@@ -13,7 +13,7 @@ The `VirtualBus` class is a factory of singleton objects charged of exchanging i
 from abc import ABCMeta
 from functools import lru_cache
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import final, TYPE_CHECKING
 
 from psygnal import SignalInstance
 
@@ -22,7 +22,7 @@ from sunflare.log import Loggable
 if TYPE_CHECKING:
     from typing import Any, Tuple
 
-__all__ = ["Signal", "VirtualBus"]
+__all__ = ["Signal", "VirtualBus", "ModuleVirtualBus", "module_bus"]
 
 
 class Signal(SignalInstance):
@@ -134,3 +134,17 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
     def signals(self) -> "MappingProxyType[str, Signal]":
         """A read-only dictionary with the registered signals."""
         return MappingProxyType(self._signal_registry)
+
+
+@final
+class ModuleVirtualBus(VirtualBus):
+    """
+    Inter-module virtual bus.
+
+    Communication between modules passes via this virtual bus. There can be only one instance of this class within a RedSun application.
+    """
+
+    ...
+
+
+module_bus = ModuleVirtualBus()
