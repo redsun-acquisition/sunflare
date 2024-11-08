@@ -10,7 +10,7 @@ The `VirtualBus` class is a factory of singleton objects charged of exchanging i
 `VirtualBuses` can be inter-module or intra-module, and they can be used to emit notifications, as well as carry information to other plugins and/or different RedSun modules.
 """
 
-from abc import ABC
+from abc import ABCMeta
 from functools import lru_cache
 from types import MappingProxyType
 from typing import TYPE_CHECKING
@@ -48,7 +48,7 @@ class Signal(SignalInstance):
         return self._info
 
 
-class VirtualBus(Loggable):
+class VirtualBus(Loggable, metaclass=ABCMeta):
     """
 
     VirtualBus base class. Supports logging via `Loggable`.
