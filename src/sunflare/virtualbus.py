@@ -13,7 +13,7 @@ The `VirtualBus` class is a factory of singleton objects charged of exchanging i
 from abc import ABCMeta
 from functools import lru_cache
 from types import MappingProxyType
-from typing import final, TYPE_CHECKING
+from typing import final, TYPE_CHECKING, Final
 
 from psygnal import SignalInstance
 
@@ -147,4 +147,4 @@ class _ModuleVirtualBus(VirtualBus):
     ...
 
 
-module_bus = _ModuleVirtualBus()
+module_bus: Final = _ModuleVirtualBus()
