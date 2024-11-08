@@ -159,5 +159,5 @@ class ModuleVirtualBus(VirtualBus):
         """
         # singleton pattern
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
+            cls._instance = object.__new__(cls)
         return cls._instance
