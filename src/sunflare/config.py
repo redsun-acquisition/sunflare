@@ -152,20 +152,18 @@ class DeviceModelInfo:
     modelParams : Dict[str, Union[str, int, float]]
         Device model parameters dictionary. Used to store start-up configuration parameters.
     supportedEngines : list[AcquisitionEngineTypes]
-        Supported acquisition engines list. Defaults to ['exengine'].
+        Supported acquisition engines list.
     vendor : Optional[str]
-        Detector vendor. Optional for debugging purposes. Defaults to 'N/A'.
+        Detector vendor. Optional for debugging purposes.
     serialNumber : Optional[str]
-        Detector serial number. Optional for debugging purposes. Defaults to 'N/A'.
+        Detector serial number. Optional for debugging purposes.
     """
 
     modelName: str
     modelParams: dict[str, Union[str, int, float]]
-    supportedEngines: list[AcquisitionEngineTypes] = Field(
-        default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
-    )
-    vendor: Optional[str] = "N/A"
-    serialNumber: Optional[str] = "N/A"
+    supportedEngines: list[AcquisitionEngineTypes]
+    vendor: Optional[str]
+    serialNumber: Optional[str]
 
 
 @dataclass
@@ -206,19 +204,26 @@ class LightModelInfo(DeviceModelInfo):
     powerEGU : str
         Engineering unit for light source, .e.g. 'mW', 'μW'. Defaults to 'mW'.
     minPower : Union[float, int]
-        Minimum light source power. Defaults to 0.
+        Minimum light source power.
     maxPower : Union[float, int]
         Maximum light source power.
     powerStep: Union[float, int]
         Power increase/decrease minimum step size.
     """
 
-    category: LightModelTypes = LightModelTypes.LASER
-    wavelength: int = Field(default=None)
+    # None is intentional,
+    # and also not using `Optioanl`,
+    # in order to hint that there's a behavior
+    # for the `wavelength` attribute when it's None,
+    # although it may be necessary
+    # to enforce it to have a non-None value
+    # in the future
+    minPower: Union[float, int]
+    maxPower: Union[float, int]
+    powerStep: Union[float, int]
+    wavelength: int
     powerEGU: str = "mW"
-    minPower: Union[float, int] = 0
-    maxPower: Union[float, int] = Field(default=None)
-    powerStep: Union[float, int] = Field(default=None)
+    category: LightModelTypes = LightModelTypes.LASER
 
 
 @dataclass
