@@ -16,7 +16,7 @@ from sunflare.utils import create_evented_dataclass
 from sunflare.virtualbus import VirtualBus
 
 if TYPE_CHECKING:
-    from typing import Any, Dict
+    from typing import Any
 
     from sunflare.config import ControllerInfo
     from sunflare.engine import EngineHandler
@@ -74,7 +74,7 @@ class BaseController(Loggable):
         return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
 
     @property
-    def controllerParams(self) -> "Dict[str, Any]":
+    def controllerParams(self) -> "dict[str, Any]":
         """Controller custom parameters dictionary."""
         return self._modelInfo.controllerParams  # type: ignore[no-any-return]
 
