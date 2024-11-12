@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from numpy import ndarray
 
-from sunflare.virtualbus import Signal, VirtualBus
+from sunflare.virtualbus import Signal, VirtualBus, ModuleVirtualBus
 
 if TYPE_CHECKING:
     from logging import LogRecord
@@ -275,3 +275,10 @@ def test_big_virtual_bus_signals():
     mock_bus.sigSignal18.emit({"key": "value"})
     assert dest == {"key": "value"}
     mock_bus.sigSignal18.disconnect(my_slot)
+
+def test_module_virtual_bus() -> None:
+    """Tests the creation of a singleton module virtual bus."""
+    module_bus1 = ModuleVirtualBus()
+    module_bus2 = ModuleVirtualBus()
+
+    assert module_bus1 is module_bus2
