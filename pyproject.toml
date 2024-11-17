@@ -44,7 +44,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"*" = ["*.typed"]
+"sunflare" = ["py.typed"]
 
 [tool.setuptools.dynamic]
 version = {attr = "sunflare.__version__"}
