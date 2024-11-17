@@ -3,8 +3,7 @@
 from enum import Enum
 from typing import Any, Optional, Tuple, Union
 
-from pydantic import Field
-from pydantic.dataclasses import dataclass
+from pydantic import Field, BaseModel
 
 
 class AcquisitionEngineTypes(str, Enum):
@@ -116,9 +115,8 @@ class ControllerTypes(str, Enum):
     COMPUTATIONAL: str = "computational"
 
 
-@dataclass
-class ControllerInfo:
-    """Controller information class.
+class ControllerInfo(BaseModel):
+    """Controller information model.
 
     Attributes
     ----------
@@ -133,7 +131,7 @@ class ControllerInfo:
         - They are exposed to the upper layers to allow the user to configure the controller at runtime.
     """
 
-    category: ControllerTypes = ControllerTypes.DEVICE
+    category: ControllerTypes = Field(default=ControllerTypes.DEVICE)
     controllerName: str = Field(default=str())
     supportedEngines: list[AcquisitionEngineTypes] = Field(
         default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
@@ -141,9 +139,8 @@ class ControllerInfo:
     controllerParams: dict[str, Any] = Field(default_factory=dict)
 
 
-@dataclass
-class DeviceModelInfo:
-    """Base class for device model's information.
+class DeviceModelInfo(BaseModel):
+    """Base model for device information.
 
     Attributes
     ----------
@@ -161,12 +158,15 @@ class DeviceModelInfo:
 
     modelName: str
     modelParams: dict[str, Union[str, int, float]]
-    supportedEngines: list[AcquisitionEngineTypes]
-    vendor: Optional[str]
-    serialNumber: Optional[str]
+    supportedEngines: list[AcquisitionEngineTypes] = Field(
+        default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
+    )
+    vendor: Optional[str] = Field(default="N/A", description="Device vendor name")
+    serialNumber: Optional[str] = Field(
+        default="N/A", description="Device serial number"
+    )
 
 
-@dataclass
 class DetectorModelInfo(DeviceModelInfo):
     """Detector model informations.
 
@@ -176,8 +176,7 @@ class DetectorModelInfo(DeviceModelInfo):
         Detector type. Currently supported values are
         'area', 'line' and 'point'. Defaults to 'area'.
     sensorSize: Tuple[int]
-        Detector sensor size in pixels: represents the 2D axis (Y, X). Only applicable
-        for 'line' and 'area' detectors. Defaults to `(0, 0)`.
+        Detector sensor size in pixels: represents the 2D axis (Y, X).
     pixelSize : Tuple[float]
         Detector pixel size in micrometers: represents the 3D axis (Z, Y, X).
         Defaults to `(1, 1, 1)`.
@@ -185,13 +184,12 @@ class DetectorModelInfo(DeviceModelInfo):
         Engineering unit for exposure time, e.g. 'ms', 'μs'. Defaults to 'ms'.
     """
 
-    category: str = DetectorModelTypes.AREA
-    sensorSize: Tuple[int, int] = (0, 0)
-    pixelSize: Tuple[float, float, float] = (1, 1, 1)
-    exposureEGU: str = "ms"
+    category: str = Field(default=DetectorModelTypes.AREA)
+    sensorSize: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
+    pixelSize: Tuple[float, float, float] = Field(default_factory=lambda: (1, 1, 1))
+    exposureEGU: str = Field(default="ms")
 
 
-@dataclass
 class LightModelInfo(DeviceModelInfo):
     """Light source model informations.
 
@@ -211,15 +209,14 @@ class LightModelInfo(DeviceModelInfo):
         Power increase/decrease minimum step size.
     """
 
+    powerEGU: str = Field(default="mW")
+    wavelength: int
+    category: LightModelTypes = Field(default=LightModelTypes.LASER)
     minPower: Union[float, int]
     maxPower: Union[float, int]
     powerStep: Union[float, int]
-    wavelength: int
-    powerEGU: str = "mW"
-    category: LightModelTypes = LightModelTypes.LASER
 
 
-@dataclass
 class MotorModelInfo(DeviceModelInfo):
     """Motor model informations.
 
@@ -238,13 +235,12 @@ class MotorModelInfo(DeviceModelInfo):
         after RedSun is closed. Defaults to `False`.
     """
 
-    category: str = MotorModelTypes.STEPPER
-    stepEGU: str = "μm"
+    category: str = Field(default=MotorModelTypes.STEPPER)
+    stepEGU: str = Field(default="μm")
     axes: list[str] = Field(default_factory=list)
-    returnHome: bool = False
+    returnHome: bool = Field(default=False)
 
 
-@dataclass
 class ScannerModelInfo(DeviceModelInfo):
     """Scanner model informations.
 
@@ -262,8 +258,7 @@ class ScannerModelInfo(DeviceModelInfo):
     # TODO: investigate what other parameters are needed for scanner
 
 
-@dataclass
-class RedSunInstanceInfo:
+class RedSunInstanceInfo(BaseModel):
     """RedSun instance configuration class.
 
     This class is used to store the configuration of a running RedSun application;

@@ -2,19 +2,14 @@
     "engine" : "exengine",
     "detectors" : {
         "First mock detector" : {
-            "vendor" : "N/A",
-            "serialNumber" : "N/A",
             "modelName" : "MockDetectorModel",
             "modelParams" : {
                 "paramInt" : 1,
                 "paramStr" : "info",
                 "paramFloat" : 1.0
-            },
-            "supportedEngines" : ["exengine"]
+            }
         },
         "Second mock detector" : {
-            "vendor" : "N/A",
-            "serialNumber" : "N/A",
             "modelName" : "MockDetectorModel",
             "modelParams" : {
                 "paramInt" : 2,
@@ -22,8 +17,7 @@
                 "paramFloat" : 2.0
             },
             "category" : "line",
-            "exposureEGU" : "s",
-            "supportedEngines" : ["exengine"]
+            "exposureEGU" : "s"
         }
     }
 }
