@@ -1,4 +1,5 @@
 """ExEngine motor model available for creating custom device interfaces with the RedSun Toolkit."""
+
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
@@ -18,7 +19,7 @@ from sunflare.engine.motor import MotorModel
 
 if TYPE_CHECKING:
     import numpy.typing as npt
-    
+
     from typing import Any, Tuple
 
 
@@ -30,26 +31,21 @@ class ExEngineSingleMotorModel(MotorModel, ExEngineSingleMotor):  # type: ignore
         ExEngineSingleMotor.__init__(
             self, name, no_executor=False, no_executor_attrs=("_name",)
         )
-    
-    @abstractmethod
-    def set_position(self, position: float) -> None:
-        ...
-    
-    @abstractmethod
-    def get_position(self) -> float:
-        ...
-    
-    @abstractmethod
-    def set_position_sequence(self, positions: "npt.NDArray[Any]") -> None:
-        ...
 
     @abstractmethod
-    def get_triggerable_position_sequence_max_length(self) -> int:
-        ...
+    def set_position(self, position: float) -> None: ...  # noqa: D102
 
     @abstractmethod
-    def stop_position_sequence(self) -> None:
-        ...
+    def get_position(self) -> float: ...  # noqa: D102
+
+    @abstractmethod
+    def set_position_sequence(self, positions: "npt.NDArray[Any]") -> None: ...  # noqa: D102
+
+    @abstractmethod
+    def get_triggerable_position_sequence_max_length(self) -> int: ...  # noqa: D102
+
+    @abstractmethod
+    def stop_position_sequence(self) -> None: ...  # noqa: D102
 
 
 class ExEngineDoubleMotorModel(MotorModel, ExEngineDoubleMotor):  # type: ignore[misc]  # noqa: D101
@@ -60,26 +56,21 @@ class ExEngineDoubleMotorModel(MotorModel, ExEngineDoubleMotor):  # type: ignore
         ExEngineDoubleMotor.__init__(
             self, name, no_executor=False, no_executor_attrs=("_name",)
         )
-    
-    @abstractmethod
-    def set_position(self, x: float, y: float) -> None:
-        ...
 
     @abstractmethod
-    def get_position(self) -> "Tuple[float, float]":
-        ...
-    
-    @abstractmethod
-    def set_position_sequence(self, positions: "npt.NDArray[Any]") -> None:
-        ...
+    def set_position(self, x: float, y: float) -> None: ...  # noqa: D102
 
     @abstractmethod
-    def get_triggerable_position_sequence_max_length(self) -> int:
-        ...
+    def get_position(self) -> "Tuple[float, float]": ...  # noqa: D102
 
     @abstractmethod
-    def stop_position_sequence(self) -> None:
-            ...
+    def set_position_sequence(self, positions: "npt.NDArray[Any]") -> None: ...  # noqa: D102
+
+    @abstractmethod
+    def get_triggerable_position_sequence_max_length(self) -> int: ...  # noqa: D102
+
+    @abstractmethod
+    def stop_position_sequence(self) -> None: ...  # noqa: D102
 
 
 class ExEngineMMSingleMotorModel(MotorModel, ExEngineMMSingleMotor):  # type: ignore[misc]  # noqa: D101
