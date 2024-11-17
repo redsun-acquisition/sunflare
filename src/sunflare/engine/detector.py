@@ -71,7 +71,6 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
     ) -> None:
         cls_name = model_info.modelName + "Info"
         types = {
-            "name": str,
             "pixelPhotometric": PixelPhotometricTypes,
             "bitsPerPixel": int,
             "binning": int,
@@ -88,6 +87,8 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         FullModelInfo = create_evented_dataclass(
             cls_name=cls_name, original_cls=type(model_info), types=types, values=values
         )
+        
+        self.__name = name
 
         model_info_dict = asdict(model_info)
         model_info_dict.update(values)
@@ -96,7 +97,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
     @property
     def name(self) -> str:
         """Detector instance unique identifier name."""
-        return self._modelInfo.name  # type: ignore[no-any-return]
+        return self.__name
 
     @property
     def modelName(self) -> str:

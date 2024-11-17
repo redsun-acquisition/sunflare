@@ -55,16 +55,15 @@ class MotorModel(Loggable, metaclass=ABCMeta):
     def __init__(self, name: str, model_info: "MotorModelInfo"):
         FullModelInfo = create_evented_dataclass(
             cls_name=model_info.modelName + "Info",
-            original_cls=type(model_info),
-            types={"name": str},
-            values={"name": name},
+            original_cls=type(model_info)
         )
+        self.__name = name
         self._modelInfo = FullModelInfo(**asdict(model_info))
 
     @property
     def name(self) -> str:
         """Motor instance unique identifier name."""
-        return self._modelInfo.name  # type: ignore[no-any-return]
+        return self.__name
 
     @property
     def modelName(self) -> str:
