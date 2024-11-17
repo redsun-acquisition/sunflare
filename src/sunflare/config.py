@@ -211,13 +211,6 @@ class LightModelInfo(DeviceModelInfo):
         Power increase/decrease minimum step size.
     """
 
-    # None is intentional,
-    # and also not using `Optioanl`,
-    # in order to hint that there's a behavior
-    # for the `wavelength` attribute when it's None,
-    # although it may be necessary
-    # to enforce it to have a non-None value
-    # in the future
     minPower: Union[float, int]
     maxPower: Union[float, int]
     powerStep: Union[float, int]

@@ -20,7 +20,7 @@ from psygnal import SignalInstance
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Tuple
+    from typing import Any, Tuple, Optional
 
 __all__ = ["Signal", "VirtualBus", "ModuleVirtualBus"]
 
@@ -148,7 +148,7 @@ class ModuleVirtualBus(VirtualBus):
     Communication between modules passes via this virtual bus. There can be only one instance of this class within a RedSun application.
     """
 
-    _instance = None
+    _instance: "Optional[ModuleVirtualBus]" = None
 
     def __new__(cls) -> "ModuleVirtualBus":
         """

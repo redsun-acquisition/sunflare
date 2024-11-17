@@ -105,8 +105,8 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
             return
         self._workflows[name] = workflow
 
-    @abstractmethod
     @property
+    @abstractmethod
     def engine(self) -> "Any":
         """Returns the engine instance.
 
@@ -114,26 +114,26 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         """
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def detectors(self) -> "dict[str, Any]":
         """Detectors dictionary. Device class type is engine-specific and must inherit from `DetectorModel`."""
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def motors(self) -> "dict[str, Any]":
         """Motors dictionary. Device class type is engine-specific and must inherit from `MotorModel`."""
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def lights(self) -> "dict[str, Any]":
         """Lights dictionary. Device class type is engine-specific and must inherit from `LightModel`."""
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def scanners(self) -> "dict[str, Any]":
         """Scanners dictionary. Device class type is engine-specific and must inherit from `ScannerModel`."""
         ...

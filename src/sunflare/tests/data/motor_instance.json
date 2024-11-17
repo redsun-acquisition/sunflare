@@ -2,15 +2,20 @@
     "engine" : "exengine",
     "motors" : {
         "Single axis motor" : {
+            "vendor" : "N/A",
+            "serialNumber" : "N/A",
             "modelName" : "MockMotorModel",
             "modelParams" : {
                 "paramInt" : 1,
                 "paramStr" : "info",
                 "paramFloat" : 1.0
             },
-            "axes" : ["X"]
+            "axes" : ["X"],
+            "supportedEngines" : ["exengine"]
         },
         "Double axis motor" : {
+            "vendor" : "N/A",
+            "serialNumber" : "N/A",
             "modelName" : "MockMotorModel",
             "modelParams" : {
                 "paramInt" : 2,
@@ -18,7 +23,8 @@
                 "paramFloat" : 2.0
             },
             "axes" : ["X", "Y"],
-            "stepEGU" : "mm"
+            "stepEGU" : "mm",
+            "supportedEngines" : ["exengine"]
         }
     }
 }
