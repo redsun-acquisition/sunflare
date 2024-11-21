@@ -26,28 +26,8 @@ class ExEngineDetectorModel(DetectorModel, ExEngineDetector):  # type: ignore[mi
     """
 
     @abstractmethod
-    def __init__(
-        self,
-        name: "str",
-        model_info: "DetectorModelInfo",
-        exposure: "Union[int, float]",
-        pixel_photometric: "list[PixelPhotometricTypes]" = [PixelPhotometricTypes.GRAY],
-        bits_per_pixel: "Optional[set[int]]" = {8},
-        binning: "Optional[list[int]]" = [1],
-        offset: "Optional[Tuple[int, int]]" = (0, 0),
-        shape: "Optional[Tuple[int, int]]" = None,
-    ) -> None:
-        DetectorModel.__init__(
-            self,
-            name,
-            model_info,
-            exposure,
-            pixel_photometric,
-            bits_per_pixel,
-            binning,
-            offset,
-            shape,
-        )
+    def __init__(self, name: "str", model_info: "DetectorModelInfo") -> None:
+        DetectorModel.__init__(self, name, model_info)
 
     @abstractmethod
     def arm(self, frame_count: "Optional[int]" = None) -> None:  # noqa: D102
@@ -69,28 +49,8 @@ class ExEngineDetectorModel(DetectorModel, ExEngineDetector):  # type: ignore[mi
 
 
 class ExEngineMMCameraModel(DetectorModel, ExEngineMMCamera):  # type: ignore[misc]  # noqa: D101
-    def __init__(
-        self,
-        name: "str",
-        model_info: "DetectorModelInfo",
-        exposure: "Union[int, float]",
-        pixel_photometric: "list[PixelPhotometricTypes]" = [PixelPhotometricTypes.GRAY],
-        bits_per_pixel: "Optional[set[int]]" = {8},
-        binning: "Optional[list[int]]" = [1],
-        offset: "Optional[Tuple[int, int]]" = (0, 0),
-        shape: "Optional[Tuple[int, int]]" = None,
-    ) -> None:
-        DetectorModel.__init__(
-            self,
-            name,
-            model_info,
-            exposure,
-            pixel_photometric,
-            bits_per_pixel,
-            binning,
-            offset,
-            shape,
-        )
+    def __init__(self, name: "str", model_info: "DetectorModelInfo") -> None:
+        DetectorModel.__init__(self, name, model_info)
 
         # after initializing the general model, initialize the specific camera model
         ExEngineMMCamera.__init__(name=name)
