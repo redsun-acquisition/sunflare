@@ -13,5 +13,5 @@ if TYPE_CHECKING:
 class BlueskyDetectorModel(DetectorModel, Readable, Stageable):
     """Bluesky detector base model."""
 
-    def __init__(self, name: str, model_info: DetectorModelInfo) -> None:
+    def __init__(self, name: str, model_info: "DetectorModelInfo") -> None:
         super().__init__(name, model_info)
