@@ -201,11 +201,11 @@ class Loggable:
         return self.__class__.__name__
 
     @property
-    def name(self) -> "Optional[str]":
+    def name(self) -> str:
         """Class instance unique identifier."""
         # This property should be implemented by
         # all model and controller classes by default
-        return None
+        return str()
 
 
 def get_logger() -> logging.Logger:
