@@ -5,11 +5,9 @@ Belonging to this category fall devices such as stage axis, focusing units, gene
 """
 
 from abc import ABCMeta, abstractmethod
-from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 from sunflare.log import Loggable
-from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
     from typing import Any
@@ -53,12 +51,8 @@ class MotorModel(Loggable, metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self, name: str, model_info: "MotorModelInfo"):
-        FullModelInfo = create_evented_dataclass(
-            cls_name=model_info.modelName + "Info",
-            original_cls=type(model_info)
-        )
         self.__name = name
-        self._modelInfo = FullModelInfo(**asdict(model_info))
+        self._modelInfo = model_info
 
     @property
     def name(self) -> str:
@@ -68,47 +62,47 @@ class MotorModel(Loggable, metaclass=ABCMeta):
     @property
     def modelName(self) -> str:
         """Motor model name."""
-        return self._modelInfo.modelName  # type: ignore[no-any-return]
+        return self._modelInfo.modelName
 
     @property
     def modelParams(self) -> "dict[str, Any]":
         """Motor model parameters dictionary."""
-        return self._modelInfo.modelParams  # type: ignore[no-any-return]
+        return self._modelInfo.modelParams
 
     @property
     def vendor(self) -> str:
         """Motor vendor."""
-        return self._modelInfo.vendor  # type: ignore[no-any-return]
+        return self._modelInfo.vendor
 
     @property
     def serialNumber(self) -> str:
         """Motor serial number."""
-        return self._modelInfo.serialNumber  # type: ignore[no-any-return]
+        return self._modelInfo.serialNumber
 
     @property
     def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
         """Supported acquisition engines list."""
-        return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
+        return self._modelInfo.supportedEngines
 
     @property
     def category(self) -> "MotorModelTypes":
         """Motor type."""
-        return self._modelInfo.category  # type: ignore[no-any-return]
+        return self._modelInfo.category
 
     @property
     def stepEGU(self) -> str:
         """Motor step unit."""
-        return self._modelInfo.stepEGU  # type: ignore[no-any-return]
+        return self._modelInfo.stepEGU
 
     @property
     def stepSize(self) -> float:
         """Motor step size."""
-        return self._modelInfo.stepSize  # type: ignore[no-any-return]
+        return self._modelInfo.stepSize
 
     @property
-    def axes(self) -> "list[str]":
+    def axes(self) -> list[str]:
         """Motor axes list."""
-        return self._modelInfo.axes  # type: ignore[no-any-return]
+        return self._modelInfo.axes
 
     @property
     def returnHome(self) -> bool:
@@ -117,4 +111,4 @@ class MotorModel(Loggable, metaclass=ABCMeta):
 
         Defaults to `False`.
         """
-        return self._modelInfo.returnHome  # type: ignore[no-any-return]
+        return self._modelInfo.returnHome
