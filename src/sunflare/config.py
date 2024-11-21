@@ -23,6 +23,7 @@ class AcquisitionEngineTypes(str, Enum):
         For more informations, refer to the `ExEngine documentation page<https://exengine.readthedocs.io/en/latest/index.html>`_
     """
 
+    BLUESKY: str = "bluesky"
     EXENGINE: str = "exengine"
 
 
@@ -161,10 +162,8 @@ class DeviceModelInfo(BaseModel):
     supportedEngines: list[AcquisitionEngineTypes] = Field(
         default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
     )
-    vendor: Optional[str] = Field(default="N/A", description="Device vendor name")
-    serialNumber: Optional[str] = Field(
-        default="N/A", description="Device serial number"
-    )
+    vendor: str = Field(default="N/A", description="Device vendor name")
+    serialNumber: str = Field(default="N/A", description="Device serial number")
 
 
 class DetectorModelInfo(DeviceModelInfo):
