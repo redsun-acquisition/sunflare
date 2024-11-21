@@ -234,7 +234,7 @@ class MotorModelInfo(DeviceModelInfo):
         after RedSun is closed. Defaults to `False`.
     """
 
-    category: str = Field(default=MotorModelTypes.STEPPER)
+    category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
     stepEGU: str = Field(default="μm")
     axes: list[str] = Field(default_factory=list)
     returnHome: bool = Field(default=False)
