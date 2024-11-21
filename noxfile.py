@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from nox.sessions import Session
 
-python_versions = ["3.9", "3.10", "3.11"]
+python_versions = ["3.10", "3.11", "3.12"]
 
 @nox.session(venv_backend="mamba", python=python_versions)
 def lint(session: "Session") -> None:
