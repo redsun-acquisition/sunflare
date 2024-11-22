@@ -209,7 +209,7 @@ class LightModelInfo(DeviceModelInfo):
     """
 
     powerEGU: str = Field(default="mW")
-    wavelength: int
+    wavelength: Optional[int] = Field(default=None)
     category: LightModelTypes = Field(default=LightModelTypes.LASER)
     minPower: Union[float, int]
     maxPower: Union[float, int]
@@ -225,6 +225,8 @@ class MotorModelInfo(DeviceModelInfo):
         Motor type. Defaults to 'stepper'.
     stepEGU : str
         Engineering unit for steps, e.g. 'mm', 'μm'. Defaults to 'μm'.
+    stepSize : float
+        Motor step size in `stepEGU` units. Defaults to 1.
     axes : list[str]
         Supported motor axes. Suggestion is to be a list of
         single character, capital strings, e.g. ['X', 'Y', 'Z'].
@@ -236,6 +238,7 @@ class MotorModelInfo(DeviceModelInfo):
 
     category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
     stepEGU: str = Field(default="μm")
+    stepSize: float = Field(default=1.0)
     axes: list[str] = Field(default_factory=list)
     returnHome: bool = Field(default=False)
 

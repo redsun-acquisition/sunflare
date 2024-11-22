@@ -6,11 +6,10 @@ from typing import TYPE_CHECKING, Tuple
 from exengine.backends.micromanager import MicroManagerCamera as ExEngineMMCamera
 from exengine.device_types import Detector as ExEngineDetector
 
-from sunflare.config import PixelPhotometricTypes
 from sunflare.engine.detector import DetectorModel
 
 if TYPE_CHECKING:
-    from typing import Any, Optional, Union
+    from typing import Any, Optional
 
     import numpy.typing as npt
 

@@ -16,7 +16,7 @@ __all__ = ["Loggable", "get_logger"]
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any, Optional
+    from typing import Any
 
 
 class ClassFormatter(logging.Formatter):
