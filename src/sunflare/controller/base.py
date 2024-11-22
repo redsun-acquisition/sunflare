@@ -115,32 +115,6 @@ class BaseController(Loggable, metaclass=ABCMeta):
         return self._ctrlInfo.controllerParams
 
 
-class DeviceController(BaseController):
-    """Device controller base class.
-
-    Parameters
-    ----------
-    ctrl_info : ControllerInfo
-        Controller information dataclass.
-    handler : EngineHandler
-        Engine API.
-    virtual_bus : VirtualBus
-        Intra-module virtual bus.
-    module_bus : VirtualBus
-        Inter-module virtual bus.
-    """
-
-    @abstractmethod
-    def __init__(
-        self,
-        ctrl_info: "ControllerInfo",
-        handler: "EngineHandler",
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
-    ) -> None:
-        super().__init__(ctrl_info, handler, virtual_bus, module_bus)
-
-
 class ComputationalController(BaseController):
     """Computational controller base class.
 
