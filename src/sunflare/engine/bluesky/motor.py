@@ -16,7 +16,13 @@ if TYPE_CHECKING:
 
 # TODO: more protocols for this?
 class BlueskyMotorModel(MotorModel):
-    """Bluesky detector base model."""
+    """Bluesky detector base model.
+
+    Implements the following protocols
+
+    - :class:`bluesky.protocols.Movable`
+    - :class:`bluesky.protocols.Locatable`
+    """
 
     def __init__(self, name: str, model_info: "MotorModelInfo"):
         super().__init__(name, model_info)
