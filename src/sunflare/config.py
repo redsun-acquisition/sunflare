@@ -209,7 +209,7 @@ class LightModelInfo(DeviceModelInfo):
     """
 
     powerEGU: str = Field(default="mW")
-    wavelength: int
+    wavelength: Optional[int] = Field(default=None)
     category: LightModelTypes = Field(default=LightModelTypes.LASER)
     minPower: Union[float, int]
     maxPower: Union[float, int]
