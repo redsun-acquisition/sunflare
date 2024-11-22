@@ -38,6 +38,14 @@ class BlueskyDetectorModel(DetectorModel):
     def __init__(self, name: str, model_info: "DetectorModelInfo") -> None:
         super().__init__(name, model_info)
 
+    def shutdown(self) -> None:
+        """Shutdown the detector.
+
+        Optional method.
+        Implement this to perform any necessary cleanup when the detector is shut down.
+        """
+        ...
+
     @abstractmethod
     def stage(self) -> Status:
         """Set up the device for acquisition.

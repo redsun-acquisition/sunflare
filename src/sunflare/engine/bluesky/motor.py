@@ -21,6 +21,14 @@ class BlueskyMotorModel(MotorModel):
     def __init__(self, name: str, model_info: "MotorModelInfo"):
         super().__init__(name, model_info)
 
+    def shutdown(self) -> None:
+        """Shutdown the motor.
+
+        Optional method.
+        Implement this to for graceful shutdown.
+        """
+        ...
+
     # TODO: define a proper type
     # for the value parameter
     @abstractmethod
