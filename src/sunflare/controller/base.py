@@ -8,16 +8,14 @@ Two controller types are defined: `DeviceController` and `ComputationalControlle
 
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
-from dataclasses import asdict
 
 from sunflare.config import ControllerInfo
 from sunflare.log import Loggable
-from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
     from typing import Any
 
-    from sunflare.config import ControllerInfo
+    from sunflare.config import ControllerInfo, AcquisitionEngineTypes
     from sunflare.engine import EngineHandler
     from sunflare.virtualbus import VirtualBus
 
@@ -48,11 +46,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
         self._handler = handler
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
-        FullModelInfo = create_evented_dataclass(
-            ctrl_info.controllerName + "Info", type(ctrl_info)
-        )
-        ctrl_info_dict = asdict(ctrl_info)
-        self._ctrlInfo = FullModelInfo(**ctrl_info_dict)
+        self._ctrlInfo = ctrl_info
 
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations."""
@@ -85,7 +79,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
         """Connect to other controllers' signals.
 
         At application start-up, controllers can't know what signals are available from other controllers.
-        This method is invoked after the controller is built and after `registration_phase` as well, allowing to
+        This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
         connect to all available registered signals in both virtual buses.
         Controllers may be able to connect to other controllers' signals even after this phase.
 
@@ -103,22 +97,22 @@ class BaseController(Loggable, metaclass=ABCMeta):
     @property
     def category(self) -> str:
         """Controller category."""
-        return self._ctrlInfo.category  # type: ignore[no-any-return]
+        return self._ctrlInfo.category
 
     @property
     def controllerName(self) -> str:
         """Controller name. Represents the class which builds the controller instance."""
-        return self._ctrlInfo.controllerName  # type: ignore[no-any-return]
+        return self._ctrlInfo.controllerName
 
     @property
-    def supportedEngines(self) -> "list[str]":
+    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported engines."""
-        return self._ctrlInfo.supportedEngines  # type: ignore[no-any-return]
+        return self._ctrlInfo.supportedEngines
 
     @property
     def controllerParams(self) -> "dict[str, Any]":
         """Controller custom parameters dictionary."""
-        return self._ctrlInfo.controllerParams  # type: ignore[no-any-return]
+        return self._ctrlInfo.controllerParams
 
 
 class DeviceController(BaseController):
@@ -145,8 +139,6 @@ class DeviceController(BaseController):
         module_bus: "VirtualBus",
     ) -> None:
         super().__init__(ctrl_info, handler, virtual_bus, module_bus)
-
-    # TODO: add APIs...
 
 
 class ComputationalController(BaseController):

@@ -1,11 +1,9 @@
 """Light source model abstract base class definition."""
 
 from abc import ABCMeta, abstractmethod
-from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 from sunflare.log import Loggable
-from sunflare.utils import create_evented_dataclass
 
 if TYPE_CHECKING:
     from typing import Any, Union
@@ -40,12 +38,8 @@ class LightModel(Loggable, metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self, name: str, model_info: "LightModelInfo") -> None:
-        FullModelInfo = create_evented_dataclass(
-            cls_name=model_info.modelName + "Info",
-            original_cls=type(model_info)
-        )
         self.__name = name
-        self._modelInfo = FullModelInfo(**asdict(model_info))
+        self._modelInfo = model_info
 
     @property
     def name(self) -> str:
@@ -55,54 +49,54 @@ class LightModel(Loggable, metaclass=ABCMeta):
     @property
     def modelName(self) -> str:
         """Light source model name."""
-        return self._modelInfo.modelName  # type: ignore[no-any-return]
+        return self._modelInfo.modelName
 
     @property
     def modelParams(self) -> "dict[str, Any]":
         """Light source model parameters."""
-        return self._modelInfo.modelParams  # type: ignore[no-any-return]
+        return self._modelInfo.modelParams
 
     @property
     def vendor(self) -> str:
         """Light source vendor."""
-        return self._modelInfo.vendor  # type: ignore[no-any-return]
+        return self._modelInfo.vendor
 
     @property
     def serialNumber(self) -> str:
         """Light source serial number."""
-        return self._modelInfo.serialNumber  # type: ignore[no-any-return]
+        return self._modelInfo.serialNumber
 
     @property
     def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported acquisition engines."""
-        return self._modelInfo.supportedEngines  # type: ignore[no-any-return]
+        return self._modelInfo.supportedEngines
 
     @property
     def category(self) -> "LightModelTypes":
         """Light source type."""
-        return self._modelInfo.category  # type: ignore[no-any-return]
+        return self._modelInfo.category
 
     @property
     def wavelength(self) -> int:
         """Light source wavelength."""
-        return self._modelInfo.wavelength  # type: ignore[no-any-return]
+        return self._modelInfo.wavelength
 
     @property
     def powerEGU(self) -> str:
         """Light source power EGU."""
-        return self._modelInfo.powerEGU  # type: ignore[no-any-return]
+        return self._modelInfo.powerEGU
 
     @property
     def minPower(self) -> "Union[float, int]":
         """Minimum light source power, expressed in EGU."""
-        return self._modelInfo.minPower  # type: ignore[no-any-return]
+        return self._modelInfo.minPower
 
     @property
     def maxPower(self) -> "Union[float, int]":
         """Maximum light source power, expressed in EGU."""
-        return self._modelInfo.maxPower  # type: ignore[no-any-return]
+        return self._modelInfo.maxPower
 
     @property
     def powerStep(self) -> "Union[float, int]":
         """Light source power step, expressed in EGU."""
-        return self._modelInfo.powerStep  # type: ignore[no-any-return]
+        return self._modelInfo.powerStep
