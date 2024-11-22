@@ -42,7 +42,7 @@ class BlueskyDetectorModel(DetectorModel):
         """Shutdown the detector.
 
         Optional method.
-        Implement this to perform any necessary cleanup when the detector is shut down.
+        Implement this to for graceful shutdown.
         """
         ...
 
