@@ -30,6 +30,20 @@ class AcquisitionEngineTypes(str, Enum):
     EXENGINE: str = "exengine"
 
 
+class FrontendTypes(str, Enum):
+    """Supported frontend types.
+
+    Frontends are the GUIs that are used to interact with the user.
+
+    Attributes
+    ----------
+    QT : str
+        Qt frontend.
+    """
+
+    QT: str = "qt"
+
+
 class DetectorModelTypes(str, Enum):
     """Supported detector types.
 
@@ -289,6 +303,7 @@ class RedSunInstanceInfo(BaseModel):
     """
 
     engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.EXENGINE)
+    frontend: FrontendTypes = Field(default=FrontendTypes.QT)
     controllers: Optional[dict[str, ControllerInfo]] = Field(default_factory=dict)
     detectors: Optional[dict[str, DetectorModelInfo]] = Field(default_factory=dict)
     lights: Optional[dict[str, LightModelInfo]] = Field(default_factory=dict)
