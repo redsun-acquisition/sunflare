@@ -7,7 +7,7 @@ Two controller types are defined: `DeviceController` and `ComputationalControlle
 """
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 from sunflare.config import ControllerInfo
 from sunflare.log import Loggable
@@ -100,42 +100,34 @@ class BaseController(Loggable, metaclass=ABCMeta):
         return self._ctrlInfo.category
 
     @property
-    def controllerName(self) -> str:
+    def controller_name(self) -> str:
         """Controller name. Represents the class which builds the controller instance."""
-        return self._ctrlInfo.controllerName
+        return self._ctrlInfo.controller_name
 
     @property
-    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported engines."""
-        return self._ctrlInfo.supportedEngines
+        return self._ctrlInfo.supported_engines
 
     @property
-    def controllerParams(self) -> "dict[str, Any]":
+    def controller_params(self) -> "dict[str, Any]":
         """Controller custom parameters dictionary."""
-        return self._ctrlInfo.controllerParams
+        return self._ctrlInfo.controller_params
 
 
-class ComputationalController(BaseController):
-    """Computational controller base class.
+class Computator(Protocol):
+    """Infers that this class is a computational controller."""
 
-    Parameters
-    ----------
-    ctrl_info : ControllerInfo
-        Controller information dataclass.
-    handler : EngineHandler
-        Engine API.
-    virtual_bus : VirtualBus
-        Intra-module virtual bus.
-    module_bus : VirtualBus
-        Inter-module virtual bus.
-    """
+    ...
 
-    @abstractmethod
-    def __init__(
-        self,
-        ctrl_info: "ControllerInfo",
-        handler: "EngineHandler",
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
-    ) -> None:
-        super().__init__(ctrl_info, handler, virtual_bus, module_bus)
+
+class Publisher(Protocol):
+    """Infers that this class is a publisher."""
+
+    ...
+
+
+class Monitorer(Protocol):
+    """Infers that this class is a monitorer."""
+
+    ...

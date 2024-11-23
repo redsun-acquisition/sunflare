@@ -1,5 +1,5 @@
 # noqa: D104
 
-from .base import ComputationalController, DeviceController
+from .base import Computator, Publisher
 
-__all__ = ["DeviceController", "ComputationalController"]
+__all__ = ["Computator", "Publisher"]
