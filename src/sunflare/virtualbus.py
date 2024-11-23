@@ -150,13 +150,7 @@ class ModuleVirtualBus(VirtualBus):
 
     _instance: "Optional[ModuleVirtualBus]" = None
 
-    def __new__(cls) -> "ModuleVirtualBus":
-        """
-        Singleton pattern.
-
-        Creates a new instance of the class if it does not exist.
-        Otherwise, returns the existing instance.
-        """
+    def __new__(cls) -> "ModuleVirtualBus":  # noqa: D102
         # singleton pattern
         if cls._instance is None:
             cls._instance = object.__new__(cls)
