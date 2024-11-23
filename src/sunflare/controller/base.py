@@ -13,9 +13,7 @@ from sunflare.config import ControllerInfo
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any
-
-    from sunflare.config import ControllerInfo, AcquisitionEngineTypes
+    from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
     from sunflare.engine import EngineHandler
     from sunflare.virtualbus import VirtualBus
 
@@ -46,7 +44,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
         self._handler = handler
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
-        self._ctrlInfo = ctrl_info
+        self._ctrl_info = ctrl_info
 
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations."""
@@ -95,24 +93,19 @@ class BaseController(Loggable, metaclass=ABCMeta):
         ...
 
     @property
-    def category(self) -> str:
+    def category(self) -> "set[ControllerTypes]":
         """Controller category."""
-        return self._ctrlInfo.category
+        return self._ctrl_info.category
 
     @property
     def controller_name(self) -> str:
         """Controller name. Represents the class which builds the controller instance."""
-        return self._ctrlInfo.controller_name
+        return self._ctrl_info.controller_name
 
     @property
     def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported engines."""
-        return self._ctrlInfo.supported_engines
-
-    @property
-    def controller_params(self) -> "dict[str, Any]":
-        """Controller custom parameters dictionary."""
-        return self._ctrlInfo.controller_params
+        return self._ctrl_info.supported_engines
 
 
 class Computator(Protocol):
