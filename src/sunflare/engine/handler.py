@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
     from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
+    from sunflare.types import Workflow
 
 
 class EngineHandler(Loggable, metaclass=ABCMeta):
@@ -49,7 +50,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         Inter-module virtual bus.
     """
 
-    _workflows: "dict[str, Union[Generator[Any, None, None], Iterable[Any]]]" = {}
+    _workflows: "dict[str, Workflow]" = {}
 
     @abstractmethod
     def __init__(
@@ -85,9 +86,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         """Perform a clean shutdown of the engine and all its devices."""
         ...
 
-    def register_workflow(
-        self, name: str, workflow: "Union[Generator[Any, None, None], Iterable[Any]]"
-    ) -> None:
+    def register_workflows(self, name: str, workflow: "Workflow") -> None:
         """
         Register a new workflow in the handler.
 
