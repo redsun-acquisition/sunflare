@@ -2,8 +2,6 @@
 RedSun controller toolkit.
 
 This toolkit section provides RedSun developers with the necessary base classes to implement their own controllers.
-
-Two controller types are defined: `DeviceController` and `ComputationalController`.
 """
 
 from abc import ABCMeta, abstractmethod
@@ -13,9 +11,12 @@ from sunflare.config import ControllerInfo
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
+    from typing import Iterable
+
     from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
     from sunflare.engine import EngineHandler
-    from sunflare.virtualbus import VirtualBus
+    from sunflare.virtualbus import VirtualBus, Signal
+    from sunflare.types import Workflow
 
 
 class BaseController(Loggable, metaclass=ABCMeta):
@@ -117,7 +118,13 @@ class Computator(Protocol):
 class Publisher(Protocol):
     """Infers that this class is a publisher."""
 
-    ...
+    sigNewPlan: Signal
+
+    @property
+    @abstractmethod
+    def workflows(self) -> "Iterable[Workflow]":
+        """Iterable of available plans."""
+        ...
 
 
 class Monitorer(Protocol):
