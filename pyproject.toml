@@ -7,7 +7,7 @@ name = "sunflare"
 dynamic = ["version"]
 description = "Event-driven data acquisition software for scientific applications."
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
   {name = "Jacopo Abramo", email = "jacopo.abramo@gmail.com"}
 ]
