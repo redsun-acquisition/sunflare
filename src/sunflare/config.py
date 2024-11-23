@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Optional, Tuple, Union
 
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, ConfigDict
 
 
 class AcquisitionEngineTypes(str, Enum):
@@ -158,6 +158,9 @@ class DeviceModelInfo(BaseModel):
     )
     vendor: str = Field(default="N/A", description="Device vendor name")
     serial_number: str = Field(default="N/A", description="Device serial number")
+
+    # needed to suppress the warning about the protected namespace
+    model_config = ConfigDict(protected_namespaces=("model_config",))
 
 
 class DetectorModelInfo(DeviceModelInfo):
