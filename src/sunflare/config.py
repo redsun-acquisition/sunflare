@@ -249,7 +249,7 @@ class ScannerModelInfo(DeviceModelInfo):
         single character, capital strings, e.g. ['X', 'Y', 'Z'].
     """
 
-    category: ScannerModelTypes = ScannerModelTypes.GALVO
+    category: ScannerModelTypes = Field(default=ScannerModelTypes.GALVO)
     axes: list[str] = Field(default_factory=list)
     # TODO: investigate what other parameters are needed for scanner
 
