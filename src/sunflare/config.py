@@ -1,9 +1,9 @@
 """RedSun configuration dataclasses and enums."""
 
 from enum import Enum
-from typing import Any, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
-from pydantic import Field, BaseModel, field_validator, ValidationError
+from pydantic import Field, BaseModel
 
 
 class AcquisitionEngineTypes(str, Enum):
