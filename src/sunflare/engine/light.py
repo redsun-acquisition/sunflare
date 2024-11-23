@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Union
+    from typing import Union, Optional, Tuple
 
     from sunflare.config import (
         AcquisitionEngineTypes,
@@ -39,7 +39,7 @@ class LightModel(Loggable, metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, name: str, model_info: "LightModelInfo") -> None:
         self.__name = name
-        self._modelInfo = model_info
+        self._model_info = model_info
 
     @property
     def name(self) -> str:
@@ -47,56 +47,49 @@ class LightModel(Loggable, metaclass=ABCMeta):
         return self.__name
 
     @property
-    def modelName(self) -> str:
+    def model_name(self) -> str:
         """Light source model name."""
-        return self._modelInfo.modelName
-
-    @property
-    def modelParams(self) -> "dict[str, Any]":
-        """Light source model parameters."""
-        return self._modelInfo.modelParams
+        return self._model_info.model_name
 
     @property
     def vendor(self) -> str:
         """Light source vendor."""
-        return self._modelInfo.vendor
+        return self._model_info.vendor
 
     @property
-    def serialNumber(self) -> str:
+    def serial_number(self) -> str:
         """Light source serial number."""
-        return self._modelInfo.serialNumber
+        return self._model_info.serial_number
 
     @property
-    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported acquisition engines."""
-        return self._modelInfo.supportedEngines
+        return self._model_info.supported_engines
 
     @property
     def category(self) -> "LightModelTypes":
         """Light source type."""
-        return self._modelInfo.category
+        return self._model_info.category
 
     @property
-    def wavelength(self) -> int:
-        """Light source wavelength."""
-        return self._modelInfo.wavelength
+    def wavelength(self) -> "Optional[int]":
+        """Light source wavelength. Returns `None` if not applicable."""
+        return self._model_info.wavelength
 
     @property
-    def powerEGU(self) -> str:
+    def power_egu(self) -> str:
         """Light source power EGU."""
-        return self._modelInfo.powerEGU
+        return self._model_info.power_egu
 
     @property
-    def minPower(self) -> "Union[float, int]":
-        """Minimum light source power, expressed in EGU."""
-        return self._modelInfo.minPower
+    def range(self) -> "Union[Tuple[float, float], Tuple[int, int]]":
+        """Light source power range, expressed in EGU.
+
+        Formatted as (min, max).
+        """
+        return self._model_info.range
 
     @property
-    def maxPower(self) -> "Union[float, int]":
-        """Maximum light source power, expressed in EGU."""
-        return self._modelInfo.maxPower
-
-    @property
-    def powerStep(self) -> "Union[float, int]":
+    def power_step(self) -> "Union[float, int]":
         """Light source power step, expressed in EGU."""
-        return self._modelInfo.powerStep
+        return self._model_info.power_step

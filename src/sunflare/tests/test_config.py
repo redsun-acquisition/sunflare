@@ -37,28 +37,18 @@ def test_detectors_info():
     assert instance.scanners == {}
 
     for _, mock in instance.detectors.items():
-        assert mock.modelName == "MockDetectorModel"
+        assert mock.model_name == "MockDetectorModel"
         assert mock.vendor == "N/A"
-        assert mock.serialNumber == "N/A"
-        assert mock.supportedEngines == ["exengine"]
-        assert mock.sensorSize == (0, 0)
-        assert mock.pixelSize == (1, 1, 1)
+        assert mock.serial_number == "N/A"
+        assert mock.supported_engines == ["exengine"]
+        assert mock.sensor_size == (0, 0)
+        assert mock.pixel_size == (1, 1, 1)
 
     mocks = list(instance.detectors.values())
-    assert mocks[0].modelParams == {
-        "paramInt": 1,
-        "paramStr": "info",
-        "paramFloat": 1.0,
-    }
     assert mocks[0].category == "area"
-    assert mocks[0].exposureEGU == "ms"
-    assert mocks[1].modelParams == {
-        "paramInt": 2,
-        "paramStr": "warning",
-        "paramFloat": 2.0,
-    }
+    assert mocks[0].exposure_egu == "ms"
     assert mocks[1].category == "line"
-    assert mocks[1].exposureEGU == "s"
+    assert mocks[1].exposure_egu == "s"
 
 
 def test_motors_info():
@@ -78,25 +68,15 @@ def test_motors_info():
 
     # inspect the motors
     for _, mock in instance.motors.items():
-        assert mock.modelName == "MockMotorModel"
+        assert mock.model_name == "MockMotorModel"
         assert mock.vendor == "N/A"
-        assert mock.serialNumber == "N/A"
-        assert mock.supportedEngines == ["exengine"]
+        assert mock.serial_number == "N/A"
+        assert mock.supported_engines == ["exengine"]
         assert mock.category == "stepper"
 
     # check the model parameters
     mocks = list(instance.motors.values())
-    assert mocks[0].modelParams == {
-        "paramInt": 1,
-        "paramStr": "info",
-        "paramFloat": 1.0,
-    }
-    assert mocks[0].stepEGU == "μm"
+    assert mocks[0].step_egu == "μm"
     assert mocks[0].axes == ["X"]
-    assert mocks[1].modelParams == {
-        "paramInt": 2,
-        "paramStr": "warning",
-        "paramFloat": 2.0,
-    }
-    assert mocks[1].stepEGU == "mm"
+    assert mocks[1].step_egu == "mm"
     assert mocks[1].axes == ["X", "Y"]

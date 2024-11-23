@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Tuple
+    from typing import Tuple
 
     from sunflare.config import AcquisitionEngineTypes, DetectorModelInfo
 
@@ -31,7 +31,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         - Detector model information dataclass.
         - Provided by RedSun configuration.
     exposure: Union[int, float]
-        - Detector exposure time at startup (time scale defined by `exposureEGU`).
+        - Detector exposure time at startup (time scale defined by `exposure_egu`).
         - User defined.
     pixel_photometric: list[PixelPhotometricTypes]
         - List of supported pixel colors.
@@ -59,7 +59,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         model_info: "DetectorModelInfo",
     ) -> None:
         self.__name = name
-        self._modelInfo = model_info
+        self._model_info = model_info
 
     @property
     def name(self) -> str:
@@ -67,46 +67,41 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         return self.__name
 
     @property
-    def modelName(self) -> str:
+    def model_name(self) -> str:
         """Detector model name."""
-        return self._modelInfo.modelName
-
-    @property
-    def modelParams(self) -> "dict[str, Any]":
-        """Detector model parameters dictionary."""
-        return self._modelInfo.modelParams
+        return self._model_info.model_name
 
     @property
     def vendor(self) -> str:
         """Detector vendor."""
-        return self._modelInfo.vendor
+        return self._model_info.vendor
 
     @property
-    def serialNumber(self) -> str:
+    def serial_number(self) -> str:
         """Detector serial number."""
-        return self._modelInfo.serialNumber
+        return self._model_info.serial_number
 
     @property
-    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """Supported acquisition engines list."""
-        return self._modelInfo.supportedEngines
+        return self._model_info.supported_engines
 
     @property
     def category(self) -> str:
         """Detector type."""
-        return self._modelInfo.category
+        return self._model_info.category
 
     @property
-    def sensorSize(self) -> "Tuple[int, int]":
+    def sensor_size(self) -> "Tuple[int, int]":
         """Detector sensor size in pixels: represents the 2D axis (Y, X). Only applicable for 'line' and 'area' detectors."""
-        return self._modelInfo.sensorSize
+        return self._model_info.sensor_size
 
     @property
-    def pixelSize(self) -> "Tuple[float, float, float]":
+    def pixel_size(self) -> "Tuple[float, float, float]":
         """Detector pixel size in micrometers: represents the 3D axis (Z, Y, X)."""
-        return self._modelInfo.pixelSize
+        return self._model_info.pixel_size
 
     @property
-    def exposureEGU(self) -> str:
+    def exposure_egu(self) -> str:
         """Detector exposure unit."""
-        return self._modelInfo.exposureEGU
+        return self._model_info.exposure_egu

@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Any, Optional, Tuple, Union
 
-from pydantic import Field, BaseModel
+from pydantic import Field, BaseModel, field_validator, ValidationError
 
 
 class AcquisitionEngineTypes(str, Enum):
@@ -18,9 +18,12 @@ class AcquisitionEngineTypes(str, Enum):
 
     Attributes
     ----------
+    BLUESKY: str
+        Bluesky: a Python-based data acquisition framework for scientific experiments. \
+        For more informations, refer to the `Bluesky documentation page<https://blueskyproject.io/bluesky/index.html>`_.
     EXENGINE : str
-        ExEngine: execution engine for microscopy control.\\
-        For more informations, refer to the `ExEngine documentation page<https://exengine.readthedocs.io/en/latest/index.html>`_
+        ExEngine: execution engine for microscopy control. \
+        For more informations, refer to the `ExEngine documentation page<https://exengine.readthedocs.io/en/latest/index.html>`_.
     """
 
     BLUESKY: str = "bluesky"
@@ -103,17 +106,17 @@ class ControllerTypes(str, Enum):
 
     Attributes
     ----------
-    DEVICE : str
-        Device controllers are used to expose lower hardware devices of the same type (e.g. motors, detectors, etc.) with a unique interface to facilitate
-        the interaction with the acquisition engine and the upper layers. They do not provide computational capabilities other than the ones needed to interact with
-        the hardware (i.e. compute motor steps or update detector exposure time).
-    COMPUTATIONAL : str
-        Computational controllers provide computational resources or define workflows that are independent of specific hardware devices and can inform
-        the acquisition engine of a new workflow that can be injected into the acquisition process.
+    COMPUTATOR : str
+        Computator controller.
+    PUBLISHER : str
+        Publisher controller.
+    MONITORER : str
+        Monitorer controller.
     """
 
-    DEVICE: str = "device"
-    COMPUTATIONAL: str = "computational"
+    COMPUTATOR: str = "computator"
+    PUBLISHER: str = "publisher"
+    MONITORER: str = "monitorer"
 
 
 class ControllerInfo(BaseModel):
@@ -121,23 +124,17 @@ class ControllerInfo(BaseModel):
 
     Attributes
     ----------
-    category : ControllerTypes
-        Controller category. Defaults to 'device'.
-    controllerName : str
+    category : Set[ControllerTypes]
+        Set of controller categories.
+    controller_name : str
         Controller name.
-    supportedEngines : list[AcquisitionEngineTypes]
+    supported_engines : list[AcquisitionEngineTypes]
         Supported acquisition engines list. Defaults to ['exengine'].
-    controllerParams : Dict[str, Any]
-        Controller parameters dictionary. Used to store start-up configuration parameters.
-        - They are exposed to the upper layers to allow the user to configure the controller at runtime.
     """
 
-    category: ControllerTypes = Field(default=ControllerTypes.DEVICE)
-    controllerName: str = Field(default=str())
-    supportedEngines: list[AcquisitionEngineTypes] = Field(
-        default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
-    )
-    controllerParams: dict[str, Any] = Field(default_factory=dict)
+    category: set[ControllerTypes] = Field(default=set())
+    controller_name: str = Field(default=str())
+    supported_engines: list[AcquisitionEngineTypes] = Field(default_factory=list)
 
 
 class DeviceModelInfo(BaseModel):
@@ -145,25 +142,22 @@ class DeviceModelInfo(BaseModel):
 
     Attributes
     ----------
-    modelName : str
+    model_name : str
         Device model name.
-    modelParams : Dict[str, Union[str, int, float]]
-        Device model parameters dictionary. Used to store start-up configuration parameters.
-    supportedEngines : list[AcquisitionEngineTypes]
+    supported_engines : list[AcquisitionEngineTypes]
         Supported acquisition engines list.
     vendor : Optional[str]
         Detector vendor. Optional for debugging purposes.
-    serialNumber : Optional[str]
+    serial_number : Optional[str]
         Detector serial number. Optional for debugging purposes.
     """
 
-    modelName: str
-    modelParams: dict[str, Union[str, int, float]]
-    supportedEngines: list[AcquisitionEngineTypes] = Field(
+    model_name: str = Field(default=str())
+    supported_engines: list[AcquisitionEngineTypes] = Field(
         default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
     )
     vendor: str = Field(default="N/A", description="Device vendor name")
-    serialNumber: str = Field(default="N/A", description="Device serial number")
+    serial_number: str = Field(default="N/A", description="Device serial number")
 
 
 class DetectorModelInfo(DeviceModelInfo):
@@ -174,23 +168,23 @@ class DetectorModelInfo(DeviceModelInfo):
     category : DetectorModelTypes
         Detector type. Currently supported values are
         'area', 'line' and 'point'. Defaults to 'area'.
-    sensorSize: Tuple[int]
+    sensor_size: Tuple[int]
         Detector sensor size in pixels: represents the 2D axis (Y, X).
-    pixelSize : Tuple[float]
+    pixel_size : Tuple[float]
         Detector pixel size in micrometers: represents the 3D axis (Z, Y, X).
         Defaults to `(1, 1, 1)`.
-    exposureEGU : str
+    exposure_egu : str
         Engineering unit for exposure time, e.g. 'ms', 'μs'. Defaults to 'ms'.
     """
 
     category: str = Field(default=DetectorModelTypes.AREA)
-    sensorSize: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
-    pixelSize: Tuple[float, float, float] = Field(default_factory=lambda: (1, 1, 1))
-    exposureEGU: str = Field(default="ms")
+    sensor_size: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
+    pixel_size: Tuple[float, float, float] = Field(default_factory=lambda: (1, 1, 1))
+    exposure_egu: str = Field(default="ms")
 
 
 class LightModelInfo(DeviceModelInfo):
-    """Light source model informations.
+    r"""Light source model informations.
 
     Attributes
     ----------
@@ -198,22 +192,22 @@ class LightModelInfo(DeviceModelInfo):
         Light source type. Defaults to 'laser'.
     wavelength : int
         Light source wavelength in nanometers.
-    powerEGU : str
+    power_egu : str
         Engineering unit for light source, .e.g. 'mW', 'μW'. Defaults to 'mW'.
-    minPower : Union[float, int]
-        Minimum light source power.
-    maxPower : Union[float, int]
-        Maximum light source power.
-    powerStep: Union[float, int]
-        Power increase/decrease minimum step size.
+    range : Union[Tuple[float, float], Tuple[int, int]]
+        Light source power range. Expressed in `power_egu` units.
+        Formatted as (min, max). Defaults to (0, 0).
+    power_step: Union[float, int]
+        Power increase/decrease minimum step size. Expressed in `power_egu` units.
     """
 
-    powerEGU: str = Field(default="mW")
+    power_egu: str = Field(default="mW")
     wavelength: Optional[int] = Field(default=None)
     category: LightModelTypes = Field(default=LightModelTypes.LASER)
-    minPower: Union[float, int]
-    maxPower: Union[float, int]
-    powerStep: Union[float, int]
+    range: Union[Tuple[float, float], Tuple[int, int]] = Field(
+        default_factory=lambda: (0, 0)
+    )
+    power_step: Union[float, int] = Field(default=0)
 
 
 class MotorModelInfo(DeviceModelInfo):
@@ -223,24 +217,24 @@ class MotorModelInfo(DeviceModelInfo):
     ----------
     category : MotorModelTypes
         Motor type. Defaults to 'stepper'.
-    stepEGU : str
+    step_egu : str
         Engineering unit for steps, e.g. 'mm', 'μm'. Defaults to 'μm'.
-    stepSize : float
-        Motor step size in `stepEGU` units. Defaults to 1.
+    step_size : float
+        Motor step size in `step_egu` units. Defaults to 1.
     axes : list[str]
         Supported motor axes. Suggestion is to be a list of
         single character, capital strings, e.g. ['X', 'Y', 'Z'].
-    returnHome : bool
+    return_home : bool
         If `True`, motor will return to home position
         (defined as  the initial position the motor had at RedSun's startup)
         after RedSun is closed. Defaults to `False`.
     """
 
     category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
-    stepEGU: str = Field(default="μm")
-    stepSize: float = Field(default=1.0)
+    step_egu: str = Field(default="μm")
+    step_size: float = Field(default=1.0)
     axes: list[str] = Field(default_factory=list)
-    returnHome: bool = Field(default=False)
+    return_home: bool = Field(default=False)
 
 
 class ScannerModelInfo(DeviceModelInfo):
@@ -291,9 +285,9 @@ class RedSunInstanceInfo(BaseModel):
         Defaults to an empty dictionary.
     """
 
-    engine: "AcquisitionEngineTypes" = AcquisitionEngineTypes.EXENGINE
-    controllers: "Optional[dict[str, ControllerInfo]]" = Field(default_factory=dict)
-    detectors: "Optional[dict[str, DetectorModelInfo]]" = Field(default_factory=dict)
-    lights: "Optional[dict[str, LightModelInfo]]" = Field(default_factory=dict)
-    motors: "Optional[dict[str, MotorModelInfo]]" = Field(default_factory=dict)
-    scanners: "Optional[dict[str, ScannerModelInfo]]" = Field(default_factory=dict)
+    engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.EXENGINE)
+    controllers: Optional[dict[str, ControllerInfo]] = Field(default_factory=dict)
+    detectors: Optional[dict[str, DetectorModelInfo]] = Field(default_factory=dict)
+    lights: Optional[dict[str, LightModelInfo]] = Field(default_factory=dict)
+    motors: Optional[dict[str, MotorModelInfo]] = Field(default_factory=dict)
+    scanners: Optional[dict[str, ScannerModelInfo]] = Field(default_factory=dict)

@@ -10,8 +10,6 @@ from typing import TYPE_CHECKING
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from sunflare.config import (
         AcquisitionEngineTypes,
         MotorModelInfo,
@@ -43,7 +41,7 @@ class MotorModel(Loggable, metaclass=ABCMeta):
     ----------
     axes : list[str]
         - Motor axes.
-    returnHome : bool
+    return_home : bool
         - If `True`, motor will return to home position
         (defined as  the initial position the motor had at RedSun's startup)
         after RedSun is closed. Defaults to `False`.
@@ -52,7 +50,7 @@ class MotorModel(Loggable, metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, name: str, model_info: "MotorModelInfo"):
         self.__name = name
-        self._modelInfo = model_info
+        self._model_info = model_info
 
     @property
     def name(self) -> str:
@@ -60,55 +58,50 @@ class MotorModel(Loggable, metaclass=ABCMeta):
         return self.__name
 
     @property
-    def modelName(self) -> str:
+    def model_name(self) -> str:
         """Motor model name."""
-        return self._modelInfo.modelName
-
-    @property
-    def modelParams(self) -> "dict[str, Any]":
-        """Motor model parameters dictionary."""
-        return self._modelInfo.modelParams
+        return self._model_info.model_name
 
     @property
     def vendor(self) -> str:
         """Motor vendor."""
-        return self._modelInfo.vendor
+        return self._model_info.vendor
 
     @property
-    def serialNumber(self) -> str:
+    def serial_number(self) -> str:
         """Motor serial number."""
-        return self._modelInfo.serialNumber
+        return self._model_info.serial_number
 
     @property
-    def supportedEngines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """Supported acquisition engines list."""
-        return self._modelInfo.supportedEngines
+        return self._model_info.supported_engines
 
     @property
     def category(self) -> "MotorModelTypes":
         """Motor type."""
-        return self._modelInfo.category
+        return self._model_info.category
 
     @property
-    def stepEGU(self) -> str:
+    def step_egu(self) -> str:
         """Motor step unit."""
-        return self._modelInfo.stepEGU
+        return self._model_info.step_egu
 
     @property
-    def stepSize(self) -> float:
+    def step_size(self) -> float:
         """Motor step size."""
-        return self._modelInfo.stepSize
+        return self._model_info.step_size
 
     @property
     def axes(self) -> list[str]:
         """Motor axes list."""
-        return self._modelInfo.axes
+        return self._model_info.axes
 
     @property
-    def returnHome(self) -> bool:
+    def return_home(self) -> bool:
         """
         If `True`, motor will return to home position (defined as  the initial position the motor had at RedSun's startup) after RedSun is closed.
 
         Defaults to `False`.
         """
-        return self._modelInfo.returnHome
+        return self._model_info.return_home
