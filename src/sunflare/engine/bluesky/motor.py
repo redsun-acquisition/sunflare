@@ -51,3 +51,4 @@ class BlueskyMotorModel(MotorModel):
         was last requested to move to. This protocol formalizes how to get the
         location from a ``Movable``.
         """
+        ...
