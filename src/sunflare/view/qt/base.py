@@ -36,7 +36,7 @@ class WidgetProtocol(Protocol):
 
 
 class BaseWidget(QWidget, WidgetProtocol, metaclass=_QMeta):
-    """Base widget class. Rerquires implementation from the user.
+    """Base widget class. Requires user implementation.
 
     Parameters
     ----------
