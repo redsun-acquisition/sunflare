@@ -17,7 +17,7 @@ class _QMeta(QMetaObject, ABCMeta):
 
 
 class WidgetProtocol(Protocol):
-    """:meta-private:"""  # noqa: D400
+    """Minimmal protocol a widget should implement."""
 
     _virtual_bus: "VirtualBus"
     _module_bus: "VirtualBus"
