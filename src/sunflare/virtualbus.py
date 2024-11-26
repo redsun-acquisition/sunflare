@@ -150,6 +150,8 @@ class ModuleVirtualBus(VirtualBus):
 
     __instance: "Optional[ModuleVirtualBus]" = None
 
+    # TODO: should this become a ZMQ server
+    # where external applications can connect to?
     @classmethod
     def instance(cls) -> "ModuleVirtualBus":
         """Return global ModuleVirtualBus singleton instance."""
