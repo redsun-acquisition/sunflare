@@ -148,10 +148,11 @@ class ModuleVirtualBus(VirtualBus):
     Communication between modules passes via this virtual bus. There can be only one instance of this class within a RedSun application.
     """
 
-    _instance: "Optional[ModuleVirtualBus]" = None
+    __instance: "Optional[ModuleVirtualBus]" = None
 
-    def __new__(cls) -> "ModuleVirtualBus":  # noqa: D102
-        # singleton pattern
-        if cls._instance is None:
-            cls._instance = object.__new__(cls)
-        return cls._instance
+    @classmethod
+    def instance(cls) -> "ModuleVirtualBus":
+        """Return global ModuleVirtualBus singleton instance."""
+        if cls.__instance is None:
+            cls.__instance = cls()
+        return cls.__instance
