@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sunflare.virtualbus import VirtualBus
     from sunflare.types import Workflow
 
-T = TypeVar("T", bound="EngineHandler")
+H = TypeVar("H", bound="EngineHandler")
 
 
 class EngineHandler(Loggable, metaclass=ABCMeta):
@@ -108,7 +108,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def instance(cls: Type[T]) -> T:
+    def instance(cls: Type[H]) -> H:
         """Return the engine handler instance."""
         ...
 
