@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union
+    from typing import Any, Generator, Iterable, Union, Type
 
     from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
@@ -106,7 +106,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def instance(cls) -> "EngineHandler":
+    def instance(cls) -> "Type[EngineHandler]":
         """Return the engine handler instance."""
         ...
 
