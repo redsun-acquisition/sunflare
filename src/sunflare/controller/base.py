@@ -11,7 +11,7 @@ from sunflare.config import ControllerInfo
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Iterable
+    from typing import Iterable, Type
 
     from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
     from sunflare.engine import EngineHandler
@@ -38,7 +38,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
     def __init__(
         self,
         ctrl_info: "ControllerInfo",
-        handler: "EngineHandler",
+        handler: "Type[EngineHandler]",
         virtual_bus: "VirtualBus",
         module_bus: "VirtualBus",
     ) -> None:
