@@ -116,10 +116,13 @@ class ScannerModelTypes(str, Enum):
 
 
 class ControllerTypes(str, Enum):
-    """Supported controller category types.
+    r"""Supported controller category types.
 
     Attributes
     ----------
+    DEVICE : str
+        Device controller. \
+        These are only used internally and not exposed to the user.
     COMPUTATOR : str
         Computator controller.
     PUBLISHER : str
@@ -128,6 +131,7 @@ class ControllerTypes(str, Enum):
         Monitorer controller.
     """
 
+    DEVICE: str = "device"
     COMPUTATOR: str = "computator"
     PUBLISHER: str = "publisher"
     MONITORER: str = "monitorer"
