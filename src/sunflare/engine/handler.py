@@ -1,7 +1,7 @@
 """`EngineHandler` abstract base class."""
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 from sunflare.log import Loggable
 
@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
     from sunflare.types import Workflow
+
+T = TypeVar("T", bound="EngineHandler")
 
 
 class EngineHandler(Loggable, metaclass=ABCMeta):
@@ -106,7 +108,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def instance(cls) -> "Type[EngineHandler]":
+    def instance(cls: Type[T]) -> T:
         """Return the engine handler instance."""
         ...
 
