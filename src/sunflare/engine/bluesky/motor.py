@@ -2,16 +2,18 @@
 
 from abc import abstractmethod
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from sunflare.engine import MotorModel
 
-from bluesky.protocols import Location
-
-from ._status import Status
-
 if TYPE_CHECKING:
     from sunflare.config import MotorModelInfo
+
+    from bluesky.protocols import Location
+
+    from typing import Union
+
+    from ._status import Status
 
 
 # TODO: more protocols for this?
@@ -38,12 +40,12 @@ class BlueskyMotorModel(MotorModel):
     # TODO: define a proper type
     # for the value parameter
     @abstractmethod
-    def set(self, value: int) -> Status:
+    def set(self, value: int) -> "Status":
         """Return a ``Status`` that is marked done when the device is done moving."""
         ...
 
     @abstractmethod
-    def locate(self) -> Location[Union[float, int]]:
+    def locate(self) -> "Location[Union[float, int, str]]":
         """Return the current location of a Device.
 
         While a ``Readable`` reports many values, a ``Movable`` will have the
