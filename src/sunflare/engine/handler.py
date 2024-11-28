@@ -104,6 +104,12 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
             return
         self._workflows[name] = workflow
 
+    @classmethod
+    @abstractmethod
+    def instance(cls) -> "EngineHandler":
+        """Return the engine handler instance."""
+        ...
+
     @property
     @abstractmethod
     def engine(self) -> "Any":
