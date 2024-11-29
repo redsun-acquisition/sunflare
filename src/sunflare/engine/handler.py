@@ -1,22 +1,27 @@
 """`EngineHandler` abstract base class."""
 
-from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, TypeVar
+import sys
 
-from sunflare.log import Loggable
+from abc import abstractmethod
+from typing import TYPE_CHECKING, TypeVar, Generic, Protocol
 
 if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union, Type
+    from typing import Any, Generator, Iterable, Union
+
+    if sys.version_info < (3, 11):
+        from typing_extensions import Self
+    else:
+        from typing import Self
 
     from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
     from sunflare.types import Workflow
 
-H = TypeVar("H", bound="EngineHandler")
+E = TypeVar("E", covariant=True)
 
 
-class EngineHandler(Loggable, metaclass=ABCMeta):
-    """`EngineHandler` abstract base class. Supports logging via `Loggable`.
+class EngineHandler(Generic[E], Protocol):
+    """`EngineHandler` protocol class.
 
     The `EngineHandler` class is a singleton that stores all the devices currently
     deployed within a RedSun hardware module. It provides access to the rest of the controller layer
@@ -41,18 +46,12 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         Module-local virtual bus.
     module_bus : VirtualBus
         Inter-module virtual bus.
-
-    Attributes
-    ----------
-    config : RedSunInstanceInfo
-        RedSun instance configuration dataclass.
-    virtual_bus : VirtualBus
-        Module-local virtual bus.
-    module_bus : VirtualBus
-        Inter-module virtual bus.
     """
 
-    _workflows: "dict[str, Workflow]" = {}
+    _workflows: "dict[str, Workflow]"
+    _config_options: "RedSunInstanceInfo"
+    _virtual_bus: "VirtualBus"
+    _module_bus: "VirtualBus"
 
     @abstractmethod
     def __init__(
@@ -60,10 +59,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         config_options: "RedSunInstanceInfo",
         virtual_bus: "VirtualBus",
         module_bus: "VirtualBus",
-    ) -> None:
-        self.config = config_options
-        self.virtual_bus = virtual_bus
-        self.module_bus = module_bus
+    ) -> None: ...
 
     @abstractmethod
     def register_device(self, name: str, device: "Any") -> None:
@@ -88,6 +84,7 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         """Perform a clean shutdown of the engine and all its devices."""
         ...
 
+    @abstractmethod
     def register_workflows(self, name: str, workflow: "Workflow") -> None:
         """
         Register a new workflow in the handler.
@@ -99,22 +96,17 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         workflow : Union[Generator, Iterable]
             Workflow to be registered.
         """
-        if type(workflow) not in (Generator, Iterable):
-            self.error(
-                f'"{name}" workflow must be either a Generator or an Iterable. Skipping registration.'
-            )
-            return
-        self._workflows[name] = workflow
+        ...
 
     @classmethod
     @abstractmethod
-    def instance(cls: Type[H]) -> H:
+    def instance(cls) -> Self:
         """Return the engine handler instance."""
         ...
 
     @property
     @abstractmethod
-    def engine(self) -> "Any":
+    def engine(self) -> E:
         """Returns the engine instance.
 
         The return type is determined by the specific engine implementation.
@@ -122,32 +114,8 @@ class EngineHandler(Loggable, metaclass=ABCMeta):
         ...
 
     @property
-    @abstractmethod
-    def detectors(self) -> "dict[str, Any]":
-        """Detectors dictionary. Device class type is engine-specific and must inherit from `DetectorModel`."""
-        ...
-
-    @property
-    @abstractmethod
-    def motors(self) -> "dict[str, Any]":
-        """Motors dictionary. Device class type is engine-specific and must inherit from `MotorModel`."""
-        ...
-
-    @property
-    @abstractmethod
-    def lights(self) -> "dict[str, Any]":
-        """Lights dictionary. Device class type is engine-specific and must inherit from `LightModel`."""
-        ...
-
-    @property
-    @abstractmethod
-    def scanners(self) -> "dict[str, Any]":
-        """Scanners dictionary. Device class type is engine-specific and must inherit from `ScannerModel`."""
-        ...
-
-    @property
     def workflows(
         self,
     ) -> "dict[str, Union[Generator[Any, None, None], Iterable[Any]]]":
         """Workflows dictionary."""
-        return self._workflows
+        ...
