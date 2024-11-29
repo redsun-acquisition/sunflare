@@ -25,8 +25,8 @@ classifiers = [
 ]
 license = {text = "BSD 3-Clause license"}
 dependencies = [
-  "pydantic==2.9.2",
-  "psygnal==0.11.1",
+  "pydantic",
+  "psygnal",
   "numpy>=1.22.2, <2; python_version >= '3.10'",
   "numpy>=1.22.2, <2; python_version < '3.10'",
   "typing_extensions>=4.6.0; python_version < '3.11'"
