@@ -33,6 +33,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# TODO: enable after exengine
+# provides better support
 # exengine = [
 #     "exengine[micromanager]",
 # ]
