@@ -27,7 +27,8 @@ license = {text = "BSD 3-Clause license"}
 dependencies = [
   "pydantic==2.9.2",
   "psygnal==0.11.1",
-  "numpy>=1.23.0"
+  "numpy>=1.22.2 ; python_version >= '3.10'",
+  "numpy >=1.22.2, <2 ; python_version < '3.10'",
 ]
 
 [project.optional-dependencies]
