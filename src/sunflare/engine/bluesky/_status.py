@@ -13,7 +13,6 @@ from ._exceptions import (
     UnknownStatusFailure,
     StatusTimeoutError,
     WaitTimeoutError,
-    UseNewProperty,
 )
 
 
@@ -173,8 +172,8 @@ class Status(Loggable):
         """Boolean indicating whether associated operation has completed.
 
         This is set to True at __init__ time or by calling
-        :meth:`set_finished`, :meth:`set_exception`, or (deprecated)
-        :meth:`_finished`. Once True, it can never become False.
+        :meth:`set_finished`, :meth:`set_exception`.
+        Once True, it can never become False.
         """
         return self._event.is_set()
 
@@ -183,8 +182,8 @@ class Status(Loggable):
         """Boolean indicating whether associated operation has completed.
 
         This is set to True at __init__ time or by calling
-        :meth:`set_finished`, :meth:`set_exception`, or (deprecated)
-        :meth:`_finished`. Once True, it can never become False.
+        :meth:`set_finished`, :meth:`set_exception`
+        . Once True, it can never become False.
         """
         return self.done and self._exception is None
 
@@ -319,35 +318,6 @@ class Status(Loggable):
         else:
             self._settled_event.set()
 
-    def _finished(self, success=True, **kwargs):
-        """Inform the status object that it is done and if it succeeded.
-
-        This method is deprecated. Please use :meth:`set_finished` or
-        :meth:`set_exception`.
-        .. warning::
-           kwargs are not used, but are accepted because pyepics gives
-           in a bunch of kwargs that we don't care about.  This allows
-           the status object to be handed directly to pyepics (but
-           this is probably a bad idea for other reason.
-           This may be deprecated in the future.
-
-        Parameters
-        ----------
-        success : bool, optional
-           if the action succeeded.
-        """
-        if success:
-            self.set_finished()
-        else:
-            # success=False does not give any information about *why* it
-            # failed, so set a generic exception.
-            exc = UnknownStatusFailure(
-                f"The status {self!r} has failed. To obtain more specific, "
-                "helpful errors in the future, update the Device to use "
-                "set_exception(...) instead of _finished(success=False)."
-            )
-            self.set_exception(exc)
-
     def exception(self, timeout=None):
         """Return the exception raised by the action.
 
@@ -404,27 +374,6 @@ class Status(Loggable):
         """Callbacks to be run when the status is marked as finished."""
         return self._callbacks
 
-    @property
-    def finished_cb(self):
-        with self._lock:
-            if len(self.callbacks) == 1:
-                warn(
-                    "The property `finished_cb` is deprecated, and must raise "
-                    "an error if a status object has multiple callbacks. Use "
-                    "the `callbacks` property instead.",
-                    stacklevel=2,
-                )
-                (cb,) = self.callbacks
-                assert cb is not None
-                return cb
-            else:
-                raise UseNewProperty(
-                    "The deprecated `finished_cb` property "
-                    "cannot be used for status objects that have "
-                    "multiple callbacks. Use the `callbacks` "
-                    "property instead."
-                )
-
     def add_callback(self, callback):
         """Register a callback to be called once when the Status finishes.
 
@@ -450,22 +399,3 @@ class Status(Loggable):
                 # callback, so we will hold a strong reference until we call it,
                 # and then clear this cache to drop the reference(s).
                 self._callbacks.append(callback)
-
-    @finished_cb.setter
-    def finished_cb(self, cb):
-        with self._lock:
-            if not self.callbacks:
-                warn(
-                    "The setter `finished_cb` is deprecated, and must raise "
-                    "an error if a status object already has one callback. Use "
-                    "the `add_callback` method instead.",
-                    stacklevel=2,
-                )
-                self.add_callback(cb)
-            else:
-                raise UseNewProperty(
-                    "The deprecated `finished_cb` setter cannot "
-                    "be used for status objects that already "
-                    "have one callback. Use the `add_callbacks` "
-                    "method instead."
-                )

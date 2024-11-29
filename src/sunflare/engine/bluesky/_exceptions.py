@@ -63,9 +63,6 @@ class StatusTimeoutError(TimeoutError, BlueskyException):
     ...
 
 
-class UseNewProperty(RuntimeError, BlueskyException): ...
-
-
 class WaitTimeoutError(TimeoutError, BlueskyException):
     """TimeoutError raised when we ware waiting on completion of a task.
 
