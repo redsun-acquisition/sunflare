@@ -15,4 +15,3 @@ for /r %%f in (*.pyc) do (
 )
 
 echo Cleanup complete.
-pause
