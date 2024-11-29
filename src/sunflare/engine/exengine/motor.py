@@ -22,6 +22,13 @@ if TYPE_CHECKING:
 
     from typing import Any, Tuple
 
+__all__ = [
+    "ExEngineSingleMotorModel",
+    "ExEngineDoubleMotorModel",
+    "ExEngineMMSingleMotorModel",
+    "ExEngineMMDoubleMotorModel",
+]
+
 
 class ExEngineSingleMotorModel(MotorModel, ExEngineSingleMotor):  # type: ignore[misc]  # noqa: D101
     def __init__(self, name: str, model_info: MotorModelInfo):

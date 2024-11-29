@@ -15,6 +15,8 @@ if TYPE_CHECKING:
 
     from sunflare.config import DetectorModelInfo
 
+__all__ = ["ExEngineDetectorModel", "ExEngineMMCameraModel"]
+
 
 class ExEngineDetectorModel(DetectorModel, ExEngineDetector):  # type: ignore[misc]
     r""" 

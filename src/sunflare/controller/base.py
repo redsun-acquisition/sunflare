@@ -5,29 +5,29 @@ This toolkit section provides RedSun developers with the necessary base classes 
 """
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, TypeVar, Generic
 
 from sunflare.config import ControllerInfo
-from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Iterable, Type
+    from typing import Iterable
 
     from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
-    from sunflare.engine import EngineHandler
     from sunflare.virtualbus import VirtualBus, Signal
     from sunflare.types import Workflow
 
+R = TypeVar("R")
 
-class BaseController(Loggable, metaclass=ABCMeta):
+
+class AbstractController(Generic[R], metaclass=ABCMeta):
     """Base controller class. Supports logging via `Loggable`.
 
     Parameters
     ----------
     ctrl_info : ControllerInfo
         Controller information dataclass.
-    handler : EngineHandler
-        Engine API.
+    registry : DeviceRegistry
+        Engine-specific device registry.
     virtual_bus : VirtualBus
         Intra-module virtual bus.
     module_bus : VirtualBus
@@ -38,11 +38,11 @@ class BaseController(Loggable, metaclass=ABCMeta):
     def __init__(
         self,
         ctrl_info: "ControllerInfo",
-        handler: "Type[EngineHandler]",
+        registry: R,
         virtual_bus: "VirtualBus",
         module_bus: "VirtualBus",
     ) -> None:
-        self._handler = handler
+        self._registry = registry
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
         self._ctrl_info = ctrl_info
@@ -107,6 +107,12 @@ class BaseController(Loggable, metaclass=ABCMeta):
     def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported engines."""
         return self._ctrl_info.supported_engines
+
+    @property
+    @abstractmethod
+    def registry(self) -> R:
+        """Device registry."""
+        return self._registry
 
 
 class Computator(Protocol):
