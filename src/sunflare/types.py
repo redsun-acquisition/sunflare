@@ -22,7 +22,7 @@ class AxisLocation(TypedDict, Generic[T, X]):
         Where the Device actually is at the moment.
     """
 
-    axis: Union[X, list[X]]
+    axis: "Union[X, list[X]]"
     setpoint: T
     readback: T
 
