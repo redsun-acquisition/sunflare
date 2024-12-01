@@ -1,5 +1,7 @@
 """Light source model abstract base class definition."""
 
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -35,7 +37,7 @@ class LightModel(Loggable, metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self, name: str, model_info: "LightModelInfo") -> None:
+    def __init__(self, name: str, model_info: LightModelInfo) -> None:
         self.__name = name
         self._model_info = model_info
 
@@ -60,17 +62,17 @@ class LightModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> list[AcquisitionEngineTypes]:
         """List of supported acquisition engines."""
         return self._model_info.supported_engines
 
     @property
-    def category(self) -> "LightModelTypes":
+    def category(self) -> LightModelTypes:
         """Light source type."""
         return self._model_info.category
 
     @property
-    def wavelength(self) -> "Optional[int]":
+    def wavelength(self) -> Optional[int]:
         """Light source wavelength. Returns `None` if not applicable."""
         return self._model_info.wavelength
 
@@ -80,7 +82,7 @@ class LightModel(Loggable, metaclass=ABCMeta):
         return self._model_info.power_egu
 
     @property
-    def range(self) -> "Union[Tuple[float, float], Tuple[int, int]]":
+    def range(self) -> Union[Tuple[float, float], Tuple[int, int]]:
         """Light source power range, expressed in EGU.
 
         Formatted as (min, max).
@@ -88,6 +90,6 @@ class LightModel(Loggable, metaclass=ABCMeta):
         return self._model_info.range
 
     @property
-    def power_step(self) -> "Union[float, int]":
+    def power_step(self) -> Union[float, int]:
         """Light source power step, expressed in EGU."""
         return self._model_info.power_step
