@@ -62,24 +62,6 @@ class EngineHandler(Generic[E], Protocol):
     ) -> None: ...
 
     @abstractmethod
-    def register_device(self, name: str, device: "Any") -> None:
-        """
-        Add a new device to the registry.
-
-        Child classes must implement this method to add a new device to the registry.
-
-        Parameters
-        ----------
-        name : str
-            Device unique identifier.
-        device : Any
-            - Device instance
-            - The device instance must be coherent with the selected acquisition engine.
-            - This means that devices to be added to the registry must inherit from the correct device model class for the selected engine.
-        """
-        ...
-
-    @abstractmethod
     def shutdown(self) -> None:
         """Perform a clean shutdown of the engine and all its devices."""
         ...
