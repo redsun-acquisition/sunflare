@@ -1,4 +1,3 @@
-# ruff: noqa
 """Device registry protocol module."""
 
 from typing import TYPE_CHECKING, Generic, TypeVar, Protocol

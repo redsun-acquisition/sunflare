@@ -29,22 +29,22 @@ class DictLike(Protocol[K, V]):
     def items(self) -> Iterator[tuple[K, V]]: ...
 
 
-class HasMotors(DictLike[str, M], Protocol):
-    """A dictionary-like protocol that has motors."""
+class HasMotors(Protocol):
+    """A protocol describing that the registry has motors."""
 
     @property
     def motors(self) -> DictLike[str, M]: ...
 
 
-class HasLights(DictLike[str, L], Protocol):
-    """A dictionary-like protocol that has lights."""
+class HasLights(Protocol):
+    """A protocol describing that the registry has lights."""
 
     @property
     def lights(self) -> DictLike[str, L]: ...
 
 
-class HasDetectors(DictLike[str, D], Protocol):
-    """A dictionary-like protocol that has detectors."""
+class HasDetectors(Protocol):
+    """A protocol describing that the registry has detectors."""
 
     @property
     def detectors(self) -> DictLike[str, D]: ...
