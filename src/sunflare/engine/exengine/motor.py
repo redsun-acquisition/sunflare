@@ -39,6 +39,13 @@ class ExEngineSingleMotorModel(MotorModel, ExEngineSingleMotor):  # type: ignore
             self, name, no_executor=False, no_executor_attrs=("_name",)
         )
 
+    def shutdown(self) -> None:
+        """Shutdown the motor.
+
+        Optional method to perform cleanup operations.
+        """
+        raise NotImplementedError
+
     @abstractmethod
     def set_position(self, position: float) -> None: ...  # noqa: D102
 
@@ -64,6 +71,13 @@ class ExEngineDoubleMotorModel(MotorModel, ExEngineDoubleMotor):  # type: ignore
             self, name, no_executor=False, no_executor_attrs=("_name",)
         )
 
+    def shutdown(self) -> None:
+        """Shutdown the motor.
+
+        Optional method to perform cleanup operations.
+        """
+        raise NotImplementedError
+
     @abstractmethod
     def set_position(self, x: float, y: float) -> None: ...  # noqa: D102
 
@@ -85,8 +99,22 @@ class ExEngineMMSingleMotorModel(MotorModel, ExEngineMMSingleMotor):  # type: ig
         MotorModel.__init__(self, name, model_info)
         ExEngineMMSingleMotor.__init__(self, name)
 
+    def shutdown(self) -> None:
+        """Shutdown the motor.
+
+        Optional method to perform cleanup operations.
+        """
+        raise NotImplementedError
+
 
 class ExEngineMMDoubleMotorModel(MotorModel, ExEngineMMDoubleMotor):  # type: ignore[misc]  # noqa: D101
     def __init__(self, name: str, model_info: MotorModelInfo):
         MotorModel.__init__(self, name, model_info)
         ExEngineMMDoubleMotor.__init__(self, name)
+
+    def shutdown(self) -> None:
+        """Shutdown the motor.
+
+        Optional method to perform cleanup operations.
+        """
+        raise NotImplementedError
