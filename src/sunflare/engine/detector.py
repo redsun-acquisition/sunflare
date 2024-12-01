@@ -20,8 +20,6 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
 
     It does **not** provide APIs for performing actions, which must be instead defined by the engine-specific detector classes.
 
-    The `DetectorModel` contains an extended, evented dataclass that allows the user to expose new properties to the upper layers using `psygnal`.
-
     Parameters
     ----------
     name: str
