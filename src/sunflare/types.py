@@ -3,12 +3,13 @@
 from typing import TYPE_CHECKING, TypeAlias, TypeVar, Generic, TypedDict
 
 if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union, Optional
+    from typing import Any, Generator, Iterable, Union
 
-T = TypeVar("T")
+T = TypeVar("T", bound=Union[int, str, float])
+X = TypeVar("X", bound=Union[str, int])
 
 
-class AxisLocation(TypedDict, Generic[T]):
+class AxisLocation(TypedDict, Generic[T, X]):
     """Typed dictionary for axis-aware device location.
 
     Parameters
@@ -21,7 +22,7 @@ class AxisLocation(TypedDict, Generic[T]):
         Where the Device actually is at the moment.
     """
 
-    axis: "Optional[Union[str, int]]"
+    axis: Union[X, list[X]]
     setpoint: T
     readback: T
 
