@@ -9,13 +9,20 @@ T = TypeVar("T")
 
 
 class AxisLocation(TypedDict, Generic[T]):
-    """Extended Location adding axis information."""
+    """Typed dictionary for axis-aware device location.
 
-    #: The axis along which the Device is moving
+    Parameters
+    ----------
+    axis : Optional[Union[str, int]]
+        The axis along which the Device is moving.
+    setpoint : T
+        Where the Device was requested to move to.
+    readback : T
+        Where the Device actually is at the moment.
+    """
+
     axis: "Optional[Union[str, int]]"
-    #: Where the Device was requested to move to
     setpoint: T
-    #: Where the Device actually is at the moment
     readback: T
 
 
