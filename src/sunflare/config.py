@@ -154,6 +154,10 @@ class ControllerInfo(BaseModel):
     controller_name: str = Field(default=str())
     supported_engines: list[AcquisitionEngineTypes] = Field(default_factory=list)
 
+    # private field; it is used to bypass validation
+    # in order to build device controllers internally
+    _bypass: bool = Field(default=False)
+
 
 class DeviceModelInfo(BaseModel):
     """Base model for device information.
