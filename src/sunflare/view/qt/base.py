@@ -15,6 +15,8 @@ if TYPE_CHECKING:
 
     from typing import Any
 
+__all__ = ["BaseWidget"]
+
 
 class _QMeta(QMetaObject, ABCMeta):
     pass
