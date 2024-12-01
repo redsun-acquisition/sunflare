@@ -10,51 +10,31 @@ The `VirtualBus` class is a factory of singleton objects charged of exchanging i
 `VirtualBuses` can be inter-module or intra-module, and they can be used to emit notifications, as well as carry information to other plugins and/or different RedSun modules.
 """
 
-from abc import ABCMeta
-from functools import lru_cache
-from types import MappingProxyType
-from typing import final, TYPE_CHECKING
+from __future__ import annotations
 
-from psygnal import SignalInstance
+from abc import ABCMeta
+from types import MappingProxyType
+from typing import final, TYPE_CHECKING, Iterable, ClassVar
+
+from psygnal import SignalInstance, Signal
 
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from typing import Any, Tuple, Optional
+    import sys
+
+    from typing import Optional
+
+    if sys.version_info < (3, 11):
+        from typing_extensions import Self
+    else:
+        from typing import Self
 
 __all__ = ["Signal", "VirtualBus", "ModuleVirtualBus"]
 
 from typing import Callable, TypeVar
 
 
-class Signal(SignalInstance):
-    """Small wrapper around `psygnal.SignalInstance`."""
-
-    # TODO: https://github.com/pyapp-kit/psygnal/issues/330
-    # subclassing SignalInstance creates performance losses;
-    # we keep Signal as it is for now but an alternative
-    # implementation should be provided once this issue is resolved.
-    def __init__(
-        self, *argtypes: "Any", info: str = "RedSun signal", **kwargs: "Any"
-    ) -> None:
-        SignalInstance.__init__(self, signature=argtypes, **kwargs)
-        self._info = info
-
-    @property
-    @lru_cache
-    def types(self) -> "Tuple[type, ...]":
-        """Tuple of data types carried by the signal."""
-        return tuple(
-            [param.annotation for param in self._signature.parameters.values()]
-        )
-
-    @property
-    def info(self) -> str:
-        """Signal description."""
-        return self._info
-
-
-# Define a generic type for the function
 F = TypeVar("F", bound=Callable[..., object])
 
 
@@ -78,9 +58,7 @@ def slot(func: F) -> F:
 
 
 class VirtualBus(Loggable, metaclass=ABCMeta):
-    """
-
-    VirtualBus base class. Supports logging via `Loggable`.
+    """VirtualBus base class. Supports logging via `Loggable`.
 
     The VirtualBus is a mechanism to exchange data between different parts of the system.
 
@@ -89,97 +67,110 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
     VirtualBus' signals are implemented using the `psygnal` library; they can be dynamically registered as class attributes, and accessed as a read-only dictionary.
     """
 
-    _signal_registry: "dict[str, Signal]" = {}
-
     def __init__(self) -> None:
         # pre-register signals added as attributes in the class definition
-        self._signal_registry = {
-            key: value
-            for key, value in type(self).__dict__.items()
-            if key.startswith("sig") and isinstance(value, Signal)
-        }
+        self._cache: dict[str, dict[str, SignalInstance]] = {}
 
-    def __setattr__(self, name: str, value: "Any") -> None:
+    def register_signals(
+        self, owner: object, only: Optional[Iterable[str]] = None
+    ) -> None:
         """
-        Overload `__setattr__` to allow registering new signals attributes.
-
-        If the attribute name starts with 'sig' and the value is a `Signal` object, it will be added as instance attribute and added to the signal registry.
-
-        Otherwise, it will be registered as a regular attribute.
-
-        Args:
-            name (`str`): attribute name.
-            value (`Any`): attribute value.
-        """
-        if name.startswith("sig") and isinstance(value, Signal):
-            if not hasattr(self, name) and name not in self._signal_registry:
-                self._signal_registry[name] = value
-                super().__setattr__(name, value)
-            else:
-                self.warning(
-                    f"Signal {name} already exists in {self.__class__.__name__}."
-                )
-        else:
-            super().__setattr__(name, value)
-
-    def register_signal(self, name: str, *args: "Any", **kwargs: "Any") -> None:
-        r"""
-
-        Create a new `Signal` object with the given name and arguments, and stores it as class attribute.
-
-        >>> channel.registerSignal('sigAcquisitionStarted', str)
-        >>> # this will allow to access the signal as an attribute
-        >>> channel.sigAcquisitionStarted.connect(mySlot)
-
-        Signal names must start with 'sig' prefix.
+        Register the signals of an object in the virtual bus.
 
         Parameters
         ----------
-        name : str
-            The signal name; this will be used as the attribute name.
-        *args : tuple
-            Data types carried by the signal.
-        **kwargs : dict, optional
-            Additional arguments to pass to the `Signal` constructor: \\
-            `info` (str): signal description. \\
-            Other keyword arguments can be found in the `psygnal.SignalInstance` documentation.
+        owner : object
+            The instance whose class's signals are to be cached.
+        only : iterable of str, optional
+            A list of signal names to cache. If not provided, all
+            signals in the class will be cached automatically by inspecting
+            the class attributes.
+
+        Notes
+        -----
+        This method inspects the attributes of the owner's class to find
+        `psygnal.Signal` descriptors. For each such descriptor, it retrieves
+        the `SignalInstance` from the owner using the descriptor protocol and
+        stores it in the registry.
+        """
+        owner_class = type(owner)  # Get the class of the object
+        class_name = owner_class.__name__  # Name of the class
+
+        if only is None:
+            # Automatically detect all attributes of the class that are psygnal Signal descriptors
+            only = [
+                name
+                for name in dir(owner_class)
+                if isinstance(getattr(owner_class, name, None), Signal)
+            ]
+
+        # Initialize the registry for this class if not already present
+        if class_name not in self._cache:
+            self._cache[class_name] = {}
+
+        # Iterate over the specified signal names and cache their instances
+        for name in only:
+            signal_descriptor = getattr(owner_class, name, None)
+            if isinstance(signal_descriptor, Signal):
+                # Retrieve the SignalInstance using the descriptor protocol
+                signal_instance = getattr(owner, name)
+                self._cache[class_name][name] = signal_instance
+
+    def __getitem__(self, class_name: str) -> MappingProxyType[str, SignalInstance]:
+        """
+        Access the registry for a specific class.
+
+        Parameters
+        ----------
+        class_name : str
+            The name of the class whose signals are to be accessed.
+
+        Returns
+        -------
+        dict of {str : SignalInstance}
+            A dictionary mapping signal names to their `SignalInstance` objects.
 
         Raises
         ------
-        ValueError
-            If `name` does not start with 'sig' prefix.
+        KeyError
+            If the class name is not found in the registry.
         """
-        if not name.startswith("sig"):
-            raise ValueError("Signal name must start with 'sig' prefix.")
-        else:
-            if "info" in kwargs:
-                info = kwargs.pop("info")
-            else:
-                info = "RedSun signal"
-            signal = Signal(*args, info=info, **kwargs)
-        setattr(self, name, signal)
+        if class_name not in self._cache:
+            raise KeyError(f"Class '{class_name}' is not registered.")
+        return MappingProxyType(self._cache[class_name])
 
-    @property
-    def signals(self) -> "MappingProxyType[str, Signal]":
-        """A read-only dictionary with the registered signals."""
-        return MappingProxyType(self._signal_registry)
+    def __contains__(self, class_name: str) -> bool:
+        """
+        Check if a class is in the registry.
+
+        Parameters
+        ----------
+        class_name : str
+            The name of the class to check.
+
+        Returns
+        -------
+        bool
+            True if the class is in the registry, False otherwise.
+        """
+        return class_name in self._cache
 
 
+# TODO: should this become a ZMQ server
+# where external applications can connect to?
 @final
 class ModuleVirtualBus(VirtualBus):
-    """
+    r"""
     Inter-module virtual bus.
 
-    Communication between modules passes via this virtual bus. There can be only one instance of this class within a RedSun application.
+    Communication between modules passes via this virtual bus. \
+    There can be only one instance of this class within a RedSun application.
     """
 
-    __instance: "Optional[ModuleVirtualBus]" = None
+    __instance: ClassVar[Optional[ModuleVirtualBus]] = None
 
-    # TODO: should this become a ZMQ server
-    # where external applications can connect to?
-    @classmethod
-    def instance(cls) -> "ModuleVirtualBus":
-        """Return global ModuleVirtualBus singleton instance."""
+    def __new__(cls) -> Self:  # noqa: D102
         if cls.__instance is None:
-            cls.__instance = cls()
+            cls.__instance = super(ModuleVirtualBus, cls).__new__(cls)
+
         return cls.__instance
