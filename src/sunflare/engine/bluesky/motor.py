@@ -8,8 +8,7 @@ from sunflare.engine import MotorModel
 
 if TYPE_CHECKING:
     from sunflare.config import MotorModelInfo
-
-    from bluesky.protocols import Location
+    from sunflare.types import AxisLocation
 
     from typing import Union
 
@@ -37,15 +36,13 @@ class BlueskyMotorModel(MotorModel):
         """
         ...
 
-    # TODO: define a proper type
-    # for the value parameter
     @abstractmethod
-    def set(self, value: int) -> "Status":
+    def set(self, value: "AxisLocation[Union[float, int, str]]") -> "Status":
         """Return a ``Status`` that is marked done when the device is done moving."""
         ...
 
     @abstractmethod
-    def locate(self) -> "Location[Union[float, int, str]]":
+    def locate(self) -> "AxisLocation[Union[float, int, str]]":
         """Return the current location of a Device.
 
         While a ``Readable`` reports many values, a ``Movable`` will have the
