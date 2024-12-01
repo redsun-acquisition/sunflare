@@ -156,7 +156,7 @@ class ControllerInfo(BaseModel):
 
     # private field; it is used to bypass validation
     # in order to build device controllers internally
-    _bypass: bool = Field(default=False)
+    _bypass: bool
 
 
 class DeviceModelInfo(BaseModel):
