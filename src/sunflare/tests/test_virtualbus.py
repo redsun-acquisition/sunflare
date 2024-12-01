@@ -1,6 +1,6 @@
 import numpy as np
 
-from sunflare.virtualbus import Signal, VirtualBus, ModuleVirtualBus
+from sunflare.virtualbus import Signal, VirtualBus, ModuleVirtualBus, slot
 
 
 class MockVirtualBus(VirtualBus):
@@ -59,3 +59,12 @@ def test_module_virtual_bus_registration() -> None:
     
     bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
     bus["MockOwner"]["sigMySignal"].emit(5)
+
+def test_slot_decorator() -> None:
+    """Tests the slot decorator."""
+    
+    @slot
+    def test_slot(x: int) -> None:
+        assert x == 5
+    
+    assert hasattr(test_slot, "__isslot__")
