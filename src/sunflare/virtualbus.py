@@ -1,13 +1,35 @@
-"""
+r"""
 The `VirtualBus` is a mechanism to exchange data between different parts of the system.
 
-The module contains two main classes: `Signal` and `VirtualBus`.
+The module exposes the following:
 
-The `Signal` class is a small wrapper around `psygnal.SignalInstance` that provides additional properties to access the signal data types and description.
+- the `psygnal.Signal` class;
+- the `VirtualBus` class;
+- the `ModuleVirtualBus` class;
+- the `slot` decorator.
 
-The `VirtualBus` class is a factory of singleton objects charged of exchanging information between different controllers via `Signals`.
+`psygnal.Signal` is the main communication mechanism between controllers and the view layer. \
+It provides a syntax similar to the Qt signal/slot mechanism, i.e.
 
-`VirtualBuses` can be inter-module or intra-module, and they can be used to emit notifications, as well as carry information to other plugins and/or different RedSun modules.
+.. code-block:: python
+
+    class MyController:
+        sigMySignal = Signal()
+    
+    def a_slot():
+        print("My signal was emitted!")
+    
+    ctrl = MyController()
+    ctrl.sigMySignal.connect(my_slot)
+
+The `VirtualBus` class is the base class for building virtual communication buses. \
+It must be re-implemented by users that wish to create new modules for RedSun. \
+    
+The `ModuleVirtualBus` class is a singleton that acts as the main communication bus between modules. \
+Different modules can share information by emitting signals on this bus and connecting to them.
+
+The `slot` decorator is used to mark a function as a slot. \
+In practice, it provides no benefit at runtime; it's used to facilitate documentation.
 """
 
 from __future__ import annotations
@@ -129,14 +151,11 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
         -------
         MappingProxyType[str, SignalInstance]
             A read-only dictionary mapping signal names to their `SignalInstance` objects.
-
-        Raises
-        ------
-        KeyError
-            If the class name is not found in the registry.
+            If the class is not found in the registry, an empty dictionary is returned.
         """
         if class_name not in self._cache:
-            raise KeyError(f"Class '{class_name}' is not registered.")
+            self.error(f"Class {class_name} not found in the registry.")
+            return MappingProxyType({})
         return MappingProxyType(self._cache[class_name])
 
     def __contains__(self, class_name: str) -> bool:
