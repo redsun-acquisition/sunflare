@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING, TypeAlias, TypeVar, Generic, TypedDict
 
 if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union
+    from typing import Any, Generator, Iterable, Union, Sequence
 
 T = TypeVar("T", bound=Union[int, str, float])
 X = TypeVar("X", bound=Union[str, int])
@@ -22,7 +22,7 @@ class AxisLocation(TypedDict, Generic[T, X]):
         Where the Device actually is at the moment.
     """
 
-    axis: "Union[X, list[X]]"
+    axis: "Union[X, Sequence[X]]"
     setpoint: T
     readback: T
 
