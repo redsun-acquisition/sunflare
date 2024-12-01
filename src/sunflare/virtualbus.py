@@ -122,13 +122,13 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
 
         Parameters
         ----------
-        class_name : str
+        class_name: str
             The name of the class whose signals are to be accessed.
 
         Returns
         -------
-        dict of {str : SignalInstance}
-            A dictionary mapping signal names to their `SignalInstance` objects.
+        MappingProxyType[str, SignalInstance]
+            A read-only dictionary mapping signal names to their `SignalInstance` objects.
 
         Raises
         ------
