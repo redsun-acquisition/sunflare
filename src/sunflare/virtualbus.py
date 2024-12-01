@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 
 __all__ = ["Signal", "VirtualBus", "ModuleVirtualBus"]
 
+from typing import Callable, TypeVar
+
 
 class Signal(SignalInstance):
     """Small wrapper around `psygnal.SignalInstance`."""
@@ -50,6 +52,29 @@ class Signal(SignalInstance):
     def info(self) -> str:
         """Signal description."""
         return self._info
+
+
+# Define a generic type for the function
+F = TypeVar("F", bound=Callable[..., object])
+
+
+def slot(func: F) -> F:
+    """Decorate a function as a slot.
+
+    psygnal does not need this decorator; it is only used for documentation purposes.
+
+    Parameters
+    ----------
+    func : F
+        The function to decorate.
+
+    Returns
+    -------
+    F
+        The same function with the `__isslot__` attribute set to True.
+    """
+    setattr(func, "__isslot__", True)
+    return func
 
 
 class VirtualBus(Loggable, metaclass=ABCMeta):
