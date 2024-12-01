@@ -2,17 +2,17 @@
 
 from typing import TYPE_CHECKING
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
-from .base import AbstractController
+from .base import ControllerProtocol
 
 if TYPE_CHECKING:
-    from sunflare.config import ControllerInfo
+    from sunflare.config import ControllerInfo, ControllerTypes, AcquisitionEngineTypes
     from sunflare.virtualbus import VirtualBus
     from sunflare.engine.bluesky.registry import BlueskyDeviceRegistry
 
 
-class BlueskyController(AbstractController["BlueskyDeviceRegistry"], metaclass=ABCMeta):
+class BlueskyController(ControllerProtocol["BlueskyDeviceRegistry"], metaclass=ABCMeta):
     """ExEngine base controller class."""
 
     def __init__(
@@ -22,9 +22,39 @@ class BlueskyController(AbstractController["BlueskyDeviceRegistry"], metaclass=A
         virtual_bus: "VirtualBus",
         module_bus: "VirtualBus",
     ) -> None:
-        super().__init__(ctrl_info, registry, virtual_bus, module_bus)
+        self._registry = registry
+        self._ctrl_info = ctrl_info
+        self._virtual_bus = virtual_bus
+        self._module_bus = module_bus
+
+    @abstractmethod
+    def shutdown(self) -> None:  # noqa: D102
+        # inherited docstring
+        ...
+
+    @abstractmethod
+    def registration_phase(self) -> None:  # noqa: D102
+        # inherited docstring
+        ...
+
+    @abstractmethod
+    def connection_phase(self) -> None:  # noqa: D102
+        # inherited docstring
+        ...
 
     @property
-    def registry(self) -> "BlueskyDeviceRegistry":
-        """ExEngine device registry."""
+    def category(self) -> "set[ControllerTypes]":  # noqa: D102
+        return self._ctrl_info.category
+
+    @property
+    def controller_name(self) -> str:  # noqa: D102
+        # inherited docstring
+        return self._ctrl_info.controller_name
+
+    @property
+    def supported_engines(self) -> "list[AcquisitionEngineTypes]":  # noqa: D102
+        return self._ctrl_info.supported_engines
+
+    @property
+    def registry(self) -> "BlueskyDeviceRegistry":  # noqa: D102
         return self._registry

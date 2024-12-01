@@ -4,7 +4,7 @@ RedSun controller toolkit.
 This toolkit section provides RedSun developers with the necessary base classes to implement their own controllers.
 """
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Protocol, TypeVar, Generic
 
 from sunflare.config import ControllerInfo
@@ -16,36 +16,17 @@ if TYPE_CHECKING:
     from sunflare.virtualbus import VirtualBus, Signal
     from sunflare.types import Workflow
 
+# device registry type
 R = TypeVar("R")
 
 
-class AbstractController(Generic[R], metaclass=ABCMeta):
-    """Base controller class. Supports logging via `Loggable`.
+class ControllerProtocol(Generic[R], Protocol):
+    """Base controller protocol."""
 
-    Parameters
-    ----------
-    ctrl_info : ControllerInfo
-        Controller information dataclass.
-    registry : DeviceRegistry
-        Engine-specific device registry.
-    virtual_bus : VirtualBus
-        Intra-module virtual bus.
-    module_bus : VirtualBus
-        Inter-module virtual bus.
-    """
-
-    @abstractmethod
-    def __init__(
-        self,
-        ctrl_info: "ControllerInfo",
-        registry: R,
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
-    ) -> None:
-        self._registry = registry
-        self._virtual_bus = virtual_bus
-        self._module_bus = module_bus
-        self._ctrl_info = ctrl_info
+    _registry: R
+    _virtual_bus: "VirtualBus"
+    _module_bus: "VirtualBus"
+    _ctrl_info: "ControllerInfo"
 
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations."""
@@ -94,16 +75,19 @@ class AbstractController(Generic[R], metaclass=ABCMeta):
         ...
 
     @property
+    @abstractmethod
     def category(self) -> "set[ControllerTypes]":
         """Controller category."""
-        return self._ctrl_info.category
+        ...
 
     @property
+    @abstractmethod
     def controller_name(self) -> str:
         """Controller name. Represents the class which builds the controller instance."""
-        return self._ctrl_info.controller_name
+        ...
 
     @property
+    @abstractmethod
     def supported_engines(self) -> "list[AcquisitionEngineTypes]":
         """List of supported engines."""
         return self._ctrl_info.supported_engines

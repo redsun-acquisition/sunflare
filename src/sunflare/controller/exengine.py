@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from abc import ABCMeta
 
-from .base import AbstractController
+from .base import ControllerProtocol
 
 from sunflare.log import Loggable
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class ExEngineController(
-    AbstractController["ExEngineDeviceRegistry"], Loggable, metaclass=ABCMeta
+    ControllerProtocol["ExEngineDeviceRegistry"], Loggable, metaclass=ABCMeta
 ):
     """ExEngine base controller class."""
 
@@ -26,7 +26,10 @@ class ExEngineController(
         virtual_bus: "VirtualBus",
         module_bus: "VirtualBus",
     ) -> None:
-        super().__init__(ctrl_info, registry, virtual_bus, module_bus)
+        self._registry = registry
+        self._ctrl_info = ctrl_info
+        self._virtual_bus = virtual_bus
+        self._module_bus = module_bus
 
     @property
     def registry(self) -> "ExEngineDeviceRegistry":
