@@ -38,23 +38,27 @@ class ControllerProtocol(Generic[R], Protocol):
 
     @abstractmethod
     def registration_phase(self) -> None:
-        """Register the controller signals listed in this method to expose them to the virtual buses.
+        r"""Register the controller signals listed in this method to expose them to the virtual buses.
 
-        At application start-up, controllers can't know what signals are available from other controllers.
-        This method is called after all controllers are initialized to allow them to register their signals.
-        Controllers may be able to register further signals or connect to other controllers' signals even after this phase.
-
+        At application start-up, controllers can't know what signals are available from other controllers. \
+        This method is called after all controllers are initialized to allow them to register their signals. \
+        Controllers may be able to register further signals or connect to other controllers' signals even after this phase. \
+        
+        Only signals defined in your controller can be registered.
+        
         An implementation example:
 
-        >>> def registration_phase(self) -> None:
-        >>>     # virtual bus signal
-        >>>     self._virtual_bus.sigMySignal = Signal(str, int, **kwargs)
-        >>>
-        >>>     # module bus signal
-        >>>     self._module_bus.sigOtherMySignal = Signal(int, tuple, **kwargs)
-        >>>
-        >>>     # using "register_signal" method
-        >>>     self._virtual_bus.register_signal("sigMySecondOtherSignal", str, **kwargs)
+        .. code-block:: python
+
+            def registration_phase(self) -> None:
+                # you can register all signals...
+                self._module_bus.register_signals(self)
+                
+                # ... or only a selection of them
+                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+                
+                # you can also register signals to the module bus
+                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
         """
         ...
 
@@ -65,16 +69,26 @@ class ControllerProtocol(Generic[R], Protocol):
         At application start-up, controllers can't know what signals are available from other controllers.
         This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
         connect to all available registered signals in both virtual buses.
-        Controllers may be able to connect to other controllers' signals even after this phase.
+        Controllers may be able to connect to other controllers' signals even after this phase,
+        or to signals from the view layer (provided they have been registered as well).
 
         An implementation example:
 
-        >>> def connection_phase(self) -> None:
-        >>>     # connect to virtual bus signal
-        >>>     self._virtual_bus.sigExternalControllerSignal.connect(self._my_slot)
-        >>>
-        >>>     # connect to module bus signal
-        >>>     self._module_bus.sigOtherExternalControllerSignal.connect(self._my_other_slot)
+        .. code-block:: python
+
+            def connection_phase(self) -> None:
+                # you can connect signals from another controller to your local slots...
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+
+                # ... or to other signals ...
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self.sigMySignal)
+
+                # ... or connect to widgets
+                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+
+                # you can also connect to the module bus
+                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
         """
         ...
 
