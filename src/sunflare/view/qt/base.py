@@ -1,7 +1,7 @@
 """Base widget module.
 
 This module contains the basic functionalities a widget of any framework should provide in order to build up
-a GUI that is consistent throught all the RedSun stack.
+a Qt GUI that is consistent throught all the RedSun stack.
 """
 
 from abc import abstractmethod, ABCMeta
