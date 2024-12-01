@@ -14,8 +14,8 @@ class AxisLocation(TypedDict, Generic[T, X]):
 
     Parameters
     ----------
-    axis : Optional[Union[str, int]]
-        The axis along which the Device is moving.
+    axis : Union[X, Sequence[X]]
+        The axis along which the Device is moving. Can be a single axis or a sequence of axes.
     setpoint : T
         Where the Device was requested to move to.
     readback : T
