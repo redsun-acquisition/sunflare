@@ -1,5 +1,7 @@
 """Detector model abstract base class definition."""
 
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -28,33 +30,13 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
     model_info: DetectorModelInfo
         - Detector model information dataclass.
         - Provided by RedSun configuration.
-    exposure: Union[int, float]
-        - Detector exposure time at startup (time scale defined by `exposure_egu`).
-        - User defined.
-    pixel_photometric: list[PixelPhotometricTypes]
-        - List of supported pixel colors.
-        - User defined.
-        - Defaults to `gray`.
-    bits_per_pixel: set[int]
-        - Set of supported values for pixel width in bits.
-        - User defined.
-        - Defaults to `{8}`.
-    offset: Tuple[int, int]
-        - Detector offset at startup (Y, X).
-        - User-defined.
-        - Only applicable for 'line' and 'area' detectors. Defaults to `(0, 0)`.
-    shape: Tuple[int, int]
-        - Detector shape at startup (Y, X).
-        - User-defined.
-        - If set to `None`, it defaults to the sensor size.
-        - Only applicable for 'line' and 'area' detectors. Defaults to `None`.
     """
 
     @abstractmethod
     def __init__(
         self,
-        name: "str",
-        model_info: "DetectorModelInfo",
+        name: str,
+        model_info: DetectorModelInfo,
     ) -> None:
         self.__name = name
         self._model_info = model_info
@@ -80,7 +62,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> list[AcquisitionEngineTypes]:
         """Supported acquisition engines list."""
         return self._model_info.supported_engines
 
@@ -90,12 +72,12 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.category
 
     @property
-    def sensor_size(self) -> "Tuple[int, int]":
+    def sensor_size(self) -> Tuple[int, int]:
         """Detector sensor size in pixels: represents the 2D axis (Y, X). Only applicable for 'line' and 'area' detectors."""
         return self._model_info.sensor_size
 
     @property
-    def pixel_size(self) -> "Tuple[float, float, float]":
+    def pixel_size(self) -> Tuple[float, float, float]:
         """Detector pixel size in micrometers: represents the 3D axis (Z, Y, X)."""
         return self._model_info.pixel_size
 

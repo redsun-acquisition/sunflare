@@ -4,6 +4,8 @@ Motors are a category of hardware devices capable of moving objects in a control
 Belonging to this category fall devices such as stage axis, focusing units, generic stepper motors, and so on.
 """
 
+from __future__ import annotations
+
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -46,7 +48,7 @@ class MotorModel(Loggable, metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self, name: str, model_info: "MotorModelInfo"):
+    def __init__(self, name: str, model_info: MotorModelInfo) -> None:
         self.__name = name
         self._model_info = model_info
 
@@ -71,12 +73,12 @@ class MotorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> list[AcquisitionEngineTypes]:
         """Supported acquisition engines list."""
         return self._model_info.supported_engines
 
     @property
-    def category(self) -> "MotorModelTypes":
+    def category(self) -> MotorModelTypes:
         """Motor type."""
         return self._model_info.category
 
