@@ -29,7 +29,11 @@ class ControllerProtocol(Generic[R], Protocol):
     _ctrl_info: "ControllerInfo"
 
     def shutdown(self) -> None:
-        """Shutdown the controller. Performs cleanup operations."""
+        """Shutdown the controller. Performs cleanup operations.
+
+        If the controller handles any kind of resources (i.e. devices, connections, etc.),
+        this method should invoke any equivalent shutdown method for each resource.
+        """
         ...
 
     @abstractmethod
