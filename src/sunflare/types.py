@@ -9,7 +9,7 @@ T = TypeVar("T", bound=Union[int, str, float])
 X = TypeVar("X", bound=Union[str, int])
 
 
-class AxisLocation(TypedDict, Generic[T, X]):
+class AxisLocation(TypedDict, Generic[X, T]):
     r"""Typed dictionary for axis-aware device location.
 
     Parameters
