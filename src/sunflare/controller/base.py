@@ -24,9 +24,9 @@ class ControllerProtocol(Generic[R], Protocol):
     """Base controller protocol."""
 
     _registry: R
-    _virtual_bus: "VirtualBus"
-    _module_bus: "VirtualBus"
-    _ctrl_info: "ControllerInfo"
+    _virtual_bus: VirtualBus
+    _module_bus: VirtualBus
+    _ctrl_info: ControllerInfo
 
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations.
@@ -94,7 +94,7 @@ class ControllerProtocol(Generic[R], Protocol):
 
     @property
     @abstractmethod
-    def category(self) -> "set[ControllerTypes]":
+    def category(self) -> set[ControllerTypes]:
         """Controller category."""
         ...
 
@@ -106,7 +106,7 @@ class ControllerProtocol(Generic[R], Protocol):
 
     @property
     @abstractmethod
-    def supported_engines(self) -> "list[AcquisitionEngineTypes]":
+    def supported_engines(self) -> list[AcquisitionEngineTypes]:
         """List of supported engines."""
         return self._ctrl_info.supported_engines
 
@@ -130,7 +130,7 @@ class Publisher(Protocol):
 
     @property
     @abstractmethod
-    def workflows(self) -> "Iterable[Workflow]":
+    def workflows(self) -> Iterable[Workflow]:
         """Iterable of available plans."""
         ...
 
