@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
+    from typing import Union
+
     from sunflare.config import (
         AcquisitionEngineTypes,
         MotorModelInfo,
@@ -88,7 +90,7 @@ class MotorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.step_egu
 
     @property
-    def step_size(self) -> float:
+    def step_size(self) -> Union[int, float]:
         """Motor step size."""
         return self._model_info.step_size
 
