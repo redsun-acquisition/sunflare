@@ -42,7 +42,7 @@ class ControllerProtocol(Generic[R], Protocol):
 
         At application start-up, controllers can't know what signals are available from other controllers. \
         This method is called after all controllers are initialized to allow them to register their signals. \
-        Controllers may be able to register further signals or connect to other controllers' signals even after this phase. \
+        Controllers may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
         
         Only signals defined in your controller can be registered.
         
