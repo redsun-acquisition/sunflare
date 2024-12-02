@@ -35,7 +35,7 @@ class AcquisitionEngineTypes(str, Enum):
 class FrontendTypes(str, Enum):
     """Supported frontend types.
 
-    Frontends are the GUIs that are used to interact with the user.
+    Frontends are the supported GUI frameworks that are used to interact with the user.
 
     Attributes
     ----------
