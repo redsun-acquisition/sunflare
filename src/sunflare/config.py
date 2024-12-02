@@ -1,11 +1,16 @@
 """RedSun configuration dataclasses and enums."""
 
+from __future__ import annotations
+
 from enum import Enum
-from typing import Optional, Tuple, Union, ClassVar
+from typing import TYPE_CHECKING
 
 from psygnal import SignalGroupDescriptor
 
 from pydantic import Field, BaseModel, ConfigDict
+
+if TYPE_CHECKING:
+    from typing import Optional, Tuple, Union, ClassVar
 
 
 class AcquisitionEngineTypes(str, Enum):
@@ -249,8 +254,8 @@ class MotorModelInfo(DeviceModelInfo):
         Motor type. Defaults to 'stepper'.
     step_egu : str
         Engineering unit for steps, e.g. 'mm', 'μm'. Defaults to 'μm'.
-    step_size : float
-        Motor step size in `step_egu` units. Defaults to 1.
+    step_size : Union[int, float]
+        Motor step size in `step_egu` units. Defaults to 1.0.
     axes : list[str]
         Supported motor axes. Suggestion is to be a list of
         single character, capital strings, e.g. ['X', 'Y', 'Z'].
@@ -262,7 +267,7 @@ class MotorModelInfo(DeviceModelInfo):
 
     category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
     step_egu: str = Field(default="μm")
-    step_size: float = Field(default=1.0)
+    step_size: Union[int, float] = Field(default=1.0)
     axes: list[str] = Field(default_factory=list)
     return_home: bool = Field(default=False)
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
