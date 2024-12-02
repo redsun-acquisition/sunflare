@@ -1,7 +1,9 @@
 """RedSun configuration dataclasses and enums."""
 
 from enum import Enum
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, ClassVar
+
+from psygnal import SignalGroupDescriptor
 
 from pydantic import Field, BaseModel, ConfigDict
 
@@ -153,6 +155,7 @@ class ControllerInfo(BaseModel):
     category: set[ControllerTypes] = Field(default=set())
     controller_name: str = Field(default=str())
     supported_engines: list[AcquisitionEngineTypes] = Field(default_factory=list)
+    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
     # private field; it is used to bypass validation
     # in order to build device controllers internally
@@ -206,6 +209,7 @@ class DetectorModelInfo(DeviceModelInfo):
     sensor_size: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
     pixel_size: Tuple[float, float, float] = Field(default_factory=lambda: (1, 1, 1))
     exposure_egu: str = Field(default="ms")
+    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 
 class LightModelInfo(DeviceModelInfo):
@@ -233,6 +237,7 @@ class LightModelInfo(DeviceModelInfo):
         default_factory=lambda: (0, 0)
     )
     power_step: Union[float, int] = Field(default=0)
+    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 
 class MotorModelInfo(DeviceModelInfo):
@@ -260,6 +265,7 @@ class MotorModelInfo(DeviceModelInfo):
     step_size: float = Field(default=1.0)
     axes: list[str] = Field(default_factory=list)
     return_home: bool = Field(default=False)
+    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 
 class ScannerModelInfo(DeviceModelInfo):
@@ -277,6 +283,7 @@ class ScannerModelInfo(DeviceModelInfo):
     category: ScannerModelTypes = Field(default=ScannerModelTypes.GALVO)
     axes: list[str] = Field(default_factory=list)
     # TODO: investigate what other parameters are needed for scanner
+    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 
 class RedSunInstanceInfo(BaseModel):
