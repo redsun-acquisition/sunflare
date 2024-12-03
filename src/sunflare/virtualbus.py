@@ -45,7 +45,7 @@ from __future__ import annotations
 
 from abc import ABCMeta
 from types import MappingProxyType
-from typing import final, TYPE_CHECKING, Iterable, ClassVar
+from typing import final, TYPE_CHECKING, Iterable, ClassVar, overload
 
 from psygnal import SignalInstance, Signal
 
@@ -54,7 +54,7 @@ from sunflare.log import Loggable
 if TYPE_CHECKING:
     import sys
 
-    from typing import Optional
+    from typing import Optional, Union
 
     if sys.version_info < (3, 11):
         from typing_extensions import Self
@@ -69,26 +69,41 @@ from typing import Callable, TypeVar
 F = TypeVar("F", bound=Callable[..., object])
 
 
-def slot(func: F, private: bool = False) -> F:
-    """Decorate a function as a slot.
+@overload
+def slot(func: F) -> F: ...
 
-    psygnal does not need this decorator; it is only used for documentation purposes.
+
+@overload
+def slot(*, private: bool) -> Callable[[F], F]: ...
+
+
+def slot(
+    func: Optional[F] = None, *, private: bool = False
+) -> Union[F, Callable[[F], F]]:
+    """Decorate a function as a slot.
 
     Parameters
     ----------
-    func : F
-        The function to decorate.
+    func : F, optional
+        The function to decorate. If not provided, the decorator must be applied with arguments.
     private : bool, optional
         Mark the slot as private. Default is False.
 
     Returns
     -------
-    F
-        The same function with the `__isslot__` attribute set to True.
+    Union[F, Callable[[F], F]]
+        Either the decorated function or a callable decorator.
     """
-    setattr(func, "__isslot__", True)
-    setattr(func, "__isprivate__", private)
-    return func
+
+    def decorator(actual_func: F) -> F:
+        setattr(actual_func, "__isslot__", True)
+        setattr(actual_func, "__isprivate__", private)
+        return actual_func
+
+    if func is None:
+        return decorator  # Return the decorator function
+    else:
+        return decorator(func)  # Directly apply the decorator
 
 
 class VirtualBus(Loggable, metaclass=ABCMeta):
