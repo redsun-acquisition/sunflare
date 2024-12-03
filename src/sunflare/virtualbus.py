@@ -69,7 +69,7 @@ from typing import Callable, TypeVar
 F = TypeVar("F", bound=Callable[..., object])
 
 
-def slot(func: F) -> F:
+def slot(func: F, private: bool = False) -> F:
     """Decorate a function as a slot.
 
     psygnal does not need this decorator; it is only used for documentation purposes.
@@ -78,6 +78,8 @@ def slot(func: F) -> F:
     ----------
     func : F
         The function to decorate.
+    private : bool, optional
+        Mark the slot as private. Default is False.
 
     Returns
     -------
@@ -85,6 +87,7 @@ def slot(func: F) -> F:
         The same function with the `__isslot__` attribute set to True.
     """
     setattr(func, "__isslot__", True)
+    setattr(func, "__isprivate__", private)
     return func
 
 
