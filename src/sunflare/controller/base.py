@@ -64,13 +64,13 @@ class ControllerProtocol(Generic[R], Protocol):
 
     @abstractmethod
     def connection_phase(self) -> None:
-        """Connect to other controllers' signals.
+        """Connect to other controllers or widgets.
 
-        At application start-up, controllers can't know what signals are available from other controllers.
+        At application start-up, controllers can't know what signals are available from other parts of RedSun.
         This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
         connect to all available registered signals in both virtual buses.
-        Controllers may be able to connect to other controllers' signals even after this phase,
-        or to signals from the view layer (provided they have been registered as well).
+        Controllers may be able to connect to other signals even after this phase (provided those signals
+        were registered before).
 
         An implementation example:
 
