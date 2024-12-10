@@ -30,7 +30,9 @@ dependencies = [
     "psygnal",
     "numpy>=1.24, <1.27",
     "xarray>=2023.7.0",
-    "typing_extensions>=4.6.0; python_version < '3.11'"
+    "typing_extensions>=4.6.0; python_version < '3.11'",
+    "qtpy",
+    "pyqt6"
 ]
 
 [project.optional-dependencies]
