@@ -1,4 +1,5 @@
 engine: exengine
+frontend: qt
 detectors:
   First mock detector:
     model_name: MockDetectorModel

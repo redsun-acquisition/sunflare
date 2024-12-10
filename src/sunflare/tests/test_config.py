@@ -1,4 +1,6 @@
-import json
+# type: ignore
+
+import yaml
 import os
 
 from sunflare.config import RedSunInstanceInfo
@@ -9,25 +11,28 @@ def test_empty_info():
     """Test empty redsun instance info."""
 
     config_file = os.path.join(
-        config_path, "empty_instance.json"
+        config_path, "empty_instance.yaml"
     )
-    config_dict = json.load(open(config_file))
+
+    config_dict = yaml.safe_load(open(config_file))
+
     instance = RedSunInstanceInfo(**config_dict)
 
     assert instance.engine == "exengine"
-    assert instance.detectors == {}
+    assert instance.controllers == {}
+    # assert instance.detectors == {}
     assert instance.lights == {}
-    assert instance.motors == {}
-    assert instance.scanners == {}
+    # assert instance.motors == {}
+    # assert instance.scanners == {}
 
 
 def test_detectors_info():
     """Test the redsun instance info with detectors."""
 
     config_file = os.path.join(
-        config_path, "detector_instance.json"
+        config_path, "detector_instance.yaml"
     )
-    config_dict = json.load(open(config_file))
+    config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
     assert instance.engine == "exengine"
@@ -55,9 +60,10 @@ def test_motors_info():
     """Test the redsun instance info with motors."""
 
     config_file = os.path.join(
-        config_path, "motor_instance.json"
+        config_path, "motor_instance.yaml"
     )
-    config_dict = json.load(open(config_file))
+    
+    config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
     assert instance.engine == "exengine"

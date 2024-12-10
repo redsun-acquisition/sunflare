@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import Optional, Tuple, Union, ClassVar
 
 from psygnal import SignalGroupDescriptor
 
 from pydantic import Field, BaseModel, ConfigDict
-
-if TYPE_CHECKING:
-    from typing import Optional, Tuple, Union, ClassVar
 
 
 class AcquisitionEngineTypes(str, Enum):
@@ -164,7 +161,7 @@ class ControllerInfo(BaseModel):
 
     # private field; it is used to bypass validation
     # in order to build device controllers internally
-    _bypass: bool
+    _bypass: bool = False
 
 
 class DeviceModelInfo(BaseModel):
@@ -212,7 +209,9 @@ class DetectorModelInfo(DeviceModelInfo):
 
     category: str = Field(default=DetectorModelTypes.AREA)
     sensor_size: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
-    pixel_size: Tuple[float, float, float] = Field(default_factory=lambda: (1, 1, 1))
+    pixel_size: Tuple[float, float, float] = Field(
+        default_factory=lambda: (1.0, 1.0, 1.0)
+    )
     exposure_egu: str = Field(default="ms")
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
@@ -268,7 +267,7 @@ class MotorModelInfo(DeviceModelInfo):
     category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
     step_egu: str = Field(default="μm")
     step_size: Union[int, float] = Field(default=1.0)
-    axes: list[str] = Field(default_factory=list)
+    axes: list[str] = Field(default_factory=lambda: list())
     return_home: bool = Field(default=False)
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
@@ -324,8 +323,8 @@ class RedSunInstanceInfo(BaseModel):
 
     engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.EXENGINE)
     frontend: FrontendTypes = Field(default=FrontendTypes.QT)
-    controllers: Optional[dict[str, ControllerInfo]]
-    detectors: Optional[dict[str, DetectorModelInfo]]
-    lights: Optional[dict[str, LightModelInfo]]
-    motors: Optional[dict[str, MotorModelInfo]]
-    scanners: Optional[dict[str, ScannerModelInfo]]
+    controllers: dict[str, ControllerInfo] = Field(default_factory=lambda: dict())
+    detectors: dict[str, DetectorModelInfo] = Field(default_factory=lambda: dict())
+    lights: dict[str, LightModelInfo] = Field(default_factory=lambda: dict())
+    motors: dict[str, MotorModelInfo] = Field(default_factory=lambda: dict())
+    scanners: dict[str, ScannerModelInfo] = Field(default_factory=lambda: dict())

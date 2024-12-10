@@ -1,4 +1,4 @@
-import numpy as np
+# type: ignore
 
 from sunflare.virtualbus import Signal, VirtualBus, ModuleVirtualBus, slot
 
@@ -60,7 +60,7 @@ def test_module_virtual_bus_registration() -> None:
     bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
     bus["MockOwner"]["sigMySignal"].emit(5)
 
-def test_slot_decorator() -> None:
+def test_slot() -> None:
     """Tests the slot decorator."""
     
     @slot
@@ -68,3 +68,13 @@ def test_slot_decorator() -> None:
         assert x == 5
     
     assert hasattr(test_slot, "__isslot__")
+
+def test_slot_private() -> None:
+    """Tests the slot decorator when it is private."""
+    
+    @slot(private=True)
+    def _test_slot(x: int) -> None:
+        assert x == 5
+    
+    assert hasattr(_test_slot, "__isslot__")
+    assert hasattr(_test_slot, "__isprivate__")

@@ -1,16 +1,13 @@
 engine: exengine
+frontend: qt
 motors:
   Single axis motor:
-    vendor: N/A
-    serial_number: N/A
     model_name: MockMotorModel
     axes:
       - X
     supported_engines:
       - exengine
   Double axis motor:
-    vendor: N/A
-    serial_number: N/A
     model_name: MockMotorModel
     axes:
       - X

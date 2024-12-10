@@ -1,3 +1,5 @@
+# type: ignore
+
 from typing import TYPE_CHECKING
 
 from sunflare.log import Loggable, get_logger
