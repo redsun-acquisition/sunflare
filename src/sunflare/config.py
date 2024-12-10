@@ -324,8 +324,8 @@ class RedSunInstanceInfo(BaseModel):
 
     engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.EXENGINE)
     frontend: FrontendTypes = Field(default=FrontendTypes.QT)
-    controllers: Optional[dict[str, ControllerInfo]] = Field(default_factory=dict)
-    detectors: Optional[dict[str, DetectorModelInfo]] = Field(default_factory=dict)
-    lights: Optional[dict[str, LightModelInfo]] = Field(default_factory=dict)
-    motors: Optional[dict[str, MotorModelInfo]] = Field(default_factory=dict)
-    scanners: Optional[dict[str, ScannerModelInfo]] = Field(default_factory=dict)
+    controllers: Optional[dict[str, ControllerInfo]]
+    detectors: Optional[dict[str, DetectorModelInfo]]
+    lights: Optional[dict[str, LightModelInfo]]
+    motors: Optional[dict[str, MotorModelInfo]]
+    scanners: Optional[dict[str, ScannerModelInfo]]
