@@ -2,7 +2,7 @@
 
 Redsun plugin's SDK.
 
-> [WARNING!]
+> [!WARNING]
 > This project is still in alpha stage and very unstable. Use at your own risk.
 
 ## Installation
