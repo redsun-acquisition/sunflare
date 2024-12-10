@@ -42,6 +42,13 @@ dependencies = [
 bluesky = [
     "bluesky"
 ]
+dev = [
+  "nox",
+  "sphinx",
+  "ruff",
+  "pre-commit",
+  "pytest"
+]
 
 [project.urls]
 
