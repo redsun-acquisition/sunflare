@@ -1,5 +1,7 @@
 """`EngineHandler` abstract base class."""
 
+from __future__ import annotations
+
 import sys
 
 from abc import abstractmethod
@@ -48,17 +50,17 @@ class EngineHandler(Generic[E], Protocol):
         Inter-module virtual bus.
     """
 
-    _workflows: "dict[str, Workflow]"
-    _config_options: "RedSunInstanceInfo"
-    _virtual_bus: "VirtualBus"
-    _module_bus: "VirtualBus"
+    _workflows: dict[str, Workflow]
+    _config_options: RedSunInstanceInfo
+    _virtual_bus: VirtualBus
+    _module_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
-        config_options: "RedSunInstanceInfo",
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
+        config_options: RedSunInstanceInfo,
+        virtual_bus: VirtualBus,
+        module_bus: VirtualBus,
     ) -> None: ...
 
     @abstractmethod
