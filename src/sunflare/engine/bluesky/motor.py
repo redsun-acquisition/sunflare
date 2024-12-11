@@ -1,5 +1,7 @@
 """Bluesky detector interface."""
 
+from __future__ import annotations
+
 from abc import abstractmethod
 
 from typing import TYPE_CHECKING
@@ -25,7 +27,7 @@ class BlueskyMotorModel(MotorModel):
     - :class:`bluesky.protocols.Locatable`
     """
 
-    def __init__(self, name: str, model_info: "MotorModelInfo"):
+    def __init__(self, name: str, model_info: MotorModelInfo):
         super().__init__(name, model_info)
 
     def shutdown(self) -> None:
@@ -37,12 +39,12 @@ class BlueskyMotorModel(MotorModel):
         ...
 
     @abstractmethod
-    def set(self, value: "AxisLocation[Union[float, int, str]]") -> "Status":
+    def set(self, value: AxisLocation[Union[float, int, str]]) -> Status:
         """Return a ``Status`` that is marked done when the device is done moving."""
         ...
 
     @abstractmethod
-    def locate(self) -> "AxisLocation[Union[float, int, str]]":
+    def locate(self) -> AxisLocation[Union[float, int, str]]:
         """Return the current location of a Device.
 
         While a ``Readable`` reports many values, a ``Movable`` will have the
