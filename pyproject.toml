@@ -55,9 +55,9 @@ dev = [
 
 [project.urls]
 
-bugs = "https://github.com/jacopoabramo/sunflare/issues"
-changelog = "https://github.com/jacopoabramo/sunflare/blob/master/changelog.md"
-homepage = "https://github.com/jacopoabramo/sunflare"
+bugs = "https://github.com/redsun-acquisition/sunflare/issues"
+changelog = "https://github.com/redsun-acquisition/sunflare/blob/master/changelog.md"
+homepage = "https://github.com/redsun-acquisition/sunflare"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
