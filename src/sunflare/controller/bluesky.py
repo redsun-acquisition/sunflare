@@ -1,5 +1,7 @@
 """Bluesky base controller module."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from abc import ABCMeta, abstractmethod
@@ -12,15 +14,15 @@ if TYPE_CHECKING:
     from sunflare.engine.bluesky.registry import BlueskyDeviceRegistry
 
 
-class BlueskyController(ControllerProtocol["BlueskyDeviceRegistry"], metaclass=ABCMeta):
+class BlueskyController(ControllerProtocol[BlueskyDeviceRegistry], metaclass=ABCMeta):
     """ExEngine base controller class."""
 
     def __init__(
         self,
-        ctrl_info: "ControllerInfo",
-        registry: "BlueskyDeviceRegistry",
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
+        ctrl_info: ControllerInfo,
+        registry: BlueskyDeviceRegistry,
+        virtual_bus: VirtualBus,
+        module_bus: VirtualBus,
     ) -> None:
         self._registry = registry
         self._ctrl_info = ctrl_info
@@ -52,9 +54,9 @@ class BlueskyController(ControllerProtocol["BlueskyDeviceRegistry"], metaclass=A
         return self._ctrl_info.controller_name
 
     @property
-    def supported_engines(self) -> "list[AcquisitionEngineTypes]":  # noqa: D102
+    def supported_engines(self) -> list[AcquisitionEngineTypes]:  # noqa: D102
         return self._ctrl_info.supported_engines
 
     @property
-    def registry(self) -> "BlueskyDeviceRegistry":  # noqa: D102
+    def registry(self) -> BlueskyDeviceRegistry:  # noqa: D102
         return self._registry

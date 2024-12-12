@@ -1,5 +1,7 @@
 """ExEngine base controller module."""
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from abc import ABCMeta
@@ -15,16 +17,16 @@ if TYPE_CHECKING:
 
 
 class ExEngineController(
-    ControllerProtocol["ExEngineDeviceRegistry"], Loggable, metaclass=ABCMeta
+    ControllerProtocol[ExEngineDeviceRegistry], Loggable, metaclass=ABCMeta
 ):
     """ExEngine base controller class."""
 
     def __init__(
         self,
-        ctrl_info: "ControllerInfo",
-        registry: "ExEngineDeviceRegistry",
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
+        ctrl_info: ControllerInfo,
+        registry: ExEngineDeviceRegistry,
+        virtual_bus: VirtualBus,
+        module_bus: VirtualBus,
     ) -> None:
         self._registry = registry
         self._ctrl_info = ctrl_info
@@ -32,6 +34,6 @@ class ExEngineController(
         self._module_bus = module_bus
 
     @property
-    def registry(self) -> "ExEngineDeviceRegistry":
+    def registry(self) -> ExEngineDeviceRegistry:
         """ExEngine device registry."""
         return self._registry
