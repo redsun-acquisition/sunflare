@@ -1,5 +1,7 @@
 """ExEngine motor model available for creating custom device interfaces with the RedSun Toolkit."""
 
+from __future__ import annotations
+
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
@@ -53,7 +55,7 @@ class ExEngineSingleMotorModel(MotorModel, ExEngineSingleMotor):  # type: ignore
     def get_position(self) -> float: ...  # noqa: D102
 
     @abstractmethod
-    def set_position_sequence(self, positions: "npt.NDArray[Any]") -> None: ...  # noqa: D102
+    def set_position_sequence(self, positions: npt.NDArray[Any]) -> None: ...  # noqa: D102
 
     @abstractmethod
     def get_triggerable_position_sequence_max_length(self) -> int: ...  # noqa: D102
@@ -82,10 +84,10 @@ class ExEngineDoubleMotorModel(MotorModel, ExEngineDoubleMotor):  # type: ignore
     def set_position(self, x: float, y: float) -> None: ...  # noqa: D102
 
     @abstractmethod
-    def get_position(self) -> "Tuple[float, float]": ...  # noqa: D102
+    def get_position(self) -> Tuple[float, float]: ...  # noqa: D102
 
     @abstractmethod
-    def set_position_sequence(self, positions: "npt.NDArray[Any]") -> None: ...  # noqa: D102
+    def set_position_sequence(self, positions: npt.NDArray[Any]) -> None: ...  # noqa: D102
 
     @abstractmethod
     def get_triggerable_position_sequence_max_length(self) -> int: ...  # noqa: D102
