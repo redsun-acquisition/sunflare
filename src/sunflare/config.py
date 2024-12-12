@@ -181,7 +181,7 @@ class DeviceModelInfo(BaseModel):
 
     model_name: str = Field(default=str())
     supported_engines: list[AcquisitionEngineTypes] = Field(
-        default_factory=lambda: [AcquisitionEngineTypes.EXENGINE]
+        default_factory=lambda: [AcquisitionEngineTypes.BLUESKY]
     )
     vendor: str = Field(default="N/A", description="Device vendor name")
     serial_number: str = Field(default="N/A", description="Device serial number")
