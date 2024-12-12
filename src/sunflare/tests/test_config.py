@@ -18,12 +18,12 @@ def test_empty_info():
 
     instance = RedSunInstanceInfo(**config_dict)
 
-    assert instance.engine == "exengine"
+    assert instance.engine == "bluesky"
     assert instance.controllers == {}
-    # assert instance.detectors == {}
+    assert instance.detectors == {}
     assert instance.lights == {}
-    # assert instance.motors == {}
-    # assert instance.scanners == {}
+    assert instance.motors == {}
+    assert instance.scanners == {}
 
 
 def test_detectors_info():
@@ -35,7 +35,7 @@ def test_detectors_info():
     config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
-    assert instance.engine == "exengine"
+    assert instance.engine == "bluesky"
     assert instance.detectors != {}
     assert instance.lights == {}
     assert instance.motors == {}
@@ -45,7 +45,7 @@ def test_detectors_info():
         assert mock.model_name == "MockDetectorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert mock.supported_engines == ["exengine"]
+        assert mock.supported_engines == ["bluesky"]
         assert mock.sensor_size == (0, 0)
         assert mock.pixel_size == (1, 1, 1)
 
@@ -66,7 +66,7 @@ def test_motors_info():
     config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
-    assert instance.engine == "exengine"
+    assert instance.engine == "bluesky"
     assert instance.detectors == {}
     assert instance.lights == {}
     assert instance.motors != {}

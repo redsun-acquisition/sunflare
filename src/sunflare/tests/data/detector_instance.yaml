@@ -1,4 +1,4 @@
-engine: exengine
+engine: bluesky
 frontend: qt
 detectors:
   First mock detector:
