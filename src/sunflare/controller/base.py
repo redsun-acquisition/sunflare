@@ -117,8 +117,8 @@ class ControllerProtocol(Generic[R], Protocol):
         return self._registry
 
 
-class Computator(Protocol):
-    """Infers that this class is a computational controller."""
+class Renderer(Protocol):
+    """Infers that this class is a rendering controller."""
 
     ...
 
