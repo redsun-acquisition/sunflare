@@ -25,25 +25,13 @@ E = TypeVar("E", covariant=True)
 class EngineHandler(Generic[E], Protocol):
     """`EngineHandler` protocol class.
 
-    The `EngineHandler` class is a singleton that stores all the devices currently
-    deployed within a RedSun hardware module. It provides access to the rest of the controller layer
-    to information for each device, allowing for execution of atomic operations such as moving
-    a motor or setting a light intensity.
+    The `EngineHandler` wraps the acquisition engine and provides a common interface for all engines.
+    It communicates with the rest of the application via the virtual buses.
 
-    At startup, the `EngineHandler` is populated with the devices defined in the configuration file. These
-    can be then accessed as read-only dictionaries, indexing the device by unique identifiers.
-
-    Each engine has its own dedicated `EngineHandler` instance, with common methods that are specialized
-    for the specific engine type by using inheritance.
-
-    `EngineHandler` classes hold dictionaries that are used to group up devices by type and provide
-    a key-value access to specific devices the user wants to interact with. The types of devices
-    the registry can provide depend on the engine capabilities to support that type of device.
+    The handler needs to be specialized depending on what engine is being used.
 
     Parameters
     ----------
-    config_options: RedSunInstanceInfo
-        RedSun instance configuration dataclass.
     virtual_bus : VirtualBus
         Module-local virtual bus.
     module_bus : VirtualBus
@@ -51,25 +39,23 @@ class EngineHandler(Generic[E], Protocol):
     """
 
     _workflows: dict[str, Workflow]
-    _config_options: RedSunInstanceInfo
     _virtual_bus: VirtualBus
     _module_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
-        config_options: RedSunInstanceInfo,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
     ) -> None: ...
 
     @abstractmethod
     def shutdown(self) -> None:
-        """Perform a clean shutdown of the engine and all its devices."""
+        """Perform a clean shutdown of the engine."""
         ...
 
     @abstractmethod
-    def register_workflows(self, name: str, workflow: "Workflow") -> None:
+    def register_workflows(self, name: str, workflow: Workflow) -> None:
         """
         Register a new workflow in the handler.
 
@@ -80,12 +66,6 @@ class EngineHandler(Generic[E], Protocol):
         workflow : Union[Generator, Iterable]
             Workflow to be registered.
         """
-        ...
-
-    @classmethod
-    @abstractmethod
-    def instance(cls) -> Self:
-        """Return the engine handler instance."""
         ...
 
     @property
@@ -100,6 +80,6 @@ class EngineHandler(Generic[E], Protocol):
     @property
     def workflows(
         self,
-    ) -> "dict[str, Union[Generator[Any, None, None], Iterable[Any]]]":
+    ) -> dict[str, Union[Generator[Any, None, None], Iterable[Any]]]:
         """Workflows dictionary."""
         ...
