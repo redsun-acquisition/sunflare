@@ -2,20 +2,12 @@
 
 from __future__ import annotations
 
-import sys
-
 from abc import abstractmethod
 from typing import TYPE_CHECKING, TypeVar, Generic, Protocol
 
 if TYPE_CHECKING:
     from typing import Any, Generator, Iterable, Union
 
-    if sys.version_info < (3, 11):
-        from typing_extensions import Self
-    else:
-        from typing import Self
-
-    from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
     from sunflare.types import Workflow
 
