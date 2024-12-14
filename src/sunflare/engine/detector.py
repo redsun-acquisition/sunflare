@@ -3,14 +3,10 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING
+from typing import Tuple
 
 from sunflare.log import Loggable
-
-if TYPE_CHECKING:
-    from typing import Tuple
-
-    from sunflare.config import AcquisitionEngineTypes, DetectorModelInfo
+from sunflare.config import AcquisitionEngineTypes, DetectorModelInfo
 
 
 class DetectorModel(Loggable, metaclass=ABCMeta):

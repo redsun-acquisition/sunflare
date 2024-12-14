@@ -7,18 +7,13 @@ Belonging to this category fall devices such as stage axis, focusing units, gene
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING
-
+from typing import Union
 from sunflare.log import Loggable
-
-if TYPE_CHECKING:
-    from typing import Union
-
-    from sunflare.config import (
-        AcquisitionEngineTypes,
-        MotorModelInfo,
-        MotorModelTypes,
-    )
+from sunflare.config import (
+    AcquisitionEngineTypes,
+    MotorModelInfo,
+    MotorModelTypes,
+)
 
 
 class MotorModel(Loggable, metaclass=ABCMeta):

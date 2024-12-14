@@ -2,20 +2,17 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from abc import ABCMeta, abstractmethod
 
 from .base import ControllerProtocol
 
-if TYPE_CHECKING:
-    from sunflare.config import ControllerInfo, ControllerTypes, AcquisitionEngineTypes
-    from sunflare.virtualbus import VirtualBus
-    from sunflare.engine.bluesky.registry import BlueskyDeviceRegistry
+from sunflare.config import ControllerInfo, ControllerTypes, AcquisitionEngineTypes
+from sunflare.virtualbus import VirtualBus
+from sunflare.engine.bluesky.registry import BlueskyDeviceRegistry
 
 
 class BlueskyController(ControllerProtocol[BlueskyDeviceRegistry], metaclass=ABCMeta):
-    """ExEngine base controller class."""
+    """Bluesky base controller class."""
 
     def __init__(
         self,

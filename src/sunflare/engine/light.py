@@ -3,18 +3,14 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING
+from typing import Union, Optional, Tuple
 
 from sunflare.log import Loggable
-
-if TYPE_CHECKING:
-    from typing import Union, Optional, Tuple
-
-    from sunflare.config import (
-        AcquisitionEngineTypes,
-        LightModelInfo,
-        LightModelTypes,
-    )
+from sunflare.config import (
+    AcquisitionEngineTypes,
+    LightModelInfo,
+    LightModelTypes,
+)
 
 
 class LightModel(Loggable, metaclass=ABCMeta):

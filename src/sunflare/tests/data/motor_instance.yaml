@@ -6,7 +6,7 @@ motors:
     axes:
       - X
     supported_engines:
-      - exengine
+      - bluesky
   Double axis motor:
     model_name: MockMotorModel
     axes:
@@ -14,4 +14,4 @@ motors:
       - Y
     step_egu: mm
     supported_engines:
-      - exengine
+      - bluesky

@@ -2,17 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TypeAlias, Union
 
 from sunflare.engine.registry import DeviceRegistry
+from sunflare.virtualbus import VirtualBus
 
-if TYPE_CHECKING:
-    from typing import Union
-
-    from sunflare.virtualbus import VirtualBus
-
-    from .motor import BlueskyMotorModel
-    from .detector import BlueskyDetectorModel
+from .motor import BlueskyMotorModel
+from .detector import BlueskyDetectorModel
 
 Registry: TypeAlias = dict[str, Union[BlueskyDetectorModel, BlueskyMotorModel]]
 

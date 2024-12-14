@@ -1,12 +1,9 @@
 """Device registry protocol module."""
 
-from typing import TYPE_CHECKING, Generic, TypeVar, Protocol
+from typing import Generic, TypeVar, Protocol, Optional
 
-if TYPE_CHECKING:
-    from typing import Optional
-
-    from sunflare.engine.motor import MotorModel
-    from sunflare.engine.detector import DetectorModel
+from sunflare.engine.motor import MotorModel
+from sunflare.engine.detector import DetectorModel
 
 M = TypeVar("M", bound="MotorModel")
 D = TypeVar("D", bound="DetectorModel")

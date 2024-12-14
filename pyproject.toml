@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "sunflare"
 dynamic = ["version"]
 description = "Event-driven data acquisition software for scientific applications."
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.9"
 authors = [
   {name = "Jacopo Abramo", email = "jacopo.abramo@gmail.com"}
@@ -29,18 +29,12 @@ dependencies = [
     "pydantic",
     "psygnal",
     "numpy>=1.24, <1.27",
-    "xarray>=2023.7.0",
     "typing_extensions>=4.6.0; python_version < '3.11'",
     "qtpy",
     "pyqt6"
 ]
 
 [project.optional-dependencies]
-# TODO: enable after exengine
-# provides better support
-# exengine = [
-#     "exengine[micromanager]",
-# ]
 bluesky = [
     "bluesky"
 ]
@@ -59,18 +53,11 @@ bugs = "https://github.com/redsun-acquisition/sunflare/issues"
 changelog = "https://github.com/redsun-acquisition/sunflare/blob/master/changelog.md"
 homepage = "https://github.com/redsun-acquisition/sunflare"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-"sunflare" = ["py.typed"]
-
-[tool.setuptools.dynamic]
-version = {attr = "sunflare.__version__"}
-
+[tool.hatch.build.targets.wheel]
+packages = ["src/sunflare"]
 
 # Mypy
 # ----

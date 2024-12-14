@@ -2,12 +2,23 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generic, TypeVar, TypedDict
+import sys
+from typing import (
+    Any,
+    Generator,
+    Iterable,
+    Union,
+    Tuple,
+    TypeAlias,
+    TypeVar,
+)
 
-if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union, Tuple, TypeAlias
+if sys.version_info < (3, 11):
+    from typing_extensions import TypedDict, Generic
+else:
+    from typing import TypedDict, Generic
 
-    import numpy.typing as npt
+import numpy.typing as npt
 
 T = TypeVar("T", bound=Union[int, str, float])
 X = TypeVar("X", bound=Union[str, int])

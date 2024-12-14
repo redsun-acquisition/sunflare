@@ -77,7 +77,7 @@ def test_motors_info():
         assert mock.model_name == "MockMotorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert mock.supported_engines == ["exengine"]
+        assert mock.supported_engines == ["bluesky"]
         assert mock.category == "stepper"
 
     # check the model parameters

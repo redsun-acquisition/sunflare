@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, TypeVar, Generic, Protocol
+from typing import TypeVar, Generic, Protocol, Any, Generator, Iterable, Union
 
-if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union
-
-    from sunflare.virtualbus import VirtualBus
-    from sunflare.types import Workflow
+from sunflare.virtualbus import VirtualBus
+from sunflare.types import Workflow
 
 E = TypeVar("E", covariant=True)
 

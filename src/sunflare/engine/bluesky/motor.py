@@ -4,17 +4,14 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from typing import TYPE_CHECKING
-
 from sunflare.engine import MotorModel
 
-if TYPE_CHECKING:
-    from sunflare.config import MotorModelInfo
-    from sunflare.types import AxisLocation
+from sunflare.config import MotorModelInfo
+from sunflare.types import AxisLocation
 
-    from typing import Union
+from typing import Union
 
-    from ._status import Status
+from ._status import Status
 
 
 # TODO: more protocols for this?

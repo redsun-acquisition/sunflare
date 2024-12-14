@@ -5,16 +5,13 @@ This toolkit section provides RedSun developers with the necessary base classes 
 """
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Protocol, TypeVar, Generic
+
+from typing import Iterable, Protocol, TypeVar, Generic
 
 from sunflare.config import ControllerInfo
-
-if TYPE_CHECKING:
-    from typing import Iterable
-
-    from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
-    from sunflare.virtualbus import VirtualBus, Signal
-    from sunflare.types import Workflow
+from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
+from sunflare.virtualbus import VirtualBus, Signal
+from sunflare.types import Workflow
 
 # device registry type
 R = TypeVar("R")

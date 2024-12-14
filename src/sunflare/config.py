@@ -25,13 +25,9 @@ class AcquisitionEngineTypes(str, Enum):
     BLUESKY: str
         Bluesky: a Python-based data acquisition framework for scientific experiments. \
         For more informations, refer to the `Bluesky documentation page<https://blueskyproject.io/bluesky/index.html>`_.
-    EXENGINE : str
-        ExEngine: execution engine for microscopy control. \
-        For more informations, refer to the `ExEngine documentation page<https://exengine.readthedocs.io/en/latest/index.html>`_.
     """
 
     BLUESKY: str = "bluesky"
-    EXENGINE: str = "exengine"
 
 
 class FrontendTypes(str, Enum):
@@ -151,7 +147,7 @@ class ControllerInfo(BaseModel):
     controller_name : str
         Controller name.
     supported_engines : list[AcquisitionEngineTypes]
-        Supported acquisition engines list. Defaults to ['exengine'].
+        Supported acquisition engines list.
     """
 
     category: set[ControllerTypes] = Field(default=set())
@@ -303,7 +299,6 @@ class RedSunInstanceInfo(BaseModel):
     ----------
     engine : AcquisitionEngineTypes
         Acquisition engine selected for the current instance.
-        Defaults to 'exengine'.
     controllers : Optional[Dict[str, ControllerInfo]]
         Controller informations dictionary.
         Defaults to an empty dictionary.
@@ -321,7 +316,7 @@ class RedSunInstanceInfo(BaseModel):
         Defaults to an empty dictionary.
     """
 
-    engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.EXENGINE)
+    engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.BLUESKY)
     frontend: FrontendTypes = Field(default=FrontendTypes.QT)
     controllers: dict[str, ControllerInfo] = Field(default_factory=lambda: dict())
     detectors: dict[str, DetectorModelInfo] = Field(default_factory=lambda: dict())
