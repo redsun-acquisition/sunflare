@@ -116,7 +116,6 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
     """
 
     def __init__(self) -> None:
-        # pre-register signals added as attributes in the class definition
         self._cache: dict[str, dict[str, SignalInstance]] = {}
 
     def register_signals(
@@ -211,11 +210,3 @@ class ModuleVirtualBus(VirtualBus):
     Communication between modules passes via this virtual bus. \
     There can be only one instance of this class within a RedSun application.
     """
-
-    __instance: ClassVar[Optional[ModuleVirtualBus]] = None
-
-    def __new__(cls) -> Self:  # noqa: D102
-        if cls.__instance is None:
-            cls.__instance = super(ModuleVirtualBus, cls).__new__(cls)
-
-        return cls.__instance
