@@ -43,26 +43,15 @@ In practice, it provides no benefit at runtime; it's used to facilitate document
 
 from __future__ import annotations
 
-import sys
-
 from abc import ABCMeta
 from types import MappingProxyType
-from typing import final, Iterable, ClassVar, overload
+from typing import final, Iterable, overload, Optional, Union, Callable, TypeVar
 
 from psygnal import SignalInstance, Signal
 
 from sunflare.log import Loggable
 
-from typing import Optional, Union
-
-if sys.version_info < (3, 11):
-    from typing_extensions import Self
-else:
-    from typing import Self
-
 __all__ = ["Signal", "VirtualBus", "ModuleVirtualBus"]
-
-from typing import Callable, TypeVar
 
 
 F = TypeVar("F", bound=Callable[..., object])
