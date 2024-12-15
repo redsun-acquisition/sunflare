@@ -6,8 +6,8 @@ a Qt GUI that is consistent throught all the RedSun stack.
 
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import Protocol, TYPE_CHECKING
+from abc import ABC, abstractmethod
+from typing import Protocol, runtime_checkable, TYPE_CHECKING
 
 from qtpy.QtWidgets import QWidget
 
@@ -15,9 +15,10 @@ if TYPE_CHECKING:
     from sunflare.virtualbus import VirtualBus
     from typing import Any
 
-__all__ = ["BaseWidget"]
+__all__ = ["BaseWidget", "WidgetProtocol"]
 
 
+@runtime_checkable
 class WidgetProtocol(Protocol):
     """Minimmal protocol a widget should implement."""
 
@@ -26,12 +27,58 @@ class WidgetProtocol(Protocol):
 
     @abstractmethod
     def registration_phase(self) -> None:
-        """Register the widget signals."""
+        r"""Register the widget signals listed in this method to expose them to the virtual buses.
+
+        At application start-up, widgets can't know what signals are available from other controllers or widgets. \
+        This method is called after all widgets are initialized to allow them to register their signals. \
+        Widgets may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
+        
+        Only signals defined in your widgets can be registered.
+        
+        An implementation example:
+
+        .. code-block:: python
+
+            def registration_phase(self) -> None:
+                # you can register all signals...
+                self._module_bus.register_signals(self)
+                
+                # ... or only a selection of them
+                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+                
+                # you can also register signals to the module bus
+                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+        """
         ...
 
     @abstractmethod
     def connection_phase(self) -> None:
-        """Connect to other controllers or widgets."""
+        """Connect to other controllers or widgets.
+
+        At application start-up, widgets can't know what signals are available from other parts of RedSun.
+        This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
+        connect to all available registered signals in both virtual buses.
+        Controllers may be able to connect to other signals even after this phase (provided those signals
+        were registered before).
+
+        An implementation example:
+
+        .. code-block:: python
+
+            def connection_phase(self) -> None:
+                # you can connect signals from another controller to your local slots...
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+
+                # ... or to other signals ...
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self.sigMySignal)
+
+                # ... or connect to widgets
+                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+
+                # you can also connect to the module bus
+                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+        """
         ...
 
     @property
@@ -48,7 +95,7 @@ class WidgetProtocol(Protocol):
 
 
 class BaseWidget(QWidget):
-    """Base widget class. Requires user implementation.
+    """Base widget class for Qt-based widgets.
 
     Parameters
     ----------
