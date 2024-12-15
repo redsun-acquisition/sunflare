@@ -42,7 +42,7 @@ class BlueskyController(ControllerProtocol[BlueskyDeviceRegistry], metaclass=ABC
         ...
 
     @property
-    def category(self) -> "set[ControllerTypes]":  # noqa: D102
+    def category(self) -> set[ControllerTypes]:  # noqa: D102
         return self._ctrl_info.category
 
     @property
