@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from sunflare.engine.registry import DeviceRegistry
 from sunflare.virtualbus import VirtualBus
-
-from .motor import BlueskyMotorModel
-from .detector import BlueskyDetectorModel
+from sunflare.engine.protocols import MotorProtocol, DetectorProtocol
 
 
-class BlueskyDeviceRegistry(DeviceRegistry[BlueskyMotorModel, BlueskyDetectorModel]):
+class BlueskyDeviceRegistry:
     """Bluesky device registry class."""
 
     def __init__(
@@ -19,15 +16,15 @@ class BlueskyDeviceRegistry(DeviceRegistry[BlueskyMotorModel, BlueskyDetectorMod
     ) -> None:
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
-        self._motors: dict[str, BlueskyMotorModel] = {}
-        self._detectors: dict[str, BlueskyDetectorModel] = {}
+        self._motors: dict[str, MotorProtocol] = {}
+        self._detectors: dict[str, DetectorProtocol] = {}
 
     @property
-    def motors(self) -> dict[str, BlueskyMotorModel]:
+    def motors(self) -> dict[str, MotorProtocol]:
         """Get the motors dictionary."""
         return self._motors
 
     @property
-    def detectors(self) -> dict[str, BlueskyDetectorModel]:
+    def detectors(self) -> dict[str, DetectorProtocol]:
         """Get the detectors dictionary."""
         return self._detectors
