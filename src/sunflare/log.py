@@ -1,10 +1,12 @@
 """
 RedSun logging module.
 
-In each RedSun instance, only one logger is created.
+In each RedSun application, only one logger is created.
 
-All classes implementing the `Logging` protocol can use the logger to log messages.
+All classes implementing the `Logging` classe can use the logger to log messages.
 """
+
+from __future__ import annotations
 
 import logging
 import logging.config
@@ -82,7 +84,7 @@ class Loggable:
     All methods allow to forward extra arguments to the logger calls as documented in the `logging` module.
     """
 
-    def _extend(self, kwargs: "dict[str, Any]") -> "dict[str, Any]":
+    def _extend(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         """
         Enrich kwargs with class name and user-defined ID.
 
@@ -95,7 +97,7 @@ class Loggable:
         }
         return kwargs
 
-    def info(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def info(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log an info message in the core logger.
 
@@ -111,7 +113,7 @@ class Loggable:
         self._extend(kwargs)
         logger.info(msg, *args, **kwargs)
 
-    def debug(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def debug(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log a debug message in the core logger.
 
@@ -202,9 +204,13 @@ class Loggable:
 
     @property
     def name(self) -> str:
-        """Class instance unique identifier."""
-        # This property should be implemented by
-        # all model and controller classes by default
+        """Class instance unique identifier.
+
+        This property should be implemented by
+        all model and controller classes by default.
+
+        :meta-private:
+        """
         return str()
 
 

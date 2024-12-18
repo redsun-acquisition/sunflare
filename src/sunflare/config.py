@@ -160,9 +160,9 @@ class DeviceModelInfo(BaseModel):
     ----------
     model_name : ``str``
         Device model name.
-    vendor : ``Optional[str]``
+    vendor : `str``, optional
         Detector vendor. Optional for visualization purposes.
-    serial_number : ``Optional[str]``
+    serial_number : ``str``, optional
         Detector serial number. Optional for visualization purposes.
     """
 
@@ -206,14 +206,14 @@ class LightModelInfo(DeviceModelInfo):
     ----------
     category : LightModelTypes
         Light source type. Defaults to ``laser``.
-    wavelength : int
+    wavelength : ``int``, optional
         Light source wavelength in nanometers.
-    power_egu : str
+    power_egu : ``str``
         Engineering unit for light source, .e.g. ``mW``, ``μW``. Defaults to ``mW``.
-    range : Union[Tuple[float, float], Tuple[int, int]]
+    range : ``Union[Tuple[float, float], Tuple[int, int]]``
         Light source power range. Expressed in `power_egu` units.
         Formatted as (min, max). Defaults to ``(0, 0)``.
-    power_step: Union[float, int]
+    power_step: ``Union[float, int]``
         Power increase/decrease minimum step size. Expressed in ``power_egu`` units.
     """
 
@@ -234,15 +234,15 @@ class MotorModelInfo(DeviceModelInfo):
     ----------
     category : MotorModelTypes
         Motor type. Defaults to ``stepper``.
-    step_egu : str
+    step_egu : ``str``
         Engineering unit for steps, e.g. ``mm``, ``μm``. Defaults to ``μm``.
-    step_size : Union[int, float]
+    step_size : ``Union[int, float]``
         Motor step size in ``step_egu`` units. Defaults to 1.0.
-    axes : list[str]
+    axes : ``list[str]``
         Supported motor axes.
 
         - Suggestion is to be a list of single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
-    return_home : bool
+    return_home : ``bool``
         If ``True``, motor will return to home position
         (defined as  the initial position the motor had at RedSun's startup)
         after RedSun is closed. Defaults to ``False``.
@@ -263,7 +263,7 @@ class ScannerModelInfo(DeviceModelInfo):
     ----------
     category : ScannerModelTypes
         Scanner type. Defaults to ``galvo``.
-    axes : list[str]
+    axes : ``list[str]``
         Supported scanner axes. Suggestion is to be a list of
         single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
     """

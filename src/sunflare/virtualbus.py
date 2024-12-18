@@ -1,35 +1,35 @@
 r"""
-The `VirtualBus` is a mechanism to exchange data between different parts of the system.
+SunFlare virtual module.
+
+This module implements the communication mechanism between the controller layer and the view layer.
+
+It achieves this by using the `psygnal <https://psygnal.readthedocs.io/en/stable/>`_ library.
 
 The module exposes the following:
 
-- the `psygnal.Signal` class;
-- the `VirtualBus` class;
-- the `ModuleVirtualBus` class;
-- the `slot` decorator.
+- the ``psygnal.Signal`` class;
+- the ``VirtualBus`` class;
+- the ``ModuleVirtualBus`` class;
+- the ``slot`` decorator.
 
-`psygnal.Signal` is the main communication mechanism between controllers and the view layer. \
+``psygnal.Signal`` is the main communication mechanism between controllers and the view layer.
+
 It provides a syntax similar to the Qt signal/slot mechanism, i.e.
 
 .. code-block:: python
 
     class MyController:
         sigMySignal = Signal()
-    
+
     def a_slot():
         print("My signal was emitted!")
-    
+
     ctrl = MyController()
     ctrl.sigMySignal.connect(my_slot)
 
-The `VirtualBus` class is the base class for building virtual communication buses. \
-It must be re-implemented by users that wish to create new modules for RedSun. \
-    
-The `ModuleVirtualBus` class is a singleton that acts as the main communication bus between modules. \
-Different modules can share information by emitting signals on this bus and connecting to them.
-
-The `slot` decorator is used to mark a function as a slot. \
-In practice, it provides no benefit at runtime; it's used to facilitate code readability.
+- The ``VirtualBus`` class is the base class for building virtual communication buses. It must be re-implemented by users that wish to create new modules for RedSun.
+- The ``ModuleVirtualBus`` class is a pre-defined bus that acts as the main communication mechanism between modules. Different modules can share information by emitting signals on this bus and connecting to them.
+- The ``slot`` decorator is used to mark a function as a slot. In practice, it provides no benefit at runtime; it's used to facilitate code readability.
 
 .. code-block:: python
 
@@ -49,7 +49,7 @@ from psygnal import SignalInstance, Signal
 
 from sunflare.log import Loggable
 
-__all__ = ["Signal", "VirtualBus", "ModuleVirtualBus"]
+__all__ = ["Signal", "VirtualBus", "ModuleVirtualBus", "slot"]
 
 
 F = TypeVar("F", bound=Callable[..., object])
@@ -70,14 +70,14 @@ def slot(
 
     Parameters
     ----------
-    func : F, optional
+    func : ``F``, optional
         The function to decorate. If not provided, the decorator must be applied with arguments.
-    private : bool, optional
-        Mark the slot as private. Default is False.
+    private : ``bool``, optional
+        Mark the slot as private. Default is ``False``.
 
     Returns
     -------
-    Union[F, Callable[[F], F]]
+    ``Union[F, Callable[[F], F]]``
         Either the decorated function or a callable decorator.
     """
 
@@ -93,13 +93,13 @@ def slot(
 
 
 class VirtualBus(Loggable, metaclass=ABCMeta):
-    """VirtualBus base class. Supports logging via `Loggable`.
+    """``VirtualBus`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
-    The VirtualBus is a mechanism to exchange data between different parts of the system.
+    The ``VirtualBus`` is a mechanism to exchange data between different parts of the system.
 
-    They can be used to emit notifications, as well as carry information to other plugins and/or different RedSun modules.
+    It can be used to emit notifications, as well as carry information to other plugins and/or different RedSun modules.
 
-    VirtualBus' signals are implemented using the `psygnal` library; they can be dynamically registered as class attributes, and accessed as a read-only dictionary.
+    ``VirtualBus``' signals are implemented using the ``psygnal`` library; they can be dynamically registered as class attributes, and accessed as a read-only dictionary.
     """
 
     def __init__(self) -> None:
@@ -123,8 +123,8 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
         Notes
         -----
         This method inspects the attributes of the owner's class to find
-        `psygnal.Signal` descriptors. For each such descriptor, it retrieves
-        the `SignalInstance` from the owner using the descriptor protocol and
+        ``psygnal.Signal`` descriptors. For each such descriptor, it retrieves
+        the ``SignalInstance`` from the owner using the descriptor protocol and
         stores it in the registry.
         """
         owner_class = type(owner)  # Get the class of the object

@@ -10,4 +10,6 @@ and its philosophy.
 :caption: API reference:
 
 config/config
+virtual
+log
 ```
