@@ -10,7 +10,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Union
 from sunflare.log import Loggable
 from sunflare.config import (
-    AcquisitionEngineTypes,
     MotorModelInfo,
     MotorModelTypes,
 )

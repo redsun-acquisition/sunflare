@@ -2,12 +2,9 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, TypeVar, Union, runtime_checkable, Any
+from typing import Protocol, Union, runtime_checkable, Any
 
 from sunflare.config import MotorModelInfo, DetectorModelInfo
-from sunflare.engine.motor import MotorModel
-from sunflare.engine.light import LightModel
-from sunflare.engine.detector import DetectorModel
 from sunflare.types import AxisLocation
 
 from bluesky.protocols import Reading
