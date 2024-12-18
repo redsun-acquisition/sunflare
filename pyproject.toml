@@ -26,6 +26,7 @@ classifiers = [
 ]
 license = {text = "BSD 3-Clause license"}
 dependencies = [
+    "bluesky",
     "pydantic",
     "psygnal",
     "numpy>=1.24, <1.27",
@@ -35,8 +36,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-bluesky = [
-    "bluesky"
+docs = [
+    "sphinx",
+    "pydata-sphinx-theme"
 ]
 dev = [
   "nox",
