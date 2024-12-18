@@ -6,7 +6,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Tuple
 
 from sunflare.log import Loggable
-from sunflare.config import DetectorModelInfo
+from sunflare.config import DetectorModelInfo, DetectorModelTypes
 
 
 class DetectorModel(Loggable, metaclass=ABCMeta):
@@ -58,7 +58,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def category(self) -> str:
+    def category(self) -> DetectorModelTypes:
         """Detector type."""
         return self._model_info.category
 

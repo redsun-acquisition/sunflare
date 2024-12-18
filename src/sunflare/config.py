@@ -190,7 +190,7 @@ class DetectorModelInfo(DeviceModelInfo):
         Engineering unit for exposure time, e.g. ``ms``, ``μs``. Defaults to ``ms``.
     """
 
-    category: str = Field(default=DetectorModelTypes.AREA)
+    category: DetectorModelTypes = Field(default=DetectorModelTypes.AREA)
     sensor_size: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
     pixel_size: Tuple[float, float, float] = Field(
         default_factory=lambda: (1.0, 1.0, 1.0)
