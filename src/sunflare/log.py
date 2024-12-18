@@ -3,7 +3,7 @@ RedSun logging module.
 
 In each RedSun application, only one logger is created.
 
-All classes implementing the `Logging` classe can use the logger to log messages.
+All classes inheriting the :class:`~sunflare.log.Loggable` class can log messages via the core logger.
 """
 
 from __future__ import annotations
@@ -103,12 +103,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.info`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.info`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.info``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.info``.
         """
         self._extend(kwargs)
         logger.info(msg, *args, **kwargs)
@@ -119,12 +119,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.debug`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.debug`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.debug``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.debug``.
         """
         self._extend(kwargs)
         logger.debug(msg, *args, **kwargs)
@@ -135,12 +135,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.warning`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.warning`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.warning``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.warning``.
         """
         self._extend(kwargs)
         logger.warning(msg, *args, **kwargs)
@@ -151,12 +151,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.error`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.error`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.error``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.error``.
         """
         self._extend(kwargs)
         logger.error(msg, *args, **kwargs)
@@ -167,12 +167,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.critical`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.critical`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.critical``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.critical``.
         """
         self._extend(kwargs)
         logger.critical(msg, *args, **kwargs)
@@ -183,10 +183,12 @@ class Loggable:
 
         Parameters
         ----------
-        *args : Any
-            Additional positional arguments for `logging.Logger.exception`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.exception`.
+        msg : ``str``
+            String to log.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.exception``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.exception``.
         """
         self._extend(kwargs)
         logger.exception(msg, *args, **kwargs)
@@ -220,7 +222,7 @@ def get_logger() -> logging.Logger:
 
     Returns
     -------
-    logging.Logger
+    ``logging.Logger``
         The core logger instance.
     """
     return logger
