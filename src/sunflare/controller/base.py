@@ -105,13 +105,13 @@ class ControllerProtocol(Generic[R], Protocol):
     @abstractmethod
     def supported_engines(self) -> list[AcquisitionEngineTypes]:
         """List of supported engines."""
-        return self._ctrl_info.supported_engines
+        ...
 
     @property
     @abstractmethod
     def registry(self) -> R:
         """Device registry."""
-        return self._registry
+        ...
 
 
 class Renderer(Protocol):
