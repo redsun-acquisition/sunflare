@@ -6,7 +6,7 @@ from abc import ABCMeta, abstractmethod
 
 from .base import ControllerProtocol
 
-from sunflare.config import ControllerInfo, ControllerTypes, AcquisitionEngineTypes
+from sunflare.config import ControllerInfo, ControllerTypes
 from sunflare.virtualbus import VirtualBus
 from sunflare.engine.bluesky.registry import BlueskyDeviceRegistry
 
