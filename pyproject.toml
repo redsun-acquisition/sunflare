@@ -38,11 +38,12 @@ dependencies = [
 [project.optional-dependencies]
 docs = [
     "sphinx",
-    "pydata-sphinx-theme"
+    "pydata-sphinx-theme",
+    "myst-parser",
+    "sphinx-autodoc2"
 ]
 dev = [
   "nox",
-  "sphinx",
   "ruff",
   "pre-commit",
   "pytest",

@@ -1,4 +1,9 @@
-"""RedSun configuration dataclasses and enums."""
+"""RedSun configuration dataclasses and enumerators.
+
+The module provides a set of `pydantic.BaseModel <https://docs.pydantic.dev/latest/concepts/models/>`_ and enumerators classes that are used to
+provide a basic representation of a RedSun-compatible hardware interface. These models are used in plugins to be inherited
+by custom models defined by the user, which can provide additional information about specific hardware components.
+"""
 
 from __future__ import annotations
 
@@ -11,7 +16,7 @@ from pydantic import Field, BaseModel, ConfigDict
 
 
 class AcquisitionEngineTypes(str, Enum):
-    r""" 
+    """ 
     Supported acquisition engine entities.
 
     Acquisition engines are singleton objects that are instantiated within RedSun and operate
@@ -22,12 +27,12 @@ class AcquisitionEngineTypes(str, Enum):
 
     Attributes
     ----------
-    BLUESKY: str
-        Bluesky: a Python-based data acquisition framework for scientific experiments. \
-        For more informations, refer to the `Bluesky documentation page<https://blueskyproject.io/bluesky/index.html>`_.
+    BLUESKY
+        Python-based data acquisition framework for scientific experiments. \
+        For more informations, refer to the `Bluesky documentation page <https://blueskyproject.io/bluesky/index.html>`_.
     """
 
-    BLUESKY: str = "bluesky"
+    BLUESKY = "bluesky"
 
 
 class FrontendTypes(str, Enum):
@@ -37,17 +42,17 @@ class FrontendTypes(str, Enum):
 
     Attributes
     ----------
-    QT : str
+    QT
         Qt frontend.
     """
 
-    QT: str = "qt"
+    QT = "qt"
 
 
 class DetectorModelTypes(str, Enum):
     """Supported detector types.
 
-    Detectors are devices that are used to capture images or signals from the sample.
+    Detectors are devices that are used to capture visualizable data.
 
     Attributes
     ----------
@@ -59,36 +64,24 @@ class DetectorModelTypes(str, Enum):
         Point detector (i.e. Avalanche Photodiode (APD) detector).
     """
 
-    AREA: str = "area"
-    LINE: str = "line"
-    POINT: str = "point"
-
-
-class PixelPhotometricTypes(str, Enum):
-    """Supported pixel photometric types.
-
-    Attributes
-    ----------
-    GRAY : str
-        Gray scale pixel.
-    RGB : str
-        RGB pixel.
-    """
-
-    GRAY: str = "gray"
-    RGB: str = "rgb"
+    AREA = "area"
+    LINE = "line"
+    POINT = "point"
 
 
 class MotorModelTypes(str, Enum):
     """Supported motor types.
 
+    This enumerator is used to provide a default categorization for the built-in user interface provided by RedSun,
+    to facilitate the correct building of the application layout.
+
     Attributes
     ----------
-    STEPPER : str
+    STEPPER
         Stepper motor.
     """
 
-    STEPPER: str = "stepper"
+    STEPPER = "stepper"
 
 
 class LightModelTypes(str, Enum):
@@ -96,11 +89,11 @@ class LightModelTypes(str, Enum):
 
     Attributes
     ----------
-    LASER : str
+    LASER
         Laser light source.
     """
 
-    LASER: str = "laser"
+    LASER = "laser"
 
 
 class ScannerModelTypes(str, Enum):
@@ -108,33 +101,34 @@ class ScannerModelTypes(str, Enum):
 
     Attributes
     ----------
-    GALVO : str
+    GALVO
         Galvanometric scanner.
     """
 
-    GALVO: str = "galvo"
+    GALVO = "galvo"
 
 
 class ControllerTypes(str, Enum):
-    r"""Supported controller category types.
+    """Supported controller category types.
 
     Attributes
     ----------
-    DEVICE : str
-        Device controller. \
+    DEVICE
+        Device controller.
+
         These are only used internally and not exposed to the user.
-    COMPUTATOR : str
-        Computator controller.
-    PUBLISHER : str
+    COMPUTATOR
+        Renderer controller.
+    PUBLISHER
         Publisher controller.
-    MONITORER : str
+    MONITORER
         Monitorer controller.
     """
 
-    DEVICE: str = "device"
-    COMPUTATOR: str = "computator"
-    PUBLISHER: str = "publisher"
-    MONITORER: str = "monitorer"
+    DEVICE = "device"
+    RENDERER = "renderer"
+    PUBLISHER = "publisher"
+    MONITORER = "monitorer"
 
 
 class ControllerInfo(BaseModel):
@@ -142,9 +136,9 @@ class ControllerInfo(BaseModel):
 
     Attributes
     ----------
-    category : Set[ControllerTypes]
+    category : ``set[ControllerTypes]``
         Set of controller categories.
-    controller_name : str
+    controller_name : ``str``
         Controller name.
     """
 
@@ -160,14 +154,16 @@ class ControllerInfo(BaseModel):
 class DeviceModelInfo(BaseModel):
     """Base model for device information.
 
+    All device information models inherit from this class.
+
     Attributes
     ----------
-    model_name : str
+    model_name : ``str``
         Device model name.
-    vendor : Optional[str]
-        Detector vendor. Optional for debugging purposes.
-    serial_number : Optional[str]
-        Detector serial number. Optional for debugging purposes.
+    vendor : ``Optional[str]``
+        Detector vendor. Optional for visualization purposes.
+    serial_number : ``Optional[str]``
+        Detector serial number. Optional for visualization purposes.
     """
 
     model_name: str = Field(default=str())
@@ -184,15 +180,14 @@ class DetectorModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : DetectorModelTypes
-        Detector type. Currently supported values are
-        'area', 'line' and 'point'. Defaults to 'area'.
-    sensor_size: Tuple[int]
-        Detector sensor size in pixels: represents the 2D axis (Y, X).
-    pixel_size : Tuple[float]
-        Detector pixel size in micrometers: represents the 3D axis (Z, Y, X).
-        Defaults to `(1, 1, 1)`.
-    exposure_egu : str
-        Engineering unit for exposure time, e.g. 'ms', 'μs'. Defaults to 'ms'.
+        Detector type.
+    sensor_size : ``Tuple[int, int]``
+        Detector sensor size in pixels: represents the 2D axis ``(Y, X)``.
+    pixel_size : ``Tuple[float, float, float]``
+        - Detector pixel size in micrometers: represents the 3D axis ``(Z, Y, X)``.
+        - Defaults to ``(1, 1, 1)``.
+    exposure_egu : ``str``
+        Engineering unit for exposure time, e.g. ``ms``, ``μs``. Defaults to ``ms``.
     """
 
     category: str = Field(default=DetectorModelTypes.AREA)
@@ -210,16 +205,16 @@ class LightModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : LightModelTypes
-        Light source type. Defaults to 'laser'.
+        Light source type. Defaults to ``laser``.
     wavelength : int
         Light source wavelength in nanometers.
     power_egu : str
-        Engineering unit for light source, .e.g. 'mW', 'μW'. Defaults to 'mW'.
+        Engineering unit for light source, .e.g. ``mW``, ``μW``. Defaults to ``mW``.
     range : Union[Tuple[float, float], Tuple[int, int]]
         Light source power range. Expressed in `power_egu` units.
-        Formatted as (min, max). Defaults to (0, 0).
+        Formatted as (min, max). Defaults to ``(0, 0)``.
     power_step: Union[float, int]
-        Power increase/decrease minimum step size. Expressed in `power_egu` units.
+        Power increase/decrease minimum step size. Expressed in ``power_egu`` units.
     """
 
     power_egu: str = Field(default="mW")
@@ -238,18 +233,19 @@ class MotorModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : MotorModelTypes
-        Motor type. Defaults to 'stepper'.
+        Motor type. Defaults to ``stepper``.
     step_egu : str
-        Engineering unit for steps, e.g. 'mm', 'μm'. Defaults to 'μm'.
+        Engineering unit for steps, e.g. ``mm``, ``μm``. Defaults to ``μm``.
     step_size : Union[int, float]
-        Motor step size in `step_egu` units. Defaults to 1.0.
+        Motor step size in ``step_egu`` units. Defaults to 1.0.
     axes : list[str]
-        Supported motor axes. Suggestion is to be a list of
-        single character, capital strings, e.g. ['X', 'Y', 'Z'].
+        Supported motor axes.
+
+        - Suggestion is to be a list of single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
     return_home : bool
-        If `True`, motor will return to home position
+        If ``True``, motor will return to home position
         (defined as  the initial position the motor had at RedSun's startup)
-        after RedSun is closed. Defaults to `False`.
+        after RedSun is closed. Defaults to ``False``.
     """
 
     category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
@@ -266,10 +262,10 @@ class ScannerModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : ScannerModelTypes
-        Scanner type. Defaults to 'galvo'.
+        Scanner type. Defaults to ``galvo``.
     axes : list[str]
         Supported scanner axes. Suggestion is to be a list of
-        single character, capital strings, e.g. ['X', 'Y', 'Z'].
+        single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
     """
 
     category: ScannerModelTypes = Field(default=ScannerModelTypes.GALVO)
