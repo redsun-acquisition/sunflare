@@ -21,18 +21,14 @@ from collections import OrderedDict
 
 from ._status import Status
 
-# specific device types
-M = TypeVar("M", bound=MotorModel)
-L = TypeVar("L", bound=LightModel)
-D = TypeVar("D", bound=DetectorModel)
-
 
 @runtime_checkable
 class HasMotors(Protocol):
     """A protocol describing that the registry has motors."""
 
     @property
-    def motors(self) -> dict[str, M]: ...
+    @abstractmethod
+    def motors(self) -> dict[str, MotorProtocol]: ...
 
 
 @runtime_checkable
@@ -40,7 +36,8 @@ class HasDetectors(Protocol):
     """A protocol describing that the registry has detectors."""
 
     @property
-    def detectors(self) -> dict[str, D]: ...
+    @abstractmethod
+    def detectors(self) -> dict[str, DetectorProtocol]: ...
 
 
 # TODO: more protocols for this?
@@ -81,6 +78,11 @@ class MotorProtocol(Protocol):
         ...
 
     @property
+    def name(self) -> str:
+        """Return the name of the motor."""
+        ...
+
+    @property
     def model_info(self) -> MotorModelInfo:
         """Return the model information for the motor."""
         ...
@@ -99,6 +101,7 @@ class DetectorProtocol(Protocol):
     - :class:`bluesky.protocols.Completable`
     """
 
+    _name: str
     _model_info: DetectorModelInfo
 
     def shutdown(self) -> None:
@@ -203,6 +206,11 @@ class DetectorProtocol(Protocol):
     @abstractmethod
     def describe_configuration(self) -> OrderedDict[str, DataKey]:
         """Provide same API as ``describe``, but corresponding to the keys in ``read_configuration``."""
+        ...
+
+    @property
+    def name(self) -> str:
+        """Return the name of the detector."""
         ...
 
     @property
