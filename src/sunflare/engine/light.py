@@ -7,7 +7,6 @@ from typing import Union, Optional, Tuple
 
 from sunflare.log import Loggable
 from sunflare.config import (
-    AcquisitionEngineTypes,
     LightModelInfo,
     LightModelTypes,
 )
