@@ -4,6 +4,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Protocol, TypeVar, Union, runtime_checkable, Any
 
+from sunflare.config import MotorModelInfo, DetectorModelInfo
 from sunflare.engine.motor import MotorModel
 from sunflare.engine.light import LightModel
 from sunflare.engine.detector import DetectorModel
@@ -53,6 +54,8 @@ class MotorProtocol(Protocol):
     - :class:`bluesky.protocols.Locatable`
     """
 
+    _model_info: MotorModelInfo
+
     def shutdown(self) -> None:
         """Shutdown the motor.
 
@@ -77,6 +80,11 @@ class MotorProtocol(Protocol):
         """
         ...
 
+    @property
+    def model_info(self) -> MotorModelInfo:
+        """Return the model information for the motor."""
+        ...
+
 
 @runtime_checkable
 class DetectorProtocol(Protocol):
@@ -90,6 +98,8 @@ class DetectorProtocol(Protocol):
     - :class:`bluesky.protocols.Flyable`
     - :class:`bluesky.protocols.Completable`
     """
+
+    _model_info: DetectorModelInfo
 
     def shutdown(self) -> None:
         """Shutdown the detector.
@@ -193,4 +203,9 @@ class DetectorProtocol(Protocol):
     @abstractmethod
     def describe_configuration(self) -> OrderedDict[str, DataKey]:
         """Provide same API as ``describe``, but corresponding to the keys in ``read_configuration``."""
+        ...
+
+    @property
+    def model_info(self) -> DetectorModelInfo:
+        """Return the model information for the detector."""
         ...
