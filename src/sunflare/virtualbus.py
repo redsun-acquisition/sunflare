@@ -29,13 +29,11 @@ The `ModuleVirtualBus` class is a singleton that acts as the main communication 
 Different modules can share information by emitting signals on this bus and connecting to them.
 
 The `slot` decorator is used to mark a function as a slot. \
-In practice, it provides no benefit at runtime; it's used to facilitate documentation.
+In practice, it provides no benefit at runtime; it's used to facilitate code readability.
 
 .. code-block:: python
 
-    # slot will mark the function as a slot;
-    # a documentation framework such as sphinx
-    # can use this information to generate documentation.
+    # slot will mark the function as a slot
     @slot
     def my_slot():
         print("My slot was called!")
