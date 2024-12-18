@@ -8,8 +8,7 @@ from abc import abstractmethod
 
 from typing import Iterable, Protocol, TypeVar, Generic
 
-from sunflare.config import ControllerInfo
-from sunflare.config import ControllerInfo, AcquisitionEngineTypes, ControllerTypes
+from sunflare.config import ControllerInfo, ControllerTypes
 from sunflare.virtualbus import VirtualBus, Signal
 from sunflare.types import Workflow
 
