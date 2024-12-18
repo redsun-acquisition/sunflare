@@ -58,11 +58,6 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def supported_engines(self) -> list[AcquisitionEngineTypes]:
-        """Supported acquisition engines list."""
-        return self._model_info.supported_engines
-
-    @property
     def category(self) -> str:
         """Detector type."""
         return self._model_info.category

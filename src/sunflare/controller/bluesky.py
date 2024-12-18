@@ -51,9 +51,5 @@ class BlueskyController(ControllerProtocol[BlueskyDeviceRegistry], metaclass=ABC
         return self._ctrl_info.controller_name
 
     @property
-    def supported_engines(self) -> list[AcquisitionEngineTypes]:  # noqa: D102
-        return self._ctrl_info.supported_engines
-
-    @property
     def registry(self) -> BlueskyDeviceRegistry:  # noqa: D102
         return self._registry

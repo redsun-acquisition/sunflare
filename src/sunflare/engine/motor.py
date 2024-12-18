@@ -70,11 +70,6 @@ class MotorModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def supported_engines(self) -> list[AcquisitionEngineTypes]:
-        """Supported acquisition engines list."""
-        return self._model_info.supported_engines
-
-    @property
     def category(self) -> MotorModelTypes:
         """Motor type."""
         return self._model_info.category

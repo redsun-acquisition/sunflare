@@ -45,7 +45,6 @@ def test_detectors_info():
         assert mock.model_name == "MockDetectorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert mock.supported_engines == ["bluesky"]
         assert mock.sensor_size == (0, 0)
         assert mock.pixel_size == (1, 1, 1)
 
@@ -77,7 +76,6 @@ def test_motors_info():
         assert mock.model_name == "MockMotorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert mock.supported_engines == ["bluesky"]
         assert mock.category == "stepper"
 
     # check the model parameters

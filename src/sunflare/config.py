@@ -146,13 +146,10 @@ class ControllerInfo(BaseModel):
         Set of controller categories.
     controller_name : str
         Controller name.
-    supported_engines : list[AcquisitionEngineTypes]
-        Supported acquisition engines list.
     """
 
     category: set[ControllerTypes] = Field(default=set())
     controller_name: str = Field(default=str())
-    supported_engines: list[AcquisitionEngineTypes] = Field(default_factory=list)
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
     # private field; it is used to bypass validation
@@ -167,8 +164,6 @@ class DeviceModelInfo(BaseModel):
     ----------
     model_name : str
         Device model name.
-    supported_engines : list[AcquisitionEngineTypes]
-        Supported acquisition engines list.
     vendor : Optional[str]
         Detector vendor. Optional for debugging purposes.
     serial_number : Optional[str]
@@ -176,9 +171,6 @@ class DeviceModelInfo(BaseModel):
     """
 
     model_name: str = Field(default=str())
-    supported_engines: list[AcquisitionEngineTypes] = Field(
-        default_factory=lambda: [AcquisitionEngineTypes.BLUESKY]
-    )
     vendor: str = Field(default="N/A", description="Device vendor name")
     serial_number: str = Field(default="N/A", description="Device serial number")
 

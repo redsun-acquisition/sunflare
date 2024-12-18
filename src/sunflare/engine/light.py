@@ -58,11 +58,6 @@ class LightModel(Loggable, metaclass=ABCMeta):
         return self._model_info.serial_number
 
     @property
-    def supported_engines(self) -> list[AcquisitionEngineTypes]:
-        """List of supported acquisition engines."""
-        return self._model_info.supported_engines
-
-    @property
     def category(self) -> LightModelTypes:
         """Light source type."""
         return self._model_info.category
