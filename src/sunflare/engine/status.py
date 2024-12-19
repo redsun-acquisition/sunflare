@@ -324,8 +324,8 @@ class Status:
 
         Parameters
         ----------
-        timeout: Union[Number, None], optional
-            If None (default) wait indefinitely until the status finishes.
+        timeout: ``float``, optional
+            If ``None`` (default) wait indefinitely until the status finishes.
 
         Raises
         ------
