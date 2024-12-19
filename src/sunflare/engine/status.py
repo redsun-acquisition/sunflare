@@ -1,25 +1,7 @@
 # mypy: ignore-errors
-"""Ophyd status object module."""
+"""Ophyd status object module.
 
-__all__ = ["Status"]
-
-from sunflare.log import Loggable
-
-from collections import deque
-import threading
-from warnings import warn
-
-from ._exceptions import (
-    InvalidState,
-    UnknownStatusFailure,
-    StatusTimeoutError,
-    WaitTimeoutError,
-)
-
-
-"""
-The Status class has been adapted from ophyd:
-https://github.com/bluesky/ophyd
+The Status class has been adapted from `ophyd <https://github.com/bluesky/ophyd>`_.
 The ophyd license is reproduced below:
 
 
@@ -51,6 +33,21 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+
+__all__ = ["Status"]
+
+from sunflare.log import Loggable
+
+from collections import deque
+import threading
+
+from ._exceptions import (
+    InvalidState,
+    StatusTimeoutError,
+    WaitTimeoutError,
+)
+
+from typing import Optional
 
 
 class Status(Loggable):
@@ -101,7 +98,9 @@ class Status(Loggable):
     program has moved on.
     """
 
-    def __init__(self, *, timeout=None, settle_time=0, done=None, success=None):
+    def __init__(
+        self, *, timeout: Optional[float] = None, settle_time: Optional[float] = 0
+    ):
         super().__init__()
         self._tname = None
         self._lock = threading.RLock()
@@ -123,34 +122,10 @@ class Status(Loggable):
             timeout = float(timeout)
         self._timeout = timeout
 
-        # We cannot know that we are successful if we are not done.
-        if success and not done:
-            raise ValueError("Cannot initialize with done=False but success=True.")
-        if done is not None or success is not None:
-            warn(
-                "The 'done' and 'success' parameters will be removed in a "
-                "future release. Use the methods set_finished() or "
-                "set_exception(exc) to mark success or failure, respectively, "
-                "after the Status has been instantiated.",
-                DeprecationWarning,
-            )
-
         self._callback_thread = threading.Thread(
             target=self._run_callbacks, daemon=True, name=self._tname
         )
         self._callback_thread.start()
-
-        if done:
-            if success:
-                self.set_finished()
-            else:
-                exc = UnknownStatusFailure(
-                    f"The status {self!r} has failed. To obtain more specific, "
-                    "helpful errors in the future, update the Device to use "
-                    "set_exception(...) instead of setting success=False "
-                    "at __init__ time."
-                )
-                self.set_exception(exc)
 
     @property
     def timeout(self):
