@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """Ophyd status object module.
 
 The Status class has been adapted from `ophyd <https://github.com/bluesky/ophyd>`_.
@@ -33,12 +32,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-__all__ = ["Status"]
-
-from sunflare.log import Loggable
+from __future__ import annotations
 
 from collections import deque
 import threading
+
+from sunflare.log import get_logger
 
 from ._exceptions import (
     InvalidState,
@@ -46,10 +45,12 @@ from ._exceptions import (
     WaitTimeoutError,
 )
 
-from typing import Optional
+from typing import Optional, Callable
+
+__all__ = ["Status"]
 
 
-class Status(Loggable):
+class Status:
     """
     Track the status of a potentially-lengthy action like moving or triggering.
 
@@ -101,6 +102,7 @@ class Status(Loggable):
         self, *, timeout: Optional[float] = None, settle_time: Optional[float] = 0
     ):
         super().__init__()
+        self._logger = get_logger()
         self._tname = None
         self._lock = threading.RLock()
         self._event = threading.Event()  # state associated with done-ness
@@ -109,8 +111,8 @@ class Status(Loggable):
         # called, as opposed to completion via an internal timeout.
         self._externally_initiated_completion_lock = threading.Lock()
         self._externally_initiated_completion = False
-        self._callbacks = deque()
-        self._exception = None
+        self._callbacks: deque[Callable[[Status], None]] = deque()
+        self._exception: Optional[Exception] = None
 
         if settle_time is None:
             settle_time = 0.0
@@ -127,7 +129,7 @@ class Status(Loggable):
         self._callback_thread.start()
 
     @property
-    def timeout(self):
+    def timeout(self) -> Optional[float]:
         """The timeout for this action.
 
         This is set when the Status is created, and it cannot be changed.
@@ -135,7 +137,7 @@ class Status(Loggable):
         return self._timeout
 
     @property
-    def settle_time(self):
+    def settle_time(self) -> float:
         """A delay between when :meth:`set_finished` is when the Status is done.
 
         This is set when the Status is created, and it cannot be changed.
@@ -143,7 +145,7 @@ class Status(Loggable):
         return self._settle_time
 
     @property
-    def done(self):
+    def done(self) -> bool:
         """Boolean indicating whether associated operation has completed.
 
         This is set to True at __init__ time or by calling
@@ -153,7 +155,7 @@ class Status(Loggable):
         return self._event.is_set()
 
     @property
-    def success(self):
+    def success(self) -> bool:
         """Boolean indicating whether associated operation has completed.
 
         This is set to True at __init__ time or by calling
@@ -162,14 +164,14 @@ class Status(Loggable):
         """
         return self.done and self._exception is None
 
-    def _handle_failure(self):
+    def _handle_failure(self) -> None:
         pass
 
-    def _settled(self):
+    def _settled(self) -> None:
         """Connect to this this when status has completed and settled."""
         pass
 
-    def _run_callbacks(self):
+    def _run_callbacks(self) -> None:
         """Set the Event and run the callbacks."""
         if self.timeout is None:
             timeout = None
@@ -182,7 +184,7 @@ class Status(Loggable):
             # statement timing out grabbing the lock just below,
             # set_exception(exc) has been called. Both of these possibilties
             # are accounted for.
-            self.warning("%r has timed out", self)
+            self._logger.warning("%r has timed out", self)
             with self._externally_initiated_completion_lock:
                 # Set the exception and mark the Status as done, unless
                 # set_exception(exc) was called externally before we grabbed
@@ -198,7 +200,7 @@ class Status(Loggable):
         except Exception:
             # No alternative but to log this. We can't supersede set_exception,
             # and we have to continue and run the callbacks.
-            self.exception("%r encountered error during _settled()", self)
+            self._logger.exception("%r encountered error during _settled()", self)
         # Now we know whether or not we have succeed or failed, either by
         # timeout above or by set_exception(exc), so we can set the Event that
         # will mark this Status as done.
@@ -208,14 +210,16 @@ class Status(Loggable):
             try:
                 self._handle_failure()
             except Exception:
-                self.exception("%r encountered an error during _handle_failure()", self)
+                self._logger.exception(
+                    "%r encountered an error during _handle_failure()", self
+                )
         # The callbacks have access to self, from which they can distinguish
         # success or failure.
         for cb in self._callbacks:
             try:
                 cb(self)
             except Exception:
-                self.exception(
+                self._logger.exception(
                     "An error was raised on a background thread while "
                     "running the callback %r(%r).",
                     cb,
@@ -223,7 +227,7 @@ class Status(Loggable):
                 )
         self._callbacks.clear()
 
-    def set_exception(self, exc):
+    def set_exception(self, exc: Exception) -> None:
         """Mark as finished but failed with the given Exception.
 
         This method should generally not be called by the *recipient* of this
@@ -237,8 +241,7 @@ class Status(Loggable):
         # avoid potentially very confusing failures.
         if not (
             isinstance(exc, Exception)
-            or isinstance(exc, type)
-            and issubclass(exc, Exception)
+            or (isinstance(exc, type) and issubclass(exc, Exception))  # type: ignore[unreachable]
         ):
             # Note that Python allows `raise Exception` or raise Exception()`
             # so we allow a class or an instance here too.
@@ -248,10 +251,8 @@ class Status(Loggable):
         # would probably never come up except due to some rare user error, but
         # if it did it could be very confusing indeed!
         for exc_class in (StatusTimeoutError, WaitTimeoutError):
-            if (
-                isinstance(exc, exc_class)
-                or isinstance(exc, type)
-                and issubclass(exc, exc_class)
+            if isinstance(exc, exc_class) or (
+                isinstance(exc, type) and issubclass(exc, exc_class)
             ):
                 raise ValueError(
                     f"{exc_class} has special significance and cannot be set "
@@ -272,7 +273,7 @@ class Status(Loggable):
             self._exception = exc
             self._settled_event.set()
 
-    def set_finished(self):
+    def set_finished(self) -> None:
         """Mark as finished successfully.
 
         This method should generally not be called by the *recipient* of this
@@ -293,7 +294,7 @@ class Status(Loggable):
         else:
             self._settled_event.set()
 
-    def exception(self, timeout=None):
+    def exception(self, timeout: Optional[float] = None) -> Optional[Exception]:
         """Return the exception raised by the action.
 
         If the action has completed successfully, return ``None``. If it has
@@ -314,7 +315,7 @@ class Status(Loggable):
             raise WaitTimeoutError("Status has not completed yet.")
         return self._exception
 
-    def wait(self, timeout=None):
+    def wait(self, timeout: Optional[float] = None) -> None:
         """Block until the action completes.
 
         When the action has finished succesfully, return ``None``. If the
@@ -345,11 +346,11 @@ class Status(Loggable):
             raise self._exception
 
     @property
-    def callbacks(self):
+    def callbacks(self) -> deque[Callable[[Status], None]]:
         """Callbacks to be run when the status is marked as finished."""
         return self._callbacks
 
-    def add_callback(self, callback):
+    def add_callback(self, callback: Callable[[Status], None]) -> None:
         """Register a callback to be called once when the Status finishes.
 
         The callback will be called exactly once. If the Status is finished
