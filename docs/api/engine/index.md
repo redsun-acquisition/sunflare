@@ -6,5 +6,6 @@
 status
 detectors
 motors
+lights
 handler
 ```

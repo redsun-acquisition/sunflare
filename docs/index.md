@@ -1,10 +1,8 @@
 # SunFlare, toolkit for ReSun development
 
-:::{warning}
-
+```{warning}
 This project is currently under active development. Use at your own risk.
-
-:::
+```
 
 SunFlare is a separate package used to build both RedSun and its plugins.
 

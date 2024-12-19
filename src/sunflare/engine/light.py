@@ -1,4 +1,8 @@
-"""Light source model abstract base class definition."""
+"""``light`` module.
+
+.. warning:: This module is currently under active development and may see breaking changes.
+
+"""
 
 from __future__ import annotations
 
@@ -14,21 +18,19 @@ from sunflare.config import (
 
 class LightModel(Loggable, metaclass=ABCMeta):
     """
-    `LightModel` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
+    ``LightModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
-    The `LightModel` is the base class from which all light sources, regardless of the supported engine, must inherit.
-    It provides the basic information about the light source model and the properties exposable to the upper layers for user interaction.
+    The ``LightModel`` is the base class from which all light sources must inherit.
+    It provides the basic information about the motor model and the properties exposable to the upper layers for user interaction.
 
     It does **not** provide APIs for performing actions, which must be instead defined by the engine-specific light source classes.
 
     Parameters
     ----------
-    name: str
-        - Light source instance unique identifier name.
-        - User defined.
+    name : ``str``
+        Motor name.
     model_info: LightModelInfo
-        - Light source model information dataclass.
-        - Provided by RedSun configuration.
+        Light source model informations.
     """
 
     @abstractmethod
