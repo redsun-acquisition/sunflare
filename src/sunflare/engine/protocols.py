@@ -1,10 +1,10 @@
 """Protocols module.
 
-Bluesky achieves an high level of abstraction via structural duck typing via python `Protocols <https://typing.readthedocs.io/en/latest/spec/protocol.html>`_.
+RedSun protocols have the dual purpose of:
 
-RedSun uses these protocols to describe a minimum set of methods that specific device categories should implement, providing its own protocols.
+1. Providing a minimum set of functionalities that specific device categories should implement.
+2. Providing type hints for the device registry class.
 
-Although not necessary from Bluesky's perspective, it is useful for RedSun to have a minimum set of common functionalities to get a taste of what is possible.
 """
 
 from __future__ import annotations
