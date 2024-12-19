@@ -1,4 +1,4 @@
-"""Ophyd status object module.
+"""Status object.
 
 The Status class has been adapted from `ophyd <https://github.com/bluesky/ophyd>`_.
 The ophyd license is reproduced below:
