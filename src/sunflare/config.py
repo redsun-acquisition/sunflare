@@ -261,6 +261,8 @@ class MotorModelInfo(DeviceModelInfo):
 class ScannerModelInfo(DeviceModelInfo):
     """Scanner model informations.
 
+    .. warning:: This class is currently under active development and may see breaking changes.
+
     Attributes
     ----------
     category : ScannerModelTypes
