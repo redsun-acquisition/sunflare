@@ -19,7 +19,7 @@ __all__ = ["MotorModel", "MotorProtocol"]
 # TODO: more protocols for this?
 @runtime_checkable
 class MotorProtocol(Protocol):
-    """Bluesky motor protocol.
+    """Bluesky-compatible motor protocol.
 
     Implements the following protocols:
 
@@ -92,12 +92,12 @@ class MotorProtocol(Protocol):
 
 class MotorModel(Loggable, metaclass=ABCMeta):
     """
-    `MotorModel` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
+    ``MotorModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
-    The `MotorModel` is the base class from which all motors, regardless of the supported engine, must inherit.
+    The ``MotorModel`` is the base class from which all motors must inherit.
     It provides the basic information about the motor model and the properties exposable to the upper layers for user interaction.
 
-    It does **not** provide APIs for performing actions, which must be instead defined by the engine-specific motor classes.
+    It does **not** provide APIs for performing actions, which are instead defined by :class:`~sunflare.engine.motor.MotorProtocol`.
 
     Parameters
     ----------

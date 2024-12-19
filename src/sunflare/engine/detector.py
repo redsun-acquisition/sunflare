@@ -22,7 +22,7 @@ __all__ = ["DetectorModel", "DetectorProtocol"]
 
 @runtime_checkable
 class DetectorProtocol(Protocol):
-    """Bluesky detector base model.
+    """Bluesky-compatible detector protocol.
 
     This model implements the following protocols:
 
@@ -161,12 +161,12 @@ class DetectorProtocol(Protocol):
 
 class DetectorModel(Loggable, metaclass=ABCMeta):
     """
-    `DetectorModel` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
+    ``DetectorModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
-    The `DetectorModel` is the base class from which all detectors, regardless of the supported engine, must inherit.
+    The ``DetectorModel`` is the base class from which all detectors must inherit.
     It provides the basic information about the detector model and the properties exposable to the upper layers for user interaction.
 
-    It does **not** provide APIs for performing actions, which must be instead defined by the engine-specific detector classes.
+    It does **not** provide APIs for performing actions, which are instead defined by :class:`~sunflare.engine.detector.DetectorProtocol`.
 
     Parameters
     ----------
