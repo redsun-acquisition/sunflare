@@ -1,4 +1,4 @@
-"""Bluesky device registry module."""
+"""``registry`` module."""
 
 from __future__ import annotations
 
@@ -8,7 +8,19 @@ from sunflare.engine.detector import DetectorProtocol
 
 
 class DeviceRegistry:
-    """Bluesky device registry class."""
+    """Device registry class.
+
+    The registry holds references to the devices currently loaded in RedSun;
+    it provides a unique point of interaction for controllers to actively manage workflows
+    and assign specific devices to them.
+
+    Parameters
+    ----------
+    virtual_bus: :class:`~sunflare.virtualbus.VirtualBus`
+        Intra-module communication bus.
+    module_bus: :class:`~sunflare.virtualbus.VirtualBus`
+        Inter-module communication bus.
+    """
 
     def __init__(
         self,

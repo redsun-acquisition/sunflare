@@ -1,4 +1,12 @@
-# noqa: D100
+"""The module contains types that are used throughout the SunFlare package.
+
+- ``Workflow``
+    - expected signature of a workflow published by a controller.
+    - definition: ``Workflow: TypeAlias = Union[Generator[Any, None, None], Iterable[Any]]``
+- ``Buffer``
+    - expected signature of a data buffer captured by a detector.
+    - definition: ``Buffer: TypeAlias = dict[str, Tuple[npt.NDArray[Any], dict[str, Any]]]``
+"""
 
 from __future__ import annotations
 
@@ -29,7 +37,7 @@ class AxisLocation(TypedDict, Generic[T]):
 
     Parameters
     ----------
-    axis: dict[str, T]
+    axis: ``dict[str, T]``
         A dictionary containing the axis name and its corresponding value.
     """
 
@@ -37,7 +45,4 @@ class AxisLocation(TypedDict, Generic[T]):
 
 
 Workflow: TypeAlias = Union[Generator[Any, None, None], Iterable[Any]]
-
 Buffer: TypeAlias = dict[str, Tuple[npt.NDArray[Any], dict[str, Any]]]
-
-__all__ = ["Workflow", "AxisLocation"]

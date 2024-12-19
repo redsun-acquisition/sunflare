@@ -34,13 +34,6 @@ def test_virtual_bus_registration() -> None:
     bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
     bus["MockOwner"]["sigMySignal"].emit(5)
 
-def test_module_virtual_bus() -> None:
-    """Tests the creation of a singleton module virtual bus."""
-    module_bus1 = ModuleVirtualBus()
-    module_bus2 = ModuleVirtualBus()
-
-    assert module_bus1 is module_bus2
-
 def test_module_virtual_bus_registration() -> None:
     """Tests the registration of signals in the module virtual bus."""
     

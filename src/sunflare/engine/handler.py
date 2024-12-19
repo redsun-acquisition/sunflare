@@ -1,4 +1,4 @@
-"""`EngineHandler` abstract base class."""
+"""``EngineHandler`` module."""
 
 from __future__ import annotations
 
@@ -9,12 +9,12 @@ from sunflare.virtualbus import VirtualBus
 from sunflare.types import Workflow
 
 if TYPE_CHECKING:
-    # TODO: create a protocol for the engine
+    # TODO: create a protocol for the engine?
     from bluesky.run_engine import RunEngine
 
 
 class EngineHandler(Protocol):
-    """`EngineHandler` protocol class.
+    """``EngineHandler`` protocol class.
 
     The `EngineHandler` wraps the acquisition engine and provides a common interface for all engines.
     It communicates with the rest of the application via the virtual buses.
@@ -23,9 +23,9 @@ class EngineHandler(Protocol):
 
     Parameters
     ----------
-    virtual_bus : VirtualBus
+    virtual_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Module-local virtual bus.
-    module_bus : VirtualBus
+    module_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Inter-module virtual bus.
     """
 

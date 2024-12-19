@@ -6,4 +6,5 @@
 status
 detectors
 motors
+handler
 ```

@@ -1,4 +1,4 @@
-"""Motor module."""
+"""``motors`` module."""
 
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ class MotorProtocol(Protocol):
 
         Returns
         -------
-        Status
+        :class:`~sunflare.engine.status.Status`
             A status object that is marked done when the motor is done moving.
         """
         ...

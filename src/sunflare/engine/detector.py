@@ -1,4 +1,4 @@
-"""Detector module."""
+"""``detector`` module."""
 
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ class DetectorProtocol(Protocol):
 
         Returns
         -------
-        Status
+        :class:`~sunflare.engine.status.Status`
             A status object that is marked done when the device is done staging.
         """
         ...
@@ -61,7 +61,7 @@ class DetectorProtocol(Protocol):
 
         Returns
         -------
-        Status
+        :class:`~sunflare.engine.status.Status`
             A status object that is marked done when the device is done unstaging.
         """
         ...
@@ -84,6 +84,11 @@ class DetectorProtocol(Protocol):
                           'shape': []}))
 
         For a more detailed description, see the ``DataKey`` class.
+
+        Returns
+        -------
+        :class:`~collections.OrderedDict`
+            An ordered dictionary of data keys.
         """
         ...
 
@@ -101,7 +106,13 @@ class DetectorProtocol(Protocol):
                          {'value': 16, 'timestamp': 1472493713.539238}))
 
         For a more detailed description, see the ``Reading`` class.
+
+        Returns
+        -------
+        :class:`~collections.OrderedDict`
+            An ordered dictionary of readings.
         """
+        ...
 
     @abstractmethod
     def pause(self) -> None:
@@ -119,18 +130,18 @@ class DetectorProtocol(Protocol):
 
         Returns
         -------
-        Status
+        :class:`~sunflare.engine.status.Status`
             A status object that is marked done when the device is done starting.
         """
         ...
 
     @abstractmethod
     def complete(self) -> Status:
-        """Wait for the device to complete.
+        """Wait for the device to complete if it is running asynchronously.
 
         Returns
         -------
-        Status
+        :class:`~sunflare.engine.status.Status`
             A status object that is marked done when the device is done completing.
         """
         ...
@@ -140,12 +151,23 @@ class DetectorProtocol(Protocol):
         """Provide same API as ``read`` but for slow-changing fields related to configuration.
 
         Example: exposure time. These will typically be read only once per run.
+
+        Returns
+        -------
+        :class:`~collections.OrderedDict`
+            An ordered dictionary of configuration readings.
         """
         ...
 
     @abstractmethod
     def describe_configuration(self) -> OrderedDict[str, DataKey]:
-        """Provide same API as ``describe``, but corresponding to the keys in ``read_configuration``."""
+        """Provide same API as ``describe``, but corresponding to the keys in ``read_configuration``.
+
+        Returns
+        -------
+        :class:`~collections.OrderedDict`
+            An ordered dictionary of configuration data keys.
+        """
         ...
 
     @property
