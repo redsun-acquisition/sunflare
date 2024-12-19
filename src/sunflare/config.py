@@ -1,8 +1,11 @@
 """RedSun configuration dataclasses and enumerators.
 
-The module provides a set of `pydantic.BaseModel <https://docs.pydantic.dev/latest/concepts/models/>`_ and enumerators classes that are used to
+The module provides a set of `pydantic.BaseModel`_ and enumerators classes that are used to
 provide a basic representation of a RedSun-compatible hardware interface. These models are used in plugins to be inherited
 by custom models defined by the user, which can provide additional information about specific hardware components.
+
+.. _pydantic.BaseModel: https://docs.pydantic.dev/latest/concepts/models/
+
 """
 
 from __future__ import annotations
