@@ -1,4 +1,12 @@
-# ruff: noqa
+"""Protocols module.
+
+Bluesky achieves an high level of abstraction via structural duck typing via python `Protocols <https://typing.readthedocs.io/en/latest/spec/protocol.html>`_.
+
+RedSun uses these protocols to describe a minimum set of methods that specific device categories should implement, providing its own protocols.
+
+Although not necessary from Bluesky's perspective, it is useful for RedSun to have a minimum set of common functionalities to get a taste of what is possible.
+"""
+
 from __future__ import annotations
 
 from abc import abstractmethod
@@ -18,23 +26,7 @@ from collections import OrderedDict
 
 from ._status import Status
 
-
-@runtime_checkable
-class HasMotors(Protocol):
-    """A protocol describing that the registry has motors."""
-
-    @property
-    @abstractmethod
-    def motors(self) -> dict[str, MotorProtocol]: ...
-
-
-@runtime_checkable
-class HasDetectors(Protocol):
-    """A protocol describing that the registry has detectors."""
-
-    @property
-    @abstractmethod
-    def detectors(self) -> dict[str, DetectorProtocol]: ...
+__all__ = ["MotorProtocol", "DetectorProtocol"]
 
 
 # TODO: more protocols for this?

@@ -5,6 +5,7 @@
 :caption: API reference:
 
 config
+protocols
 virtual
 log
 ```
