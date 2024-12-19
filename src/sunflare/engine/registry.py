@@ -6,7 +6,7 @@ from sunflare.virtualbus import VirtualBus
 from sunflare.engine.protocols import MotorProtocol, DetectorProtocol
 
 
-class BlueskyDeviceRegistry:
+class DeviceRegistry:
     """Bluesky device registry class."""
 
     def __init__(

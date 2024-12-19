@@ -1,4 +1,5 @@
 # Bluesky-specific exceptions, adapted from yaqc-bluesky
+# Used primarily in sunflare.engine.status
 
 # BSD 3-Clause License
 

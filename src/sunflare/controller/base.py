@@ -4,26 +4,32 @@ RedSun controller toolkit.
 This toolkit section provides RedSun developers with the necessary base classes to implement their own controllers.
 """
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
-from typing import Iterable, Protocol, TypeVar, Generic
+from typing import Iterable, Protocol
 
 from sunflare.config import ControllerInfo, ControllerTypes
 from sunflare.virtualbus import VirtualBus, Signal
 from sunflare.types import Workflow
-
-# device registry type
-R = TypeVar("R")
+from sunflare.engine import DeviceRegistry
 
 
-class ControllerProtocol(Generic[R], Protocol):
-    """Base controller protocol."""
+class BaseController(ABC):
+    """Abstract base class for all controllers."""
 
-    _registry: R
-    _virtual_bus: VirtualBus
-    _module_bus: VirtualBus
-    _ctrl_info: ControllerInfo
+    def __init__(
+        self,
+        ctrl_info: ControllerInfo,
+        registry: DeviceRegistry,
+        virtual_bus: VirtualBus,
+        module_bus: VirtualBus,
+    ) -> None:
+        self._registry = registry
+        self._ctrl_info = ctrl_info
+        self._virtual_bus = virtual_bus
+        self._module_bus = module_bus
 
+    @abstractmethod
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations.
 
@@ -89,22 +95,19 @@ class ControllerProtocol(Generic[R], Protocol):
         ...
 
     @property
-    @abstractmethod
     def category(self) -> set[ControllerTypes]:
         """Controller category."""
-        ...
+        return self._ctrl_info.category
 
     @property
-    @abstractmethod
-    def controller_name(self) -> str:
-        """Controller name. Represents the class which builds the controller instance."""
-        ...
+    def controller_name(self) -> str:  # noqa: D102
+        """Controller class name."""
+        return self._ctrl_info.controller_name
 
     @property
-    @abstractmethod
-    def registry(self) -> R:
+    def registry(self) -> DeviceRegistry:
         """Device registry."""
-        ...
+        return self._registry
 
 
 class Renderer(Protocol):

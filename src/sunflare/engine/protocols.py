@@ -24,7 +24,7 @@ from event_model.documents.event_descriptor import DataKey
 
 from collections import OrderedDict
 
-from ._status import Status
+from .status import Status
 
 __all__ = ["MotorProtocol", "DetectorProtocol"]
 
