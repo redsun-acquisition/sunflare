@@ -25,8 +25,6 @@ class MotorProtocol(Protocol):
 
     - :class:`bluesky.protocols.Movable`
     - :class:`bluesky.protocols.Locatable`
-
-
     """
 
     _model_info: MotorModelInfo
