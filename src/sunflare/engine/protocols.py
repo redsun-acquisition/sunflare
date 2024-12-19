@@ -52,7 +52,26 @@ class MotorProtocol(Protocol):
 
     @abstractmethod
     def set(self, value: AxisLocation[Union[float, int, str]]) -> Status:
-        """Return a ``Status`` that is marked done when the device is done moving."""
+        """Set a value for the given motor.
+
+        `value` meaning depends on the motor model implementation, i.e.
+
+        - setting a new position for a linear motor;
+        - setting a new angle for a rotary motor;
+        - setting a new voltage for a piezo motor;
+        - setting a pressure value for a pump;
+        - ...
+
+        Parameters
+        ----------
+        value : AxisLocation[Union[float, int, str]]
+            The value to set.
+
+        Returns
+        -------
+        Status
+            A status object that is marked done when the motor is done moving.
+        """
         ...
 
     @abstractmethod
@@ -63,12 +82,17 @@ class MotorProtocol(Protocol):
         concept of location. This is where the Device currently is, and where it
         was last requested to move to. This protocol formalizes how to get the
         location from a ``Movable``.
+
+        Returns
+        -------
+        AxisLocation[Union[float, int, str]]
+            The current location of the motor.
         """
         ...
 
     @property
     def name(self) -> str:
-        """Return the name of the motor."""
+        """The name of the motor instance."""
         ...
 
     @property
@@ -105,8 +129,10 @@ class DetectorProtocol(Protocol):
     def stage(self) -> Status:
         """Set up the device for acquisition.
 
-        It should return a ``Status`` that is marked done when the device is
-        done staging.
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done staging.
         """
         ...
 
@@ -114,8 +140,10 @@ class DetectorProtocol(Protocol):
     def unstage(self) -> Status:
         """Disables device.
 
-        It should return a ``Status`` that is marked done when the device is finished
-        unstaging.
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done unstaging.
         """
         ...
 
@@ -170,8 +198,10 @@ class DetectorProtocol(Protocol):
     def kickoff(self) -> Status:
         """Start the device for asynchronous acquisition.
 
-        Returns a ``Status`` that is marked done when the device is finished
-        starting.
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done starting.
         """
         ...
 
@@ -179,8 +209,10 @@ class DetectorProtocol(Protocol):
     def complete(self) -> Status:
         """Wait for the device to complete.
 
-        Returns ``Status`` that is marked done when the device is finished
-        completing.
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done completing.
         """
         ...
 
@@ -199,10 +231,10 @@ class DetectorProtocol(Protocol):
 
     @property
     def name(self) -> str:
-        """Return the name of the detector."""
+        """The name of the detector."""
         ...
 
     @property
     def model_info(self) -> DetectorModelInfo:
-        """Return the model information for the detector."""
+        """The model information for the detector."""
         ...
