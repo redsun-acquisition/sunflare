@@ -1,4 +1,4 @@
-"""Detector model abstract base class definition."""
+"""Detector module."""
 
 from __future__ import annotations
 
