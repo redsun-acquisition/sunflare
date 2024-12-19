@@ -169,7 +169,7 @@ class DeviceModelInfo(BaseModel):
         Detector serial number. Optional for visualization purposes.
     """
 
-    model_name: str = Field(default=str())
+    model_name: str = Field(description="Device model name")
     vendor: str = Field(default="N/A", description="Device vendor name")
     serial_number: str = Field(default="N/A", description="Device serial number")
 
