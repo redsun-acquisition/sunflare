@@ -11,7 +11,7 @@ from sunflare.config import DetectorModelInfo, DetectorModelTypes
 
 class DetectorModel(Loggable, metaclass=ABCMeta):
     """
-    `DetectorModel` abstract base class. Supports logging via `Loggable`.
+    `DetectorModel` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
     The `DetectorModel` is the base class from which all detectors, regardless of the supported engine, must inherit.
     It provides the basic information about the detector model and the properties exposable to the upper layers for user interaction.
