@@ -56,11 +56,11 @@ class DetectorModelTypes(str, Enum):
 
     Attributes
     ----------
-    AREA : str
+    AREA
         Area detector (i.e. CCD, CMOS cameras).
-    LINE : str
+    LINE
         Line detector (i.e. photodiode arrays).
-    POINT : str
+    POINT
         Point detector (i.e. Avalanche Photodiode (APD) detector).
     """
 
@@ -116,7 +116,7 @@ class ControllerTypes(str, Enum):
     DEVICE
         Device controller.
 
-        These are only used internally and not exposed to the user.
+        - These are only used internally and not exposed to the user.
     COMPUTATOR
         Renderer controller.
     PUBLISHER
@@ -160,7 +160,7 @@ class DeviceModelInfo(BaseModel):
     ----------
     model_name : ``str``
         Device model name.
-    vendor : `str``, optional
+    vendor : ``str``, optional
         Detector vendor. Optional for visualization purposes.
     serial_number : ``str``, optional
         Detector serial number. Optional for visualization purposes.
@@ -180,14 +180,14 @@ class DetectorModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : DetectorModelTypes
-        Detector type.
+        - Detector type.
     sensor_size : ``Tuple[int, int]``
-        Detector sensor size in pixels: represents the 2D axis ``(Y, X)``.
+        - Detector sensor size in pixels: represents the 2D axis ``(Y, X)``.
     pixel_size : ``Tuple[float, float, float]``
         - Detector pixel size in micrometers: represents the 3D axis ``(Z, Y, X)``.
         - Defaults to ``(1, 1, 1)``.
     exposure_egu : ``str``
-        Engineering unit for exposure time, e.g. ``ms``, ``μs``. Defaults to ``ms``.
+        - Engineering unit for exposure time, e.g. ``ms``, ``μs``. Defaults to ``ms``.
     """
 
     category: DetectorModelTypes = Field(default=DetectorModelTypes.AREA)
@@ -205,16 +205,16 @@ class LightModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : LightModelTypes
-        Light source type. Defaults to ``laser``.
+        - Light source type. Defaults to ``laser``.
     wavelength : ``int``, optional
-        Light source wavelength in nanometers.
+        - Light source wavelength in nanometers.
     power_egu : ``str``
-        Engineering unit for light source, .e.g. ``mW``, ``μW``. Defaults to ``mW``.
+        - Engineering unit for light source, .e.g. ``mW``, ``μW``. Defaults to ``mW``.
     range : ``Union[Tuple[float, float], Tuple[int, int]]``
-        Light source power range. Expressed in `power_egu` units.
-        Formatted as (min, max). Defaults to ``(0, 0)``.
+        - Light source power range. Expressed in `power_egu` units.
+        - Formatted as (min, max). Defaults to ``(0, 0)``.
     power_step: ``Union[float, int]``
-        Power increase/decrease minimum step size. Expressed in ``power_egu`` units.
+        - Power increase/decrease minimum step size. Expressed in ``power_egu`` units.
     """
 
     power_egu: str = Field(default="mW")
@@ -233,19 +233,18 @@ class MotorModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : MotorModelTypes
-        Motor type. Defaults to ``stepper``.
+        - Motor type. Defaults to ``stepper``.
     step_egu : ``str``
-        Engineering unit for steps, e.g. ``mm``, ``μm``. Defaults to ``μm``.
+        - Engineering unit for steps, e.g. ``mm``, ``μm``. Defaults to ``μm``.
     step_size : ``Union[int, float]``
-        Motor step size in ``step_egu`` units. Defaults to 1.0.
+        - Motor step size in ``step_egu`` units. Defaults to 1.0.
     axes : ``list[str]``
-        Supported motor axes.
-
-        - Suggestion is to be a list of single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
+        - Supported motor axes.
+        - Suggested values are single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
     return_home : ``bool``
-        If ``True``, motor will return to home position
-        (defined as  the initial position the motor had at RedSun's startup)
-        after RedSun is closed. Defaults to ``False``.
+        - If ``True``, motor will return to home position
+        - (defined as  the initial position the motor had at RedSun's startup)
+        - after RedSun is closed. Defaults to ``False``.
     """
 
     category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
@@ -262,10 +261,10 @@ class ScannerModelInfo(DeviceModelInfo):
     Attributes
     ----------
     category : ScannerModelTypes
-        Scanner type. Defaults to ``galvo``.
+        - Scanner type. Defaults to ``galvo``.
     axes : ``list[str]``
-        Supported scanner axes. Suggestion is to be a list of
-        single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
+        - Supported scanner axes. Suggestion is to be a list of
+        - single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
     """
 
     category: ScannerModelTypes = Field(default=ScannerModelTypes.GALVO)
