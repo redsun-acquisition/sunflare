@@ -61,6 +61,19 @@ source = "vcs"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sunflare"]
+exclude = [
+    "src/sunflare/docs",
+    "src/sunflare/tests",
+    "src/sunflare/noxfile.py",
+    "src/sunflare/dist"
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/sunflare/*.py",
+  "src/sunflare/tests",
+  "src/sunflare/docs",
+]
 
 # Mypy
 # ----
