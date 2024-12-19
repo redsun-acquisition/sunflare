@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TypeVar, Generic, Protocol, Any, Generator, Iterable, Union
+from typing import Protocol, Any, Generator, Iterable, Union, TYPE_CHECKING
 
 from sunflare.virtualbus import VirtualBus
 from sunflare.types import Workflow
 
-E = TypeVar("E", covariant=True)
+if TYPE_CHECKING:
+    # TODO: create a protocol for the engine
+    from bluesky.run_engine import RunEngine
 
 
-class EngineHandler(Generic[E], Protocol):
+class EngineHandler(Protocol):
     """`EngineHandler` protocol class.
 
     The `EngineHandler` wraps the acquisition engine and provides a common interface for all engines.
@@ -59,7 +61,7 @@ class EngineHandler(Generic[E], Protocol):
 
     @property
     @abstractmethod
-    def engine(self) -> E:
+    def engine(self) -> RunEngine:
         """Returns the engine instance.
 
         The return type is determined by the specific engine implementation.
