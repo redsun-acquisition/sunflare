@@ -1,12 +1,11 @@
 # API Reference
 
+
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 
 config
-status
-motors
-detectors
+engine/index
 virtual
 log
 ```
