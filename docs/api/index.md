@@ -5,7 +5,7 @@
 
 config
 status
-protocols
+motors
 virtual
 log
 ```

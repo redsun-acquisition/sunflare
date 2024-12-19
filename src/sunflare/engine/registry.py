@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from sunflare.virtualbus import VirtualBus
-from sunflare.engine.protocols import MotorProtocol, DetectorProtocol
+from sunflare.engine.motor import MotorProtocol
+from sunflare.engine.detector import DetectorProtocol
 
 
 class DeviceRegistry:

@@ -3,10 +3,160 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import Tuple
+from typing import Tuple, runtime_checkable, Protocol, Any
+from collections import OrderedDict
 
 from sunflare.log import Loggable
 from sunflare.config import DetectorModelInfo, DetectorModelTypes
+from sunflare.engine.status import Status
+
+from bluesky.protocols import Reading
+
+# TODO: rather than using the event_model package,
+# we should switch to a local TypedDict;
+# for now we start with this
+from event_model.documents.event_descriptor import DataKey
+
+__all__ = ["DetectorModel", "DetectorProtocol"]
+
+
+@runtime_checkable
+class DetectorProtocol(Protocol):
+    """Bluesky detector base model.
+
+    This model implements the following protocols:
+
+    - :class:`bluesky.protocols.Readable`
+    - :class:`bluesky.protocols.Stageable`
+    - :class:`bluesky.protocols.Pausable`
+    - :class:`bluesky.protocols.Flyable`
+    - :class:`bluesky.protocols.Completable`
+    """
+
+    _name: str
+    _model_info: DetectorModelInfo
+
+    def shutdown(self) -> None:
+        """Shutdown the detector.
+
+        Optional method.
+        Implement this to for graceful shutdown.
+        """
+        ...
+
+    @abstractmethod
+    def stage(self) -> Status:
+        """Set up the device for acquisition.
+
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done staging.
+        """
+        ...
+
+    @abstractmethod
+    def unstage(self) -> Status:
+        """Disables device.
+
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done unstaging.
+        """
+        ...
+
+    @abstractmethod
+    def describe(self) -> OrderedDict[str, DataKey]:
+        """Return an OrderedDict with exactly the same keys as the ``read`` method, here mapped to per-scan metadata about each field.
+
+        A base example of a return value is shown below:
+
+        .. code-block:: python
+
+            OrderedDict(('channel1',
+                         {'source': 'XF23-ID:SOME_PV_NAME',
+                          'dtype': 'number',
+                          'shape': []}),
+                        ('channel2',
+                         {'source': 'XF23-ID:SOME_PV_NAME',
+                          'dtype': 'number',
+                          'shape': []}))
+
+        For a more detailed description, see the ``DataKey`` class.
+        """
+        ...
+
+    @abstractmethod
+    def read(self) -> OrderedDict[str, Reading[Any]]:
+        """Return an OrderedDict mapping string field name(s) to dictionaries of values and timestamps and optional per-point metadata.
+
+        Example return value:
+
+        .. code-block:: python
+
+            OrderedDict(('channel1',
+                         {'value': 5, 'timestamp': 1472493713.271991}),
+                         ('channel2',
+                         {'value': 16, 'timestamp': 1472493713.539238}))
+
+        For a more detailed description, see the ``Reading`` class.
+        """
+
+    @abstractmethod
+    def pause(self) -> None:
+        """Perform device-specific work when the RunEngine pauses."""
+        ...
+
+    @abstractmethod
+    def resume(self) -> None:
+        """Perform device-specific work when the RunEngine resumes after a pause."""
+        ...
+
+    @abstractmethod
+    def kickoff(self) -> Status:
+        """Start the device for asynchronous acquisition.
+
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done starting.
+        """
+        ...
+
+    @abstractmethod
+    def complete(self) -> Status:
+        """Wait for the device to complete.
+
+        Returns
+        -------
+        Status
+            A status object that is marked done when the device is done completing.
+        """
+        ...
+
+    @abstractmethod
+    def read_configuration(self) -> OrderedDict[str, Reading[Any]]:
+        """Provide same API as ``read`` but for slow-changing fields related to configuration.
+
+        Example: exposure time. These will typically be read only once per run.
+        """
+        ...
+
+    @abstractmethod
+    def describe_configuration(self) -> OrderedDict[str, DataKey]:
+        """Provide same API as ``describe``, but corresponding to the keys in ``read_configuration``."""
+        ...
+
+    @property
+    def name(self) -> str:
+        """The name of the detector."""
+        ...
+
+    @property
+    def model_info(self) -> DetectorModelInfo:
+        """The model information for the detector."""
+        ...
 
 
 class DetectorModel(Loggable, metaclass=ABCMeta):

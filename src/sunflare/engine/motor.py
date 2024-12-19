@@ -7,12 +7,91 @@ Belonging to this category fall devices such as stage axis, focusing units, gene
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import Union
+from typing import Union, runtime_checkable, Protocol
+
+from sunflare.engine.status import Status
+from sunflare.types import AxisLocation
 from sunflare.log import Loggable
 from sunflare.config import (
     MotorModelInfo,
     MotorModelTypes,
 )
+
+__all__ = ["MotorModel", "MotorProtocol"]
+
+
+# TODO: more protocols for this?
+@runtime_checkable
+class MotorProtocol(Protocol):
+    """Bluesky motor protocol.
+
+    Implements the following protocols:
+
+    - :class:`bluesky.protocols.Movable`
+    - :class:`bluesky.protocols.Locatable`
+
+
+    """
+
+    _model_info: MotorModelInfo
+
+    def shutdown(self) -> None:
+        """Shutdown the motor.
+
+        Optional method.
+        Implement this to for graceful shutdown.
+        """
+        ...
+
+    @abstractmethod
+    def set(self, value: AxisLocation[Union[float, int, str]]) -> Status:
+        """Set a value for the given motor.
+
+        The meaning of ``value`` depends on the motor model implementation, i.e.
+
+        - setting a new position for a linear motor;
+        - setting a new angle for a rotary motor;
+        - setting a new voltage for a piezo motor;
+        - setting a pressure value for a pump;
+        - ...
+
+        Parameters
+        ----------
+        value : ``AxisLocation[Union[float, int, str]]``
+            The value to set.
+
+        Returns
+        -------
+        Status
+            A status object that is marked done when the motor is done moving.
+        """
+        ...
+
+    @abstractmethod
+    def locate(self) -> AxisLocation[Union[float, int, str]]:
+        """Return the current location of a Device.
+
+        While a ``Readable`` reports many values, a ``Movable`` will have the
+        concept of location. This is where the Device currently is, and where it
+        was last requested to move to. This protocol formalizes how to get the
+        location from a ``Movable``.
+
+        Returns
+        -------
+        ``AxisLocation[Union[float, int, str]]``
+            The current location of the motor.
+        """
+        ...
+
+    @property
+    def name(self) -> str:
+        """The name of the motor instance."""
+        ...
+
+    @property
+    def model_info(self) -> MotorModelInfo:
+        """Return the model information for the motor."""
+        ...
 
 
 class MotorModel(Loggable, metaclass=ABCMeta):
@@ -26,21 +105,10 @@ class MotorModel(Loggable, metaclass=ABCMeta):
 
     Parameters
     ----------
-    name : str
-        - Motor unique identifier name.
-        - User defined.
+    name : ``str``
+        Motor name.
     model_info: MotorModelInfo
-        - Motor model information dataclass.
-        - Provided by RedSun configuration.
-
-    Properties
-    ----------
-    axes : list[str]
-        - Motor axes.
-    return_home : bool
-        - If `True`, motor will return to home position
-        (defined as  the initial position the motor had at RedSun's startup)
-        after RedSun is closed. Defaults to `False`.
+        Motor model informations.
     """
 
     @abstractmethod
