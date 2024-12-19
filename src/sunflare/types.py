@@ -44,5 +44,7 @@ class AxisLocation(TypedDict, Generic[T]):
     axis: dict[str, T]
 
 
+# TODO: the Workflow type is useless since Bluesky already provides a type for
+#       message generators. Use the Bluesky type instead.
 Workflow: TypeAlias = Union[Generator[Any, None, None], Iterable[Any]]
 Buffer: TypeAlias = dict[str, Tuple[npt.NDArray[Any], dict[str, Any]]]
