@@ -10,7 +10,8 @@
 
 from __future__ import annotations
 
-import sys
+from bluesky.protocols import Location
+
 from typing import (
     Any,
     Generator,
@@ -21,28 +22,12 @@ from typing import (
     TypeVar,
 )
 
-if sys.version_info < (3, 11):
-    from typing_extensions import TypedDict, Generic
-else:
-    from typing import TypedDict, Generic
-
 import numpy.typing as npt
 
 T = TypeVar("T", bound=Union[int, str, float])
 X = TypeVar("X", bound=Union[str, int])
 
-
-class AxisLocation(TypedDict, Generic[T]):
-    """TypedDict for accessing coordinates along a specific axis.
-
-    Parameters
-    ----------
-    axis: ``dict[str, T]``
-        A dictionary containing the axis name and its corresponding value.
-    """
-
-    axis: dict[str, T]
-
+__all__ = ["Location", "Workflow", "Buffer"]
 
 # TODO: the Workflow type is useless since Bluesky already provides a type for
 #       message generators. Use the Bluesky type instead.

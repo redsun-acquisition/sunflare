@@ -5,8 +5,8 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import Union, runtime_checkable, Protocol
 
+from sunflare.types import Location
 from sunflare.engine.status import Status
-from sunflare.types import AxisLocation
 from sunflare.log import Loggable
 from sunflare.config import (
     MotorModelInfo,
@@ -44,7 +44,7 @@ class MotorProtocol(Protocol):
         ...
 
     @abstractmethod
-    def set(self, value: AxisLocation[Union[float, int, str]]) -> Status:
+    def set(self, value: dict[str, Location[Union[float, int, str]]]) -> Status:
         """Set a value for the given motor.
 
         The meaning of ``value`` depends on the motor model implementation, i.e.
@@ -57,7 +57,7 @@ class MotorProtocol(Protocol):
 
         Parameters
         ----------
-        value : ``AxisLocation[Union[float, int, str]]``
+        value : ``dict[str, Location[Union[float, int, str]]]``
             The value to set.
 
         Returns
@@ -68,7 +68,7 @@ class MotorProtocol(Protocol):
         ...
 
     @abstractmethod
-    def locate(self) -> AxisLocation[Union[float, int, str]]:
+    def locate(self) -> dict[str, Location[Union[float, int, str]]]:
         """Return the current location of a Device.
 
         While a ``Readable`` reports many values, a ``Movable`` will have the
@@ -78,7 +78,7 @@ class MotorProtocol(Protocol):
 
         Returns
         -------
-        ``AxisLocation[Union[float, int, str]]``
+        ``dict[str, Location[Union[float, int, str]]]``
             The current location of the motor.
         """
         ...
