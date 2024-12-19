@@ -4,7 +4,6 @@
 The Status class has been adapted from `ophyd <https://github.com/bluesky/ophyd>`_.
 The ophyd license is reproduced below:
 
-
 Copyright (c) 2014, Brookhaven Science Associates, Brookhaven National
 Laboratory. All rights reserved.
 
