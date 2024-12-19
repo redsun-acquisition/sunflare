@@ -1,5 +1,5 @@
 # noqa: D104
 
-from .base import ControllerProtocol, Renderer, Publisher, Monitorer
+from .base import BaseController, Renderer, Publisher, Monitorer
 
-__all__ = ["ControllerProtocol", "Renderer", "Publisher", "Monitorer"]
+__all__ = ["BaseController", "Renderer", "Publisher", "Monitorer"]
