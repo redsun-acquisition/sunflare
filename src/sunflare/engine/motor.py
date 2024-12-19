@@ -27,7 +27,13 @@ class MotorProtocol(Protocol):
     - :class:`bluesky.protocols.Locatable`
     """
 
+    _name: str
     _model_info: MotorModelInfo
+
+    @abstractmethod
+    def __init__(self, name: str, model_info: MotorModelInfo) -> None:
+        # the __init__ method is provided only for type checking
+        ...
 
     def shutdown(self) -> None:
         """Shutdown the motor.
@@ -107,13 +113,13 @@ class MotorModel(Loggable, metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self, name: str, model_info: MotorModelInfo) -> None:
-        self.__name = name
+        self._name = name
         self._model_info = model_info
 
     @property
     def name(self) -> str:
         """Motor instance unique identifier name."""
-        return self.__name
+        return self._name
 
     @property
     def model_name(self) -> str:

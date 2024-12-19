@@ -36,6 +36,11 @@ class DetectorProtocol(Protocol):
     _name: str
     _model_info: DetectorModelInfo
 
+    @abstractmethod
+    def __init__(self, name: str, model_info: DetectorModelInfo) -> None:
+        # the __init__ method is provided only for type checking
+        ...
+
     def shutdown(self) -> None:
         """Shutdown the detector.
 
