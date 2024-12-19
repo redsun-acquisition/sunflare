@@ -1,4 +1,5 @@
 # mypy: ignore-errors
+"""Ophyd status object module."""
 
 __all__ = ["Status"]
 
