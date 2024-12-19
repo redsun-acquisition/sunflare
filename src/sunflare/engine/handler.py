@@ -1,4 +1,4 @@
-"""``EngineHandler`` module."""
+"""``handler`` module."""
 
 from __future__ import annotations
 
@@ -18,8 +18,6 @@ class EngineHandler(Protocol):
 
     The `EngineHandler` wraps the acquisition engine and provides a common interface for all engines.
     It communicates with the rest of the application via the virtual buses.
-
-    The handler needs to be specialized depending on what engine is being used.
 
     Parameters
     ----------
@@ -52,9 +50,9 @@ class EngineHandler(Protocol):
 
         Parameters
         ----------
-        name : str
+        name : ``str``
             Workflow unique identifier.
-        workflow : Union[Generator, Iterable]
+        workflow : ``Union[Generator, Iterable]``
             Workflow to be registered.
         """
         ...
@@ -62,9 +60,9 @@ class EngineHandler(Protocol):
     @property
     @abstractmethod
     def engine(self) -> RunEngine:
-        """Returns the engine instance.
+        """The engine instance.
 
-        The return type is determined by the specific engine implementation.
+        Any ``engine`` object should implement the ``RunEngine`` public API.
         """
         ...
 
