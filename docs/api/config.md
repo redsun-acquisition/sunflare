@@ -1,8 +1,8 @@
-# Enumerators
-
-Common enumerators used in RedSun.
+# Configuration module
 
 ```{eval-rst}
+.. automodule:: sunflare.config
+
 .. autoclass:: sunflare.config.AcquisitionEngineTypes
     :show-inheritance:
 .. autoclass:: sunflare.config.FrontendTypes
@@ -17,4 +17,9 @@ Common enumerators used in RedSun.
     :show-inheritance:
 .. autoclass:: sunflare.config.ControllerTypes
     :show-inheritance:
+.. autoclass:: sunflare.config.DeviceModelInfo
+.. autoclass:: sunflare.config.DetectorModelInfo
+.. autoclass:: sunflare.config.MotorModelInfo
+.. autoclass:: sunflare.config.ScannerModelInfo
+.. autoclass:: sunflare.config.LightModelInfo
 ```

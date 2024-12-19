@@ -9,7 +9,5 @@ and its philosophy.
 :maxdepth: 2
 :caption: API reference:
 
-config/config
-virtual
-log
+api/index
 ```
