@@ -99,6 +99,8 @@ class Status:
     may reports success or failure after the Status object has expired, but
     to no effect because the callbacks have already been called and the
     program has moved on.
+    The ``immediate`` bypasses the mechanism above; it it useful when
+    direct manual control of the device that returns the ``Status`` object is desired.
     """
 
     def __init__(
