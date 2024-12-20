@@ -16,10 +16,10 @@ conda create -n sunflare python=3.12
 conda activate sunflare
 ```
 
-The package is currently not available on PyPI. You'll have to install it from source by cloning the [repository](https://github.com/redsun-project/sunflare)
+The package is currently not available on PyPI. You'll have to install it from source by cloning the [repository](https://github.com/redsun-acquisition/sunflare)
 
 ```bash
-git clone https://github.com/redsun-project/sunflare.git
+git clone https://github.com/redsun-acquisition/sunflare.git
 cd sunflare
 pip install -e .
 ```
