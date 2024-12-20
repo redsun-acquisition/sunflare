@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from abc import ABCMeta, abstractmethod
-from typing import Union, runtime_checkable, Protocol
+from abc import abstractmethod
+from typing import runtime_checkable, Union, Any, Protocol, TypeVar, Generic
 
 from sunflare.types import Location
 from sunflare.engine.status import Status
@@ -15,10 +15,12 @@ from sunflare.config import (
 
 __all__ = ["MotorModel", "MotorProtocol"]
 
+M = TypeVar("M", bound=MotorModelInfo, covariant=True)
+
 
 # TODO: more protocols for this?
 @runtime_checkable
-class MotorProtocol(Protocol):
+class MotorProtocol(Protocol[M]):
     """Bluesky-compatible motor protocol.
 
     Implements the following protocols:
@@ -27,11 +29,8 @@ class MotorProtocol(Protocol):
     - :class:`bluesky.protocols.Locatable`
     """
 
-    _name: str
-    _model_info: MotorModelInfo
-
     @abstractmethod
-    def __init__(self, name: str, model_info: MotorModelInfo) -> None:
+    def __init__(self, name: str, model_info: M) -> None:
         # the __init__ method is provided only for type checking
         ...
 
@@ -44,7 +43,7 @@ class MotorProtocol(Protocol):
         ...
 
     @abstractmethod
-    def set(self, value: dict[str, Location[Union[float, int, str]]]) -> Status:
+    def set(self, value: Union[float, int, str], *args: Any, **kwargs: Any) -> Status:
         """Set a value for the given motor.
 
         The meaning of ``value`` depends on the motor model implementation, i.e.
@@ -57,8 +56,12 @@ class MotorProtocol(Protocol):
 
         Parameters
         ----------
-        value : ``dict[str, Location[Union[float, int, str]]]``
+        value : ``Union[float, int, str]]``
             The value to set.
+        *args : ``Any``
+            Additional positional arguments.
+        **kwargs : ``Any``
+            Additional keyword arguments.
 
         Returns
         -------
@@ -68,7 +71,7 @@ class MotorProtocol(Protocol):
         ...
 
     @abstractmethod
-    def locate(self) -> dict[str, Location[Union[float, int, str]]]:
+    def locate(self) -> Location[Union[float, int, str]]:
         """Return the current location of a Device.
 
         While a ``Readable`` reports many values, a ``Movable`` will have the
@@ -78,7 +81,7 @@ class MotorProtocol(Protocol):
 
         Returns
         -------
-        ``dict[str, Location[Union[float, int, str]]]``
+        ``Location[Union[float, int, str]]]``
             The current location of the motor.
         """
         ...
@@ -89,12 +92,12 @@ class MotorProtocol(Protocol):
         ...
 
     @property
-    def model_info(self) -> MotorModelInfo:
+    def model_info(self) -> M:
         """Return the model information for the motor."""
         ...
 
 
-class MotorModel(Loggable, metaclass=ABCMeta):
+class MotorModel(Loggable, Generic[M]):
     """
     ``MotorModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
@@ -112,7 +115,7 @@ class MotorModel(Loggable, metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self, name: str, model_info: MotorModelInfo) -> None:
+    def __init__(self, name: str, model_info: M) -> None:
         self._name = name
         self._model_info = model_info
 
@@ -122,7 +125,7 @@ class MotorModel(Loggable, metaclass=ABCMeta):
         return self._name
 
     @property
-    def model_info(self) -> MotorModelInfo:
+    def model_info(self) -> M:
         """Motor model informations."""
         return self._model_info
 
