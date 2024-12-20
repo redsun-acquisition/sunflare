@@ -47,7 +47,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           personal_token: ${{ secrets.SUNFLARE_DOCS_TOKEN }}
-          external_repository: redsun-acquisition/redsun-acquisition.github.io
+          external_repository: redsun-acquisition/redsun-acquisition.github.io/sunflare
           publish_dir: docs/_build/dirhtml
           publish_branch: main
           destination_dir: sunflare
