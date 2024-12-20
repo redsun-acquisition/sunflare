@@ -50,4 +50,4 @@ jobs:
           external_repository: redsun-acquisition/redsun-acquisition.github.io
           publish_dir: docs/_build/dirhtml
           publish_branch: main
-          destination_dir: docs/${{github.ref_name}}
+          destination_dir: sunflare
