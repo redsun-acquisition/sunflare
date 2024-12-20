@@ -64,9 +64,6 @@ class Status:
     settle_time: float, optional
         The amount of time to wait between the caller specifying that the
         status has completed to running callbacks. Default is 0.
-    immediate: bool, optional
-        If ``True``, when calling ``set_finished()`` or ``set_exception()``,
-        the status will be marked as done immediately. Default is ``False``.
 
     Notes
     -----
@@ -99,16 +96,10 @@ class Status:
     may reports success or failure after the Status object has expired, but
     to no effect because the callbacks have already been called and the
     program has moved on.
-    The ``immediate`` bypasses the mechanism above; it it useful when
-    direct manual control of the device that returns the ``Status`` object is desired.
     """
 
     def __init__(
-        self,
-        *,
-        timeout: Optional[float] = None,
-        settle_time: Optional[float] = 0,
-        immediate: bool = False,
+        self, *, timeout: Optional[float] = None, settle_time: Optional[float] = 0
     ):
         super().__init__()
         self._logger = get_logger()
@@ -122,22 +113,20 @@ class Status:
         self._externally_initiated_completion = False
         self._callbacks: deque[Callable[[Status], None]] = deque()
         self._exception: Optional[Exception] = None
-        self._immediate = immediate
 
-        if not self._immediate:
-            if settle_time is None:
-                settle_time = 0.0
+        if settle_time is None:
+            settle_time = 0.0
 
-            self._settle_time = float(settle_time)
+        self._settle_time = float(settle_time)
 
-            if timeout is not None:
-                timeout = float(timeout)
-            self._timeout = timeout
+        if timeout is not None:
+            timeout = float(timeout)
+        self._timeout = timeout
 
-            self._callback_thread = threading.Thread(
-                target=self._run_callbacks, daemon=True, name=self._tname
-            )
-            self._callback_thread.start()
+        self._callback_thread = threading.Thread(
+            target=self._run_callbacks, daemon=True, name=self._tname
+        )
+        self._callback_thread.start()
 
     @property
     def timeout(self) -> Optional[float]:
@@ -291,9 +280,6 @@ class Status:
         This method should generally not be called by the *recipient* of this
         Status object, but only by the object that created and returned it.
         """
-        if self._immediate:
-            self._event.set()
-            return
         with self._externally_initiated_completion_lock:
             if self._externally_initiated_completion:
                 raise InvalidState(
