@@ -30,10 +30,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install hatch
         uses: pypa/hatch@install
+      - name: Install hatchling and pip
+        run: |
+          python -m pip install -U pip hatchling
       - name: Install package and dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install --no-build-isolation --no-deps --verbose --editable .[docs]
+          hatch env create
+          hatch env run pip install .[docs]
       - name: Build docs
         run: |
           cd docs
