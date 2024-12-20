@@ -122,6 +122,11 @@ class MotorModel(Loggable, metaclass=ABCMeta):
         return self._name
 
     @property
+    def model_info(self) -> MotorModelInfo:
+        """Motor model informations."""
+        return self._model_info
+
+    @property
     def model_name(self) -> str:
         """Motor model name."""
         return self._model_info.model_name

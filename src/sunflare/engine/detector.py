@@ -211,13 +211,18 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         name: str,
         model_info: DetectorModelInfo,
     ) -> None:
-        self.__name = name
+        self._name = name
         self._model_info = model_info
 
     @property
     def name(self) -> str:
         """Detector instance unique identifier uid."""
-        return self.__name
+        return self._name
+
+    @property
+    def model_info(self) -> DetectorModelInfo:
+        """Detector model informations."""
+        return self._model_info
 
     @property
     def model_name(self) -> str:
