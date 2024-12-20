@@ -29,8 +29,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install hatch
-        run: |
-          pipx install hatch
+        uses: pypa/hatch@install
       - name: Install package and dependencies
         run: |
           python -m pip install --upgrade pip
