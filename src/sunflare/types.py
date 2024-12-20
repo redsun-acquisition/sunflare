@@ -12,15 +12,7 @@ from __future__ import annotations
 
 from bluesky.protocols import Location
 
-from typing import (
-    Any,
-    Generator,
-    Iterable,
-    Union,
-    Tuple,
-    TypeAlias,
-    TypeVar,
-)
+from typing import Any, Generator, Iterable, Union, Tuple, TypeAlias, TypeVar
 
 import numpy.typing as npt
 
