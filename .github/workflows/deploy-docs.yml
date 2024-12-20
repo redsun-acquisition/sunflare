@@ -11,9 +11,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  MPLBACKEND: agg
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,8 +32,7 @@ jobs:
           python -m pip install -U pip hatchling
       - name: Install package and dependencies
         run: |
-          hatch env create
-          hatch env run pip install .[docs]
+          python -m pip install .[docs]
       - name: Build docs
         run: |
           cd docs
