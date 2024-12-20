@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import Tuple, runtime_checkable, Protocol, Any
+from typing import Tuple, runtime_checkable, Protocol, Any, TypeVar, Generic
 from collections import OrderedDict
 
 from sunflare.log import Loggable
@@ -19,9 +19,11 @@ from event_model.documents.event_descriptor import DataKey
 
 __all__ = ["DetectorModel", "DetectorProtocol"]
 
+M = TypeVar("M", bound=DetectorModelInfo, covariant=True)
+
 
 @runtime_checkable
-class DetectorProtocol(Protocol):
+class DetectorProtocol(Protocol[M]):
     """Bluesky-compatible detector protocol.
 
     This model implements the following protocols:
@@ -181,12 +183,12 @@ class DetectorProtocol(Protocol):
         ...
 
     @property
-    def model_info(self) -> DetectorModelInfo:
+    def model_info(self) -> M:
         """The model information for the detector."""
         ...
 
 
-class DetectorModel(Loggable, metaclass=ABCMeta):
+class DetectorModel(Loggable, Generic[M]):
     """
     ``DetectorModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
@@ -209,7 +211,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
     def __init__(
         self,
         name: str,
-        model_info: DetectorModelInfo,
+        model_info: M,
     ) -> None:
         self._name = name
         self._model_info = model_info
@@ -220,7 +222,7 @@ class DetectorModel(Loggable, metaclass=ABCMeta):
         return self._name
 
     @property
-    def model_info(self) -> DetectorModelInfo:
+    def model_info(self) -> M:
         """Detector model informations."""
         return self._model_info
 
