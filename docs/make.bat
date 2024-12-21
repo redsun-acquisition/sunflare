@@ -25,11 +25,20 @@ if errorlevel 9009 (
 
 if "%1" == "" goto help
 
+if "%1" == "clean" goto clean
+
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
 :help
 %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+
+:clean
+%SPHINXBUILD% -M clean %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+pushd _build
+git worktree add -f dirhtml gh-pages
+popd
+goto end
 
 :end
 popd
