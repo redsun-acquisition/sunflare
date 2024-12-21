@@ -13,6 +13,7 @@ SunFlare is a separate package used to build both RedSun and its plugins.
 
 getting_started
 api/index
+changelog
 ```
 
 ## Indices and tables
