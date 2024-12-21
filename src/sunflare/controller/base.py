@@ -1,21 +1,47 @@
+"""RedSun uses controllers to manage the interaction between the user interface and the hardware.
+
+Controllers can either render information (i.e. process some data and send it to the upper layer for visualization),
+notify of changes in the hardware state or publish Bluesky plans for the run engine to execute.
+
+Each controller is associated with a ``ControllerInfo`` object, which contains a series of user-defined properties that
+describe the controller and provides further customization options.
+
+Controllers can access specific hardware devices through the ``DeviceRegistry`` object, which is a singleton instance
+that holds all the devices registered in the application.
 """
-RedSun controller toolkit.
 
-This toolkit section provides RedSun developers with the necessary base classes to implement their own controllers.
-"""
+from abc import ABCMeta, abstractmethod
 
-from abc import ABC, abstractmethod
-
-from typing import Iterable, Protocol
-
+from sunflare.log import Loggable
 from sunflare.config import ControllerInfo, ControllerTypes
 from sunflare.virtualbus import VirtualBus, Signal
 from sunflare.types import Workflow
 from sunflare.engine import DeviceRegistry
 
 
-class BaseController(ABC):
-    """Abstract base class for all controllers."""
+class BaseController(Loggable, metaclass=ABCMeta):
+    """Abstract base class for all controllers.
+
+    Parameters
+    ----------
+    ctrl_info : :class:`sunflare.config.ControllerInfo`
+        Controller information.
+    registry : :class:`sunflare.engine.DeviceRegistry`
+        Device registry.
+    virtual_bus : :class:`sunflare.virtualbus.VirtualBus`
+        Virtual bus.
+    module_bus : :class:`sunflare.virtualbus.VirtualBus`
+        Module bus.
+
+    Attributes
+    ----------
+    sigNewPlan : Signal(object)
+        - Signal that can emit plans built within the controller.
+    """
+
+    sigNewPlan: Signal = Signal(object)
+
+    __slots__ = ("_ctrl_info", "_registry", "_virtual_bus", "_module_bus")
 
     def __init__(
         self,
@@ -28,6 +54,7 @@ class BaseController(ABC):
         self._ctrl_info = ctrl_info
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
+        self._workflows: list[Workflow] = []
 
     @abstractmethod
     def shutdown(self) -> None:
@@ -109,26 +136,7 @@ class BaseController(ABC):
         """Device registry."""
         return self._registry
 
-
-class Renderer(Protocol):
-    """Infers that this class is a rendering controller."""
-
-    ...
-
-
-class Publisher(Protocol):
-    """Infers that this class is a publisher."""
-
-    sigNewPlan: Signal
-
     @property
-    @abstractmethod
-    def workflows(self) -> Iterable[Workflow]:
-        """Iterable of available plans."""
-        ...
-
-
-class Monitorer(Protocol):
-    """Infers that this class is a monitorer."""
-
-    ...
+    def workflows(self) -> list[Workflow]:
+        """Set of available plans."""
+        return self._workflows
