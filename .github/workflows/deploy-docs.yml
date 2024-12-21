@@ -45,6 +45,6 @@ jobs:
         if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.GITHUB_TOKEN }}
+          personal_token: ${{ secrets.SUNFLARE_DOCS_TOKEN }}
           publish_dir: docs/_build/dirhtml
           publish_branch: main
