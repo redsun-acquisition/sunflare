@@ -41,8 +41,7 @@ dependencies = [
 docs = [
     "sphinx",
     "pydata-sphinx-theme",
-    "myst-parser",
-    "sphinx-autodoc2"
+    "myst-parser"
 ]
 dev = [
   "nox",

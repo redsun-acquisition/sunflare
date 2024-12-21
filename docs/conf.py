@@ -44,5 +44,4 @@ source_suffix = {
 }
 
 napoleon_numpy_docstring = True
-
 autodoc_typehints = 'description'

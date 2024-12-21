@@ -9,14 +9,14 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-Alternatively, you can also use [`conda`](https://docs.conda.io/en/latest/) or [`mamba`](https://mamba.readthedocs.io/en/latest/) to create a new environment.
+Alternatively, you can also use [`conda`] or [`mamba`] to create a new environment.
 
 ```bash
 conda create -n sunflare python=3.12
 conda activate sunflare
 ```
 
-The package is currently not available on PyPI. You'll have to install it from source by cloning the [repository](https://github.com/redsun-acquisition/sunflare)
+The package is currently not available on PyPI. You'll have to install it from source by cloning the [repository]
 
 ```bash
 git clone https://github.com/redsun-acquisition/sunflare.git
@@ -37,3 +37,7 @@ make html
 # for windows
 make.bat html
 ```
+
+[conda]: https://docs.conda.io/en/latest/
+[mamba]: https://mamba.readthedocs.io/en/latest/
+[repository]: https://github.com/redsun-acquisition/sunflare
