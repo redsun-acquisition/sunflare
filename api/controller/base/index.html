@@ -1,0 +1,609 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>base &#8212; SunFlare 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=b2731ba4"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/controller/base';</script>
+    <link rel="index" title="Index" href="../../../genindex/" />
+    <link rel="search" title="Search" href="../../../search/" />
+    <link rel="next" title="Virtual module" href="../../virtual/" />
+    <link rel="prev" title="Control modules" href="../" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SunFlare 0.1.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../changelog/">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started/">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../changelog/">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../types/">SunFlare types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config/">Configuration module</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../engine/">Engine-relevant modules</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../engine/status/">Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../engine/detectors/">Detectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../engine/motors/">Motors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../engine/lights/">Lights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../engine/handler/">Engine handler</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../">Control modules</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">base</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../virtual/">Virtual module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../log/">Logging facilities</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../" class="nav-link">Control modules</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><code class="docutils literal notranslate"><span class="pre">base</span></code></span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="base">
+<h1><code class="docutils literal notranslate"><span class="pre">base</span></code><a class="headerlink" href="#base" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">base</span></code> controller module.</p>
+<p id="module-sunflare.controller.base">RedSun uses controllers to manage the interaction between the user interface and the hardware.</p>
+<p>Controllers can either render information (i.e. process some data and send it to the upper layer for visualization),
+notify of changes in the hardware state or publish Bluesky plans for the run engine to execute.</p>
+<p>Each controller is associated with a <code class="docutils literal notranslate"><span class="pre">ControllerInfo</span></code> object, which contains a series of user-defined properties that
+describe the controller and provides further customization options.</p>
+<p>Controllers can access specific hardware devices through the <code class="docutils literal notranslate"><span class="pre">DeviceRegistry</span></code> object, which is a singleton instance
+that holds all the devices registered in the application.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.controller.base.</span></span><span class="sig-name descname"><span class="pre">BaseController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctrl_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_bus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_bus</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.controller.base.BaseController" title="Link to this definition">#</a></dt>
+<dd><p>Abstract base class for all controllers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ctrl_info</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">sunflare.config.ControllerInfo</span></code>) – Controller information.</p></li>
+<li><p><strong>registry</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">sunflare.engine.DeviceRegistry</span></code>) – Device registry.</p></li>
+<li><p><strong>virtual_bus</strong> (<a class="reference internal" href="../../virtual/#sunflare.virtualbus.VirtualBus" title="sunflare.virtualbus.VirtualBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">sunflare.virtualbus.VirtualBus</span></code></a>) – Virtual bus.</p></li>
+<li><p><strong>module_bus</strong> (<a class="reference internal" href="../../virtual/#sunflare.virtualbus.VirtualBus" title="sunflare.virtualbus.VirtualBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">sunflare.virtualbus.VirtualBus</span></code></a>) – Module bus.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.sigNewPlan">
+<span class="sig-name descname"><span class="pre">sigNewPlan</span></span><a class="headerlink" href="#sunflare.controller.base.BaseController.sigNewPlan" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Signal that can emit plans built within the controller.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Signal(object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.category">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">category</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../config/#sunflare.config.ControllerTypes" title="sunflare.config.ControllerTypes"><span class="pre">ControllerTypes</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#sunflare.controller.base.BaseController.category" title="Link to this definition">#</a></dt>
+<dd><p>Controller category.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.connection_phase">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connection_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.controller.base.BaseController.connection_phase" title="Link to this definition">#</a></dt>
+<dd><p>Connect to other controllers or widgets.</p>
+<p>At application start-up, controllers can’t know what signals are available from other parts of RedSun.
+This method is invoked after the controller’s construction and after <cite>registration_phase</cite> as well, allowing to
+connect to all available registered signals in both virtual buses.
+Controllers may be able to connect to other signals even after this phase (provided those signals
+were registered before).</p>
+<p>An implementation example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">connection_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># you can connect signals from another controller to your local slots...</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_virtual_bus</span><span class="p">[</span><span class="s2">&quot;OtherController&quot;</span><span class="p">][</span><span class="s2">&quot;sigOtherControllerSignal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_my_slot</span><span class="p">)</span>
+
+    <span class="c1"># ... or to other signals ...</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_virtual_bus</span><span class="p">[</span><span class="s2">&quot;OtherController&quot;</span><span class="p">][</span><span class="s2">&quot;sigOtherControllerSignal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigMySignal</span><span class="p">)</span>
+
+    <span class="c1"># ... or connect to widgets</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_virtual_bus</span><span class="p">[</span><span class="s2">&quot;OtherWidget&quot;</span><span class="p">][</span><span class="s2">&quot;sigOtherWidgetSignal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_my_slot</span><span class="p">)</span>
+
+    <span class="c1"># you can also connect to the module bus</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_module_bus</span><span class="p">[</span><span class="s2">&quot;OtherController&quot;</span><span class="p">][</span><span class="s2">&quot;sigOtherControllerSignal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_my_slot</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_module_bus</span><span class="p">[</span><span class="s2">&quot;OtherWidget&quot;</span><span class="p">][</span><span class="s2">&quot;sigOtherWidgetSignal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_my_slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.controller_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">controller_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#sunflare.controller.base.BaseController.controller_name" title="Link to this definition">#</a></dt>
+<dd><p>Controller class name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.registration_phase">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">registration_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.controller.base.BaseController.registration_phase" title="Link to this definition">#</a></dt>
+<dd><p>Register the controller signals listed in this method to expose them to the virtual buses.</p>
+<p>At application start-up, controllers can’t know what signals are available from other controllers. This method is called after all controllers are initialized to allow them to register their signals. Controllers may be able to register further signals even after this phase (but not before the <cite>connection_phase</cite> ended). </p>
+<p>Only signals defined in your controller can be registered.</p>
+<p>An implementation example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">registration_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># you can register all signals...</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_module_bus</span><span class="o">.</span><span class="n">register_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="c1"># ... or only a selection of them</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_module_bus</span><span class="o">.</span><span class="n">register_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sigMySignal&quot;</span><span class="p">,</span> <span class="s2">&quot;sigMyOtherSignal&quot;</span><span class="p">])</span>
+
+    <span class="c1"># you can also register signals to the module bus</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_module_bus</span><span class="o">.</span><span class="n">register_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sigMySignal&quot;</span><span class="p">,</span> <span class="s2">&quot;sigMyOtherSignal&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.registry">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DeviceRegistry</span></em><a class="headerlink" href="#sunflare.controller.base.BaseController.registry" title="Link to this definition">#</a></dt>
+<dd><p>Device registry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.shutdown">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.controller.base.BaseController.shutdown" title="Link to this definition">#</a></dt>
+<dd><p>Shutdown the controller. Performs cleanup operations.</p>
+<p>If the controller handles any kind of resources (i.e. devices, connections, etc.),
+this method should invoke any equivalent shutdown method for each resource.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sunflare.controller.base.BaseController.workflows">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">workflows</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#sunflare.controller.base.BaseController.workflows" title="Link to this definition">#</a></dt>
+<dd><p>Set of available plans.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Control modules</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../virtual/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Virtual module</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController"><code class="docutils literal notranslate"><span class="pre">BaseController</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.sigNewPlan"><code class="docutils literal notranslate"><span class="pre">BaseController.sigNewPlan</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.category"><code class="docutils literal notranslate"><span class="pre">BaseController.category</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.connection_phase"><code class="docutils literal notranslate"><span class="pre">BaseController.connection_phase()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.controller_name"><code class="docutils literal notranslate"><span class="pre">BaseController.controller_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.registration_phase"><code class="docutils literal notranslate"><span class="pre">BaseController.registration_phase()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.registry"><code class="docutils literal notranslate"><span class="pre">BaseController.registry</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.shutdown"><code class="docutils literal notranslate"><span class="pre">BaseController.shutdown()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.controller.base.BaseController.workflows"><code class="docutils literal notranslate"><span class="pre">BaseController.workflows</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/api/controller/base.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jacopo Abramo.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

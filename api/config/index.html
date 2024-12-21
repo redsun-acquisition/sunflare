@@ -1,0 +1,1011 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Configuration module &#8212; SunFlare 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=b2731ba4"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/config';</script>
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" />
+    <link rel="next" title="Engine-relevant modules" href="../engine/" />
+    <link rel="prev" title="SunFlare types" href="../types/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SunFlare 0.1.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../getting_started/">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changelog/">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../getting_started/">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changelog/">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../types/">SunFlare types</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Configuration module</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../engine/">Engine-relevant modules</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../engine/status/">Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../engine/detectors/">Detectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../engine/motors/">Motors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../engine/lights/">Lights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../engine/handler/">Engine handler</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../controller/">Control modules</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../controller/base/"><code class="docutils literal notranslate"><span class="pre">base</span></code></a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../virtual/">Virtual module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log/">Logging facilities</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../" class="nav-link">API Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Configuration module</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-sunflare.config">
+<span id="configuration-module"></span><h1>Configuration module<a class="headerlink" href="#module-sunflare.config" title="Link to this heading">#</a></h1>
+<p>RedSun configuration dataclasses and enumerators.</p>
+<p>The module provides a set of <a class="reference internal" href="#pydantic-basemodel">pydantic.BaseModel</a> and enumerators classes that are used to
+provide a basic representation of a RedSun-compatible hardware interface. These models are used in plugins to be inherited
+by custom models defined by the user, which can provide additional information about specific hardware components.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.AcquisitionEngineTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">AcquisitionEngineTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.AcquisitionEngineTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported acquisition engine entities.</p>
+<p>Acquisition engines are singleton objects that are instantiated within RedSun and operate
+as workflow managers for the acquisition process. They are responsible for the orchestration
+of the different hardware components currently loaded in RedSun. Accross the entire
+module there can be only one active acquisition engine at a time, otherwise RedSun will
+raise an exception.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.AcquisitionEngineTypes.BLUESKY">
+<span class="sig-name descname"><span class="pre">BLUESKY</span></span><a class="headerlink" href="#sunflare.config.AcquisitionEngineTypes.BLUESKY" title="Link to this definition">#</a></dt>
+<dd><p>Python-based data acquisition framework for scientific experiments.         For more informations, refer to the <a class="reference external" href="https://blueskyproject.io/bluesky/index.html">Bluesky documentation page</a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.FrontendTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">FrontendTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.FrontendTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported frontend types.</p>
+<p>Frontends are the supported GUI frameworks that are used to interact with the user.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.FrontendTypes.QT">
+<span class="sig-name descname"><span class="pre">QT</span></span><a class="headerlink" href="#sunflare.config.FrontendTypes.QT" title="Link to this definition">#</a></dt>
+<dd><p>Qt frontend.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">DetectorModelTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.DetectorModelTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported detector types.</p>
+<p>Detectors are devices that are used to capture visualizable data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelTypes.AREA">
+<span class="sig-name descname"><span class="pre">AREA</span></span><a class="headerlink" href="#sunflare.config.DetectorModelTypes.AREA" title="Link to this definition">#</a></dt>
+<dd><p>Area detector (i.e. CCD, CMOS cameras).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelTypes.LINE">
+<span class="sig-name descname"><span class="pre">LINE</span></span><a class="headerlink" href="#sunflare.config.DetectorModelTypes.LINE" title="Link to this definition">#</a></dt>
+<dd><p>Line detector (i.e. photodiode arrays).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelTypes.POINT">
+<span class="sig-name descname"><span class="pre">POINT</span></span><a class="headerlink" href="#sunflare.config.DetectorModelTypes.POINT" title="Link to this definition">#</a></dt>
+<dd><p>Point detector (i.e. Avalanche Photodiode (APD) detector).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">MotorModelTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.MotorModelTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported motor types.</p>
+<p>This enumerator is used to provide a default categorization for the built-in user interface provided by RedSun,
+to facilitate the correct building of the application layout.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelTypes.STEPPER">
+<span class="sig-name descname"><span class="pre">STEPPER</span></span><a class="headerlink" href="#sunflare.config.MotorModelTypes.STEPPER" title="Link to this definition">#</a></dt>
+<dd><p>Stepper motor.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.LightModelTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">LightModelTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.LightModelTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported light source types.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.LightModelTypes.LASER">
+<span class="sig-name descname"><span class="pre">LASER</span></span><a class="headerlink" href="#sunflare.config.LightModelTypes.LASER" title="Link to this definition">#</a></dt>
+<dd><p>Laser light source.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.ScannerModelTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">ScannerModelTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.ScannerModelTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported scanner types.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ScannerModelTypes.GALVO">
+<span class="sig-name descname"><span class="pre">GALVO</span></span><a class="headerlink" href="#sunflare.config.ScannerModelTypes.GALVO" title="Link to this definition">#</a></dt>
+<dd><p>Galvanometric scanner.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.ControllerTypes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">ControllerTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.ControllerTypes" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Supported controller category types.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ControllerTypes.DEVICE">
+<span class="sig-name descname"><span class="pre">DEVICE</span></span><a class="headerlink" href="#sunflare.config.ControllerTypes.DEVICE" title="Link to this definition">#</a></dt>
+<dd><p>Device controller.</p>
+<ul class="simple">
+<li><p>These are only used internally and not exposed to the user.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ControllerTypes.COMPUTATOR">
+<span class="sig-name descname"><span class="pre">COMPUTATOR</span></span><a class="headerlink" href="#sunflare.config.ControllerTypes.COMPUTATOR" title="Link to this definition">#</a></dt>
+<dd><p>Renderer controller.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ControllerTypes.PUBLISHER">
+<span class="sig-name descname"><span class="pre">PUBLISHER</span></span><a class="headerlink" href="#sunflare.config.ControllerTypes.PUBLISHER" title="Link to this definition">#</a></dt>
+<dd><p>Publisher controller.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ControllerTypes.MONITORER">
+<span class="sig-name descname"><span class="pre">MONITORER</span></span><a class="headerlink" href="#sunflare.config.ControllerTypes.MONITORER" title="Link to this definition">#</a></dt>
+<dd><p>Monitorer controller.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.DeviceModelInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">DeviceModelInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serial_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'N/A'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.DeviceModelInfo" title="Link to this definition">#</a></dt>
+<dd><p>Base model for device information.</p>
+<p>All device information models inherit from this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>vendor</strong> (<em>str</em>)</p></li>
+<li><p><strong>serial_number</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DeviceModelInfo.model_name">
+<span class="sig-name descname"><span class="pre">model_name</span></span><a class="headerlink" href="#sunflare.config.DeviceModelInfo.model_name" title="Link to this definition">#</a></dt>
+<dd><p>Device model name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DeviceModelInfo.vendor">
+<span class="sig-name descname"><span class="pre">vendor</span></span><a class="headerlink" href="#sunflare.config.DeviceModelInfo.vendor" title="Link to this definition">#</a></dt>
+<dd><p>Detector vendor. Optional for visualization purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DeviceModelInfo.serial_number">
+<span class="sig-name descname"><span class="pre">serial_number</span></span><a class="headerlink" href="#sunflare.config.DeviceModelInfo.serial_number" title="Link to this definition">#</a></dt>
+<dd><p>Detector serial number. Optional for visualization purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">DetectorModelInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serial_number='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category=DetectorModelTypes.AREA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensor_size=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_size=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exposure_egu='ms'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.DetectorModelInfo" title="Link to this definition">#</a></dt>
+<dd><p>Detector model informations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>vendor</strong> (<em>str</em>)</p></li>
+<li><p><strong>serial_number</strong> (<em>str</em>)</p></li>
+<li><p><strong>category</strong> (<a class="reference internal" href="#sunflare.config.DetectorModelTypes" title="sunflare.config.DetectorModelTypes"><em>DetectorModelTypes</em></a>)</p></li>
+<li><p><strong>sensor_size</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>pixel_size</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>exposure_egu</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelInfo.category">
+<span class="sig-name descname"><span class="pre">category</span></span><a class="headerlink" href="#sunflare.config.DetectorModelInfo.category" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Detector type.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sunflare.config.DetectorModelTypes" title="sunflare.config.DetectorModelTypes">DetectorModelTypes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelInfo.sensor_size">
+<span class="sig-name descname"><span class="pre">sensor_size</span></span><a class="headerlink" href="#sunflare.config.DetectorModelInfo.sensor_size" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Detector sensor size in pixels: represents the 2D axis <code class="docutils literal notranslate"><span class="pre">(Y,</span> <span class="pre">X)</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelInfo.pixel_size">
+<span class="sig-name descname"><span class="pre">pixel_size</span></span><a class="headerlink" href="#sunflare.config.DetectorModelInfo.pixel_size" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Detector pixel size in micrometers: represents the 3D axis <code class="docutils literal notranslate"><span class="pre">(Z,</span> <span class="pre">Y,</span> <span class="pre">X)</span></code>.</p></li>
+<li><p>Defaults to <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">1,</span> <span class="pre">1)</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Tuple[float,</span> <span class="pre">float,</span> <span class="pre">float]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.DetectorModelInfo.exposure_egu">
+<span class="sig-name descname"><span class="pre">exposure_egu</span></span><a class="headerlink" href="#sunflare.config.DetectorModelInfo.exposure_egu" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Engineering unit for exposure time, e.g. <code class="docutils literal notranslate"><span class="pre">ms</span></code>, <code class="docutils literal notranslate"><span class="pre">μs</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">ms</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">MotorModelInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serial_number='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category=MotorModelTypes.STEPPER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_egu='μm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_home=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.MotorModelInfo" title="Link to this definition">#</a></dt>
+<dd><p>Motor model informations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>vendor</strong> (<em>str</em>)</p></li>
+<li><p><strong>serial_number</strong> (<em>str</em>)</p></li>
+<li><p><strong>category</strong> (<a class="reference internal" href="#sunflare.config.MotorModelTypes" title="sunflare.config.MotorModelTypes"><em>MotorModelTypes</em></a>)</p></li>
+<li><p><strong>step_egu</strong> (<em>str</em>)</p></li>
+<li><p><strong>step_size</strong> (<em>int</em><em> | </em><em>float</em>)</p></li>
+<li><p><strong>axes</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>return_home</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelInfo.category">
+<span class="sig-name descname"><span class="pre">category</span></span><a class="headerlink" href="#sunflare.config.MotorModelInfo.category" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Motor type. Defaults to <code class="docutils literal notranslate"><span class="pre">stepper</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sunflare.config.MotorModelTypes" title="sunflare.config.MotorModelTypes">MotorModelTypes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelInfo.step_egu">
+<span class="sig-name descname"><span class="pre">step_egu</span></span><a class="headerlink" href="#sunflare.config.MotorModelInfo.step_egu" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Engineering unit for steps, e.g. <code class="docutils literal notranslate"><span class="pre">mm</span></code>, <code class="docutils literal notranslate"><span class="pre">μm</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">μm</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelInfo.step_size">
+<span class="sig-name descname"><span class="pre">step_size</span></span><a class="headerlink" href="#sunflare.config.MotorModelInfo.step_size" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Motor step size in <code class="docutils literal notranslate"><span class="pre">step_egu</span></code> units. Defaults to 1.0.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Union[int,</span> <span class="pre">float]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelInfo.axes">
+<span class="sig-name descname"><span class="pre">axes</span></span><a class="headerlink" href="#sunflare.config.MotorModelInfo.axes" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Supported motor axes.</p></li>
+<li><p>Suggested values are single character, capital strings, e.g. <code class="docutils literal notranslate"><span class="pre">['X',</span> <span class="pre">'Y',</span> <span class="pre">'Z']</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">list[str]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.MotorModelInfo.return_home">
+<span class="sig-name descname"><span class="pre">return_home</span></span><a class="headerlink" href="#sunflare.config.MotorModelInfo.return_home" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, motor will return to home position</p></li>
+<li><p>(defined as  the initial position the motor had at RedSun’s startup)</p></li>
+<li><p>after RedSun is closed. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.ScannerModelInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">ScannerModelInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serial_number='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category=ScannerModelTypes.GALVO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.ScannerModelInfo" title="Link to this definition">#</a></dt>
+<dd><p>Scanner model informations.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is currently under active development and may see breaking changes.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>vendor</strong> (<em>str</em>)</p></li>
+<li><p><strong>serial_number</strong> (<em>str</em>)</p></li>
+<li><p><strong>category</strong> (<a class="reference internal" href="#sunflare.config.ScannerModelTypes" title="sunflare.config.ScannerModelTypes"><em>ScannerModelTypes</em></a>)</p></li>
+<li><p><strong>axes</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ScannerModelInfo.category">
+<span class="sig-name descname"><span class="pre">category</span></span><a class="headerlink" href="#sunflare.config.ScannerModelInfo.category" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Scanner type. Defaults to <code class="docutils literal notranslate"><span class="pre">galvo</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sunflare.config.ScannerModelTypes" title="sunflare.config.ScannerModelTypes">ScannerModelTypes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.ScannerModelInfo.axes">
+<span class="sig-name descname"><span class="pre">axes</span></span><a class="headerlink" href="#sunflare.config.ScannerModelInfo.axes" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Supported scanner axes. Suggestion is to be a list of</p></li>
+<li><p>single character, capital strings, e.g. <code class="docutils literal notranslate"><span class="pre">['X',</span> <span class="pre">'Y',</span> <span class="pre">'Z']</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">list[str]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sunflare.config.LightModelInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sunflare.config.</span></span><span class="sig-name descname"><span class="pre">LightModelInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vendor='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serial_number='N/A'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power_egu='mW'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category=LightModelTypes.LASER</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power_step=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sunflare.config.LightModelInfo" title="Link to this definition">#</a></dt>
+<dd><p>Light source model informations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>vendor</strong> (<em>str</em>)</p></li>
+<li><p><strong>serial_number</strong> (<em>str</em>)</p></li>
+<li><p><strong>power_egu</strong> (<em>str</em>)</p></li>
+<li><p><strong>wavelength</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>category</strong> (<a class="reference internal" href="#sunflare.config.LightModelTypes" title="sunflare.config.LightModelTypes"><em>LightModelTypes</em></a>)</p></li>
+<li><p><strong>range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>power_step</strong> (<em>float</em><em> | </em><em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.LightModelInfo.category">
+<span class="sig-name descname"><span class="pre">category</span></span><a class="headerlink" href="#sunflare.config.LightModelInfo.category" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Light source type. Defaults to <code class="docutils literal notranslate"><span class="pre">laser</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#sunflare.config.LightModelTypes" title="sunflare.config.LightModelTypes">LightModelTypes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.LightModelInfo.wavelength">
+<span class="sig-name descname"><span class="pre">wavelength</span></span><a class="headerlink" href="#sunflare.config.LightModelInfo.wavelength" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Light source wavelength in nanometers.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">int</span></code>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.LightModelInfo.power_egu">
+<span class="sig-name descname"><span class="pre">power_egu</span></span><a class="headerlink" href="#sunflare.config.LightModelInfo.power_egu" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Engineering unit for light source, .e.g. <code class="docutils literal notranslate"><span class="pre">mW</span></code>, <code class="docutils literal notranslate"><span class="pre">μW</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">mW</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.LightModelInfo.range">
+<span class="sig-name descname"><span class="pre">range</span></span><a class="headerlink" href="#sunflare.config.LightModelInfo.range" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Light source power range. Expressed in <cite>power_egu</cite> units.</p></li>
+<li><p>Formatted as (min, max). Defaults to <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Union[Tuple[float,</span> <span class="pre">float],</span> <span class="pre">Tuple[int,</span> <span class="pre">int]]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sunflare.config.LightModelInfo.power_step">
+<span class="sig-name descname"><span class="pre">power_step</span></span><a class="headerlink" href="#sunflare.config.LightModelInfo.power_step" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Power increase/decrease minimum step size. Expressed in <code class="docutils literal notranslate"><span class="pre">power_egu</span></code> units.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">Union[float,</span> <span class="pre">int]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../types/"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">SunFlare types</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../engine/"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Engine-relevant modules</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.AcquisitionEngineTypes"><code class="docutils literal notranslate"><span class="pre">AcquisitionEngineTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.AcquisitionEngineTypes.BLUESKY"><code class="docutils literal notranslate"><span class="pre">AcquisitionEngineTypes.BLUESKY</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.FrontendTypes"><code class="docutils literal notranslate"><span class="pre">FrontendTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.FrontendTypes.QT"><code class="docutils literal notranslate"><span class="pre">FrontendTypes.QT</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelTypes"><code class="docutils literal notranslate"><span class="pre">DetectorModelTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelTypes.AREA"><code class="docutils literal notranslate"><span class="pre">DetectorModelTypes.AREA</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelTypes.LINE"><code class="docutils literal notranslate"><span class="pre">DetectorModelTypes.LINE</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelTypes.POINT"><code class="docutils literal notranslate"><span class="pre">DetectorModelTypes.POINT</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelTypes"><code class="docutils literal notranslate"><span class="pre">MotorModelTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelTypes.STEPPER"><code class="docutils literal notranslate"><span class="pre">MotorModelTypes.STEPPER</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelTypes"><code class="docutils literal notranslate"><span class="pre">LightModelTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelTypes.LASER"><code class="docutils literal notranslate"><span class="pre">LightModelTypes.LASER</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ScannerModelTypes"><code class="docutils literal notranslate"><span class="pre">ScannerModelTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ScannerModelTypes.GALVO"><code class="docutils literal notranslate"><span class="pre">ScannerModelTypes.GALVO</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ControllerTypes"><code class="docutils literal notranslate"><span class="pre">ControllerTypes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ControllerTypes.DEVICE"><code class="docutils literal notranslate"><span class="pre">ControllerTypes.DEVICE</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ControllerTypes.COMPUTATOR"><code class="docutils literal notranslate"><span class="pre">ControllerTypes.COMPUTATOR</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ControllerTypes.PUBLISHER"><code class="docutils literal notranslate"><span class="pre">ControllerTypes.PUBLISHER</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ControllerTypes.MONITORER"><code class="docutils literal notranslate"><span class="pre">ControllerTypes.MONITORER</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DeviceModelInfo"><code class="docutils literal notranslate"><span class="pre">DeviceModelInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DeviceModelInfo.model_name"><code class="docutils literal notranslate"><span class="pre">DeviceModelInfo.model_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DeviceModelInfo.vendor"><code class="docutils literal notranslate"><span class="pre">DeviceModelInfo.vendor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DeviceModelInfo.serial_number"><code class="docutils literal notranslate"><span class="pre">DeviceModelInfo.serial_number</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelInfo"><code class="docutils literal notranslate"><span class="pre">DetectorModelInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelInfo.category"><code class="docutils literal notranslate"><span class="pre">DetectorModelInfo.category</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelInfo.sensor_size"><code class="docutils literal notranslate"><span class="pre">DetectorModelInfo.sensor_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelInfo.pixel_size"><code class="docutils literal notranslate"><span class="pre">DetectorModelInfo.pixel_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.DetectorModelInfo.exposure_egu"><code class="docutils literal notranslate"><span class="pre">DetectorModelInfo.exposure_egu</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelInfo"><code class="docutils literal notranslate"><span class="pre">MotorModelInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelInfo.category"><code class="docutils literal notranslate"><span class="pre">MotorModelInfo.category</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelInfo.step_egu"><code class="docutils literal notranslate"><span class="pre">MotorModelInfo.step_egu</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelInfo.step_size"><code class="docutils literal notranslate"><span class="pre">MotorModelInfo.step_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelInfo.axes"><code class="docutils literal notranslate"><span class="pre">MotorModelInfo.axes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.MotorModelInfo.return_home"><code class="docutils literal notranslate"><span class="pre">MotorModelInfo.return_home</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ScannerModelInfo"><code class="docutils literal notranslate"><span class="pre">ScannerModelInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ScannerModelInfo.category"><code class="docutils literal notranslate"><span class="pre">ScannerModelInfo.category</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.ScannerModelInfo.axes"><code class="docutils literal notranslate"><span class="pre">ScannerModelInfo.axes</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelInfo"><code class="docutils literal notranslate"><span class="pre">LightModelInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelInfo.category"><code class="docutils literal notranslate"><span class="pre">LightModelInfo.category</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelInfo.wavelength"><code class="docutils literal notranslate"><span class="pre">LightModelInfo.wavelength</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelInfo.power_egu"><code class="docutils literal notranslate"><span class="pre">LightModelInfo.power_egu</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelInfo.range"><code class="docutils literal notranslate"><span class="pre">LightModelInfo.range</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sunflare.config.LightModelInfo.power_step"><code class="docutils literal notranslate"><span class="pre">LightModelInfo.power_step</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/api/config.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Jacopo Abramo.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
