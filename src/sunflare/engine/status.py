@@ -166,10 +166,13 @@ class Status:
         return self.done and self._exception is None
 
     def _handle_failure(self) -> None:
+        """Do something if an exception occurred during the action."""
+        # TODO: implement this; maybe ophyd has a good example
         pass
 
     def _settled(self) -> None:
         """Connect to this this when status has completed and settled."""
+        # TODO: implement this; maybe ophyd has a good example
         pass
 
     def _run_callbacks(self) -> None:
