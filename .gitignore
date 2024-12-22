@@ -109,3 +109,6 @@ ENV/
 # IDE settings
 .vscode/
 .idea/
+_version.py
+
+sunflare/_version.py
