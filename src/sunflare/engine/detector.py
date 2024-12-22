@@ -81,14 +81,16 @@ class DetectorProtocol(Protocol[M]):
 
         .. code-block:: python
 
-            OrderedDict(('channel1',
-                         {'source': 'XF23-ID:SOME_PV_NAME',
-                          'dtype': 'number',
-                          'shape': []}),
-                        ('channel2',
-                         {'source': 'XF23-ID:SOME_PV_NAME',
-                          'dtype': 'number',
-                          'shape': []}))
+            OrderedDict(
+                (
+                    "channel1",
+                    {"source": "XF23-ID:SOME_PV_NAME", "dtype": "number", "shape": []},
+                ),
+                (
+                    "channel2",
+                    {"source": "XF23-ID:SOME_PV_NAME", "dtype": "number", "shape": []},
+                ),
+            )
 
         For a more detailed description, see the ``DataKey`` class.
 
@@ -107,10 +109,10 @@ class DetectorProtocol(Protocol[M]):
 
         .. code-block:: python
 
-            OrderedDict(('channel1',
-                         {'value': 5, 'timestamp': 1472493713.271991}),
-                         ('channel2',
-                         {'value': 16, 'timestamp': 1472493713.539238}))
+            OrderedDict(
+                ("channel1", {"value": 5, "timestamp": 1472493713.271991}),
+                ("channel2", {"value": 16, "timestamp": 1472493713.539238}),
+            )
 
         For a more detailed description, see the ``Reading`` class.
 

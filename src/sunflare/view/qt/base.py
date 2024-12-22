@@ -68,17 +68,27 @@ class WidgetProtocol(Protocol):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self._my_slot
+                )
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self.sigMySignal)
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self.sigMySignal
+                )
 
                 # ... or connect to widgets
-                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
+                    self._my_slot
+                )
 
                 # you can also connect to the module bus
-                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
-                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self._my_slot
+                )
+                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
+                    self._my_slot
+                )
         """
         ...
 
@@ -163,17 +173,27 @@ class BaseWidget(QWidget):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self._my_slot
+                )
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self.sigMySignal)
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self.sigMySignal
+                )
 
                 # ... or connect to widgets
-                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
+                    self._my_slot
+                )
 
                 # you can also connect to the module bus
-                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
-                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self._my_slot
+                )
+                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
+                    self._my_slot
+                )
         """
         ...
 

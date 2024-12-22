@@ -21,8 +21,10 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
     class MyController:
         sigMySignal = Signal()
 
+
     def a_slot():
         print("My signal was emitted!")
+
 
     ctrl = MyController()
     ctrl.sigMySignal.connect(my_slot)
