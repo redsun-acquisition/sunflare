@@ -8,13 +8,11 @@ on:
       - main
     paths:
       - "src/**"
-      - "tests/**"
   pull_request:
     branches:
       - main
     paths:
       - "src/**"
-      - "tests/**"
 
 jobs:
   ruff:
@@ -26,4 +24,4 @@ jobs:
           version: 0.8.4
           changed-files: true
           src: "src/sunflare"
-          args: "check --extend-exclude=[\"tests\"]"
+          args: "check"
