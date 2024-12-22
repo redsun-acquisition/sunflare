@@ -15,43 +15,56 @@ env:
   PROJECT_NAME: sunflare
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  test:
+    name: Test
+    uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      extras: "dev"
+      pip-install-flags: --editable
+      coverage-upload: artifact
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+    
+  upload_coverage:
+    if: always()
+    needs: [test]
+    uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v2
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+    
+    # steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v4
+    #     with:
+    #       fetch-depth: 9
+    #       submodules: false
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 9
-          submodules: false
+    #   - name: Setup Python ${{ matrix.python-version }}
+    #     uses: actions/setup-python@v4
+    #     with:
+    #       python-version: ${{ matrix.python-version }}
 
-      - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install hatch
-        run: |
-          pip install -U pip
-          pipx install hatch
-          pip install -U hatchling
+    #   - name: Install hatch
+    #     run: |
+    #       pip install -U pip
+    #       pipx install hatch
+    #       pip install -U hatchling
       
-      - name: Install dependencies
-        run: |
-          pip install -e .[dev]
-          pip install pytest-cov
+    #   - name: Install dependencies
+    #     run: |
+    #       pip install -e .[dev]
+    #       pip install pytest-cov
 
-      - name: Run tests
-        run: |
-          pytest --cov-branch --cov-report=xml
+    #   - name: Run tests
+    #     uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
       
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: redsun-acquisition/sunflare
+    #   - name: Upload coverage reports to Codecov
+    #     uses: codecov/codecov-action@v5
+    #     with:
+    #       token: ${{ secrets.CODECOV_TOKEN }}
+    #       slug: redsun-acquisition/sunflare
