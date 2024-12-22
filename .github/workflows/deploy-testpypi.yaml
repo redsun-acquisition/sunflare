@@ -14,8 +14,10 @@ jobs:
       with:
         python-version: "3.x"
     - name: Install hatch
-      run: >-
+      run: |
         pipx install hatch 
+    - name: Install dependencies
+      run: |
         pip install -U pip hatchling
     - name: Build a binary wheel and a source tarball
       run: hatch build
