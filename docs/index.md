@@ -9,7 +9,7 @@ SunFlare is a separate package used to build both RedSun and its plugins.
 ## Contents
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 
 getting_started
 api/index
