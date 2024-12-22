@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/ruff-action@v1
         with:
-          version: 0.7.2
+          version: 0.8.4
           changed-files: true
           src: "src/sunflare"
-          args: check --extend-exclude=["tests"]
+          args: "check --extend-exclude=[\"tests\"]"
