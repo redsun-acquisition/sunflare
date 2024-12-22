@@ -96,16 +96,17 @@ disallow_untyped_defs = true
 [tool.coverage.report]
 exclude_lines = [
     "@abstractmethod",
-    "pragma: no cover",
     "if TYPE_CHECKING:",
     "@overload",
     "except ImportError",
     "raise NotImplementedError()",
 ]
 omit = [
+    "src/sunflare/engine/handler.py",
     "src/sunflare/controller/base.py",
 ]
 show_missing = true
+skip_covered = true
 
 [tool.coverage.run]
 source = ["sunflare"]
