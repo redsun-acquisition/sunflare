@@ -167,10 +167,11 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
             A read-only dictionary mapping signal names to their `SignalInstance` objects.
             If the class is not found in the registry, an empty dictionary is returned.
         """
-        if class_name not in self._cache:
+        try:
+            return MappingProxyType(self._cache[class_name])
+        except KeyError:
             self.error(f"Class {class_name} not found in the registry.")
             return MappingProxyType({})
-        return MappingProxyType(self._cache[class_name])
 
     def __contains__(self, class_name: str) -> bool:
         """
