@@ -98,6 +98,9 @@ disallow_untyped_defs = true
 # https://coverage.readthedocs.io/en/latest/config.html
 [tool.coverage.report]
 exclude_lines = [
+    "^class .*Protocol\b",
+    "^class .*ABC\b",
+    "^class .*ABCMeta\b",
     "@abstractmethod",
     "pragma: no cover",
     "if TYPE_CHECKING:",
