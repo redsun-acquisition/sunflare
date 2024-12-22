@@ -121,6 +121,3 @@ select = ["D"] # enable docstring checks
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
-
-[tool.pytest.ini_options]
-addopts = "--cov=sunflare --cov-report html --log-cli-level=DEBUG"
