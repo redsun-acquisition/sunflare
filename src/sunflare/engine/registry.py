@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from sunflare.config import MotorModelInfo, DetectorModelInfo
 from sunflare.engine.detector import DetectorProtocol
 from sunflare.engine.motor import MotorProtocol
 from sunflare.virtualbus import VirtualBus
@@ -29,15 +30,15 @@ class DeviceRegistry:
     ) -> None:
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
-        self._motors: dict[str, MotorProtocol] = {}
-        self._detectors: dict[str, DetectorProtocol] = {}
+        self._motors: dict[str, MotorProtocol[MotorModelInfo]] = {}
+        self._detectors: dict[str, DetectorProtocol[DetectorModelInfo]] = {}
 
     @property
-    def motors(self) -> dict[str, MotorProtocol]:
+    def motors(self) -> dict[str, MotorProtocol[MotorModelInfo]]:
         """Get the motors dictionary."""
         return self._motors
 
     @property
-    def detectors(self) -> dict[str, DetectorProtocol]:
+    def detectors(self) -> dict[str, DetectorProtocol[DetectorModelInfo]]:
         """Get the detectors dictionary."""
         return self._detectors
