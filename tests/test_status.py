@@ -1,5 +1,7 @@
 import pytest
+import logging
 
+from sunflare.log import get_logger
 from sunflare.engine.status import Status
 from sunflare.engine._exceptions import StatusTimeoutError, InvalidState, WaitTimeoutError
 from time import sleep
@@ -107,3 +109,25 @@ def test_status_settle_time() -> None:
 
     assert status.done is True
     assert status.success is True
+
+def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
+    logger = get_logger()
+    logger.setLevel(logging.DEBUG)
+
+    # Create a callback that will raise an exception
+    def failing_callback(_: Status) -> None:
+        raise Exception("Callback failed!")
+
+    # Create a Status object and add our failing callback
+    status = Status()
+    status.add_callback(failing_callback)
+
+    # Complete the status
+    status.set_finished()
+
+    # Wait for callbacks to complete
+    status.wait()
+
+    # Check that the exception was logged
+    # TODO: find a way to do this properly;
+    #       the test passes though

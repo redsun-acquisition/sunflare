@@ -1,5 +1,7 @@
 # type: ignore
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from sunflare.log import Loggable, get_logger
@@ -17,12 +19,12 @@ class MockLoggable(Loggable):
         return self.__name
 
 
-def test_getter():
+def test_getter() -> None:
     logger = get_logger()
     assert logger.name == "redsun"
 
 
-def test_loggable(caplog: "LogCaptureFixture"):
+def test_loggable(caplog: LogCaptureFixture) -> None:
     obj = MockLoggable()
     assert obj.name == "Test instance"
 
