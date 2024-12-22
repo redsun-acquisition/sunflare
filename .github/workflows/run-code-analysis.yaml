@@ -35,8 +35,8 @@ jobs:
           python-version: 3.12
       - name: Install requirements
         run: |
-          python -m pip install -U pip mypy
-          python -m pip install -U pydantic # mypy requires pydantic plugin
+          # mypy requires pydantic plugin
+          python -m pip install -U pip mypy pydantic
       - name: Run mypy
         run: |
           mypy src/sunflare
