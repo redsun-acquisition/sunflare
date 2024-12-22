@@ -35,6 +35,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           publish_branch: gh-pages
-          github_token: ${{ secrets.SUNFLARE_DOCS_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/_build/dirhtml
           force_orphan: true
