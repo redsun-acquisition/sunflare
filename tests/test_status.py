@@ -21,3 +21,15 @@ def test_status():
 
     assert status.done is True
     assert status.success is True
+
+def test_status_timeout():
+
+    status = Status(timeout=0.1)
+
+    status.set_exception(Exception("Test exception"))
+
+    while not status.done:
+        ...
+
+    assert status.done is True
+    assert status.success is False
