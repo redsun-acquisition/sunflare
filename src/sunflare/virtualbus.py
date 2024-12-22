@@ -43,9 +43,9 @@ from __future__ import annotations
 
 from abc import ABCMeta
 from types import MappingProxyType
-from typing import final, Iterable, overload, Optional, Union, Callable, TypeVar
+from typing import Callable, Iterable, Optional, TypeVar, Union, final, overload
 
-from psygnal import SignalInstance, Signal
+from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 

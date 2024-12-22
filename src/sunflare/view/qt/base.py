@@ -7,13 +7,14 @@ a Qt GUI that is consistent throught all the RedSun stack.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Protocol, runtime_checkable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from qtpy.QtWidgets import QWidget
 
 if TYPE_CHECKING:
-    from sunflare.virtualbus import VirtualBus
     from typing import Any
+
+    from sunflare.virtualbus import VirtualBus
 
 __all__ = ["BaseWidget", "WidgetProtocol"]
 

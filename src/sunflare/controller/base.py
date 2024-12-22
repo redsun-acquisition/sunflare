@@ -12,11 +12,11 @@ that holds all the devices registered in the application.
 
 from abc import ABCMeta, abstractmethod
 
-from sunflare.log import Loggable
 from sunflare.config import ControllerInfo, ControllerTypes
-from sunflare.virtualbus import VirtualBus, Signal
-from sunflare.types import Workflow
 from sunflare.engine import DeviceRegistry
+from sunflare.log import Loggable
+from sunflare.types import Workflow
+from sunflare.virtualbus import Signal, VirtualBus
 
 
 class BaseController(Loggable, metaclass=ABCMeta):

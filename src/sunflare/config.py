@@ -11,11 +11,10 @@ by custom models defined by the user, which can provide additional information a
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional, Tuple, Union, ClassVar
+from typing import ClassVar, Optional, Tuple, Union
 
 from psygnal import SignalGroupDescriptor
-
-from pydantic import Field, BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AcquisitionEngineTypes(str, Enum):

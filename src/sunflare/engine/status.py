@@ -34,18 +34,13 @@ The ophyd license is reproduced below:
 
 from __future__ import annotations
 
-from collections import deque
 import threading
+from collections import deque
+from typing import Callable, Optional
 
 from sunflare.log import get_logger
 
-from ._exceptions import (
-    InvalidState,
-    StatusTimeoutError,
-    WaitTimeoutError,
-)
-
-from typing import Optional, Callable
+from ._exceptions import InvalidState, StatusTimeoutError, WaitTimeoutError
 
 __all__ = ["Status"]
 

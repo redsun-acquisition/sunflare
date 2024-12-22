@@ -1,6 +1,6 @@
 # type: ignore
 
-from sunflare.virtualbus import Signal, VirtualBus, ModuleVirtualBus, slot
+from sunflare.virtualbus import ModuleVirtualBus, Signal, VirtualBus, slot
 
 
 class MockVirtualBus(VirtualBus):

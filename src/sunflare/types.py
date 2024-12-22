@@ -10,11 +10,10 @@
 
 from __future__ import annotations
 
-from bluesky.protocols import Location
-
-from typing import Any, Generator, Iterable, Union, Tuple, TypeAlias, TypeVar
+from typing import Any, Generator, Iterable, Tuple, TypeAlias, TypeVar, Union
 
 import numpy.typing as npt
+from bluesky.protocols import Location
 
 T = TypeVar("T", bound=Union[int, str, float])
 X = TypeVar("X", bound=Union[str, int])

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Any, Generator, Iterable, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Generator, Iterable, Protocol, Union
 
-from sunflare.virtualbus import VirtualBus
 from sunflare.types import Workflow
+from sunflare.virtualbus import VirtualBus
 
 if TYPE_CHECKING:
     # TODO: create a protocol for the engine?

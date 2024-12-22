@@ -1,7 +1,8 @@
 # type: ignore
 
-import yaml
 import os
+
+import yaml
 
 from sunflare.config import RedSunInstanceInfo
 
