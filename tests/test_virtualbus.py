@@ -1,5 +1,7 @@
 # type: ignore
-
+import pytest
+import logging
+from sunflare.log import get_logger
 from sunflare.virtualbus import ModuleVirtualBus, Signal, VirtualBus, slot
 
 
@@ -56,6 +58,18 @@ def test_module_virtual_bus_registration() -> None:
     bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
     bus["MockOwner"]["sigMySignal"].emit(5)
 
+def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture) -> None:
+    """Test that trying to access a non-existent signal raises an error."""
+
+    logger = get_logger()
+    logger.setLevel(logging.DEBUG)
+
+    bus = MockVirtualBus()
+    signals = bus["MockOwner"]
+
+    assert len(signals) == 0
+    assert caplog.records[0].levelname == "ERROR"
+    assert caplog.records[0].message == "Class MockOwner not found in the registry."
 
 def test_slot() -> None:
     """Tests the slot decorator."""
