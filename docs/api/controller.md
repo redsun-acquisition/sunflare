@@ -1,6 +1,4 @@
-# ``base``
-
-``base`` controller module.
+# Base controller module
 
 ```{eval-rst}
 .. automodule:: sunflare.controller.base

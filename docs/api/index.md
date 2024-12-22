@@ -5,7 +5,7 @@
 
 config
 engine/index
-controller/index
+controller
 virtual
 log
 ```
