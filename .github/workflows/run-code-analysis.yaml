@@ -33,10 +33,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: 3.12
-      - name: Install requirements
+      - name: Install dependencies
         run: |
-          # mypy requires pydantic plugin
-          python -m pip install -U pip mypy pydantic
+          python -m pip install -U pip mypy
+          python -m pip install -e .
       - name: Run mypy
         run: |
           mypy src/sunflare
