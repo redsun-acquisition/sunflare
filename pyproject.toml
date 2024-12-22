@@ -92,6 +92,13 @@ plugins = ["pydantic.mypy"]
 module = "tests.*"
 disallow_untyped_defs = true
 
+[tool.coverage.run]
+omit = [
+    "src/sunflare/view/**",
+    "src/sunflare/engine/handler.py",
+    "src/sunflare/controller/**",
+]
+
 # https://coverage.readthedocs.io/en/latest/config.html
 [tool.coverage.report]
 exclude_lines = [
@@ -101,15 +108,6 @@ exclude_lines = [
     "except ImportError",
     "raise NotImplementedError()",
 ]
-omit = [
-    "src/sunflare/engine/handler.py",
-    "src/sunflare/controller/base.py",
-]
-show_missing = true
-skip_covered = true
-
-[tool.coverage.run]
-source = ["sunflare"]
 
 [tool.ruff]
 target-version = "py39"
