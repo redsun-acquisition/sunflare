@@ -6,10 +6,7 @@ import yaml
 
 from sunflare.config import RedSunInstanceInfo
 
-config_path = os.path.join(os.path.dirname(__file__), "data")
-
-
-def test_empty_info():
+def test_empty_info(config_path: str) -> None:
     """Test empty redsun instance info."""
 
     config_file = os.path.join(config_path, "empty_instance.yaml")
