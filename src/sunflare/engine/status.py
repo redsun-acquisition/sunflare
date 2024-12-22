@@ -64,7 +64,7 @@ class Status:
     -----
     Theory of operation:
 
-    This employs two ``threading.Event`` objects, one thread the runs for
+    This employs two ``threading.Event`` objects, one thread that runs for
     (timeout + settle_time) seconds, and one thread that runs for
     settle_time seconds (if settle_time is nonzero).
 
