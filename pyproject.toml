@@ -44,7 +44,6 @@ docs = [
     "myst-parser"
 ]
 dev = [
-  "nox",
   "isort",
   "ruff",
   "pre-commit",
