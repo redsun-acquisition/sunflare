@@ -5,10 +5,11 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Generic, Protocol, TypeVar, Union, runtime_checkable
 
+from bluesky.protocols import Location
+
 from sunflare.config import MotorModelInfo, MotorModelTypes
 from sunflare.engine.status import Status
 from sunflare.log import Loggable
-from sunflare.types import Location
 
 __all__ = ["MotorModel", "MotorProtocol"]
 

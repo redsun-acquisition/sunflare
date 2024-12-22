@@ -11,7 +11,6 @@ that holds all the devices registered in the application.
 """
 
 from abc import ABCMeta, abstractmethod
-
 from typing import Any
 
 from bluesky.utils import MsgGenerator

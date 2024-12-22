@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Protocol, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
-from bluesky.utils import MsgGenerator
 from bluesky.protocols import Reading
+from bluesky.utils import MsgGenerator
 
 from sunflare.virtualbus import VirtualBus
 
