@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Generator, Iterable, Protocol, Union
+from typing import TYPE_CHECKING, Any, Protocol, Any
 
-from sunflare.types import Workflow
+from bluesky.utils import MsgGenerator
+from bluesky.protocols import Reading
+
 from sunflare.virtualbus import VirtualBus
 
 if TYPE_CHECKING:
@@ -27,7 +29,7 @@ class EngineHandler(Protocol):
         Inter-module virtual bus.
     """
 
-    _workflows: dict[str, Workflow]
+    _plans: dict[str, MsgGenerator[Any]]
     _virtual_bus: VirtualBus
     _module_bus: VirtualBus
 
@@ -44,16 +46,16 @@ class EngineHandler(Protocol):
         ...
 
     @abstractmethod
-    def register_workflows(self, name: str, workflow: Workflow) -> None:
+    def register_plan(self, name: str, workflow: MsgGenerator[Any]) -> None:
         """
         Register a new workflow in the handler.
 
         Parameters
         ----------
         name : ``str``
-            Workflow unique identifier.
-        workflow : ``Union[Generator, Iterable]``
-            Workflow to be registered.
+            Plan unique identifier.
+        plan : ``MsgGenerator[Any]``
+            Plan to be registered.
         """
         ...
 
@@ -67,8 +69,8 @@ class EngineHandler(Protocol):
         ...
 
     @property
-    def workflows(
+    def plans(
         self,
-    ) -> dict[str, Union[Generator[Any, None, None], Iterable[Any]]]:
+    ) -> dict[str, MsgGenerator[Any]]:
         """Workflows dictionary."""
         ...

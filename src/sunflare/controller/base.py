@@ -12,10 +12,13 @@ that holds all the devices registered in the application.
 
 from abc import ABCMeta, abstractmethod
 
+from typing import Any
+
+from bluesky.utils import MsgGenerator
+
 from sunflare.config import ControllerInfo, ControllerTypes
 from sunflare.engine import DeviceRegistry
 from sunflare.log import Loggable
-from sunflare.types import Workflow
 from sunflare.virtualbus import Signal, VirtualBus
 
 
@@ -54,7 +57,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
         self._ctrl_info = ctrl_info
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
-        self._workflows: list[Workflow] = []
+        self._plans: list[MsgGenerator[Any]] = []
 
     @abstractmethod
     def shutdown(self) -> None:
@@ -107,17 +110,27 @@ class BaseController(Loggable, metaclass=ABCMeta):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self._my_slot
+                )
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(self.sigMySignal)
+                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self.sigMySignal
+                )
 
                 # ... or connect to widgets
-                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
+                    self._my_slot
+                )
 
                 # you can also connect to the module bus
-                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(self._my_slot)
-                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(self._my_slot)
+                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(
+                    self._my_slot
+                )
+                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
+                    self._my_slot
+                )
         """
         ...
 
@@ -137,6 +150,6 @@ class BaseController(Loggable, metaclass=ABCMeta):
         return self._registry
 
     @property
-    def workflows(self) -> list[Workflow]:
+    def plans(self) -> list[MsgGenerator[Any]]:
         """Set of available plans."""
-        return self._workflows
+        return self._plans

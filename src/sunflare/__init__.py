@@ -3,5 +3,5 @@ from importlib.metadata import PackageNotFoundError, version
 
 try:
     __version__ = version("sunflare")
-except PackageNotFoundError:
+except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
