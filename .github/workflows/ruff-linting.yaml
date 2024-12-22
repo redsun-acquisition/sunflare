@@ -22,6 +22,5 @@ jobs:
       - uses: astral-sh/ruff-action@v2
         with:
           version: 0.8.4
-          changed-files: true
+          args: "check --fix"
           src: "src/sunflare"
-          args: "check"
