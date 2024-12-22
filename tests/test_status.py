@@ -3,11 +3,15 @@ import logging
 
 from sunflare.log import get_logger
 from sunflare.engine.status import Status
-from sunflare.engine._exceptions import StatusTimeoutError, InvalidState, WaitTimeoutError
+from sunflare.engine._exceptions import (
+    StatusTimeoutError,
+    InvalidState,
+    WaitTimeoutError,
+)
 from time import sleep
 
-def test_status() -> None:
 
+def test_status() -> None:
     def callback(_: Status) -> None:
         # Simulate a task
         sleep(0.5)
@@ -27,8 +31,9 @@ def test_status() -> None:
     while not status.done:
         ...
 
-    assert status.done is True # type: ignore
+    assert status.done is True  # type: ignore
     assert status.success is True
+
 
 def test_status_wrong_external_exception() -> None:
     status = Status()
@@ -37,6 +42,7 @@ def test_status_wrong_external_exception() -> None:
     with pytest.raises(InvalidState):
         # finishing twice raises invalid state
         status.set_exception(Exception("Can't call set exception twice"))
+
 
 def test_status_wrong_external_finished() -> None:
     status = Status()
@@ -52,15 +58,16 @@ def test_status_wrong_external_finished() -> None:
         # finishing twice raises invalid state
         status.set_finished()
 
+
 def test_status_false_exception() -> None:
     status = Status()
     with pytest.raises(Exception):
-        status.set_exception("This is not an exception") # type: ignore
+        status.set_exception("This is not an exception")  # type: ignore
     assert status.done is False
     assert status.success is False
 
-def test_status_timeout() -> None:
 
+def test_status_timeout() -> None:
     status = Status(timeout=0.1)
 
     # cause a timeout
@@ -71,7 +78,8 @@ def test_status_timeout() -> None:
 
     # what happens if we set StatusTimeoutError as the exception?
     with pytest.raises(ValueError):
-        status.set_exception(StatusTimeoutError) # type: ignore
+        status.set_exception(StatusTimeoutError)  # type: ignore
+
 
 def test_status_set_exception_after_timeout() -> None:
     status = Status(timeout=0.1)
@@ -79,8 +87,8 @@ def test_status_set_exception_after_timeout() -> None:
     status.set_exception(Exception("Test exception"))
     assert isinstance(status.exception(), StatusTimeoutError)
 
-def test_status_callback_after_finished() -> None:
 
+def test_status_callback_after_finished() -> None:
     def post_callback(status: Status) -> None:
         assert status.done is True
 
@@ -94,11 +102,13 @@ def test_status_callback_after_finished() -> None:
     assert status.done is True
     assert status.success is True
 
+
 def test_status_wait_timeout() -> None:
     status = Status()
 
     with pytest.raises(WaitTimeoutError):
         status.wait(timeout=0.1)
+
 
 def test_status_settle_time() -> None:
     status = Status(timeout=0.1, settle_time=0.3)
@@ -109,6 +119,7 @@ def test_status_settle_time() -> None:
 
     assert status.done is True
     assert status.success is True
+
 
 def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
     logger = get_logger()

@@ -8,12 +8,11 @@ from sunflare.config import RedSunInstanceInfo
 
 config_path = os.path.join(os.path.dirname(__file__), "data")
 
+
 def test_empty_info():
     """Test empty redsun instance info."""
 
-    config_file = os.path.join(
-        config_path, "empty_instance.yaml"
-    )
+    config_file = os.path.join(config_path, "empty_instance.yaml")
 
     config_dict = yaml.safe_load(open(config_file))
 
@@ -30,9 +29,7 @@ def test_empty_info():
 def test_detectors_info():
     """Test the redsun instance info with detectors."""
 
-    config_file = os.path.join(
-        config_path, "detector_instance.yaml"
-    )
+    config_file = os.path.join(config_path, "detector_instance.yaml")
     config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
@@ -59,10 +56,8 @@ def test_detectors_info():
 def test_motors_info():
     """Test the redsun instance info with motors."""
 
-    config_file = os.path.join(
-        config_path, "motor_instance.yaml"
-    )
-    
+    config_file = os.path.join(config_path, "motor_instance.yaml")
+
     config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
