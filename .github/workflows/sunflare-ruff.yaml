@@ -1,6 +1,20 @@
-name: sunflare-ruff-check
+name: Check linting
 
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "tests/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "tests/**"
 
 jobs:
   ruff:
