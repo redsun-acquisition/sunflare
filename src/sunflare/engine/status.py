@@ -234,7 +234,6 @@ class Status:
         """
         # Since we rely on this being raise-able later, check proactively to
         # avoid potentially very confusing failures.
-        # TODO: fix type checker
         if not (
             isinstance(exc, Exception)
             or (isinstance(exc, type) and issubclass(exc, Exception))  # type: ignore[unreachable]
