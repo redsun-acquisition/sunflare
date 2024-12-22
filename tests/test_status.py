@@ -36,6 +36,20 @@ def test_status_wrong_external_exception() -> None:
         # finishing twice raises invalid state
         status.set_exception(Exception("Can't call set exception twice"))
 
+def test_status_wrong_external_finished() -> None:
+    status = Status()
+    status.set_finished()
+
+    while not status.done:
+        ...
+
+    assert status.done is True
+    assert status.success is True
+
+    with pytest.raises(InvalidState):
+        # finishing twice raises invalid state
+        status.set_finished()
+
 def test_status_false_exception() -> None:
     status = Status()
     with pytest.raises(Exception):
@@ -83,3 +97,13 @@ def test_status_wait_timeout() -> None:
 
     with pytest.raises(WaitTimeoutError):
         status.wait(timeout=0.1)
+
+def test_status_settle_time() -> None:
+    status = Status(timeout=0.1, settle_time=0.3)
+    status.set_finished()
+
+    # wait for timeout + settle_time
+    sleep(0.4)
+
+    assert status.done is True
+    assert status.success is True
