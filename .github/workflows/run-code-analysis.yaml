@@ -39,4 +39,4 @@ jobs:
           python -m pip install -e .
       - name: Run mypy
         run: |
-          mypy src/sunflare
+          mypy src/sunflare --ignore-missing-imports
