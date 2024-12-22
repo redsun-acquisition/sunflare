@@ -23,7 +23,7 @@ def test_empty_info(config_path: str) -> None:
     assert instance.scanners == {}
 
 
-def test_detectors_info():
+def test_detectors_info(config_path: str):
     """Test the redsun instance info with detectors."""
 
     config_file = os.path.join(config_path, "detector_instance.yaml")
@@ -50,7 +50,7 @@ def test_detectors_info():
     assert mocks[1].exposure_egu == "s"
 
 
-def test_motors_info():
+def test_motors_info(config_path: str):
     """Test the redsun instance info with motors."""
 
     config_file = os.path.join(config_path, "motor_instance.yaml")
