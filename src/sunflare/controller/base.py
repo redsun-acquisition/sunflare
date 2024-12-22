@@ -26,13 +26,13 @@ class BaseController(Loggable, metaclass=ABCMeta):
 
     Parameters
     ----------
-    ctrl_info : :class:`sunflare.config.ControllerInfo`
+    ctrl_info : :class:`~sunflare.config.ControllerInfo`
         Controller information.
-    registry : :class:`sunflare.engine.DeviceRegistry`
+    registry : :class:`~sunflare.engine.registry.DeviceRegistry`
         Device registry.
-    virtual_bus : :class:`sunflare.virtualbus.VirtualBus`
+    virtual_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Virtual bus.
-    module_bus : :class:`sunflare.virtualbus.VirtualBus`
+    module_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Module bus.
 
     Attributes

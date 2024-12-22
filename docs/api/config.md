@@ -17,6 +17,7 @@
     :show-inheritance:
 .. autoclass:: sunflare.config.ControllerTypes
     :show-inheritance:
+.. autoclass:: sunflare.config.ControllerInfo
 .. autoclass:: sunflare.config.DeviceModelInfo
 .. autoclass:: sunflare.config.DetectorModelInfo
 .. autoclass:: sunflare.config.MotorModelInfo
