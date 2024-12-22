@@ -63,23 +63,29 @@ class Status:
     Notes
     -----
     Theory of operation:
+
     This employs two ``threading.Event`` objects, one thread the runs for
     (timeout + settle_time) seconds, and one thread that runs for
     settle_time seconds (if settle_time is nonzero).
+
     At __init__ time, a *timeout* and *settle_time* are specified. A thread
     is started, on which user callbacks, registered after __init__ time via
     :meth:`add_callback`, will eventually be run. The thread waits on an
     Event be set or (timeout + settle_time) seconds to pass, whichever
     happens first.
+
     If (timeout + settle_time) expires and the Event has not
     been set, an internal Exception is set to ``StatusTimeoutError``, and a
     second Event is set, marking the Status as done and failed. The
     callbacks are run.
+
     If a callback is registered after the Status is done, it will be run
     immediately.
+
     If the first Event is set before (timeout + settle_time) expires,
     then the second Event is set and no internal Exception is set, marking
     the Status as done and successful. The callbacks are run.
+
     There are two methods that directly set the first Event. One,
     :meth:set_exception, sets it directly after setting the internal
     Exception.  The other, :meth:`set_finished`, starts a
