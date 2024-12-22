@@ -1,4 +1,4 @@
-name: publish documentation
+name: Publish documentation
 
 on:
   push:
@@ -16,6 +16,7 @@ on:
 
 jobs:
   publish-docs:
+    name: Publish on pages
     runs-on: ubuntu-latest
     permissions:
       contents: write
