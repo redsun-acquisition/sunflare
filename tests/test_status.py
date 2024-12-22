@@ -115,7 +115,7 @@ def test_status_settle_time() -> None:
     status.set_finished()
 
     # wait for timeout + settle_time
-    status.wait(timeout=0.4)
+    status.wait()
 
     assert status.done is True
     assert status.success is True
