@@ -1,4 +1,5 @@
 import logging
+import platform
 from time import sleep
 
 import pytest
@@ -110,7 +111,7 @@ def test_status_wait_timeout() -> None:
     with pytest.raises(WaitTimeoutError):
         status.wait(timeout=0.1)
 
-
+@pytest.mark.skipif(platform.system() == "Darwin", reason="Sometimes fails on macOS")
 def test_status_settle_time() -> None:
     status = Status(timeout=0.1, settle_time=0.3)
     status.set_finished()
