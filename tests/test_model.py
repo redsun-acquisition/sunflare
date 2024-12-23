@@ -27,20 +27,36 @@ class MockMotorModel(MotorModel[MotorModelInfo]):
 def test_detector_model(config_path: str) -> None:
     """Test the detector model info."""
 
+    truth_dict = {
+        "First mock detector": {
+            "model_name": "MockDetectorModel",
+        },
+        "Second mock detector": {
+            "model_name": "MockDetectorModel",
+            "category": "line",
+            "exposure_egu": "s",
+        },
+    }
+
+    truth_configs = {
+        name: DetectorModelInfo(**cfg_info)
+        for name, cfg_info in truth_dict.items()
+    }
+
     config_file = os.path.join(config_path, "detector_instance.yaml")
     config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
-    for name, cfg_info in instance.detectors.items():
+    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.detectors.items(), truth_configs.items()):
         detector = MockDetectorModel(name=name, cfg_info=cfg_info)
-        assert detector.name == name
-        assert detector.name == name
-        assert detector.model_info == cfg_info
-        assert detector.vendor == cfg_info.vendor
-        assert detector.serial_number == cfg_info.serial_number
-        assert detector.category == cfg_info.category
-        assert detector.sensor_size == cfg_info.sensor_size
-        assert detector.pixel_size == cfg_info.pixel_size
+        assert detector.name == truth_name
+        assert detector.name == truth_name
+        assert detector.model_info == truth_cfg_info
+        assert detector.vendor == truth_cfg_info.vendor
+        assert detector.serial_number == truth_cfg_info.serial_number
+        assert detector.category == truth_cfg_info.category
+        assert detector.sensor_size == truth_cfg_info.sensor_size
+        assert detector.pixel_size == truth_cfg_info.pixel_size
         detector.shutdown()
 
 def test_motor_model(config_path: str) -> None:
