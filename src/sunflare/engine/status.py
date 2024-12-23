@@ -309,6 +309,12 @@ class Status:
         timeout: Union[Number, None], optional
             If None (default) wait indefinitely until the status finishes.
 
+        Returns
+        -------
+        Exception:
+            The exception raised by the action. If the action has completed
+            successfully, return ``None``.
+
         Raises
         ------
         WaitTimeoutError
