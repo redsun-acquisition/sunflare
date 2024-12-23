@@ -20,10 +20,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+    
+  upload_coverage:
+    name: Upload coverage
+    needs: [test]
+    uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v2
+    secrets:
+        codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     name: Deploy
-    needs: test
+    needs: [test, upload_coverage]
     if: success() && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
