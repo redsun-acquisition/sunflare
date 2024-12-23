@@ -93,6 +93,7 @@ module = "tests.*"
 disallow_untyped_defs = true
 
 [tool.coverage.run]
+source = ["sunflare"]
 omit = [
     "src/sunflare/tests/conftest.py",
     "src/sunflare/view/**",
