@@ -108,6 +108,7 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@overload",
     "except ImportError",
+    "except PackageNotFoundError",
     "raise NotImplementedError()",
 ]
 
