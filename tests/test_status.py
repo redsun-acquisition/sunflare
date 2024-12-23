@@ -1,14 +1,15 @@
-import pytest
 import logging
-
-from sunflare.log import get_logger
-from sunflare.engine.status import Status
-from sunflare.engine._exceptions import (
-    StatusTimeoutError,
-    InvalidState,
-    WaitTimeoutError,
-)
 from time import sleep
+
+import pytest
+
+from sunflare.engine._exceptions import (
+    InvalidState,
+    StatusTimeoutError,
+    WaitTimeoutError
+)
+from sunflare.engine.status import Status
+from sunflare.log import get_logger
 
 
 def test_status() -> None:

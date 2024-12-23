@@ -6,6 +6,7 @@ import yaml
 
 from sunflare.config import RedSunInstanceInfo
 
+
 def test_empty_info(config_path: str) -> None:
     """Test empty redsun instance info."""
 

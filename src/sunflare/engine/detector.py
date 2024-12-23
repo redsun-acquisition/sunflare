@@ -2,15 +2,11 @@
 
 from __future__ import annotations
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from collections import OrderedDict
 from typing import Any, Generic, Protocol, Tuple, TypeVar, runtime_checkable
 
 from bluesky.protocols import Reading
-
-# TODO: rather than using the event_model package,
-# we should switch to a local TypedDict;
-# for now we start with this
 from event_model.documents.event_descriptor import DataKey
 
 from sunflare.config import DetectorModelInfo, DetectorModelTypes
