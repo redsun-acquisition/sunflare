@@ -1,7 +1,7 @@
 ---
-name: "[FB] Feedback requested"
+name: Feedback requested
 about: Request feedback for something
-title: ''
+title: "[FB] Feedback requested"
 labels: feedback-requested
 assignees: ''
 
