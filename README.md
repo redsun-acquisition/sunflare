@@ -2,6 +2,7 @@
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![codecov](https://codecov.io/gh/redsun-acquisition/sunflare/graph/badge.svg?token=XAL7NBIU9N)](https://codecov.io/gh/redsun-acquisition/sunflare)
 
 # Sunflare
 
