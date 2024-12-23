@@ -94,6 +94,7 @@ disallow_untyped_defs = true
 
 [tool.coverage.run]
 omit = [
+    "src/sunflare/tests/conftest.py",
     "src/sunflare/view/**",
     "src/sunflare/engine/handler.py",
     "src/sunflare/controller/**",
