@@ -13,6 +13,7 @@ class MockDetectorModel(DetectorModel[DetectorModelInfo]):
 
     def shutdown(self) -> None:
         """Shutdown the detector."""
+        ...
 
 class MockMotorModel(MotorModel[MotorModelInfo]):
     """Mock motor model."""
@@ -50,7 +51,7 @@ def test_detector_model(config_path: str) -> None:
     for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.detectors.items(), truth_configs.items()):
         detector = MockDetectorModel(name=name, cfg_info=cfg_info)
         assert detector.name == truth_name
-        assert detector.name == truth_name
+        assert detector.model_name == truth_cfg_info.model_name
         assert detector.model_info == truth_cfg_info
         assert detector.vendor == truth_cfg_info.vendor
         assert detector.serial_number == truth_cfg_info.serial_number
@@ -86,6 +87,7 @@ def test_motor_model(config_path: str) -> None:
     for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.motors.items(), truth_configs.items()):
         motor = MockMotorModel(name=name, cfg_info=cfg_info)
         assert motor.name == truth_name
+        assert motor.model_name == truth_cfg_info.model_name
         assert motor.model_info == truth_cfg_info
         assert motor.vendor == truth_cfg_info.vendor
         assert motor.serial_number == truth_cfg_info.serial_number
@@ -134,6 +136,7 @@ def test_multi_model(config_path: str) -> None:
     for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.detectors.items(), truth_config_detectors.items()):
         detector = MockDetectorModel(name=name, cfg_info=cfg_info)
         assert detector.name == truth_name
+        assert detector.model_name == truth_cfg_info.model_name
         assert detector.model_info == truth_cfg_info
         assert detector.vendor == truth_cfg_info.vendor
         assert detector.serial_number == truth_cfg_info.serial_number
@@ -145,6 +148,7 @@ def test_multi_model(config_path: str) -> None:
     for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.motors.items(), truth_configs_motors.items()):
         motor = MockMotorModel(name=name, cfg_info=cfg_info)
         assert motor.name == truth_name
+        assert motor.model_name == truth_cfg_info.model_name
         assert motor.model_info == truth_cfg_info
         assert motor.vendor == truth_cfg_info.vendor
         assert motor.serial_number == truth_cfg_info.serial_number
