@@ -6,8 +6,8 @@ notify of changes in the hardware state or publish Bluesky plans for the run eng
 Each controller is associated with a ``ControllerInfo`` object, which contains a series of user-defined properties that
 describe the controller and provides further customization options.
 
-Controllers can access specific hardware devices through the ``DeviceRegistry`` object, which is a singleton instance
-that holds all the devices registered in the application.
+Controllers can access specific hardware devices through the :class:`~sunflare.engine.handler.EngineHandler`, which holds
+references to all the devices available in the application.
 """
 
 from abc import ABCMeta, abstractmethod
@@ -16,7 +16,7 @@ from typing import Any
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo, ControllerTypes
-from sunflare.engine import DeviceRegistry
+from sunflare.engine import EngineHandler
 from sunflare.log import Loggable
 from sunflare.virtualbus import Signal, VirtualBus
 
@@ -28,8 +28,8 @@ class BaseController(Loggable, metaclass=ABCMeta):
     ----------
     ctrl_info : :class:`~sunflare.config.ControllerInfo`
         Controller information.
-    registry : :class:`~sunflare.engine.registry.DeviceRegistry`
-        Device registry.
+    handler : :class:`~sunflare.engine.handler.EngineHandler`
+        Engine handler.
     virtual_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Virtual bus.
     module_bus : :class:`~sunflare.virtualbus.VirtualBus`
@@ -43,16 +43,16 @@ class BaseController(Loggable, metaclass=ABCMeta):
 
     sigNewPlan: Signal = Signal(object)
 
-    __slots__ = ("_ctrl_info", "_registry", "_virtual_bus", "_module_bus")
+    __slots__ = ("_ctrl_info", "_handler", "_virtual_bus", "_module_bus")
 
     def __init__(
         self,
         ctrl_info: ControllerInfo,
-        registry: DeviceRegistry,
+        handler: EngineHandler,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
     ) -> None:
-        self._registry = registry
+        self._handler = handler
         self._ctrl_info = ctrl_info
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
@@ -62,7 +62,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations.
 
-        If the controller handles any kind of resources (i.e. devices, connections, etc.),
+        If the controller holds any kind of resources,
         this method should invoke any equivalent shutdown method for each resource.
         """
         ...
@@ -142,11 +142,6 @@ class BaseController(Loggable, metaclass=ABCMeta):
     def controller_name(self) -> str:  # noqa: D102
         """Controller class name."""
         return self._ctrl_info.controller_name
-
-    @property
-    def registry(self) -> DeviceRegistry:
-        """Device registry."""
-        return self._registry
 
     @property
     def plans(self) -> list[MsgGenerator[Any]]:

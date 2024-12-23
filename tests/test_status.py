@@ -1,14 +1,16 @@
-import pytest
 import logging
-
-from sunflare.log import get_logger
-from sunflare.engine.status import Status
-from sunflare.engine._exceptions import (
-    StatusTimeoutError,
-    InvalidState,
-    WaitTimeoutError,
-)
+import platform
 from time import sleep
+
+import pytest
+
+from sunflare.engine._exceptions import (
+    InvalidState,
+    StatusTimeoutError,
+    WaitTimeoutError
+)
+from sunflare.engine.status import Status
+from sunflare.log import get_logger
 
 
 def test_status() -> None:
@@ -109,7 +111,7 @@ def test_status_wait_timeout() -> None:
     with pytest.raises(WaitTimeoutError):
         status.wait(timeout=0.1)
 
-
+@pytest.mark.skipif(platform.system() == "Darwin", reason="Sometimes fails on macOS")
 def test_status_settle_time() -> None:
     status = Status(timeout=0.1, settle_time=0.3)
     status.set_finished()

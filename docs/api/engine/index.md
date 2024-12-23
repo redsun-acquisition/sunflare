@@ -8,5 +8,4 @@ detectors
 motors
 lights
 handler
-registry
 ```

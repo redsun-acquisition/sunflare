@@ -1,9 +1,11 @@
 import os
+
 import yaml
 
-from sunflare.config import RedSunInstanceInfo, DetectorModelInfo, MotorModelInfo
+from sunflare.config import DetectorModelInfo, MotorModelInfo, RedSunInstanceInfo
 from sunflare.engine.detector import DetectorModel
 from sunflare.engine.motor import MotorModel
+
 
 class MockDetectorModel(DetectorModel[DetectorModelInfo]):
     """Mock detector model."""

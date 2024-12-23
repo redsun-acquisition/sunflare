@@ -1,6 +1,8 @@
 # type: ignore
-import pytest
 import logging
+
+import pytest
+
 from sunflare.log import get_logger
 from sunflare.virtualbus import ModuleVirtualBus, Signal, VirtualBus, slot
 
