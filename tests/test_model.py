@@ -62,16 +62,34 @@ def test_detector_model(config_path: str) -> None:
 def test_motor_model(config_path: str) -> None:
     """Test the motor model info."""
 
+    truth_dict = {
+        "Single axis motor": {
+            "model_name": "MockMotorModel",
+            "axes": ["X"],
+        },
+        "Double axis motor": {
+            "model_name": "MockMotorModel",
+            "axes": ["X", "Y"],
+            "step_egu": "mm",
+        },
+    }
+
+    truth_configs = {
+        name: MotorModelInfo(**cfg_info)
+        for name, cfg_info in truth_dict.items()
+    }
+
     config_file = os.path.join(config_path, "motor_instance.yaml")
     config_dict = yaml.safe_load(open(config_file))
     instance = RedSunInstanceInfo(**config_dict)
 
-    for name, cfg_info in instance.motors.items():
+    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.motors.items(), truth_configs.items()):
         motor = MockMotorModel(name=name, cfg_info=cfg_info)
-        assert motor.name == name
-        assert motor.model_info == cfg_info
-        assert motor.vendor == cfg_info.vendor
-        assert motor.serial_number == cfg_info.serial_number
-        assert motor.category == cfg_info.category
-        assert motor.axes == cfg_info.axes
+        assert motor.name == truth_name
+        assert motor.model_info == truth_cfg_info
+        assert motor.vendor == truth_cfg_info.vendor
+        assert motor.serial_number == truth_cfg_info.serial_number
+        assert motor.category == truth_cfg_info.category
+        assert motor.axes == truth_cfg_info.axes
+        assert motor.step_egu == truth_cfg_info.step_egu
         motor.shutdown()
