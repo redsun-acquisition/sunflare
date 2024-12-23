@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol, Un
 
 from bluesky.utils import MsgGenerator
 
+from sunflare.config import MotorModelInfo, DetectorModelInfo
 from sunflare.engine.detector import DetectorProtocol
 from sunflare.engine.motor import MotorProtocol
 from sunflare.virtualbus import VirtualBus
@@ -17,6 +18,8 @@ if TYPE_CHECKING:
 
 
 EventName = Literal["all", "start", "descriptor", "event", "stop"]
+Motor = MotorProtocol[MotorModelInfo]
+Detector = DetectorProtocol[DetectorModelInfo]
 
 
 class EngineHandler(Protocol):
@@ -67,16 +70,14 @@ class EngineHandler(Protocol):
         ...
 
     @abstractmethod
-    def load_device(
-        self, name: str, device: Union[MotorProtocol, DetectorProtocol]
-    ) -> None:
+    def load_device(self, name: str, device: Union[Motor, Detector]) -> None:
         """Load a device into the handler and make it available to the rest of the application.
 
         Parameters
         ----------
         name : ``str``
             Device unique identifier.
-        device : Union[MotorProtocol, DetectorProtocol]
+        device : Union[Motor, Detector]
             Device to be loaded.
         """
         ...
@@ -143,11 +144,11 @@ class EngineHandler(Protocol):
         ...
 
     @property
-    def detectors(self) -> dict[str, DetectorProtocol]:
+    def detectors(self) -> dict[str, Detector]:
         """Detectors dictionary."""
         ...
 
     @property
-    def motors(self) -> dict[str, MotorProtocol]:
+    def motors(self) -> dict[str, Motor]:
         """Motors dictionary."""
         ...
