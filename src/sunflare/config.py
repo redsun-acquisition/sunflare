@@ -370,20 +370,3 @@ class RedSunInstanceInfo(BaseModel):
             raise yaml.YAMLError(f"Error loading YAML file {path}: {e}")
 
         return data  # type: ignore[no-any-return]
-
-    @classmethod
-    def from_yaml(cls, path: str) -> RedSunInstanceInfo:
-        """Build the RedSun instance configuration from a YAML file.
-
-        Parameters
-        ----------
-        path : ``str``
-            Path to the YAML file.
-
-        Returns
-        -------
-        RedSunInstanceInfo
-            RedSun instance configuration.
-        """
-        data = cls.load_yaml(path)
-        return cls(**data)
