@@ -2,12 +2,13 @@ name: Publish to PyPI
 
 on:
   push:
-    tags: [v*.*.*]
+    tags: 
+      - 'v*.*.*'
 
 jobs:
   test:
     name: Test
-    if: startsWith(github.ref, 'refs/tags/v') # only run on tags
+    if: startsWith(github.ref, 'refs/tags/v') && (!contains(github.ref, 'a') && !contains(github.ref, 'rc')) # only run on tags (not alpha/rc)
     uses: pyapp-kit/workflows/.github/workflows/test-pyrepo.yml@v2
     with:
       os: ${{ matrix.os }}
