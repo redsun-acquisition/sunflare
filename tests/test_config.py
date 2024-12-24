@@ -13,7 +13,7 @@ def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None
     path_to_test = config_path / "non_existent.yaml"
 
     with pytest.raises(FileNotFoundError):
-        RedSunInstanceInfo.from_yaml(path_to_test)
+        RedSunInstanceInfo.load_yaml(path_to_test)
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
@@ -24,7 +24,7 @@ def test_not_a_file(config_path: Path, caplog: LogCaptureFixture) -> None:
     path_to_test = config_path / "not_a_file"
 
     with pytest.raises(FileNotFoundError):
-        RedSunInstanceInfo.from_yaml(path_to_test)
+        RedSunInstanceInfo.load_yaml(path_to_test)
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
@@ -34,7 +34,7 @@ def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
     path_to_test = config_path / "fake_yaml.yeml"
 
     with pytest.raises(ValueError):
-        RedSunInstanceInfo.from_yaml(path_to_test)
+        RedSunInstanceInfo.load_yaml(path_to_test)
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
@@ -42,7 +42,8 @@ def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
 def test_empty_info(config_path: Path) -> None:
     """Test empty redsun instance info."""
 
-    instance = RedSunInstanceInfo.from_yaml(config_path / "empty_instance.yaml")
+    config = RedSunInstanceInfo.load_yaml(config_path / "empty_instance.yaml")
+    instance = RedSunInstanceInfo(**config)
 
     assert instance.engine == "bluesky"
     assert instance.controllers == {}
@@ -57,7 +58,8 @@ def test_empty_info(config_path: Path) -> None:
 def test_detectors_info(config_path: Path):
     """Test the redsun instance info with detectors."""
 
-    instance = RedSunInstanceInfo.from_yaml(config_path / "detector_instance.yaml")
+    config = RedSunInstanceInfo.load_yaml(config_path / "detector_instance.yaml")
+    instance = RedSunInstanceInfo(**config)
 
     assert instance.engine == "bluesky"
     assert instance.detectors != {}
@@ -84,7 +86,8 @@ def test_detectors_info(config_path: Path):
 def test_motors_info(config_path: Path):
     """Test the redsun instance info with motors."""
 
-    instance = RedSunInstanceInfo.from_yaml(config_path / "motor_instance.yaml")
+    config = RedSunInstanceInfo.load_yaml(config_path / "motor_instance.yaml")
+    instance = RedSunInstanceInfo(**config)
 
     assert instance.engine == "bluesky"
     assert instance.detectors == {}
