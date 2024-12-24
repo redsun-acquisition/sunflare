@@ -331,16 +331,16 @@ class RedSunInstanceInfo(BaseModel):
 
         Returns
         -------
-        dict[str, Any]
+        ``dict[str, Any]``
             A dictionary containing the configuration data.
 
         Raises
         ------
-        FileNotFoundError
+        ``FileNotFoundError``
             If the file does not exist.
-        ValueError
+        ``ValueError``
             If the file is not a YAML file.
-        yaml.YAMLError
+        ``yaml.YAMLError``
             If an error occurs while loading the file.
         """
         logger = get_logger()
