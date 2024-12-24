@@ -1,8 +1,7 @@
-import os
-
+from pathlib import Path
 import pytest
 
 
 @pytest.fixture
-def config_path() -> str:
-    return os.path.join(os.path.dirname(__file__), "data")
+def config_path() -> Path:
+    return Path(__file__).parent / "data"

@@ -1,20 +1,48 @@
 # type: ignore
 
-import os
+import pytest
+from pytest import LogCaptureFixture
 
-import yaml
-
+from pathlib import Path
 from sunflare.config import RedSunInstanceInfo
 
 
-def test_empty_info(config_path: str) -> None:
+def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None:
+    """Test non-existent file."""
+
+    path_to_test = config_path / "non_existent.yaml"
+
+    with pytest.raises(FileNotFoundError):
+        RedSunInstanceInfo.from_yaml(path_to_test)
+
+    assert str(path_to_test) in caplog.handler.records[0].msg
+
+
+def test_not_a_file(config_path: Path, caplog: LogCaptureFixture) -> None:
+    """Test not a file."""
+
+    path_to_test = config_path / "not_a_file"
+
+    with pytest.raises(FileNotFoundError):
+        RedSunInstanceInfo.from_yaml(path_to_test)
+
+    assert str(path_to_test) in caplog.handler.records[0].msg
+
+def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
+    """Test not a YAML file."""
+
+    path_to_test = config_path / "fake_yaml.yeml"
+
+    with pytest.raises(ValueError):
+        RedSunInstanceInfo.from_yaml(path_to_test)
+
+    assert str(path_to_test) in caplog.handler.records[0].msg
+
+
+def test_empty_info(config_path: Path) -> None:
     """Test empty redsun instance info."""
 
-    config_file = os.path.join(config_path, "empty_instance.yaml")
-
-    config_dict = yaml.safe_load(open(config_file))
-
-    instance = RedSunInstanceInfo(**config_dict)
+    instance = RedSunInstanceInfo.from_yaml(config_path / "empty_instance.yaml")
 
     assert instance.engine == "bluesky"
     assert instance.controllers == {}
@@ -26,12 +54,10 @@ def test_empty_info(config_path: str) -> None:
     # assert instance.scanners == {}
 
 
-def test_detectors_info(config_path: str):
+def test_detectors_info(config_path: Path):
     """Test the redsun instance info with detectors."""
 
-    config_file = os.path.join(config_path, "detector_instance.yaml")
-    config_dict = yaml.safe_load(open(config_file))
-    instance = RedSunInstanceInfo(**config_dict)
+    instance = RedSunInstanceInfo.from_yaml(config_path / "detector_instance.yaml")
 
     assert instance.engine == "bluesky"
     assert instance.detectors != {}
@@ -55,13 +81,10 @@ def test_detectors_info(config_path: str):
     assert mocks[1].exposure_egu == "s"
 
 
-def test_motors_info(config_path: str):
+def test_motors_info(config_path: Path):
     """Test the redsun instance info with motors."""
 
-    config_file = os.path.join(config_path, "motor_instance.yaml")
-
-    config_dict = yaml.safe_load(open(config_file))
-    instance = RedSunInstanceInfo(**config_dict)
+    instance = RedSunInstanceInfo.from_yaml(config_path / "motor_instance.yaml")
 
     assert instance.engine == "bluesky"
     assert instance.detectors == {}

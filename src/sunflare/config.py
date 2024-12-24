@@ -19,6 +19,8 @@ from typing import ClassVar, Optional, Tuple, Union
 from psygnal import SignalGroupDescriptor
 from pydantic import BaseModel, ConfigDict, Field
 
+from sunflare.log import get_logger
+
 
 class AcquisitionEngineTypes(str, Enum):
     """ 
@@ -337,21 +339,30 @@ class RedSunInstanceInfo(BaseModel):
         ValueError
             If the file is not a YAML file or if an error occurs while loading the file.
         """
+        logger = get_logger()
+
         path_obj = Path(path)
 
+        if not path_obj.is_absolute():
+            path_obj = path_obj.resolve()
+
         if not path_obj.exists():
+            logger.error(f"The file {path} does not exist.")
             raise FileNotFoundError(f"The file {path} does not exist.")
 
         if not path_obj.is_file():
+            logger.error(f"The path {path} is not a file.")
             raise FileNotFoundError(f"The path {path} is not a file.")
 
         if path_obj.suffix not in [".yaml", ".yml"]:
+            logger.error(f"The file {path} is not a YAML file.")
             raise ValueError(f"The file {path} is not a YAML file.")
 
         try:
             with open(path, "r") as file:
                 data = yaml.safe_load(file)
         except Exception as e:
+            logger.error(f"Error loading YAML file {path}: {e}")
             raise ValueError(f"Error loading YAML file {path}: {e}") from e
 
         return cls(**data)
