@@ -11,8 +11,8 @@ by custom models defined by the user, which can provide additional information a
 from __future__ import annotations
 
 import yaml
-import os
 
+from pathlib import Path
 from enum import Enum
 from typing import ClassVar, Optional, Tuple, Union
 
@@ -334,11 +334,24 @@ class RedSunInstanceInfo(BaseModel):
         ------
         FileNotFoundError
             If the file does not exist.
+        ValueError
+            If the file is not a YAML file or if an error occurs while loading the file.
         """
-        # check if the path exists
-        if not os.path.exists(path):
+        path_obj = Path(path)
+
+        if not path_obj.exists():
             raise FileNotFoundError(f"The file {path} does not exist.")
 
-        with open(path, "r") as file:
-            data = yaml.safe_load(file)
+        if not path_obj.is_file():
+            raise FileNotFoundError(f"The path {path} is not a file.")
+
+        if path_obj.suffix not in [".yaml", ".yml"]:
+            raise ValueError(f"The file {path} is not a YAML file.")
+
+        try:
+            with open(path, "r") as file:
+                data = yaml.safe_load(file)
+        except Exception as e:
+            raise ValueError(f"Error loading YAML file {path}: {e}") from e
+
         return cls(**data)
