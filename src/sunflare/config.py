@@ -10,12 +10,11 @@ by custom models defined by the user, which can provide additional information a
 
 from __future__ import annotations
 
-import yaml
-
-from pathlib import Path
 from enum import Enum
-from typing import ClassVar, Optional, Tuple, Union
+from pathlib import Path
+from typing import Any, ClassVar, Optional, Tuple, Union
 
+import yaml
 from psygnal import SignalGroupDescriptor
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -318,9 +317,12 @@ class RedSunInstanceInfo(BaseModel):
     detectors: dict[str, DetectorModelInfo] = Field(default_factory=lambda: dict())
     motors: dict[str, MotorModelInfo] = Field(default_factory=lambda: dict())
 
-    @classmethod
-    def from_yaml(cls, path: str) -> RedSunInstanceInfo:
-        """Load the configuration from a YAML file.
+    @staticmethod
+    def load_yaml(path: str) -> dict[str, Any]:
+        """Load a YAML configuration file.
+
+        This method is invoked before the actual construction of the model. It will do
+        preliminary checks on the YAML file and store the configuration in a dictionary.
 
         Parameters
         ----------
@@ -329,15 +331,17 @@ class RedSunInstanceInfo(BaseModel):
 
         Returns
         -------
-        RedSunInstanceInfo
-            RedSun instance configuration.
+        dict[str, Any]
+            A dictionary containing the configuration data.
 
         Raises
         ------
         FileNotFoundError
             If the file does not exist.
         ValueError
-            If the file is not a YAML file or if an error occurs while loading the file.
+            If the file is not a YAML file.
+        yaml.YAMLError
+            If an error occurs while loading the file.
         """
         logger = get_logger()
 
@@ -361,8 +365,25 @@ class RedSunInstanceInfo(BaseModel):
         try:
             with open(path, "r") as file:
                 data = yaml.safe_load(file)
-        except Exception as e:
-            logger.error(f"Error loading YAML file {path}: {e}")
-            raise ValueError(f"Error loading YAML file {path}: {e}") from e
+        except yaml.YAMLError as e:
+            logger.exception(f"Error loading YAML file {path}: {e}")
+            raise e(f"Error loading YAML file {path}: {e}")
 
+        return data
+
+    @classmethod
+    def from_yaml(cls, path: str) -> RedSunInstanceInfo:
+        """Build the RedSun instance configuration from a YAML file.
+
+        Parameters
+        ----------
+        path : ``str``
+            Path to the YAML file.
+
+        Returns
+        -------
+        RedSunInstanceInfo
+            RedSun instance configuration.
+        """
+        data = cls.load_yaml(path)
         return cls(**data)
