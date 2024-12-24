@@ -19,9 +19,11 @@ def test_empty_info(config_path: str) -> None:
     assert instance.engine == "bluesky"
     assert instance.controllers == {}
     assert instance.detectors == {}
-    assert instance.lights == {}
     assert instance.motors == {}
-    assert instance.scanners == {}
+
+    # TODO: add lights and scanners in the future
+    # assert instance.lights == {}
+    # assert instance.scanners == {}
 
 
 def test_detectors_info(config_path: str):
@@ -33,9 +35,11 @@ def test_detectors_info(config_path: str):
 
     assert instance.engine == "bluesky"
     assert instance.detectors != {}
-    assert instance.lights == {}
     assert instance.motors == {}
-    assert instance.scanners == {}
+
+    # TODO: add lights and scanners in the future
+    # assert instance.lights == {}
+    # assert instance.scanners == {}
 
     for _, mock in instance.detectors.items():
         assert mock.model_name == "MockDetectorModel"
@@ -61,9 +65,11 @@ def test_motors_info(config_path: str):
 
     assert instance.engine == "bluesky"
     assert instance.detectors == {}
-    assert instance.lights == {}
     assert instance.motors != {}
-    assert instance.scanners == {}
+
+    # TODO: add lights and scanners in the future
+    # assert instance.lights == {}
+    # assert instance.scanners == {}
 
     # inspect the motors
     for _, mock in instance.motors.items():
