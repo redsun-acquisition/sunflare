@@ -44,9 +44,7 @@ docs = [
     "myst-parser"
 ]
 dev = [
-  "isort",
   "ruff",
-  "pre-commit",
   "pytest",
   "pytest-cov",
   "mypy"
@@ -77,7 +75,7 @@ include = [
 
 [tool.mypy]
 files = "src/**/*.py"
-exclude = ["docs", "tests", "noxfile.py", "build"]
+exclude = ["docs", "tests", "build"]
 disable_error_code = ["import-untyped"]
 pretty = true
 
