@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol, Un
 
 from bluesky.utils import MsgGenerator
 
-from sunflare.config import MotorModelInfo, DetectorModelInfo
+from sunflare.config import DetectorModelInfo, MotorModelInfo
 from sunflare.engine.detector import DetectorProtocol
 from sunflare.engine.motor import MotorProtocol
 from sunflare.virtualbus import VirtualBus
