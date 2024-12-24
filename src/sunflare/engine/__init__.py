@@ -1,5 +1,3 @@
-# noqa: D104
-
 from .detector import DetectorModel
 from .handler import EngineHandler
 from .light import LightModel

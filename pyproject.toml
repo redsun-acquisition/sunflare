@@ -119,6 +119,7 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 select = ["D"] # enable docstring checks
+ignore = ["D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

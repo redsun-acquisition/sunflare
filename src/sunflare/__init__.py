@@ -1,4 +1,3 @@
-# noqa: D104
 from importlib.metadata import PackageNotFoundError, version
 
 try:
