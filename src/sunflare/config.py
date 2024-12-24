@@ -367,9 +367,9 @@ class RedSunInstanceInfo(BaseModel):
                 data = yaml.safe_load(file)
         except yaml.YAMLError as e:
             logger.exception(f"Error loading YAML file {path}: {e}")
-            raise e(f"Error loading YAML file {path}: {e}")
+            raise yaml.YAMLError(f"Error loading YAML file {path}: {e}")
 
-        return data
+        return data  # type: ignore[no-any-return]
 
     @classmethod
     def from_yaml(cls, path: str) -> RedSunInstanceInfo:
