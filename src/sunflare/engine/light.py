@@ -7,10 +7,12 @@
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-from typing import Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
-from sunflare.config import LightModelInfo, LightModelTypes
 from sunflare.log import Loggable
+
+if TYPE_CHECKING:
+    from sunflare.config import LightModelInfo, LightModelTypes
 
 
 class LightModel(Loggable, metaclass=ABCMeta):

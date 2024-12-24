@@ -3,13 +3,22 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, Protocol, TypeVar, Union, runtime_checkable
-
-from bluesky.protocols import Location
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    Protocol,
+    TypeVar,
+    Union,
+    runtime_checkable,
+)
 
 from sunflare.config import MotorModelInfo, MotorModelTypes
-from sunflare.engine.status import Status
 from sunflare.log import Loggable
+
+if TYPE_CHECKING:
+    from bluesky.protocols import Location
+    from sunflare.engine.status import Status
 
 __all__ = ["MotorModel", "MotorProtocol"]
 

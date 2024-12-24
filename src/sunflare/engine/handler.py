@@ -5,16 +5,15 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol, Union
 
-from bluesky.utils import MsgGenerator
-
 from sunflare.config import DetectorModelInfo, MotorModelInfo
 from sunflare.engine.detector import DetectorProtocol
 from sunflare.engine.motor import MotorProtocol
-from sunflare.virtualbus import VirtualBus
 
 if TYPE_CHECKING:
     # TODO: create a protocol for the engine?
     from bluesky.run_engine import RunEngine
+    from bluesky.utils import MsgGenerator
+    from sunflare.virtualbus import VirtualBus
 
 
 EventName = Literal["all", "start", "descriptor", "event", "stop"]

@@ -3,15 +3,24 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from collections import OrderedDict
-from typing import Any, Generic, Protocol, Tuple, TypeVar, runtime_checkable
-
-from bluesky.protocols import Reading
-from event_model.documents.event_descriptor import DataKey
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    Protocol,
+    Tuple,
+    TypeVar,
+    runtime_checkable,
+)
 
 from sunflare.config import DetectorModelInfo, DetectorModelTypes
-from sunflare.engine.status import Status
 from sunflare.log import Loggable
+
+if TYPE_CHECKING:
+    from collections import OrderedDict
+    from bluesky.protocols import Reading
+    from sunflare.engine.status import Status
+    from event_model.documents.event_descriptor import DataKey
 
 __all__ = ["DetectorModel", "DetectorProtocol"]
 
