@@ -10,6 +10,9 @@ by custom models defined by the user, which can provide additional information a
 
 from __future__ import annotations
 
+import yaml
+import os
+
 from enum import Enum
 from typing import ClassVar, Optional, Tuple, Union
 
@@ -204,6 +207,9 @@ class DetectorModelInfo(DeviceModelInfo):
 class LightModelInfo(DeviceModelInfo):
     r"""Light source model informations.
 
+    .. warning:: This class is currently under active development and may see breaking changes. It is not yet
+        fully implemented and may not be used in production.
+
     Attributes
     ----------
     category : LightModelTypes
@@ -260,7 +266,8 @@ class MotorModelInfo(DeviceModelInfo):
 class ScannerModelInfo(DeviceModelInfo):
     """Scanner model informations.
 
-    .. warning:: This class is currently under active development and may see breaking changes.
+    .. warning:: This class is currently under active development and may see breaking changes. It is not yet
+        fully implemented and may not be used in production.
 
     Attributes
     ----------
@@ -288,29 +295,50 @@ class RedSunInstanceInfo(BaseModel):
 
     Attributes
     ----------
-    engine : AcquisitionEngineTypes
-        Acquisition engine selected for the current instance.
-    controllers : Optional[Dict[str, ControllerInfo]]
+    engine : ``AcquisitionEngineTypes``
+        Acquisition engine selected for the current instance. Mandatory.
+    frontend : ``FrontendTypes``
+        Frontend selected for the current instance. Defaults to ``FrontendTypes.QT``.
+    controllers : ``dict[str, ControllerInfo]``
         Controller informations dictionary.
         Defaults to an empty dictionary.
-    detectors : Optional[Dict[str, DetectorModelInfo]]
+    detectors : ``dict[str, DetectorModelInfo]``
         Detector model informations dictionary.
         Defaults to an empty dictionary.
-    lights : Optional[Dict[str, LightModelInfo]]
-        Light source model informations dictionary.
-        Defaults to an empty dictionary.
-    motors : Optional[Dict[str, MotorModelInfo]]
+    motors : ``dict[str, MotorModelInfo]``
         Motor model informations dictionary.
-        Defaults to an empty dictionary.
-    scanners : Optional[Dict[str, ScannerModelInfo]]
-        Scanner model informations dictionary.
         Defaults to an empty dictionary.
     """
 
-    engine: AcquisitionEngineTypes = Field(default=AcquisitionEngineTypes.BLUESKY)
+    engine: AcquisitionEngineTypes
     frontend: FrontendTypes = Field(default=FrontendTypes.QT)
     controllers: dict[str, ControllerInfo] = Field(default_factory=lambda: dict())
     detectors: dict[str, DetectorModelInfo] = Field(default_factory=lambda: dict())
-    lights: dict[str, LightModelInfo] = Field(default_factory=lambda: dict())
     motors: dict[str, MotorModelInfo] = Field(default_factory=lambda: dict())
-    scanners: dict[str, ScannerModelInfo] = Field(default_factory=lambda: dict())
+
+    @classmethod
+    def from_yaml(cls, path: str) -> RedSunInstanceInfo:
+        """Load the configuration from a YAML file.
+
+        Parameters
+        ----------
+        path : ``str``
+            Path to the YAML file.
+
+        Returns
+        -------
+        RedSunInstanceInfo
+            RedSun instance configuration.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file does not exist.
+        """
+        # check if the path exists
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"The file {path} does not exist.")
+
+        with open(path, "r") as file:
+            data = yaml.safe_load(file)
+        return cls(**data)
