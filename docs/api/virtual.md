@@ -1,7 +1,7 @@
 # Virtual module
 
 ```{eval-rst}
-.. automodule:: sunflare.virtualbus
+.. automodule:: sunflare.virtual
     :members: VirtualBus, ModuleVirtualBus, slot
     :member-order: bysource
     :exclude-members: Signal
