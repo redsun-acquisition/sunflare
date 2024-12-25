@@ -30,9 +30,9 @@ class BaseController(Loggable, metaclass=ABCMeta):
         Controller information.
     handler : :class:`~sunflare.engine.handler.EngineHandler`
         Engine handler.
-    virtual_bus : :class:`~sunflare.virtualbus.VirtualBus`
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-    module_bus : :class:`~sunflare.virtualbus.VirtualBus`
+    module_bus : :class:`~sunflare.virtual.VirtualBus`
         Module bus.
 
     Attributes

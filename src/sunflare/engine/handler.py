@@ -33,9 +33,9 @@ class EngineHandler(Protocol):
     ----------
     config : :class:`~sunflare.config.RedSunInstanceInfo`
         Configuration options for the RedSun instance.
-    virtual_bus : :class:`~sunflare.virtualbus.VirtualBus`
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Module-local virtual bus.
-    module_bus : :class:`~sunflare.virtualbus.VirtualBus`
+    module_bus : :class:`~sunflare.virtual.VirtualBus`
         Inter-module virtual bus.
     during_task : :class:`~bluesky.utils.DuringTask`
         DuringTask object. This object manages the blocking event
