@@ -18,6 +18,7 @@ from sunflare.log import Loggable
 
 if TYPE_CHECKING:
     from bluesky.protocols import Location
+
     from sunflare.engine.status import Status
 
 __all__ = ["MotorModel", "MotorProtocol"]
