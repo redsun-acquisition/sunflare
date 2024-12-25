@@ -30,7 +30,7 @@ M = TypeVar("M", bound=DetectorModelInfo, covariant=True)
 
 
 @runtime_checkable
-class DetectorProtocol(Protocol):  # pragma: no cover
+class DetectorProtocol(Protocol):
     """Bluesky-compatible detector protocol.
 
     This model implements the following protocols:

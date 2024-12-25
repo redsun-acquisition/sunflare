@@ -105,6 +105,7 @@ exclude_lines = [
     "@abstractmethod",
     "if TYPE_CHECKING:",
     "@overload",
+    "class .*\bProtocol\b)",
     "except ImportError",
     "except PackageNotFoundError",
     "raise NotImplementedError()",
