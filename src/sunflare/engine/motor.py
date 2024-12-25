@@ -45,7 +45,6 @@ class MotorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def set(self, value: Union[float, int, str], *args: Any, **kwargs: Any) -> Status:
         """Set a value for the given motor.
 
@@ -73,7 +72,6 @@ class MotorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def locate(self) -> Location[Union[float, int, str]]:
         """Return the current location of a Device.
 

@@ -50,7 +50,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def stage(self) -> Status:
         """Set up the device for acquisition.
 
@@ -61,7 +60,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def unstage(self) -> Status:
         """Disables device.
 
@@ -72,7 +70,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def describe(self) -> OrderedDict[str, DataKey]:
         """Return an OrderedDict with exactly the same keys as the ``read`` method, here mapped to per-scan metadata about each field.
 
@@ -100,7 +97,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def read(self) -> OrderedDict[str, Reading[Any]]:
         """Return an OrderedDict mapping string field name(s) to dictionaries of values and timestamps and optional per-point metadata.
 
@@ -122,17 +118,14 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def pause(self) -> None:
         """Perform device-specific work when the RunEngine pauses."""
         ...
 
-    @abstractmethod
     def resume(self) -> None:
         """Perform device-specific work when the RunEngine resumes after a pause."""
         ...
 
-    @abstractmethod
     def kickoff(self) -> Status:
         """Start the device for asynchronous acquisition.
 
@@ -143,7 +136,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def complete(self) -> Status:
         """Wait for the device to complete if it is running asynchronously.
 
@@ -154,7 +146,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def read_configuration(self) -> OrderedDict[str, Reading[Any]]:
         """Provide same API as ``read`` but for slow-changing fields related to configuration.
 
@@ -167,7 +158,6 @@ class DetectorProtocol(Protocol):
         """
         ...
 
-    @abstractmethod
     def describe_configuration(self) -> OrderedDict[str, DataKey]:
         """Provide same API as ``describe``, but corresponding to the keys in ``read_configuration``.
 
