@@ -28,7 +28,7 @@ M = TypeVar("M", bound=MotorModelInfo, covariant=True)
 
 # TODO: more protocols for this?
 @runtime_checkable
-class MotorProtocol(Protocol):
+class MotorProtocol(Protocol):  # pragma: no cover
     """Bluesky-compatible motor protocol.
 
     Implements the following protocols:
