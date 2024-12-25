@@ -14,6 +14,7 @@ from qtpy.QtWidgets import QWidget
 if TYPE_CHECKING:
     from typing import Any
 
+    from sunflare.config import RedSunInstanceInfo
     from sunflare.virtualbus import VirtualBus
 
 __all__ = ["BaseWidget", "WidgetProtocol"]
@@ -110,6 +111,8 @@ class BaseWidget(QWidget):
 
     Parameters
     ----------
+    config : RedSunInstanceInfo
+        The RedSun instance configuration.
     virtual_bus : VirtualBus
         The inter-module bus.
     module_bus : VirtualBus
@@ -122,12 +125,14 @@ class BaseWidget(QWidget):
 
     def __init__(
         self,
+        config: RedSunInstanceInfo,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
+        self._config = config
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
 
