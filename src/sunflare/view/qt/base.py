@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from sunflare.config import RedSunInstanceInfo
-    from sunflare.virtualbus import VirtualBus
+    from sunflare.virtual import VirtualBus
 
 __all__ = ["BaseWidget", "WidgetProtocol"]
 

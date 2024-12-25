@@ -18,7 +18,7 @@ from bluesky.utils import MsgGenerator
 from sunflare.config import ControllerInfo, ControllerTypes
 from sunflare.engine import EngineHandler
 from sunflare.log import Loggable
-from sunflare.virtualbus import Signal, VirtualBus
+from sunflare.virtual import Signal, VirtualBus
 
 
 class BaseController(Loggable, metaclass=ABCMeta):

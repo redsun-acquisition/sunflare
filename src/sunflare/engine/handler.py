@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from bluesky.run_engine import RunEngine
     from bluesky.utils import DuringTask, MsgGenerator
 
-    from sunflare.virtualbus import VirtualBus
+    from sunflare.virtual import VirtualBus
 
 
 EventName = Literal["all", "start", "descriptor", "event", "stop"]

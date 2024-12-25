@@ -4,7 +4,7 @@ import logging
 import pytest
 
 from sunflare.log import get_logger
-from sunflare.virtualbus import ModuleVirtualBus, Signal, VirtualBus, slot
+from sunflare.virtual import ModuleVirtualBus, Signal, VirtualBus, slot
 
 
 class MockVirtualBus(VirtualBus):
