@@ -5,14 +5,14 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol, Union
 
-from sunflare.config import DetectorModelInfo, MotorModelInfo
+from sunflare.config import DetectorModelInfo, MotorModelInfo, RedSunInstanceInfo
 from sunflare.engine.detector import DetectorProtocol
 from sunflare.engine.motor import MotorProtocol
 
 if TYPE_CHECKING:
-    # TODO: create a protocol for the engine?
     from bluesky.run_engine import RunEngine
-    from bluesky.utils import MsgGenerator
+    from bluesky.utils import DuringTask, MsgGenerator
+
     from sunflare.virtualbus import VirtualBus
 
 
@@ -31,10 +31,15 @@ class EngineHandler(Protocol):
 
     Parameters
     ----------
+    config : :class:`~sunflare.config.RedSunInstanceInfo`
+        Configuration options for the RedSun instance.
     virtual_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Module-local virtual bus.
     module_bus : :class:`~sunflare.virtualbus.VirtualBus`
         Inter-module virtual bus.
+    during_task : :class:`~bluesky.utils.DuringTask`
+        DuringTask object. This object manages the blocking event
+        used by the run engine to safely execute the plan.
     """
 
     _plans: dict[str, MsgGenerator[Any]]
@@ -45,8 +50,10 @@ class EngineHandler(Protocol):
     @abstractmethod
     def __init__(
         self,
+        config: RedSunInstanceInfo,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
+        during_task: DuringTask,
     ) -> None: ...
 
     @abstractmethod
@@ -76,7 +83,7 @@ class EngineHandler(Protocol):
         ----------
         name : ``str``
             Device unique identifier.
-        device : Union[Motor, Detector]
+        device : ``Union[Motor, Detector]``
             Device to be loaded.
         """
         ...
@@ -84,10 +91,7 @@ class EngineHandler(Protocol):
     @abstractmethod
     def subscribe(
         self,
-        func: Callable[
-            [EventName, dict[str, Any]],
-            None,
-        ],
+        func: Callable[[EventName, dict[str, Any]], None],
         name: Optional[EventName] = "all",
     ) -> int:
         """Subscribe a callback function to the engine notifications.
