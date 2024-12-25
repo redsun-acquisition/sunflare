@@ -6,8 +6,8 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol, Union
 
 from sunflare.config import DetectorModelInfo, MotorModelInfo, RedSunInstanceInfo
-from sunflare.engine.detector import DetectorProtocol
-from sunflare.engine.motor import MotorProtocol
+from sunflare.engine.detector import DetectorModel
+from sunflare.engine.motor import MotorModel
 
 if TYPE_CHECKING:
     from bluesky.run_engine import RunEngine
@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
 
 EventName = Literal["all", "start", "descriptor", "event", "stop"]
-Motor = MotorProtocol[MotorModelInfo]
-Detector = DetectorProtocol[DetectorModelInfo]
+Motor = MotorModel[MotorModelInfo]
+Detector = DetectorModel[DetectorModelInfo]
 
 
 class EngineHandler(Protocol):

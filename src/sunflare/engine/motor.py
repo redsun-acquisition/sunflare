@@ -21,14 +21,14 @@ if TYPE_CHECKING:
 
     from sunflare.engine.status import Status
 
-__all__ = ["MotorModel", "MotorProtocol"]
+__all__ = ["MotorModel"]
 
 M = TypeVar("M", bound=MotorModelInfo, covariant=True)
 
 
 # TODO: more protocols for this?
 @runtime_checkable
-class MotorProtocol(Protocol[M]):
+class MotorProtocol(Protocol):
     """Bluesky-compatible motor protocol.
 
     Implements the following protocols:
@@ -36,11 +36,6 @@ class MotorProtocol(Protocol[M]):
     - :class:`bluesky.protocols.Movable`
     - :class:`bluesky.protocols.Locatable`
     """
-
-    @abstractmethod
-    def __init__(self, name: str, model_info: M) -> None:
-        # the __init__ method is provided only for type checking
-        ...
 
     def shutdown(self) -> None:
         """Shutdown the motor.
@@ -100,12 +95,16 @@ class MotorProtocol(Protocol[M]):
         ...
 
     @property
-    def model_info(self) -> M:
-        """Return the model information for the motor."""
+    def parent(self) -> None:
+        """Required property for Bluesky compatibility.
+
+        It's tied to Ophyd's concept of
+        parent/child relationships between devices.
+        """
         ...
 
 
-class MotorModel(Loggable, Generic[M]):
+class MotorModel(MotorProtocol, Loggable, Generic[M]):
     """
     ``MotorModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
@@ -131,6 +130,15 @@ class MotorModel(Loggable, Generic[M]):
     def name(self) -> str:
         """Motor instance unique identifier name."""
         return self._name
+
+    @property
+    def parent(self) -> None:
+        """Required property for Bluesky compatibility.
+
+        It's tied to Ophyd's concept of
+        parent/child relationships between devices.
+        """
+        None
 
     @property
     def model_info(self) -> M:

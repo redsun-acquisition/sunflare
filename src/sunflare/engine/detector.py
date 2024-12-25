@@ -24,13 +24,13 @@ if TYPE_CHECKING:
 
     from sunflare.engine.status import Status
 
-__all__ = ["DetectorModel", "DetectorProtocol"]
+__all__ = ["DetectorModel"]
 
 M = TypeVar("M", bound=DetectorModelInfo, covariant=True)
 
 
 @runtime_checkable
-class DetectorProtocol(Protocol[M]):
+class DetectorProtocol(Protocol):
     """Bluesky-compatible detector protocol.
 
     This model implements the following protocols:
@@ -41,14 +41,6 @@ class DetectorProtocol(Protocol[M]):
     - :class:`bluesky.protocols.Flyable`
     - :class:`bluesky.protocols.Completable`
     """
-
-    _name: str
-    _model_info: DetectorModelInfo
-
-    @abstractmethod
-    def __init__(self, name: str, model_info: DetectorModelInfo) -> None:
-        # the __init__ method is provided only for type checking
-        ...
 
     def shutdown(self) -> None:
         """Shutdown the detector.
@@ -192,12 +184,16 @@ class DetectorProtocol(Protocol[M]):
         ...
 
     @property
-    def model_info(self) -> M:
-        """The model information for the detector."""
+    def parent(self) -> None:
+        """Required property for Bluesky compatibility.
+
+        It's tied to Ophyd's concept of
+        parent/child relationships between devices.
+        """
         ...
 
 
-class DetectorModel(Loggable, Generic[M]):
+class DetectorModel(Loggable, DetectorProtocol, Generic[M]):
     """
     ``DetectorModel`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
 
@@ -229,6 +225,15 @@ class DetectorModel(Loggable, Generic[M]):
     def name(self) -> str:
         """Detector instance unique identifier uid."""
         return self._name
+
+    @property
+    def parent(self) -> None:
+        """Required property for Bluesky compatibility.
+
+        It's tied to Ophyd's concept of
+        parent/child relationships between devices.
+        """
+        None
 
     @property
     def model_info(self) -> M:
