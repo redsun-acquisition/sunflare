@@ -18,9 +18,11 @@ from sunflare.log import Loggable
 
 if TYPE_CHECKING:
     from collections import OrderedDict
+
     from bluesky.protocols import Reading
-    from sunflare.engine.status import Status
     from event_model.documents.event_descriptor import DataKey
+
+    from sunflare.engine.status import Status
 
 __all__ = ["DetectorModel", "DetectorProtocol"]
 
