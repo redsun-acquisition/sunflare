@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+
+## [v0.1.1] - 26-12-2024
+
+- Same changes as [v0.1.1a1]
+- Some typo adjustments
+
 ## [v0.1.1a1] - 25-12-2024
+
+(Only available on TestPyPI)
 
 ### Added
 
@@ -33,6 +41,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[v0.1.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1
 [v0.1.1a1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1a1
 [v0.1.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0a1...v0.1.0
 [v0.1.0a1]: https://github.com/redsun-acquisition/sunflare/commits/v0.1.0a1/
