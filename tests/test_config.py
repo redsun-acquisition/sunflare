@@ -43,7 +43,7 @@ def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
 def test_not_absolute_path() -> None:
     """Test not an absolute path."""
 
-    path_to_test = Path(".\\tests") / "data" / "empty_instance.yaml"
+    path_to_test = Path("tests") / "data" / "empty_instance.yaml"
 
     config = RedSunInstanceInfo.load_yaml(str(path_to_test))
 
