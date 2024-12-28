@@ -3,6 +3,8 @@
 import pytest
 from pytest import LogCaptureFixture
 
+from yaml import YAMLError
+
 from pathlib import Path
 from sunflare.config import RedSunInstanceInfo
 
@@ -12,16 +14,16 @@ def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None
 
     path_to_test = config_path / "non_existent.yaml"
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(FileExistsError):
         RedSunInstanceInfo.load_yaml(path_to_test)
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
 
-def test_not_a_file(config_path: Path, caplog: LogCaptureFixture) -> None:
+def test_not_a_file(caplog: LogCaptureFixture) -> None:
     """Test not a file."""
 
-    path_to_test = config_path / "not_a_file"
+    path_to_test = Path(__file__).parent / "data"
 
     with pytest.raises(FileNotFoundError):
         RedSunInstanceInfo.load_yaml(path_to_test)
@@ -38,6 +40,14 @@ def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
+def test_not_absolute_path() -> None:
+    """Test not an absolute path."""
+
+    path_to_test = Path("tests") / "data" / "empty_instance.yaml"
+
+    config = RedSunInstanceInfo.load_yaml(str(path_to_test))
+
+    assert config["engine"] == "bluesky"
 
 def test_empty_info(config_path: Path) -> None:
     """Test empty redsun instance info."""
@@ -50,10 +60,6 @@ def test_empty_info(config_path: Path) -> None:
     assert instance.detectors == {}
     assert instance.motors == {}
 
-    # TODO: add lights and scanners in the future
-    # assert instance.lights == {}
-    # assert instance.scanners == {}
-
 
 def test_detectors_info(config_path: Path):
     """Test the redsun instance info with detectors."""
@@ -65,15 +71,11 @@ def test_detectors_info(config_path: Path):
     assert instance.detectors != {}
     assert instance.motors == {}
 
-    # TODO: add lights and scanners in the future
-    # assert instance.lights == {}
-    # assert instance.scanners == {}
-
     for _, mock in instance.detectors.items():
         assert mock.model_name == "MockDetectorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert mock.sensor_size == (0, 0)
+        assert mock.sensor_size == (10, 10)
         assert mock.pixel_size == (1, 1, 1)
 
     mocks = list(instance.detectors.values())
@@ -92,10 +94,6 @@ def test_motors_info(config_path: Path):
     assert instance.engine == "bluesky"
     assert instance.detectors == {}
     assert instance.motors != {}
-
-    # TODO: add lights and scanners in the future
-    # assert instance.lights == {}
-    # assert instance.scanners == {}
 
     # inspect the motors
     for _, mock in instance.motors.items():

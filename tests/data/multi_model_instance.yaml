@@ -3,8 +3,10 @@ frontend: qt
 detectors:
   First mock detector:
     model_name: MockDetectorModel
+    sensor_size: [10, 10]
   Second mock detector:
     model_name: MockDetectorModel
+    sensor_size: [10, 10]
     category: line
     exposure_egu: s
 motors:

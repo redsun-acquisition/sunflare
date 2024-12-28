@@ -10,17 +10,18 @@ by custom models defined by the user, which can provide additional information a
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import Enum, unique
 from pathlib import Path
 from typing import Any, ClassVar, Optional, Tuple, Union
 
 import yaml
+from attrs import Attribute, define, field, validators
 from psygnal import SignalGroupDescriptor
-from pydantic import BaseModel, ConfigDict, Field
 
 from sunflare.log import get_logger
 
 
+@unique
 class AcquisitionEngineTypes(str, Enum):
     """ 
     Supported acquisition engine entities.
@@ -41,6 +42,7 @@ class AcquisitionEngineTypes(str, Enum):
     BLUESKY = "bluesky"
 
 
+@unique
 class FrontendTypes(str, Enum):
     """Supported frontend types.
 
@@ -55,6 +57,7 @@ class FrontendTypes(str, Enum):
     QT = "qt"
 
 
+@unique
 class DetectorModelTypes(str, Enum):
     """Supported detector types.
 
@@ -75,6 +78,7 @@ class DetectorModelTypes(str, Enum):
     POINT = "point"
 
 
+@unique
 class MotorModelTypes(str, Enum):
     """Supported motor types.
 
@@ -90,74 +94,23 @@ class MotorModelTypes(str, Enum):
     STEPPER = "stepper"
 
 
-class LightModelTypes(str, Enum):
-    """Supported light source types.
-
-    Attributes
-    ----------
-    LASER
-        Laser light source.
-    """
-
-    LASER = "laser"
-
-
-class ScannerModelTypes(str, Enum):
-    """Supported scanner types.
-
-    Attributes
-    ----------
-    GALVO
-        Galvanometric scanner.
-    """
-
-    GALVO = "galvo"
-
-
-class ControllerTypes(str, Enum):
-    """Supported controller category types.
-
-    Attributes
-    ----------
-    DEVICE
-        Device controller.
-
-        - These are only used internally and not exposed to the user.
-    COMPUTATOR
-        Renderer controller.
-    PUBLISHER
-        Publisher controller.
-    MONITORER
-        Monitorer controller.
-    """
-
-    DEVICE = "device"
-    RENDERER = "renderer"
-    PUBLISHER = "publisher"
-    MONITORER = "monitorer"
-
-
-class ControllerInfo(BaseModel):
+@define(kw_only=True)
+class ControllerInfo:
     """Controller information model.
 
     Attributes
     ----------
-    category : ``set[ControllerTypes]``
-        Set of controller categories.
     controller_name : ``str``
-        Controller name.
+        The constructor class used to instantiate the controller.
+        It class must be a subclass of `BaseController`.
     """
 
-    category: set[ControllerTypes] = Field(default=set())
-    controller_name: str = Field(default=str())
+    controller_name: str = field(validator=validators.instance_of(str))
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
-    # private field; it is used to bypass validation
-    # in order to build device controllers internally
-    _bypass: bool = False
 
-
-class DeviceModelInfo(BaseModel):
+@define(kw_only=True)
+class DeviceModelInfo:
     """Base model for device information.
 
     All device information models inherit from this class.
@@ -172,14 +125,12 @@ class DeviceModelInfo(BaseModel):
         Detector serial number. Optional for visualization purposes.
     """
 
-    model_name: str = Field(description="Device model name")
-    vendor: str = Field(default="N/A", description="Device vendor name")
-    serial_number: str = Field(default="N/A", description="Device serial number")
-
-    # needed to suppress the warning about the protected namespace
-    model_config = ConfigDict(protected_namespaces=("model_config",))
+    model_name: str = field(validator=validators.instance_of(str))
+    vendor: str = field(default="N/A", validator=validators.instance_of(str))
+    serial_number: str = field(default="N/A", validator=validators.instance_of(str))
 
 
+@define(kw_only=True)
 class DetectorModelInfo(DeviceModelInfo):
     """Detector model informations.
 
@@ -196,46 +147,36 @@ class DetectorModelInfo(DeviceModelInfo):
         - Engineering unit for exposure time, e.g. ``ms``, ``μs``. Defaults to ``ms``.
     """
 
-    category: DetectorModelTypes = Field(default=DetectorModelTypes.AREA)
-    sensor_size: Tuple[int, int] = Field(default_factory=lambda: (0, 0))
-    pixel_size: Tuple[float, float, float] = Field(
-        default_factory=lambda: (1.0, 1.0, 1.0)
+    category = field(default=DetectorModelTypes.AREA, converter=DetectorModelTypes)
+    sensor_size: Tuple[int, int] = field(converter=tuple)
+    pixel_size: Tuple[float, float, float] = field(
+        default=(1.0, 1.0, 1.0), converter=tuple
     )
-    exposure_egu: str = Field(default="ms")
+    exposure_egu: str = field(default="ms")
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
+    @sensor_size.validator
+    def _validate_sensor_size(
+        self, _: Attribute[Tuple[int, int]], value: Tuple[int, int]
+    ) -> None:
+        if len(value) != 2:
+            raise ValueError("Sensor size must be a tuple of two (2) integers")
+        if any([val == 0 for val in value]):
+            raise ValueError("Sensor size cannot be zero")
 
-class LightModelInfo(DeviceModelInfo):
-    r"""Light source model informations.
-
-    .. warning:: This class is currently under active development and may see breaking changes. It is not yet
-        fully implemented and may not be used in production.
-
-    Attributes
-    ----------
-    category : LightModelTypes
-        - Light source type. Defaults to ``laser``.
-    wavelength : ``int``, optional
-        - Light source wavelength in nanometers.
-    power_egu : ``str``
-        - Engineering unit for light source, .e.g. ``mW``, ``μW``. Defaults to ``mW``.
-    range : ``Union[Tuple[float, float], Tuple[int, int]]``
-        - Light source power range. Expressed in `power_egu` units.
-        - Formatted as (min, max). Defaults to ``(0, 0)``.
-    power_step: ``Union[float, int]``
-        - Power increase/decrease minimum step size. Expressed in ``power_egu`` units.
-    """
-
-    power_egu: str = Field(default="mW")
-    wavelength: Optional[int] = Field(default=None)
-    category: LightModelTypes = Field(default=LightModelTypes.LASER)
-    range: Union[Tuple[float, float], Tuple[int, int]] = Field(
-        default_factory=lambda: (0, 0)
-    )
-    power_step: Union[float, int] = Field(default=0)
-    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
+    @pixel_size.validator
+    def _validate_pixel_size(
+        self,
+        _: Attribute[Tuple[float, float, float]],
+        value: Tuple[float, float, float],
+    ) -> None:
+        if len(value) != 3:
+            raise ValueError("Pixel size must be a tuple of three (3) floats")
+        if any([val <= 0 for val in value]):
+            raise ValueError("Pixel size must be greater than zero")
 
 
+@define(kw_only=True)
 class MotorModelInfo(DeviceModelInfo):
     """Motor model informations.
 
@@ -249,43 +190,86 @@ class MotorModelInfo(DeviceModelInfo):
         - Motor step size in ``step_egu`` units. Defaults to 1.0.
     axes : ``list[str]``
         - Supported motor axes.
-        - Suggested values are single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
+        - Accepted values are single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
     return_home : ``bool``
         - If ``True``, motor will return to home position
         - (defined as  the initial position the motor had at RedSun's startup)
         - after RedSun is closed. Defaults to ``False``.
     """
 
-    category: MotorModelTypes = Field(default=MotorModelTypes.STEPPER)
-    step_egu: str = Field(default="μm")
-    step_size: Union[int, float] = Field(default=1.0)
-    axes: list[str] = Field(default_factory=lambda: list())
-    return_home: bool = Field(default=False)
+    category: MotorModelTypes = field(
+        default=MotorModelTypes.STEPPER, validator=validators.in_(MotorModelTypes)
+    )
+    step_egu: str = field(default="μm")
+    step_size: Union[int, float] = field(default=1.0)
+    axes: list[str] = field(factory=lambda: list(), converter=list)
+    return_home: bool = field(default=False)
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
+    @axes.validator
+    def _validate_axes(self, _: Attribute[list[str]], value: list[str]) -> None:
+        for axis in value:
+            if (
+                not isinstance(axis, str)
+                or len(axis) != 1
+                or not axis.isalpha()
+                or not axis.isupper()
+            ):
+                raise ValueError(
+                    "Motor axes must be a list of single character, capital strings"
+                )
 
-class ScannerModelInfo(DeviceModelInfo):
-    """Scanner model informations.
 
-    .. warning:: This class is currently under active development and may see breaking changes. It is not yet
-        fully implemented and may not be used in production.
+def _build_controller_info(values: dict[str, Any]) -> dict[str, ControllerInfo]:
+    """Build a dictionary of ``ControllerInfo`` from a dictionary of values.
 
-    Attributes
+    Parameters
     ----------
-    category : ScannerModelTypes
-        - Scanner type. Defaults to ``galvo``.
-    axes : ``list[str]``
-        - Supported scanner axes. Suggestion is to be a list of
-        - single character, capital strings, e.g. ``['X', 'Y', 'Z']``.
+    values : ``dict[str, Any]``
+        A dictionary of controller values.
+
+    Returns
+    -------
+    ``dict[str, ControllerInfo]``
+        A dictionary of controllers.
     """
-
-    category: ScannerModelTypes = Field(default=ScannerModelTypes.GALVO)
-    axes: list[str] = Field(default_factory=list)
-    # TODO: investigate what other parameters are needed for scanner
-    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
+    return {name: ControllerInfo(**cfg_info) for name, cfg_info in values.items()}
 
 
-class RedSunInstanceInfo(BaseModel):
+def _build_detector_info(values: dict[str, Any]) -> dict[str, DetectorModelInfo]:
+    """Build a dictionary of ``DetectorModelInfo`` from a dictionary of values.
+
+    Parameters
+    ----------
+    values : ``dict[str, Any]``
+        A dictionary of detector model values.
+
+    Returns
+    -------
+    ``dict[str, DetectorModelInfo]``
+        A dictionary of detector models.
+    """
+    return {name: DetectorModelInfo(**cfg_info) for name, cfg_info in values.items()}
+
+
+def _build_motor_info(values: dict[str, Any]) -> dict[str, MotorModelInfo]:
+    """Build a dictionary of ``MotorModelInfo`` from a dictionary of values.
+
+    Parameters
+    ----------
+    values : ``dict[str, Any]``
+        A dictionary of motor model values.
+
+    Returns
+    -------
+    ``dict[str, MotorModelInfo]``
+        A dictionary of motor models.
+    """
+    return {name: MotorModelInfo(**cfg_info) for name, cfg_info in values.items()}
+
+
+@define(kw_only=True)
+class RedSunInstanceInfo:
     """RedSun instance configuration class.
 
     This class is used to store the configuration of a running RedSun application;
@@ -311,11 +295,22 @@ class RedSunInstanceInfo(BaseModel):
         Defaults to an empty dictionary.
     """
 
-    engine: AcquisitionEngineTypes
-    frontend: FrontendTypes = Field(default=FrontendTypes.QT)
-    controllers: dict[str, ControllerInfo] = Field(default_factory=lambda: dict())
-    detectors: dict[str, DetectorModelInfo] = Field(default_factory=lambda: dict())
-    motors: dict[str, MotorModelInfo] = Field(default_factory=lambda: dict())
+    engine: AcquisitionEngineTypes = field(
+        converter=AcquisitionEngineTypes,
+        validator=validators.in_(AcquisitionEngineTypes),
+    )
+    frontend: FrontendTypes = field(
+        default=FrontendTypes.QT,
+        converter=FrontendTypes,
+        validator=validators.in_(FrontendTypes),
+    )
+    controllers: dict[str, ControllerInfo] = field(
+        factory=dict, converter=_build_controller_info
+    )
+    detectors: dict[str, DetectorModelInfo] = field(
+        factory=dict, converter=_build_detector_info
+    )
+    motors: dict[str, MotorModelInfo] = field(factory=dict, converter=_build_motor_info)
 
     @staticmethod
     def load_yaml(path: str) -> dict[str, Any]:
@@ -336,8 +331,10 @@ class RedSunInstanceInfo(BaseModel):
 
         Raises
         ------
-        ``FileNotFoundError``
+        ``FileExistsError``
             If the file does not exist.
+        ``FileNotFoundError``
+            If the path is not a file.
         ``ValueError``
             If the file is not a YAML file.
         ``yaml.YAMLError``
@@ -354,7 +351,7 @@ class RedSunInstanceInfo(BaseModel):
 
         if not path_obj.exists():
             logger.error(f"The file {path} does not exist.")
-            raise FileNotFoundError(f"The file {path} does not exist.")
+            raise FileExistsError(f"The file {path} does not exist.")
 
         if not path_obj.is_file():
             logger.error(f"The path {path} is not a file.")

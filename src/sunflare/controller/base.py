@@ -15,7 +15,7 @@ from typing import Any
 
 from bluesky.utils import MsgGenerator
 
-from sunflare.config import ControllerInfo, ControllerTypes
+from sunflare.config import ControllerInfo
 from sunflare.engine import EngineHandler
 from sunflare.log import Loggable
 from sunflare.virtual import Signal, VirtualBus
@@ -132,11 +132,6 @@ class BaseController(Loggable, metaclass=ABCMeta):
                 )
         """
         ...
-
-    @property
-    def category(self) -> set[ControllerTypes]:
-        """Controller category."""
-        return self._ctrl_info.category
 
     @property
     def controller_name(self) -> str:  # noqa: D102
