@@ -29,7 +29,7 @@ dependencies = [
     "pyyaml",
     "types-PyYAML",
     "bluesky",
-    "pydantic",
+    "attrs",
     "psygnal",
     "numpy>=1.24, <1.27",
     "typing_extensions>=4.6.0; python_version < '3.11'",
