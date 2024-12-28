@@ -347,6 +347,8 @@ class RedSunInstanceInfo(BaseModel):
 
         path_obj = Path(path)
 
+        data: dict[str, Any] = {}
+
         if not path_obj.is_absolute():
             path_obj = path_obj.resolve()
 
@@ -369,4 +371,4 @@ class RedSunInstanceInfo(BaseModel):
             logger.exception(f"Error loading YAML file {path}: {e}")
             raise yaml.YAMLError(f"Error loading YAML file {path}: {e}")
 
-        return data  # type: ignore[no-any-return]
+        return data
