@@ -83,7 +83,6 @@ pretty = true
 strict = true
 warn_unreachable = true
 warn_no_return = true
-plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 # Don't require test functions to include types
