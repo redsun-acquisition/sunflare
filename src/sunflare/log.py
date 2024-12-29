@@ -48,7 +48,6 @@ class ClassFormatter(logging.Formatter):
         return formatted
 
 
-# TODO: this should be moved to a json file
 config = {
     "version": 1,
     "disable_existing_loggers": False,
