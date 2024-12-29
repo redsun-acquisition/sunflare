@@ -6,7 +6,7 @@ a Qt GUI that is consistent throught all the RedSun stack.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from qtpy.QtWidgets import QWidget
