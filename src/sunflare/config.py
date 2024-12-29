@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar, Optional, Tuple, Union
+from typing import Any, ClassVar, Tuple, Union
 
 import yaml
 from attrs import Attribute, define, field, validators
