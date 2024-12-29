@@ -134,7 +134,7 @@ class BaseController(Loggable, metaclass=ABCMeta):
         ...
 
     @property
-    def controller_name(self) -> str:  # noqa: D102
+    def controller_name(self) -> str:
         """Controller class name."""
         return self._ctrl_info.controller_name
 
