@@ -1,6 +1,6 @@
 # Base controller module
 
 ```{eval-rst}
-.. automodule:: sunflare.controller.base
+.. automodule:: sunflare.controller
     :members:
 ```
