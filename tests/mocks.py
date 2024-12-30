@@ -12,6 +12,7 @@ from sunflare.controller import ControllerProtocol
 from sunflare.virtual import VirtualBus, ModuleVirtualBus, Signal
 
 from bluesky.run_engine import RunEngine
+from bluesky.protocols import SyncOrAsync, Reading, DataKey
 from bluesky.utils import DuringTask, MsgGenerator
 from bluesky.plan_stubs import open_run, close_run, read, rel_set, rd
 
@@ -38,7 +39,7 @@ class MockEngineHandler(EngineHandler):
     def register_plan(self, name: str, plan: MsgGenerator[Any]) -> None:
         ...
     
-    def load_device(self, name: str, device: ModelProtocol) -> None:
+    def load_model(self, name: str, device: ModelProtocol) -> None:
         raise NotImplemented
 
     def subscribe(self, 
@@ -132,6 +133,16 @@ class MockDetector(ReadableModel):
 
     def read(self) -> dict[str, Any]:
         raise NotImplemented
+    
+    def read_configuration(self) -> dict[str, Reading]:
+        raise NotImplemented
+    
+    def describe_configuration(self) -> dict[str, DataKey]:
+        raise NotImplemented
+
+    def configure(self, name: str, value: Any) -> None:
+        raise NotImplemented
+
 
     @property
     def name(self) -> str:
@@ -153,6 +164,15 @@ class MockMotor(SettableModel):
         self._cfg_info = cfg_info
 
     def set(value: Any) -> None:
+        raise NotImplemented
+    
+    def read_configuration(self) -> dict[str, Reading]:
+        raise NotImplemented
+    
+    def describe_configuration(self) -> dict[str, DataKey]:
+        raise NotImplemented
+    
+    def configure(self, name: str, value: Any) -> None:
         raise NotImplemented
     
     @property
