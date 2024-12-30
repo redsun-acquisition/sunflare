@@ -14,7 +14,7 @@ from qtpy.QtWidgets import QWidget
 if TYPE_CHECKING:
     from typing import Any
 
-    from sunflare.config import RedSunInstanceInfo
+    from sunflare.config import RedSunSessionInfo
     from sunflare.virtual import VirtualBus
 
 __all__ = ["BaseWidget", "WidgetProtocol"]
@@ -93,25 +93,13 @@ class WidgetProtocol(Protocol):
         """
         ...
 
-    @property
-    @abstractmethod
-    def virtual_bus(self) -> VirtualBus:
-        """Returns the inter-module bus."""
-        ...
-
-    @property
-    @abstractmethod
-    def module_bus(self) -> VirtualBus:
-        """Returns the intra-module bus."""
-        ...
-
 
 class BaseWidget(QWidget):
     """Base widget class for Qt-based widgets.
 
     Parameters
     ----------
-    config : RedSunInstanceInfo
+    config : RedSunSessionInfo
         The RedSun instance configuration.
     virtual_bus : VirtualBus
         The inter-module bus.
@@ -125,7 +113,7 @@ class BaseWidget(QWidget):
 
     def __init__(
         self,
-        config: RedSunInstanceInfo,
+        config: RedSunSessionInfo,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
         *args: Any,
@@ -201,13 +189,3 @@ class BaseWidget(QWidget):
                 )
         """
         ...
-
-    @property
-    def virtual_bus(self) -> VirtualBus:
-        """Returns the inter-module bus."""
-        return self._virtual_bus
-
-    @property
-    def module_bus(self) -> VirtualBus:
-        """Returns the intra-module bus."""
-        return self._module_bus

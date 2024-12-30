@@ -3,10 +3,10 @@ import yaml
 
 import pytest
 
-from typing import Any
+from typing import Any, cast
 
-from sunflare.config import DetectorModelInfo, MotorModelInfo, RedSunInstanceInfo
-from mocks import MockDetectorModel, MockMotorModel
+from sunflare.config import RedSunSessionInfo
+from mocks import MockDetector, MockMotor, MockDetectorInfo, MockMotorInfo
 
 def test_detector_model(config_path: str) -> None:
     """Test the detector model info."""
@@ -19,31 +19,30 @@ def test_detector_model(config_path: str) -> None:
         "Second mock detector": {
             "model_name": "MockDetectorModel",
             "sensor_size": [10, 10],
-            "category": "line",
             "exposure_egu": "s",
         },
     }
 
-    truth_configs: dict[str, DetectorModelInfo] = {
-        name: DetectorModelInfo(**cfg_info)
+    truth_configs: dict[str, MockDetectorInfo] = {
+        name: MockDetectorInfo(**cfg_info)
         for name, cfg_info in truth_dict.items()
     }
 
     config_file = os.path.join(config_path, "detector_instance.yaml")
     config_dict = yaml.safe_load(open(config_file))
-    instance = RedSunInstanceInfo(**config_dict)
 
-    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.detectors.items(), truth_configs.items()):
-        detector = MockDetectorModel(name=name, cfg_info=cfg_info)
+    config_dict["models"] = {
+        name : MockDetectorInfo(**info) for name, info in config_dict["models"].items()
+    }
+
+    session = RedSunSessionInfo(**config_dict)
+
+    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(session.models.items(), truth_configs.items()):
+        cfg = cast(MockDetectorInfo, cfg_info)
+        detector = MockDetector(name=name, cfg_info=cfg)
         assert detector.name == truth_name
-        assert detector.model_name == truth_cfg_info.model_name
+        assert detector.parent is None
         assert detector.model_info == truth_cfg_info
-        assert detector.vendor == truth_cfg_info.vendor
-        assert detector.serial_number == truth_cfg_info.serial_number
-        assert detector.category == truth_cfg_info.category
-        assert detector.sensor_size == truth_cfg_info.sensor_size
-        assert detector.pixel_size == truth_cfg_info.pixel_size
-        detector.shutdown()
 
 def test_broken_detector_model() -> None:
     """Test the detector model info."""
@@ -55,7 +54,7 @@ def test_broken_detector_model() -> None:
     }
 
     with pytest.raises(ValueError):
-        DetectorModelInfo(**test_config)
+        MockDetectorInfo(**test_config)
     
     test_config = {
         "model_name": "MockDetectorModel",
@@ -64,7 +63,7 @@ def test_broken_detector_model() -> None:
     }
 
     with pytest.raises(ValueError):
-        DetectorModelInfo(**test_config)
+        MockDetectorInfo(**test_config)
     
     test_config = {
         "model_name": "MockDetectorModel",
@@ -73,7 +72,7 @@ def test_broken_detector_model() -> None:
     }
 
     with pytest.raises(ValueError):
-        DetectorModelInfo(**test_config)
+        MockDetectorInfo(**test_config)
     
     test_config = {
         "model_name": "MockDetectorModel",
@@ -82,24 +81,7 @@ def test_broken_detector_model() -> None:
     }
 
     with pytest.raises(ValueError):
-        DetectorModelInfo(**test_config)
-
-def test_broken_motor_model() -> None:
-    test_config: dict[str, Any] = {
-        "model_name": "MockMotorModel",
-        "axes": [1, 2]
-    }
-
-    with pytest.raises(ValueError):
-        MotorModelInfo(**test_config)
-    
-    test_config = {
-        "model_name": "MockMotorModel",
-        "axes": ["x", "a", "b"]
-    }
-
-    with pytest.raises(ValueError):
-        MotorModelInfo(**test_config)
+        MockDetectorInfo(**test_config)
 
 def test_motor_model(config_path: str) -> None:
     """Test the motor model info."""
@@ -117,84 +99,105 @@ def test_motor_model(config_path: str) -> None:
     }
 
     truth_configs = {
-        name: MotorModelInfo(**cfg_info)
+        name: MockMotorInfo(**cfg_info)
         for name, cfg_info in truth_dict.items()
     }
 
     config_file = os.path.join(config_path, "motor_instance.yaml")
-    instance = RedSunInstanceInfo(**yaml.safe_load(open(config_file)))
+    config_dict = RedSunSessionInfo.load_yaml(config_file)
+    config_dict["models"] = {
+        name : MockMotorInfo(**info) for name, info in config_dict["models"].items()
+    }
+    session = RedSunSessionInfo(**config_dict)
 
-    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(instance.motors.items(), truth_configs.items()):
-        motor = MockMotorModel(name=name, cfg_info=cfg_info)
+    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(session.models.items(), truth_configs.items()):
+        cfg = cast(MockMotorInfo, cfg_info)
+        motor = MockMotor(name=name, cfg_info=cfg)
         assert motor.name == truth_name
-        assert motor.model_name == truth_cfg_info.model_name
+        assert motor.parent is None
         assert motor.model_info == truth_cfg_info
-        assert motor.vendor == truth_cfg_info.vendor
-        assert motor.serial_number == truth_cfg_info.serial_number
-        assert motor.category == truth_cfg_info.category
-        assert motor.axes == truth_cfg_info.axes
-        assert motor.step_egu == truth_cfg_info.step_egu
-        motor.shutdown()
+
+def test_broken_motor_model() -> None:
+    test_config: dict[str, Any] = {
+        "model_name": "MockMotor",
+        "axes": [1, 2]
+    }
+
+    with pytest.raises(ValueError):
+        MockMotorInfo(**test_config)
+    
+    test_config = {
+        "model_name": "MockMotor",
+        "axes": ["x", "a", "b"]
+    }
+
+    with pytest.raises(ValueError):
+        MockMotorInfo(**test_config)
+
+    test_config = {
+        "model_name": "MockMotor",
+        "axes": []
+    }
+
+    with pytest.raises(ValueError):
+        MockMotorInfo(**test_config)
+
 
 def test_multi_model(config_path: str) -> None:
     """Test the multi model info."""
 
     truth_dict: dict[str, Any] = {
         "First mock detector": {
-            "model_name": "MockDetectorModel",
+            "model_name": "MockDetector",
             "sensor_size": [10, 10],
         },
         "Second mock detector": {
-            "model_name": "MockDetectorModel",
+            "model_name": "MockDetector",
             "sensor_size": [10, 10],
-            "category": "line",
             "exposure_egu": "s",
         },
         "Single axis motor": {
-            "model_name": "MockMotorModel",
+            "model_name": "MockMotor",
             "axes": ["X"],
         },
         "Double axis motor": {
-            "model_name": "MockMotorModel",
+            "model_name": "MockMotor",
             "axes": ["X", "Y"],
             "step_egu": "mm",
         },
     }
 
 
-    truth_config_detectors: dict[str, DetectorModelInfo] = {
-        name: DetectorModelInfo(**cfg_info)
+    truth_config_detectors: dict[str, MockDetectorInfo] = {
+        name: MockDetectorInfo(**cfg_info)
         for name, cfg_info in truth_dict.items() if "Detector" in cfg_info["model_name"]
     }
 
-    truth_configs_motors: dict[str, MotorModelInfo] = {
-        name: MotorModelInfo(**cfg_info)
+    truth_configs_motors: dict[str, MockMotorInfo] = {
+        name: MockMotorInfo(**cfg_info)
         for name, cfg_info in truth_dict.items() if "Motor" in cfg_info["model_name"]
     }
 
     config_file = os.path.join(config_path, "multi_model_instance.yaml")
-    instance = RedSunInstanceInfo(**yaml.safe_load(open(config_file)))
+    config_dict = RedSunSessionInfo.load_yaml(config_file)
+    for name, cfg_info in config_dict["models"].items():
+        if "Detector" in cfg_info["model_name"]:
+            config_dict["models"][name] = MockDetectorInfo(**cfg_info)
+        else:
+            config_dict["models"][name] = MockMotorInfo(**cfg_info)
 
-    for (name, det_info), (truth_name, det_cfg_info) in zip(instance.detectors.items(), truth_config_detectors.items()):
-        detector = MockDetectorModel(name=name, cfg_info=det_info)
-        assert detector.name == truth_name
-        assert detector.model_name == det_cfg_info.model_name
-        assert detector.model_info == det_cfg_info
-        assert detector.vendor == det_cfg_info.vendor
-        assert detector.serial_number == det_cfg_info.serial_number
-        assert detector.category == det_cfg_info.category
-        assert detector.sensor_size == det_cfg_info.sensor_size
-        assert detector.pixel_size == det_cfg_info.pixel_size
-        detector.shutdown()
+    session = RedSunSessionInfo(**yaml.safe_load(open(config_file)))
+
+    for (name, det_info), (truth_name, det_cfg_info) in zip(session.models.items(), truth_config_detectors.items()):
+        if "Detector" in name:
+            detector = MockDetector(name=name, cfg_info=cast(MockDetectorInfo, det_info))
+            assert detector.name == truth_name
+            assert detector.parent is None
+            assert detector.model_info == det_cfg_info
     
-    for (name, mot_info), (truth_name, mot_cfg_info) in zip(instance.motors.items(), truth_configs_motors.items()):
-        motor = MockMotorModel(name=name, cfg_info=mot_info)
-        assert motor.name == truth_name
-        assert motor.model_name == mot_cfg_info.model_name
-        assert motor.model_info == mot_cfg_info
-        assert motor.vendor == mot_cfg_info.vendor
-        assert motor.serial_number == mot_cfg_info.serial_number
-        assert motor.category == mot_cfg_info.category
-        assert motor.axes == mot_cfg_info.axes
-        assert motor.step_egu == mot_cfg_info.step_egu
-        motor.shutdown()
+    for (name, mot_info), (truth_name, mot_cfg_info) in zip(session.models.items(), truth_configs_motors.items()):
+        if "Motor" in name:
+            motor = MockMotor(name=name, cfg_info=cast(MockMotorInfo, mot_info))
+            assert motor.name == truth_name
+            assert motor.parent is None
+            assert motor.model_info == mot_cfg_info

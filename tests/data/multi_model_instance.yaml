@@ -1,21 +1,19 @@
 engine: bluesky
 frontend: qt
-detectors:
+models:
   First mock detector:
-    model_name: MockDetectorModel
+    model_name: MockDetector
     sensor_size: [10, 10]
   Second mock detector:
-    model_name: MockDetectorModel
+    model_name: MockDetector
     sensor_size: [10, 10]
-    category: line
     exposure_egu: s
-motors:
   Single axis motor:
-    model_name: MockMotorModel
+    model_name: MockMotor
     axes:
       - X
   Double axis motor:
-    model_name: MockMotorModel
+    model_name: MockMotor
     axes:
       - X
       - Y

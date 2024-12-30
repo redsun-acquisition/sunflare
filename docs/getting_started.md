@@ -12,7 +12,7 @@ source venv/bin/activate
 Alternatively, you can also use [`conda`] or [`mamba`] to create a new environment.
 
 ```bash
-conda create -n sunflare python=3.12
+conda create -n sunflare python=3.10
 conda activate sunflare
 ```
 

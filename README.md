@@ -1,4 +1,5 @@
 [![PyPI](https://img.shields.io/pypi/v/sunflare.svg?color=green)](https://pypi.org/project/sunflare)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/sunflare)](https://pypi.org/project/sunflare)
 [![codecov](https://codecov.io/gh/redsun-acquisition/sunflare/graph/badge.svg?token=XAL7NBIU9N)](https://codecov.io/gh/redsun-acquisition/sunflare)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
