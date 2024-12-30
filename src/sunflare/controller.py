@@ -18,12 +18,12 @@ from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo
 from sunflare.engine import EngineHandler
-from sunflare.virtual import Signal, VirtualBus
+from sunflare.virtual import VirtualBus
 
 
 @runtime_checkable
 class ControllerProtocol(Protocol):
-    """Abstract base class for all controllers.
+    """Controller protocol class.
 
     Parameters
     ----------
@@ -35,14 +35,8 @@ class ControllerProtocol(Protocol):
         Virtual bus.
     module_bus : :class:`~sunflare.virtual.VirtualBus`
         Module bus.
-
-    Attributes
-    ----------
-    sigNewPlan : Signal(object)
-        - Signal that can emit plans built within the controller.
     """
 
-    sigNewPlan: Signal
     _ctrl_info: ControllerInfo
     _handler: EngineHandler
     _virtual_bus: VirtualBus
