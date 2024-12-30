@@ -1,4 +1,4 @@
-# Base controller module
+# Controller API
 
 ```{eval-rst}
 .. automodule:: sunflare.controller

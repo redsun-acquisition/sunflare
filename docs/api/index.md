@@ -5,6 +5,7 @@
 
 config
 engine/index
+model
 controller
 virtual
 log
