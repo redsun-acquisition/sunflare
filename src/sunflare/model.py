@@ -12,7 +12,8 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from typing import Any, Optional
 
-    from bluesky.protocols import DataKey, Reading, SyncOrAsync
+    from bluesky.protocols import Reading, SyncOrAsync
+    from event_model.documents.event_descriptor import DataKey
 
     from sunflare.config import ModelInfo
 
@@ -47,7 +48,7 @@ class ModelProtocol(Protocol):
         ...
 
     @abstractmethod
-    def read_configuration(self) -> SyncOrAsync[dict[str, Reading]]:
+    def read_configuration(self) -> SyncOrAsync[dict[str, Reading[Any]]]:
         """Read the model configuration.
 
         Provides a dictionary with the current values of the model configuration.

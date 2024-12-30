@@ -12,9 +12,11 @@ from sunflare.controller import ControllerProtocol
 from sunflare.virtual import VirtualBus, ModuleVirtualBus, Signal
 
 from bluesky.run_engine import RunEngine
-from bluesky.protocols import SyncOrAsync, Reading, DataKey
+from bluesky.protocols import SyncOrAsync, Reading
 from bluesky.utils import DuringTask, MsgGenerator
-from bluesky.plan_stubs import open_run, close_run, read, rel_set, rd
+from bluesky.plan_stubs import open_run, close_run, read, rel_set
+
+from event_model.documents.event_descriptor import DataKey
 
 class MockVirtualBus(VirtualBus):
     sigFoo = Signal()
@@ -29,14 +31,14 @@ class MockEngineHandler(EngineHandler):
         self._virtual_bus = virtual_bus
         self._module_bus = module_bus
         self._engine = RunEngine(during_task=during_task) # type: ignore
-        self._plans: dict[str, MsgGenerator[Any]] = {}
+        self._plans: dict[str, list[partial[MsgGenerator[Any]]]] = {}
         self._models: dict[str, ModelProtocol] = {}
         
     
     def shutdown(self) -> None:
         ...
 
-    def register_plan(self, name: str, plan: MsgGenerator[Any]) -> None:
+    def register_plan(self, name: str, plan: partial[MsgGenerator[Any]]) -> None:
         ...
     
     def load_model(self, name: str, device: ModelProtocol) -> None:
@@ -53,7 +55,7 @@ class MockEngineHandler(EngineHandler):
     @property
     def plans(
         self,
-    ) -> dict[str, MsgGenerator[Any]]:
+    ) -> dict[str, list[partial[MsgGenerator[Any]]]]:
         """Plans dictionary."""
         return self._plans
 
@@ -166,7 +168,7 @@ class MockMotor(SettableModel):
     def set(value: Any) -> None:
         raise NotImplemented
     
-    def read_configuration(self) -> dict[str, Reading]:
+    def read_configuration(self) -> dict[str, Reading[Any]]:
         raise NotImplemented
     
     def describe_configuration(self) -> dict[str, DataKey]:
