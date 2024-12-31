@@ -40,7 +40,7 @@ class EngineHandler(Protocol):
         used by the run engine to safely execute the plan.
     """
 
-    _plans: dict[str, MsgGenerator[Any]]
+    _plans: dict[str, list[partial[MsgGenerator[Any]]]]
     _virtual_bus: VirtualBus
     _module_bus: VirtualBus
     _engine: RunEngine
