@@ -32,4 +32,4 @@ def test_controller(config_path: Path) -> None:
         controller = MockController(cast(MockControllerInfo, ctrl), mock_handler, virtual_bus, module_bus)
         assert controller.controller_info == ctrl
         assert len(controller.plans) == 2
-        assert len(controller.controller_info.events.signals) == 5
+        assert len(controller.controller_info.events.signals) == 4

@@ -2,7 +2,6 @@ engine: bluesky
 frontend: qt
 controllers:
   MyController:
-    controller_name: MockController
     integer: 42
     floating: 3.14
     string: hello
