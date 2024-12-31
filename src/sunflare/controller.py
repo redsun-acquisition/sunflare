@@ -10,19 +10,20 @@ Controllers can access specific hardware devices through the :class:`~sunflare.e
 references to all the devices available in the application.
 """
 
-from abc import ABCMeta, abstractmethod
-from typing import Any
+from abc import abstractmethod
+from functools import partial
+from typing import Any, Protocol, runtime_checkable
 
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo
 from sunflare.engine import EngineHandler
-from sunflare.log import Loggable
-from sunflare.virtual import Signal, VirtualBus
+from sunflare.virtual import VirtualBus
 
 
-class BaseController(Loggable, metaclass=ABCMeta):
-    """Abstract base class for all controllers.
+@runtime_checkable
+class ControllerProtocol(Protocol):
+    """Controller protocol class.
 
     Parameters
     ----------
@@ -34,31 +35,22 @@ class BaseController(Loggable, metaclass=ABCMeta):
         Virtual bus.
     module_bus : :class:`~sunflare.virtual.VirtualBus`
         Module bus.
-
-    Attributes
-    ----------
-    sigNewPlan : Signal(object)
-        - Signal that can emit plans built within the controller.
     """
 
-    sigNewPlan: Signal = Signal(object)
+    _ctrl_info: ControllerInfo
+    _handler: EngineHandler
+    _virtual_bus: VirtualBus
+    _module_bus: VirtualBus
 
-    __slots__ = ("_ctrl_info", "_handler", "_virtual_bus", "_module_bus")
-
+    @abstractmethod
     def __init__(
         self,
         ctrl_info: ControllerInfo,
         handler: EngineHandler,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
-    ) -> None:
-        self._handler = handler
-        self._ctrl_info = ctrl_info
-        self._virtual_bus = virtual_bus
-        self._module_bus = module_bus
-        self._plans: list[MsgGenerator[Any]] = []
+    ) -> None: ...
 
-    @abstractmethod
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations.
 
@@ -134,11 +126,13 @@ class BaseController(Loggable, metaclass=ABCMeta):
         ...
 
     @property
-    def controller_name(self) -> str:  # noqa: D102
+    @abstractmethod
+    def controller_info(self) -> ControllerInfo:
         """Controller class name."""
-        return self._ctrl_info.controller_name
+        ...
 
     @property
-    def plans(self) -> list[MsgGenerator[Any]]:
+    @abstractmethod
+    def plans(self) -> list[partial[MsgGenerator[Any]]]:
         """Set of available plans."""
-        return self._plans
+        ...

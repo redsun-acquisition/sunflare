@@ -1,6 +1,6 @@
 engine: bluesky
 frontend: qt
-motors:
+models:
   Single axis motor:
     model_name: MockMotorModel
     axes:

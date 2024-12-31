@@ -3,22 +3,20 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol, Union
-
-from sunflare.config import DetectorModelInfo, MotorModelInfo, RedSunInstanceInfo
-from sunflare.engine.detector import DetectorModel
-from sunflare.engine.motor import MotorModel
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol
 
 if TYPE_CHECKING:
+    from functools import partial
+
     from bluesky.run_engine import RunEngine
     from bluesky.utils import DuringTask, MsgGenerator
 
+    from sunflare.config import RedSunSessionInfo
+    from sunflare.model import ModelProtocol
     from sunflare.virtual import VirtualBus
 
 
 EventName = Literal["all", "start", "descriptor", "event", "stop"]
-Motor = MotorModel[MotorModelInfo]
-Detector = DetectorModel[DetectorModelInfo]
 
 
 class EngineHandler(Protocol):
@@ -31,7 +29,7 @@ class EngineHandler(Protocol):
 
     Parameters
     ----------
-    config : :class:`~sunflare.config.RedSunInstanceInfo`
+    config : :class:`~sunflare.config.RedSunSessionInfo`
         Configuration options for the RedSun instance.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Module-local virtual bus.
@@ -50,7 +48,7 @@ class EngineHandler(Protocol):
     @abstractmethod
     def __init__(
         self,
-        config: RedSunInstanceInfo,
+        config: RedSunSessionInfo,
         virtual_bus: VirtualBus,
         module_bus: VirtualBus,
         during_task: DuringTask,
@@ -62,29 +60,36 @@ class EngineHandler(Protocol):
         ...
 
     @abstractmethod
-    def register_plan(self, name: str, plan: MsgGenerator[Any]) -> None:
+    def register_plan(self, name: str, plan: partial[MsgGenerator[Any]]) -> None:
         """
-        Register a new workflow in the handler.
+        Register a new plan dynamically.
+
+        This method can be used to register a plan from an external source that is not a controller.
+        If a key of value ``name`` is already present in the plans dictionary, the plan will be
+        appended to the list of plans associated to the key.
 
         Parameters
         ----------
         name : ``str``
-            Plan unique identifier.
+            Key to be used to assign the plan.
         plan : ``MsgGenerator[Any]``
             Plan to be registered.
         """
         ...
 
     @abstractmethod
-    def load_device(self, name: str, device: Union[Motor, Detector]) -> None:
-        """Load a device into the handler and make it available to the rest of the application.
+    def load_model(self, name: str, model: ModelProtocol) -> None:
+        """Load a model into the handler and make it available to the rest of the application.
+
+        This method can be used to dynamically load a model. The request
+        for adding a model should be initiated by the plugin manager.
 
         Parameters
         ----------
         name : ``str``
-            Device unique identifier.
-        device : ``Union[Motor, Detector]``
-            Device to be loaded.
+            Model identifier.
+        model : ``ModelProtocol``
+            Model to be loaded.
         """
         ...
 
@@ -142,16 +147,15 @@ class EngineHandler(Protocol):
     @property
     def plans(
         self,
-    ) -> dict[str, MsgGenerator[Any]]:
-        """Plans dictionary."""
+    ) -> dict[str, list[partial[MsgGenerator[Any]]]]:
+        """Dictionary of plans lists.
+
+        The keys are the names of the currently loaded controllers.
+        The values are lists of plans associated to each controller.
+        """
         ...
 
     @property
-    def detectors(self) -> dict[str, Detector]:
-        """Detectors dictionary."""
-        ...
-
-    @property
-    def motors(self) -> dict[str, Motor]:
-        """Motors dictionary."""
+    def models(self) -> dict[str, ModelProtocol]:
+        """Models dictionary."""
         ...
