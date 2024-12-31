@@ -53,17 +53,8 @@ class FrontendTypes(str, Enum):
 
 @define(kw_only=True)
 class ControllerInfo(ABC):
-    """Controller information model.
+    """Controller information model."""
 
-    Attributes
-    ----------
-    controller_name : ``str``
-        The constructor class used to instantiate the controller.
-    """
-
-    controller_name: str = field(
-        validator=validators.instance_of(str), on_setattr=setters.frozen
-    )
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 
