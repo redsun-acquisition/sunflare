@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [v0.2.0] - 31-12-2024
+
+### Added
+
+* Change configuration classes to use attrs in https://github.com/redsun-acquisition/sunflare/pull/8
+* Model API rework in https://github.com/redsun-acquisition/sunflare/pull/9
 
 ## [v0.1.1] - 26-12-2024
 
@@ -41,6 +47,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[v0.2.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.1...v0.2.0
 [v0.1.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1
 [v0.1.1a1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1a1
 [v0.1.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0a1...v0.1.0
