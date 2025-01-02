@@ -37,7 +37,7 @@ pip install -e .
 If you want to build the documentation locally, you'll need to install the dependencies first:
 
 ```bash
-pip install -e .[dev]
+pip install -e .[doc]
 ```
 
 You can build the documentation by running the following command:
