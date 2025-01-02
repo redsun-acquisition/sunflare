@@ -60,7 +60,9 @@ class EngineHandler(Protocol):
         ...
 
     @abstractmethod
-    def register_plan(self, name: str, plan: partial[MsgGenerator[Any]]) -> None:
+    def register_plan(
+        self, controller: str, name: str, plan: partial[MsgGenerator[Any]]
+    ) -> None:
         """
         Register a new plan dynamically.
 
@@ -70,6 +72,8 @@ class EngineHandler(Protocol):
 
         Parameters
         ----------
+        controller : ``str``
+            Controller name.
         name : ``str``
             Key to be used to assign the plan.
         plan : ``MsgGenerator[Any]``
