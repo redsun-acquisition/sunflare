@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [v0.2.1] - 02-01-2025
+
+- Engine handler now stores plans as dictionary of dictionaries.
+  - The key of the main dictionary is the controller name which holds the plans;
+  - The values are dictionaries:
+    - Keys are the plan names;
+    - Values are plans built with `functools.partial`
+
 ## [v0.2.0] - 31-12-2024
 
 ### Added
