@@ -8,7 +8,6 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import sys
-import sunflare
 from pathlib import Path
 
 sys.path.insert(0, str(Path('..', 'src').resolve()))
@@ -16,7 +15,6 @@ sys.path.insert(0, str(Path('..', 'src').resolve()))
 project = 'SunFlare'
 copyright = '2024, Jacopo Abramo'
 author = 'Jacopo Abramo'
-release = sunflare.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
