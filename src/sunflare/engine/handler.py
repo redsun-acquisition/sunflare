@@ -40,7 +40,7 @@ class EngineHandler(Protocol):
         used by the run engine to safely execute the plan.
     """
 
-    _plans: dict[str, list[partial[MsgGenerator[Any]]]]
+    _plans: dict[str, dict[str, partial[MsgGenerator[Any]]]]
     _virtual_bus: VirtualBus
     _module_bus: VirtualBus
     _engine: RunEngine
@@ -147,11 +147,13 @@ class EngineHandler(Protocol):
     @property
     def plans(
         self,
-    ) -> dict[str, list[partial[MsgGenerator[Any]]]]:
-        """Dictionary of plans lists.
+    ) -> dict[str, dict[str, partial[MsgGenerator[Any]]]]:
+        """Dictionaries of plans.
 
-        The keys are the names of the currently loaded controllers.
-        The values are lists of plans associated to each controller.
+        The key of the main dictionary represents the name of the controller.
+        The values are dictionaries where:
+        - the key is the name of the plan;
+        - the value is the plan itself, built as a partial function.
         """
         ...
 
