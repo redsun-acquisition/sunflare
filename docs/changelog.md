@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [v0.2.2] - 02-01-2025
+
+- Correct engine handler API.
+- Update CI action versions.
+
 ## [v0.2.1] - 02-01-2025
 
 - Engine handler now stores plans as dictionary of dictionaries.
@@ -55,6 +60,8 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[v0.2.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.1...v0.2.2
+[v0.2.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.1...v0.2.0
 [v0.1.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1
 [v0.1.1a1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1a1
