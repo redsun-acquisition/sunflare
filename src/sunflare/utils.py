@@ -1,5 +1,6 @@
-from typing import Any, Callable, TypeVar
 from functools import partial, wraps
+from typing import Any, Callable, TypeVar
+
 from bluesky.utils import MsgGenerator
 
 T = TypeVar("T")
