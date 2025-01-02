@@ -9,10 +9,14 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 ## [v0.2.2] - 02-01-2025
 
+### Changed
+
 - Correct engine handler API.
 - Update CI action versions.
 
 ## [v0.2.1] - 02-01-2025
+
+### Changed
 
 - Engine handler now stores plans as dictionary of dictionaries.
   - The key of the main dictionary is the controller name which holds the plans;
