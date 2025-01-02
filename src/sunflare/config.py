@@ -85,7 +85,6 @@ class ModelInfo(ABC):
         converter=str,
         on_setattr=setters.frozen,
     )
-    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 
 @define(kw_only=True)

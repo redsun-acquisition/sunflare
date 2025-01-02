@@ -106,8 +106,6 @@ def test_motors_info(config_path: Path):
         assert mock.model_name == "MockMotorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert len(mock.events.signals) == 5
-        assert all([x in mock.events.signals for x in ["model_name", "vendor", "serial_number", "step_egu", "axes"]])
 
     # check the model parameters
     mocks = list(session.models.values())
