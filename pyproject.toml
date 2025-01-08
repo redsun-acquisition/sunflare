@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "sunflare"
 dynamic = ["version"]
-description = "Event-driven data acquisition software for scientific applications."
-readme = "README.rst"
+description = "RedSun plugin development toolkit"
+readme = "README.md"
 requires-python = ">=3.9"
 authors = [
   {name = "Jacopo Abramo", email = "jacopo.abramo@gmail.com"}
@@ -19,77 +19,107 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12"
 ]
 license = {text = "BSD 3-Clause license"}
 dependencies = [
-  "pydantic==2.9.2",
-  "psygnal==0.11.1",
-  "numpy>=1.22.2, <2; python_version >= '3.10'",
-  "numpy>=1.22.2, <2; python_version < '3.10'",
-  "typing_extensions>=4.6.0; python_version < '3.11'"
+    "pyyaml",
+    "types-PyYAML",
+    "bluesky",
+    "attrs",
+    "psygnal",
+    "numpy>=1.24, <1.27",
+    "typing_extensions>=4.6.0; python_version < '3.11'",
+    "qtpy",
+    "pyqt6"
 ]
 
 [project.optional-dependencies]
-# TODO: enable after exengine
-# provides better support
-# exengine = [
-#     "exengine[micromanager]",
-# ]
-bluesky = [
-    "bluesky"
+docs = [
+    "sphinx",
+    "pydata-sphinx-theme",
+    "myst-parser"
+]
+dev = [
+  "ruff",
+  "pytest",
+  "pytest-cov",
+  "mypy"
 ]
 
 [project.urls]
 
-bugs = "https://github.com/jacopoabramo/sunflare/issues"
-changelog = "https://github.com/jacopoabramo/sunflare/blob/master/changelog.md"
-homepage = "https://github.com/jacopoabramo/sunflare"
+bugs = "https://github.com/redsun-acquisition/sunflare/issues"
+changelog = "https://redsun-acquisition.github.io/sunflare/changelog/"
+homepage = "https://github.com/redsun-acquisition/sunflare"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/sunflare"]
+exclude = [
+    "src/sunflare/docs",
+    "src/sunflare/tests",
+]
 
-[tool.setuptools.package-data]
-"sunflare" = ["py.typed"]
-
-[tool.setuptools.dynamic]
-version = {attr = "sunflare.__version__"}
-
-
-# Mypy
-# ----
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/sunflare/*.py",
+  "src/sunflare/tests",
+  "src/sunflare/docs",
+]
 
 [tool.mypy]
-files = "."
-exclude = ["docs", "tests", "noxfile.py", "build"]
+files = "src/**/*.py"
+exclude = ["docs", "tests", "build"]
 disable_error_code = ["import-untyped"]
+pretty = true
 
 # Use strict defaults
 strict = true
 warn_unreachable = true
 warn_no_return = true
-plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 # Don't require test functions to include types
 module = "tests.*"
-allow_untyped_defs = true
-disable_error_code = "attr-defined"
+disallow_untyped_defs = true
 
-# ruff
-# ----
+[tool.coverage.run]
+source = ["sunflare"]
+omit = [
+    "src/sunflare/tests/conftest.py",
+    "src/sunflare/view/**",
+    "src/sunflare/engine/handler.py",
+    "src/sunflare/controller/**",
+]
+
+# https://coverage.readthedocs.io/en/latest/config.html
+[tool.coverage.report]
+exclude_lines = [
+    "@abstractmethod",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "class .*Protocol",
+    "except ImportError",
+    "except PackageNotFoundError",
+    "raise NotImplementedError()",
+]
 
 [tool.ruff]
 target-version = "py39"
 extend-exclude = ["docs", "tests", "noxfile.py"]
 
+[tool.ruff.format]
+docstring-code-format = true
+
 [tool.ruff.lint]
 select = ["D"] # enable docstring checks
+ignore = ["D100", "D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

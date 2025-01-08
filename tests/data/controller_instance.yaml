@@ -1,0 +1,8 @@
+engine: bluesky
+frontend: qt
+controllers:
+  MyController:
+    integer: 42
+    floating: 3.14
+    string: hello
+    boolean: true

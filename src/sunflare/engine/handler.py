@@ -1,121 +1,169 @@
-"""`EngineHandler` abstract base class."""
+"""``handler`` module."""
 
-import sys
+from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, TypeVar, Generic, Protocol
+from typing import TYPE_CHECKING, Any, Callable, Literal, Optional, Protocol
 
 if TYPE_CHECKING:
-    from typing import Any, Generator, Iterable, Union
+    from functools import partial
 
-    if sys.version_info < (3, 11):
-        from typing_extensions import Self
-    else:
-        from typing import Self
+    from bluesky.run_engine import RunEngine
+    from bluesky.utils import DuringTask, MsgGenerator
 
-    from sunflare.config import RedSunInstanceInfo
-    from sunflare.virtualbus import VirtualBus
-    from sunflare.types import Workflow
-
-E = TypeVar("E", covariant=True)
+    from sunflare.config import RedSunSessionInfo
+    from sunflare.model import ModelProtocol
+    from sunflare.virtual import VirtualBus
 
 
-class EngineHandler(Generic[E], Protocol):
-    """`EngineHandler` protocol class.
+EventName = Literal["all", "start", "descriptor", "event", "stop"]
 
-    The `EngineHandler` class is a singleton that stores all the devices currently
-    deployed within a RedSun hardware module. It provides access to the rest of the controller layer
-    to information for each device, allowing for execution of atomic operations such as moving
-    a motor or setting a light intensity.
 
-    At startup, the `EngineHandler` is populated with the devices defined in the configuration file. These
-    can be then accessed as read-only dictionaries, indexing the device by unique identifiers.
+class EngineHandler(Protocol):
+    """``EngineHandler`` protocol class.
 
-    Each engine has its own dedicated `EngineHandler` instance, with common methods that are specialized
-    for the specific engine type by using inheritance.
+    The ``EngineHandler`` wraps the acquisition engine and provides a common interface for all engines.
+    It communicates with the rest of the application via the virtual buses.
 
-    `EngineHandler` classes hold dictionaries that are used to group up devices by type and provide
-    a key-value access to specific devices the user wants to interact with. The types of devices
-    the registry can provide depend on the engine capabilities to support that type of device.
+    Controllers receive a reference to the ``EngineHandler`` object in their constructor.
 
     Parameters
     ----------
-    config_options: RedSunInstanceInfo
-        RedSun instance configuration dataclass.
-    virtual_bus : VirtualBus
+    config : :class:`~sunflare.config.RedSunSessionInfo`
+        Configuration options for the RedSun instance.
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Module-local virtual bus.
-    module_bus : VirtualBus
+    module_bus : :class:`~sunflare.virtual.VirtualBus`
         Inter-module virtual bus.
+    during_task : :class:`~bluesky.utils.DuringTask`
+        DuringTask object. This object manages the blocking event
+        used by the run engine to safely execute the plan.
     """
 
-    _workflows: "dict[str, Workflow]"
-    _config_options: "RedSunInstanceInfo"
-    _virtual_bus: "VirtualBus"
-    _module_bus: "VirtualBus"
+    _plans: dict[str, dict[str, partial[MsgGenerator[Any]]]]
+    _virtual_bus: VirtualBus
+    _module_bus: VirtualBus
+    _engine: RunEngine
 
     @abstractmethod
     def __init__(
         self,
-        config_options: "RedSunInstanceInfo",
-        virtual_bus: "VirtualBus",
-        module_bus: "VirtualBus",
+        config: RedSunSessionInfo,
+        virtual_bus: VirtualBus,
+        module_bus: VirtualBus,
+        during_task: DuringTask,
     ) -> None: ...
 
     @abstractmethod
-    def register_device(self, name: str, device: "Any") -> None:
-        """
-        Add a new device to the registry.
-
-        Child classes must implement this method to add a new device to the registry.
-
-        Parameters
-        ----------
-        name : str
-            Device unique identifier.
-        device : Any
-            - Device instance
-            - The device instance must be coherent with the selected acquisition engine.
-            - This means that devices to be added to the registry must inherit from the correct device model class for the selected engine.
-        """
-        ...
-
-    @abstractmethod
     def shutdown(self) -> None:
-        """Perform a clean shutdown of the engine and all its devices."""
+        """Perform a clean shutdown of the engine."""
         ...
 
     @abstractmethod
-    def register_workflows(self, name: str, workflow: "Workflow") -> None:
+    def register_plan(
+        self, controller: str, name: str, plan: partial[MsgGenerator[Any]]
+    ) -> None:
         """
-        Register a new workflow in the handler.
+        Register a new plan dynamically.
+
+        This method can be used to register a plan from an external source that is not a controller.
+        If a key of value ``name`` is already present in the plans dictionary, the plan will be
+        appended to the list of plans associated to the key.
 
         Parameters
         ----------
-        name : str
-            Workflow unique identifier.
-        workflow : Union[Generator, Iterable]
-            Workflow to be registered.
+        controller : ``str``
+            Controller name.
+        name : ``str``
+            Key to be used to assign the plan.
+        plan : ``MsgGenerator[Any]``
+            Plan to be registered.
         """
         ...
 
-    @classmethod
     @abstractmethod
-    def instance(cls) -> Self:
-        """Return the engine handler instance."""
-        ...
+    def load_model(self, controller: str, name: str, model: ModelProtocol) -> None:
+        """Load a model into the handler and make it available to the rest of the application.
 
-    @property
-    @abstractmethod
-    def engine(self) -> E:
-        """Returns the engine instance.
+        This method can be used to dynamically load a model. The request
+        for adding a model should be initiated by the plugin manager.
 
-        The return type is determined by the specific engine implementation.
+        Parameters
+        ----------
+        controller : ``str``
+            Controller name.
+        name : ``str``
+            Model identifier.
+        model : ``ModelProtocol``
+            Model to be loaded.
         """
         ...
 
-    @property
-    def workflows(
+    @abstractmethod
+    def subscribe(
         self,
-    ) -> "dict[str, Union[Generator[Any, None, None], Iterable[Any]]]":
-        """Workflows dictionary."""
+        func: Callable[[EventName, dict[str, Any]], None],
+        name: Optional[EventName] = "all",
+    ) -> int:
+        """Subscribe a callback function to the engine notifications.
+
+        The callback has signature ``func(name, document)``:
+
+        - ``name`` is the type of document the callback should receive;
+            - ``"all"``: all documents;
+            - ``"start"``: start documents;
+            - ``"descriptor"``: descriptor documents;
+            - ``"event"``: event documents;
+            - ``"stop"``: stop documents.
+        - ``document`` is the document received from the engine (a dictionary).
+
+        Parameters
+        ----------
+        func: Callable[[EventName, dict[str, Any]], None]
+            Function to be called when the event occurs.
+        name: Optional[EventName]
+            Event type. Defaults to ``"all"``.
+
+        Returns
+        -------
+        token: int
+            Subscription token. It can be used to unsubscribe the callback.
+
+        Notes
+        -----
+        See also :meth:`~bluesky.run_engine.RunEngine.unsubscribe`.
+        """
+        ...
+
+    @abstractmethod
+    def unsubscribe(self, token: int) -> None:
+        """Unregister a callback function its integer ID.
+
+        Parameters
+        ----------
+        token: int
+            Subscription token.
+
+        Notes
+        -----
+        See also :meth:`~bluesky.run_engine.RunEngine.unsubscribe`.
+        """
+        ...
+
+    @property
+    def plans(
+        self,
+    ) -> dict[str, dict[str, partial[MsgGenerator[Any]]]]:
+        """Dictionaries of plans.
+
+        The key of the main dictionary represents the name of the controller.
+        The values are dictionaries where:
+        - the key is the name of the plan;
+        - the value is the plan itself, built as a partial function.
+        """
+        ...
+
+    @property
+    def models(self) -> dict[str, ModelProtocol]:
+        """Models dictionary."""
         ...

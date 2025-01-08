@@ -1,10 +1,12 @@
 """
 RedSun logging module.
 
-In each RedSun instance, only one logger is created.
+In each RedSun application, only one logger is created.
 
-All classes implementing the `Logging` protocol can use the logger to log messages.
+All classes inheriting the :class:`~sunflare.log.Loggable` class can log messages via the core logger.
 """
+
+from __future__ import annotations
 
 import logging
 import logging.config
@@ -46,7 +48,6 @@ class ClassFormatter(logging.Formatter):
         return formatted
 
 
-# TODO: this should be moved to a json file
 config = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -82,7 +83,7 @@ class Loggable:
     All methods allow to forward extra arguments to the logger calls as documented in the `logging` module.
     """
 
-    def _extend(self, kwargs: "dict[str, Any]") -> "dict[str, Any]":
+    def _extend(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         """
         Enrich kwargs with class name and user-defined ID.
 
@@ -95,34 +96,34 @@ class Loggable:
         }
         return kwargs
 
-    def info(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def info(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log an info message in the core logger.
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.info`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.info`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.info``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.info``.
         """
         self._extend(kwargs)
         logger.info(msg, *args, **kwargs)
 
-    def debug(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def debug(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log a debug message in the core logger.
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.debug`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.debug`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.debug``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.debug``.
         """
         self._extend(kwargs)
         logger.debug(msg, *args, **kwargs)
@@ -133,12 +134,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.warning`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.warning`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.warning``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.warning``.
         """
         self._extend(kwargs)
         logger.warning(msg, *args, **kwargs)
@@ -149,12 +150,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.error`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.error`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.error``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.error``.
         """
         self._extend(kwargs)
         logger.error(msg, *args, **kwargs)
@@ -165,12 +166,12 @@ class Loggable:
 
         Parameters
         ----------
-        msg : str
+        msg : ``str``
             String to log.
-        *args : Any
-            Additional positional arguments for `logging.Logger.critical`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.critical`.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.critical``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.critical``.
         """
         self._extend(kwargs)
         logger.critical(msg, *args, **kwargs)
@@ -181,10 +182,12 @@ class Loggable:
 
         Parameters
         ----------
-        *args : Any
-            Additional positional arguments for `logging.Logger.exception`.
-        **kwargs : Any
-            Additional keyword arguments for `logging.Logger.exception`.
+        msg : ``str``
+            String to log.
+        *args : ``Any``
+            Additional positional arguments for ``logging.Logger.exception``.
+        **kwargs : ``Any``
+            Additional keyword arguments for ``logging.Logger.exception``.
         """
         self._extend(kwargs)
         logger.exception(msg, *args, **kwargs)
@@ -202,9 +205,13 @@ class Loggable:
 
     @property
     def name(self) -> str:
-        """Class instance unique identifier."""
-        # This property should be implemented by
-        # all model and controller classes by default
+        """Class instance unique identifier.
+
+        This property should be implemented by
+        all model and controller classes by default.
+
+        :meta-private:
+        """
         return str()
 
 
@@ -214,7 +221,7 @@ def get_logger() -> logging.Logger:
 
     Returns
     -------
-    logging.Logger
+    ``logging.Logger``
         The core logger instance.
     """
     return logger

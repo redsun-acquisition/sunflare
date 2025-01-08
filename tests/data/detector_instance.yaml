@@ -1,0 +1,10 @@
+engine: bluesky
+frontend: qt
+models:
+  First mock detector:
+    model_name: MockDetectorModel
+    sensor_size: [10, 10]
+  Second mock detector:
+    model_name: MockDetectorModel
+    sensor_size: [10, 10]
+    exposure_egu: s

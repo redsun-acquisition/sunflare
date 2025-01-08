@@ -1,0 +1,13 @@
+engine: bluesky
+frontend: qt
+models:
+  Single axis motor:
+    model_name: MockMotorModel
+    axes:
+      - X
+  Double axis motor:
+    model_name: MockMotorModel
+    axes:
+      - X
+      - Y
+    step_egu: mm
