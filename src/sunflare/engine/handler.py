@@ -81,6 +81,18 @@ class EngineHandler(Protocol):
         """
         ...
 
+    def execute(self, controller: str, name: str) -> None:
+        """Execute a plan.
+
+        Parameters
+        ----------
+        controller : str
+            The name of the controller.
+        name : str
+            The name of the plan.
+        """
+        ...
+
     @abstractmethod
     def load_model(self, name: str, model: ModelProtocol) -> None:
         """Load a model into the handler and make it available to the rest of the application.
