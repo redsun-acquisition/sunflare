@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from sunflare.config import RedSunSessionInfo
-    from sunflare.virtual import VirtualBus, ModuleVirtualBus
+    from sunflare.virtual import ModuleVirtualBus, VirtualBus
 
 
 @runtime_checkable
