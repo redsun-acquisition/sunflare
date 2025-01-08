@@ -1,1 +1,3 @@
-# TODO: how to dynamically select the view frontend?
+from .protocol import WidgetProtocol
+
+__all__ = ["WidgetProtocol"]
