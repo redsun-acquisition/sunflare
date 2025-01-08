@@ -82,7 +82,7 @@ class EngineHandler(Protocol):
         ...
 
     @abstractmethod
-    def load_model(self, controller: str, name: str, model: ModelProtocol) -> None:
+    def load_model(self, name: str, model: ModelProtocol) -> None:
         """Load a model into the handler and make it available to the rest of the application.
 
         This method can be used to dynamically load a model. The request
