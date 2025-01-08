@@ -90,8 +90,6 @@ class EngineHandler(Protocol):
 
         Parameters
         ----------
-        controller : ``str``
-            Controller name.
         name : ``str``
             Model identifier.
         model : ``ModelProtocol``
