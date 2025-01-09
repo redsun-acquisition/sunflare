@@ -93,6 +93,10 @@ class EngineHandler(Protocol):
         """
         ...
 
+    def halt(self) -> None:
+        """Halt the current plan."""
+        ...
+
     @abstractmethod
     def load_model(self, name: str, model: ModelProtocol) -> None:
         """Load a model into the handler and make it available to the rest of the application.
