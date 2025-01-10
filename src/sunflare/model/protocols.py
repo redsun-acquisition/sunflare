@@ -106,7 +106,7 @@ class ModelProtocol(Protocol):
 
 
 @runtime_checkable
-class MotorModelProtocol(Protocol, ModelProtocol):
+class MotorModelProtocol(ModelProtocol, Protocol):
     """Expected protocol for motor models.
 
     To be recognized as such, a ``MotorModel`` must implemement the methods listed below,
@@ -149,7 +149,7 @@ class MotorModelProtocol(Protocol, ModelProtocol):
 
 
 @runtime_checkable
-class DetectorModelProtocol(Protocol, ModelProtocol):
+class DetectorModelProtocol(ModelProtocol, Protocol):
     """Expected protocol for detector models.
 
     To be recognized as such, a ``DetectorModel`` must implemement the methods listed below,

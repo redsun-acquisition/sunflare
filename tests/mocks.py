@@ -12,7 +12,7 @@ from sunflare.controller import ControllerProtocol
 from sunflare.virtual import VirtualBus, ModuleVirtualBus, Signal
 
 from bluesky.run_engine import RunEngine
-from bluesky.protocols import SyncOrAsync, Reading
+from bluesky.protocols import Reading
 from bluesky.utils import DuringTask, MsgGenerator
 from bluesky.plan_stubs import open_run, close_run, read, rel_set
 
