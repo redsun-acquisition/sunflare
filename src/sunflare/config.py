@@ -124,12 +124,17 @@ class MotorInfo(ModelInfo):
 
     Attributes
     ----------
+    axis : ``list[str]``
+        Motor axis names.
     step_size : ``float``
         Motor step size.
     egu : ``str``
         Engineering unit for motor position.
     """
 
+    axis: list[str] = field(
+        validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
     step_size: float = field(validator=validators.instance_of(float))
     egu: str = field(validator=validators.instance_of(str), on_setattr=setters.frozen)
 
