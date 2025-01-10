@@ -5,10 +5,10 @@ from __future__ import annotations
 from abc import ABC
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Tuple
 
 import yaml
-from attrs import define, field, setters, validators
+from attrs import define, field, setters, validators, Attribute
 from psygnal import SignalGroupDescriptor
 
 from sunflare.log import get_logger
@@ -53,7 +53,10 @@ class FrontendTypes(str, Enum):
 
 @define(kw_only=True)
 class ControllerInfo(ABC):
-    """Controller information model."""
+    """Controller information model.
+
+    All controller information models inherit from this class.
+    """
 
     events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
@@ -85,6 +88,50 @@ class ModelInfo(ABC):
         converter=str,
         on_setattr=setters.frozen,
     )
+
+
+@define(kw_only=True)
+class DetectorInfo(ModelInfo):
+    """Detector model information class.
+
+    Attributes
+    ----------
+    exposure : ``float``
+        Initial exposure time for the detector.
+    egu : ``str``
+        Engineering unit for exposure time.
+    sensor_shape : ``Tuple[int, int]``
+        Shape of the detector sensor.
+    """
+
+    exposure: float = field(validator=validators.instance_of(float))
+    egu: str = field(validator=validators.instance_of(str), on_setattr=setters.frozen)
+    sensor_shape: Tuple[int, int] = field(converter=tuple, on_setattr=setters.frozen)
+
+    @sensor_shape.validator
+    def _validate_sensor_shape(
+        self, _: Attribute[Tuple[int, ...]], value: Tuple[int, ...]
+    ) -> None:
+        if not all(isinstance(val, int) for val in value):
+            raise ValueError("All values in the tuple must be integers.")
+        if len(value) != 2:
+            raise ValueError("The tuple must contain exactly two values.")
+
+
+@define(kw_only=True)
+class MotorInfo(ModelInfo):
+    """Motor model information class.
+
+    Attributes
+    ----------
+    step_size : ``float``
+        Motor step size.
+    egu : ``str``
+        Engineering unit for motor position.
+    """
+
+    step_size: float = field(validator=validators.instance_of(float))
+    egu: str = field(validator=validators.instance_of(str), on_setattr=setters.frozen)
 
 
 @define(kw_only=True)
