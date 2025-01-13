@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar, Tuple
+from typing import Any, ClassVar, Tuple, Optional, TypedDict
 
 import yaml
 from attrs import define, field, setters, validators, Attribute
@@ -90,6 +90,89 @@ class ModelInfo(ABC):
     )
 
 
+class Parameter(TypedDict):
+    """Typed dictionary for all parameters.
+
+    Attributes
+    ----------
+    name : ``str``
+        Parameter name.
+    title: ``str``
+        Tooltip describing parameter.
+    """
+
+    name: str
+    title: str
+
+
+class BoolParameter(Parameter):
+    """Typed dictionary for boolean parameters.
+
+    Attributes
+    ----------
+    value : ``bool``
+        Parameter current value.
+    default : ``bool``
+        Parameter default value.
+    readonly : ``bool``
+        Parameter read-only status. If True, the parameter is read-only.
+    """
+
+    value: bool
+    default: bool
+
+
+class IntParameter(Parameter):
+    """Typed dictionary for integer parameters.
+
+    Attributes
+    ----------
+    value : ``int``
+        Parameter current value.
+    default : ``int``
+        Parameter default value.
+    readonly : ``bool``
+        Parameter read-only status. If True, the parameter is read-only.
+    """
+
+    value: int
+    default: int
+    readonly: bool
+
+
+class FloatParameter(Parameter):
+    """Typed dictionary for float parameters.
+
+    Attributes
+    ----------
+    value : ``float``
+        Parameter current value.
+    default : ``float``
+        Parameter default value.
+    readonly : ``bool``
+        Parameter read-only status. If True, the parameter is read-only.
+    """
+
+    value: float
+    default: float
+    readonly: bool
+
+
+class ListParameter(Parameter):
+    """Typed dictionary for list parameters.
+
+    Attributes
+    ----------
+    options : ``list[Any]``
+        Parameter options.
+    default : ``Any``
+        Parameter default value.
+    """
+
+    options: list[Any]
+    default: Any
+
+
 @define(kw_only=True)
 class DetectorInfo(ModelInfo):
     """Detector model information class.
@@ -102,11 +185,17 @@ class DetectorInfo(ModelInfo):
         Engineering unit for exposure time.
     sensor_shape : ``Tuple[int, int]``
         Shape of the detector sensor.
+    pixel_size : ``Tuple[float, float, float]``
+        Detector pixel size.
+    timings: ``ListParameter``, optional
+        Detector trigger informations. Optional
     """
 
     exposure: float = field(validator=validators.instance_of(float))
     egu: str = field(validator=validators.instance_of(str), on_setattr=setters.frozen)
     sensor_shape: Tuple[int, int] = field(converter=tuple, on_setattr=setters.frozen)
+    pixel_size: Tuple[float, float, float] = field(converter=tuple)
+    triggers: Optional[ListParameter] = field(default=None)
 
     @sensor_shape.validator
     def _validate_sensor_shape(
@@ -116,6 +205,15 @@ class DetectorInfo(ModelInfo):
             raise ValueError("All values in the tuple must be integers.")
         if len(value) != 2:
             raise ValueError("The tuple must contain exactly two values.")
+
+    @pixel_size.validator
+    def _validate_pixel_size(
+        self, _: Attribute[Tuple[float, ...]], value: Tuple[float, ...]
+    ) -> None:
+        if not all(isinstance(val, float) for val in value):
+            raise ValueError("All values in the tuple must be floats.")
+        if len(value) != 3:
+            raise ValueError("The tuple must contain exactly three values.")
 
 
 @define(kw_only=True)
