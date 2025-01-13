@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar, Tuple, Optional, TypedDict
+from typing import Any, ClassVar, Tuple, Optional
 
 import yaml
 from attrs import define, field, setters, validators, Attribute
@@ -116,16 +116,13 @@ class BoolParameter(Parameter):
     Attributes
     ----------
     value : ``bool``
-        Parameter current value.
-    default : ``bool``
-        Parameter default value.
+        Parameter current (and initial) value.
     readonly : ``bool``
         Parameter read-only status. If True, the parameter is read-only.
         Defaults to False.
     """
 
     value: bool
-    default: bool
     readonly: bool = field(default=False)
 
 
@@ -136,7 +133,10 @@ class IntParameter(Parameter):
     Attributes
     ----------
     value : ``int``
-        Parameter current value.
+        Parameter current (and initial) value.
+    limits : ``Tuple[int, int]``, optional
+        Parameter limits. If not ``None``, the parameter value must be within the limits.
+        Formatted as (min, max).
     default : ``int``
         Parameter default value.
     readonly : ``bool``
@@ -144,8 +144,18 @@ class IntParameter(Parameter):
     """
 
     value: int
-    default: int
+    limits: Optional[Tuple[int, int]] = field(default=None)
     readonly: bool = field(default=False)
+
+    @limits.validator
+    def _validate_limits(
+        self, _: Attribute[Tuple[int, ...]], value: Optional[Tuple[int, ...]]
+    ) -> None:
+        if value is not None:
+            if not all(isinstance(val, int) for val in value):
+                raise ValueError("Parameter limits must be integers.")
+            if len(value) != 2:
+                raise ValueError("The tuple must contain exactly two values.")
 
 
 @define
@@ -155,16 +165,27 @@ class FloatParameter(Parameter):
     Attributes
     ----------
     value : ``float``
-        Parameter current value.
-    default : ``float``
-        Parameter default value.
+        Parameter current (and initial) value.
+    limits : ``Tuple[float, float]``, optional
+        Parameter limits. If not ``None``, the parameter value must be within the limits.
+        Formatted as (min, max).
     readonly : ``bool``
         Parameter read-only status. If True, the parameter is read-only.
     """
 
     value: float
-    default: float
+    limits: Optional[Tuple[float, float]] = field(default=None)
     readonly: bool = field(default=False)
+
+    @limits.validator
+    def _validate_limits(
+        self, _: Attribute[Tuple[float, ...]], value: Optional[Tuple[float, ...]]
+    ) -> None:
+        if value is not None:
+            if not all(isinstance(val, float) for val in value):
+                raise ValueError("Parameter limits must be floats.")
+            if len(value) != 2:
+                raise ValueError("The tuple must contain exactly two values.")
 
 
 @define
@@ -173,14 +194,14 @@ class ListParameter(Parameter):
 
     Attributes
     ----------
-    options : ``list[Any]``
-        Parameter options.
     default : ``Any``
         Parameter default value.
+    options : ``list[Any]``
+        Parameter options.
     """
 
-    options: list[Any]
     default: Any
+    options: list[Any]
 
 
 @define(kw_only=True)
