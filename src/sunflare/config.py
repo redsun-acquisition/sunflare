@@ -192,7 +192,7 @@ class DetectorInfo(ModelInfo):
     exposure : ``float``
         Initial exposure time for the detector.
     egu : ``str``
-        Engineering unit for exposure time.
+        Engineering unit for exposure time. Defaults to ``s``.
     sensor_shape : ``Tuple[int, int]``
         Shape of the detector sensor.
     pixel_size : ``Tuple[float, float, float]``
@@ -202,7 +202,9 @@ class DetectorInfo(ModelInfo):
     """
 
     exposure: float = field(validator=validators.instance_of(float))
-    egu: str = field(validator=validators.instance_of(str), on_setattr=setters.frozen)
+    egu: str = field(
+        default="s", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
     sensor_shape: Tuple[int, int] = field(converter=tuple, on_setattr=setters.frozen)
     pixel_size: Tuple[float, float, float] = field(converter=tuple)
     triggers: Optional[ListParameter] = field(default=None)
