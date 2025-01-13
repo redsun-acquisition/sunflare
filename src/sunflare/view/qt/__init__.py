@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-
 from typing import TYPE_CHECKING
 
 from qtpy.QtWidgets import QWidget
@@ -10,8 +9,9 @@ from sunflare.view import WidgetProtocol
 
 if TYPE_CHECKING:
     from typing import Any
+
     from sunflare.config import RedSunSessionInfo
-    from sunflare.virtual import VirtualBus, ModuleVirtualBus
+    from sunflare.virtual import ModuleVirtualBus, VirtualBus
 
 
 class BaseQtWidget(QWidget, WidgetProtocol):

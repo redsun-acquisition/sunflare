@@ -5,10 +5,10 @@ from __future__ import annotations
 from abc import ABC
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar, Tuple, Optional
+from typing import Any, ClassVar, Optional, Tuple
 
 import yaml
-from attrs import define, field, setters, validators, Attribute
+from attrs import Attribute, define, field, setters, validators
 from psygnal import SignalGroupDescriptor
 
 from sunflare.log import get_logger

@@ -112,13 +112,13 @@ exclude_lines = [
 
 [tool.ruff]
 target-version = "py39"
-extend-exclude = ["docs", "tests", "noxfile.py"]
+extend-exclude = ["docs", "tests"]
 
 [tool.ruff.format]
 docstring-code-format = true
 
 [tool.ruff.lint]
-select = ["D"] # enable docstring checks
+extend-select = ["D"] # enable docstring checks
 ignore = ["D100", "D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
 
 [tool.ruff.lint.pydocstyle]

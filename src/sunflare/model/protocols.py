@@ -12,13 +12,13 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from typing import Any, Optional, Union
 
-    from bluesky.protocols import Reading, Location, SyncOrAsync
+    from bluesky.protocols import Location, Reading, SyncOrAsync
     from event_model.documents.event_descriptor import DataKey
 
     from sunflare.config import ModelInfo
     from sunflare.engine import Status
 
-__all__ = ["ModelProtocol", "MotorModel"]
+__all__ = ["ModelProtocol", "MotorModelProtocol", "DetectorModelProtocol"]
 
 
 @runtime_checkable

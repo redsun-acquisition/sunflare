@@ -1,5 +1,6 @@
-from .protocols import ModelProtocol, MotorModelProtocol, DetectorModelProtocol
 from bluesky.protocols import check_supports
+
+from .protocols import DetectorModelProtocol, ModelProtocol, MotorModelProtocol
 
 __all__ = [
     "ModelProtocol",
