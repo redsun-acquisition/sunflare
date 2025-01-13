@@ -8,10 +8,14 @@ All classes inheriting the :class:`~sunflare.log.Loggable` class can log message
 
 from __future__ import annotations
 
+import sys
 import logging
 import logging.config
 
-from typing_extensions import override
+if sys.version_info < (3, 12):
+    from typing_extensions import override
+else:
+    from typing import override
 
 __all__ = ["Loggable", "get_logger"]
 
