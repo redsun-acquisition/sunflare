@@ -90,7 +90,8 @@ class ModelInfo(ABC):
     )
 
 
-class Parameter(TypedDict):
+@define
+class Parameter:
     """Typed dictionary for all parameters.
 
     Attributes
@@ -105,6 +106,7 @@ class Parameter(TypedDict):
     title: str
 
 
+@define
 class BoolParameter(Parameter):
     """Typed dictionary for boolean parameters.
 
@@ -116,12 +118,15 @@ class BoolParameter(Parameter):
         Parameter default value.
     readonly : ``bool``
         Parameter read-only status. If True, the parameter is read-only.
+        Defaults to False.
     """
 
     value: bool
     default: bool
+    readonly: bool = field(default=False)
 
 
+@define
 class IntParameter(Parameter):
     """Typed dictionary for integer parameters.
 
@@ -137,9 +142,10 @@ class IntParameter(Parameter):
 
     value: int
     default: int
-    readonly: bool
+    readonly: bool = field(default=False)
 
 
+@define
 class FloatParameter(Parameter):
     """Typed dictionary for float parameters.
 
@@ -155,9 +161,10 @@ class FloatParameter(Parameter):
 
     value: float
     default: float
-    readonly: bool
+    readonly: bool = field(default=False)
 
 
+@define
 class ListParameter(Parameter):
     """Typed dictionary for list parameters.
 
