@@ -39,6 +39,8 @@ class ModelProtocol(Protocol):
     def configure(self, name: str, value: Any) -> None:
         """Configure the model.
 
+        The protocol allows to set new values for slow-changing parameters.
+
         Parameters
         ----------
         name : ``str``
