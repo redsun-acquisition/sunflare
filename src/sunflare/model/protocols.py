@@ -25,7 +25,7 @@ __all__ = ["ModelProtocol", "MotorModelProtocol", "DetectorModelProtocol"]
 class ModelProtocol(Protocol):
     """Minimal required protocol for a recognizable device in RedSun.
 
-    Implements the following protocols:
+    Exposes the following Bluesky protocols:
 
     - :class:`~bluesky.protocols.HasName`
     - :class:`~bluesky.protocols.HasParent`
@@ -110,7 +110,7 @@ class MotorModelProtocol(ModelProtocol, Protocol):
     """Expected protocol for motor models.
 
     To be recognized as such, a ``MotorModel`` must implemement the methods listed below,
-    together with the interface defined in :class:`~sunflare.model.ModelProtocol``.
+    together with the interface defined in :class:`~sunflare.model.protocols.ModelProtocol`.
 
     Exposes the following Bluesky protocols:
 
@@ -153,7 +153,7 @@ class DetectorModelProtocol(ModelProtocol, Protocol):
     """Expected protocol for detector models.
 
     To be recognized as such, a ``DetectorModel`` must implemement the methods listed below,
-    together with the interface defined in :class:`~sunflare.model.ModelProtocol``.
+    together with the interface defined in :class:`~sunflare.model.protocols.ModelProtocol`.
 
     Exposes the following Bluesky protocols:
 
