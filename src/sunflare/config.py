@@ -90,7 +90,7 @@ class ModelInfo(ABC):
     )
 
 
-@define
+@define(kw_only=True)
 class Parameter:
     """Typed dictionary for all parameters.
 
@@ -100,10 +100,13 @@ class Parameter:
         Parameter name.
     title: ``str``
         Tooltip describing parameter.
+    egu : ``str``, optional
+        Engineering unit for parameter.
     """
 
     name: str
     title: str
+    egu: Optional[str] = field(default=None)
 
 
 @define
