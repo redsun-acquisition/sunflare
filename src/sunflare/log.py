@@ -8,14 +8,8 @@ All classes inheriting the :class:`~sunflare.log.Loggable` class can log message
 
 from __future__ import annotations
 
-import sys
 import logging
 import logging.config
-
-if sys.version_info < (3, 12):
-    from typing_extensions import override
-else:
-    from typing import override
 
 __all__ = ["Loggable", "get_logger"]
 
@@ -33,7 +27,6 @@ class ClassFormatter(logging.Formatter):
     def __init__(self, datefmt: str) -> None:
         super().__init__(datefmt=datefmt)
 
-    @override
     def format(self, record: logging.LogRecord) -> str:
         fmt = self.STD_FORMAT
         message = []
