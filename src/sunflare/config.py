@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar, Optional, Tuple
+from typing import Any, ClassVar, Tuple
 
 import yaml
 from attrs import Attribute, define, field, setters, validators
@@ -91,120 +91,6 @@ class ModelInfo(ABC):
 
 
 @define(kw_only=True)
-class Parameter:
-    """Typed dictionary for all parameters.
-
-    Attributes
-    ----------
-    name : ``str``
-        Parameter name.
-    title: ``str``
-        Tooltip describing parameter.
-    egu : ``str``, optional
-        Engineering unit for parameter.
-    """
-
-    name: str
-    title: str
-    egu: Optional[str] = field(default=None)
-
-
-@define
-class BoolParameter(Parameter):
-    """Typed dictionary for boolean parameters.
-
-    Attributes
-    ----------
-    value : ``bool``
-        Parameter current (and initial) value.
-    readonly : ``bool``
-        Parameter read-only status. If True, the parameter is read-only.
-        Defaults to False.
-    """
-
-    value: bool
-    readonly: bool = field(default=False)
-
-
-@define
-class IntParameter(Parameter):
-    """Typed dictionary for integer parameters.
-
-    Attributes
-    ----------
-    value : ``int``
-        Parameter current (and initial) value.
-    limits : ``Tuple[int, int]``, optional
-        Parameter limits. If not ``None``, the parameter value must be within the limits.
-        Formatted as (min, max).
-    default : ``int``
-        Parameter default value.
-    readonly : ``bool``
-        Parameter read-only status. If True, the parameter is read-only.
-    """
-
-    value: int
-    limits: Optional[Tuple[int, int]] = field(default=None)
-    readonly: bool = field(default=False)
-
-    @limits.validator
-    def _validate_limits(
-        self, _: Attribute[Tuple[int, ...]], value: Optional[Tuple[int, ...]]
-    ) -> None:
-        if value is not None:
-            if not all(isinstance(val, int) for val in value):
-                raise ValueError("Parameter limits must be integers.")
-            if len(value) != 2:
-                raise ValueError("The tuple must contain exactly two values.")
-
-
-@define
-class FloatParameter(Parameter):
-    """Typed dictionary for float parameters.
-
-    Attributes
-    ----------
-    value : ``float``
-        Parameter current (and initial) value.
-    limits : ``Tuple[float, float]``, optional
-        Parameter limits. If not ``None``, the parameter value must be within the limits.
-        Formatted as (min, max).
-    readonly : ``bool``
-        Parameter read-only status. If True, the parameter is read-only.
-    """
-
-    value: float
-    limits: Optional[Tuple[float, float]] = field(default=None)
-    readonly: bool = field(default=False)
-
-    @limits.validator
-    def _validate_limits(
-        self, _: Attribute[Tuple[float, ...]], value: Optional[Tuple[float, ...]]
-    ) -> None:
-        if value is not None:
-            if not all(isinstance(val, float) for val in value):
-                raise ValueError("Parameter limits must be floats.")
-            if len(value) != 2:
-                raise ValueError("The tuple must contain exactly two values.")
-
-
-@define
-class ListParameter(Parameter):
-    """Typed dictionary for list parameters.
-
-    Attributes
-    ----------
-    default : ``Any``
-        Parameter default value.
-    options : ``list[Any]``
-        Parameter options.
-    """
-
-    default: Any
-    options: list[Any]
-
-
-@define(kw_only=True)
 class DetectorInfo(ModelInfo):
     """Detector model information class.
 
@@ -228,7 +114,6 @@ class DetectorInfo(ModelInfo):
     )
     sensor_shape: Tuple[int, int] = field(converter=tuple, on_setattr=setters.frozen)
     pixel_size: Tuple[float, float, float] = field(converter=tuple)
-    triggers: Optional[ListParameter] = field(default=None)
 
     @sensor_shape.validator
     def _validate_sensor_shape(
