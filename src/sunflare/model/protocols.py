@@ -2,6 +2,8 @@
 
 Models offer a subset of Bluesky protocols to execute actions.
 A minimal recognizable device in RedSun must implement the :class:`~sunflare.model.ModelProtocol` protocol.
+
+SunFlare provides a set of pre-shipped built-in protocols for the most common use cases.
 """
 
 from __future__ import annotations

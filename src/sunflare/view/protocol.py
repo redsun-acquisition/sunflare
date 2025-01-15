@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from sunflare.config import RedSunSessionInfo
-    from sunflare.virtual import ModuleVirtualBus, VirtualBus
+    from sunflare.virtual import VirtualBus
 
 
 @runtime_checkable
@@ -22,21 +22,17 @@ class WidgetProtocol(Protocol):
     config : RedSunSessionInfo
         The RedSun instance configuration.
     virtual_bus : VirtualBus
-        The intra-module bus.
-    module_bus : ModuleVirtualBus
-        The inter-module bus.
+        Main virtual bus for the RedSun instance.
     """
 
     _config: RedSunSessionInfo
     _virtual_bus: VirtualBus
-    _module_bus: ModuleVirtualBus
 
     @abstractmethod
     def __init__(
         self,
         config: RedSunSessionInfo,
         virtual_bus: VirtualBus,
-        module_bus: ModuleVirtualBus,
         *args: Any,
         **kwargs: Any,
     ) -> None: ...
@@ -57,13 +53,10 @@ class WidgetProtocol(Protocol):
 
             def registration_phase(self) -> None:
                 # you can register all signals...
-                self._module_bus.register_signals(self)
+                self._virtual_bus.register_signals(self)
                 
                 # ... or only a selection of them
-                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
-                
-                # you can also register signals to the module bus
-                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+                self._virtual_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
         """
         ...
 
@@ -94,14 +87,6 @@ class WidgetProtocol(Protocol):
 
                 # ... or connect to widgets
                 self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
-                    self._my_slot
-                )
-
-                # you can also connect to the module bus
-                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self._my_slot
-                )
-                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
                     self._my_slot
                 )
         """

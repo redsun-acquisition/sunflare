@@ -9,7 +9,6 @@ The module exposes the following:
 
 - the ``psygnal.Signal`` class;
 - the ``VirtualBus`` class;
-- the ``ModuleVirtualBus`` class;
 - the ``slot`` decorator.
 
 ``psygnal.Signal`` is the main communication mechanism between controllers and the view layer.
@@ -29,8 +28,9 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
     ctrl = MyController()
     ctrl.sigMySignal.connect(my_slot)
 
-- The ``VirtualBus`` class is the base class for building virtual communication buses. It must be re-implemented by users that wish to create new modules for RedSun.
-- The ``ModuleVirtualBus`` class is a pre-defined bus that acts as the main communication mechanism between modules. Different modules can share information by emitting signals on this bus and connecting to them.
+- The ``VirtualBus`` class is a signal router for data exchange between the backend and frontend. Plugins can expose signals to other plugins or different RedSun modules,
+as well as connect to built-in signals or signals provided from other system components.
+
 - The ``slot`` decorator is used to mark a function as a slot. In practice, it provides no benefit at runtime; it's used to facilitate code readability.
 
 .. code-block:: python
@@ -43,15 +43,14 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
 
 from __future__ import annotations
 
-from abc import ABCMeta
 from types import MappingProxyType
-from typing import Callable, Iterable, Optional, TypeVar, Union, final, overload
+from typing import Callable, Iterable, Optional, TypeVar, Union, overload
 
 from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
-__all__ = ["Signal", "VirtualBus", "ModuleVirtualBus", "slot"]
+__all__ = ["Signal", "VirtualBus", "slot"]
 
 
 F = TypeVar("F", bound=Callable[..., object])
@@ -94,14 +93,22 @@ def slot(
         return decorator(func)  # Directly apply the decorator
 
 
-class VirtualBus(Loggable, metaclass=ABCMeta):
-    """``VirtualBus`` abstract base class. Supports logging via :class:`~sunflare.log.Loggable`.
+class VirtualBus(Loggable):
+    """``VirtualBus``: signal router for data exchange.
 
-    The ``VirtualBus`` is a mechanism to exchange data between different parts of the system.
+    Supports logging via :class:`~sunflare.log.Loggable`.
 
-    It can be used to emit notifications, as well as carry information to other plugins and/or different RedSun modules.
+    The ``VirtualBus`` is a mechanism to exchange
+    data between different parts of the system. Communication
+    can happen between plugins on the same layer as
+    well as between different layers of the system.
 
-    ``VirtualBus``' signals are implemented using the ``psygnal`` library; they can be dynamically registered as class attributes, and accessed as a read-only dictionary.
+    It can be used to emit notifications, as well as carry information
+    to other plugins and/or different RedSun modules.
+
+    ``VirtualBus``' signals are implemented using the ``psygnal`` library;
+    they can be dynamically registered as class attributes,
+    and accessed as a read-only dictionary.
     """
 
     def __init__(self) -> None:
@@ -188,15 +195,3 @@ class VirtualBus(Loggable, metaclass=ABCMeta):
             True if the class is in the registry, False otherwise.
         """
         return class_name in self._cache
-
-
-# TODO: should this become a ZMQ server
-# where external applications can connect to?
-@final
-class ModuleVirtualBus(VirtualBus):
-    r"""
-    Inter-module virtual bus.
-
-    Communication between modules passes via this virtual bus. \
-    There can be only one instance of this class within a RedSun application.
-    """

@@ -5,19 +5,16 @@ notify of changes in the hardware state or publish Bluesky plans for the run eng
 
 Each controller is associated with a ``ControllerInfo`` object, which contains a series of user-defined properties that
 describe the controller and provides further customization options.
-
-Controllers can access specific hardware devices through the :class:`~sunflare.engine.handler.EngineHandler`, which holds
-references to all the devices available in the application.
 """
 
 from abc import abstractmethod
 from functools import partial
 from typing import Any, Protocol, runtime_checkable
 
+from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo
-from sunflare.engine import EngineHandler
 from sunflare.virtual import VirtualBus
 
 
@@ -29,26 +26,25 @@ class ControllerProtocol(Protocol):
     ----------
     ctrl_info : :class:`~sunflare.config.ControllerInfo`
         Controller information.
-    handler : :class:`~sunflare.engine.handler.EngineHandler`
-        Engine handler.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-    module_bus : :class:`~sunflare.virtual.VirtualBus`
-        Module bus.
+
+    Attributes
+    ----------
+    _engine : :class:`~bluesky.run_engine.RunEngine`
+        Bluesky run engine instance. This must be set by the controller
+        during the initialization phase.
     """
 
     _ctrl_info: ControllerInfo
-    _handler: EngineHandler
+    _engine: RunEngine
     _virtual_bus: VirtualBus
-    _module_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
         ctrl_info: ControllerInfo,
-        handler: EngineHandler,
         virtual_bus: VirtualBus,
-        module_bus: VirtualBus,
     ) -> None: ...
 
     def shutdown(self) -> None:
@@ -75,13 +71,10 @@ class ControllerProtocol(Protocol):
 
             def registration_phase(self) -> None:
                 # you can register all signals...
-                self._module_bus.register_signals(self)
+                self._virtual_bus.register_signals(self)
                 
                 # ... or only a selection of them
-                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
-                
-                # you can also register signals to the module bus
-                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+                self._virtual_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
         """
         ...
 
@@ -112,14 +105,6 @@ class ControllerProtocol(Protocol):
 
                 # ... or connect to widgets
                 self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
-                    self._my_slot
-                )
-
-                # you can also connect to the module bus
-                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self._my_slot
-                )
-                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
                     self._my_slot
                 )
         """

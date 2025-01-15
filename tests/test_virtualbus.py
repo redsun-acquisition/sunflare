@@ -4,7 +4,7 @@ import logging
 import pytest
 
 from sunflare.log import get_logger
-from sunflare.virtual import ModuleVirtualBus, Signal, VirtualBus, slot
+from sunflare.virtual import Signal, VirtualBus, slot
 
 
 class MockVirtualBus(VirtualBus):
@@ -29,26 +29,6 @@ def test_virtual_bus_registration() -> None:
 
     owner = MockOwner()
     bus = MockVirtualBus()
-
-    bus.register_signals(owner)
-
-    assert "MockOwner" in bus
-
-    def test_slot(x: int) -> None:
-        assert x == 5
-
-    bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
-    bus["MockOwner"]["sigMySignal"].emit(5)
-
-
-def test_module_virtual_bus_registration() -> None:
-    """Tests the registration of signals in the module virtual bus."""
-
-    class MockOwner:
-        sigMySignal = Signal(int, description="My signal")
-
-    owner = MockOwner()
-    bus = ModuleVirtualBus()
 
     bus.register_signals(owner)
 

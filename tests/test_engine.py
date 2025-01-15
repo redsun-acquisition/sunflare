@@ -144,3 +144,26 @@ def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
     # Check that the exception was logged
     # TODO: find a way to do this properly;
     #       the test passes though
+
+def test_main_engine_getter() -> None:
+    from sunflare.engine._utils import get_main_engine, create_main_engine
+
+    with pytest.raises(RuntimeError):
+        get_main_engine()
+
+    create_main_engine()
+    engine = get_main_engine()
+
+    assert engine is get_main_engine()
+
+def test_main_engine_with_arguments() -> None:
+    import asyncio
+    from sunflare.engine._utils import get_main_engine, create_main_engine
+
+    loop = asyncio.new_event_loop()
+
+    create_main_engine(md={"test": "test"}, loop=loop)
+    engine = get_main_engine()
+
+    assert engine.md["test"] == "test"
+    assert engine.loop is loop
