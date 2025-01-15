@@ -4,5 +4,4 @@
 :maxdepth: 1
 
 status
-handler
 ```
