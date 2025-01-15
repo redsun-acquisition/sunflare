@@ -28,8 +28,7 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
     ctrl = MyController()
     ctrl.sigMySignal.connect(my_slot)
 
-- The ``VirtualBus`` class is a signal router for data exchange between the backend and frontend. Plugins can expose signals to other plugins or different RedSun modules,
-as well as connect to built-in signals or signals provided from other system components.
+- The ``VirtualBus`` class is a signal router for data exchange between the backend and frontend. Plugins can expose signals to other plugins or different RedSun modules, as well as connect to built-in signals or signals provided from other system components.
 
 - The ``slot`` decorator is used to mark a function as a slot. In practice, it provides no benefit at runtime; it's used to facilitate code readability.
 
