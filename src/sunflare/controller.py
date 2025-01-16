@@ -18,7 +18,6 @@ describe the controller and provides further customization options.
 """
 
 import sys
-
 from abc import abstractmethod
 from functools import partial
 
@@ -27,12 +26,12 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Protocol
 
-from typing import Any, runtime_checkable, Mapping
+from typing import Any, Mapping, runtime_checkable
 
 from bluesky.utils import MsgGenerator
 
-from sunflare.model import ModelProtocol
 from sunflare.config import ControllerInfo
+from sunflare.model import ModelProtocol
 from sunflare.virtual import VirtualBus
 
 
