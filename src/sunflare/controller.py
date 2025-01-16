@@ -1,23 +1,30 @@
 """RedSun uses controllers to manage the interaction between the user interface and the hardware.
 
-Controllers can either render information (i.e. process some data and send it to the upper layer for visualization),
-notify of changes in the hardware state or publish Bluesky plans for the run engine to execute.
+They have access to the `VirtualBus` to enable interaction with other controllers and/or
+widgets by exchanging data via either the built-in signals or custom signals that can be defined by the user.
 
-Each controller is associated with a ``ControllerInfo`` object, which contains a series of user-defined properties that
+They can keep a reference of hardware devices for exclusive control by selecting the appropriate model from the
+`models` dictionary.
+
+Functionally wise, they can:
+
+- publish plans to provide information on their capabilities;
+- allocate a reference to the ``RunEngine`` to execute said plans;
+- simply process the data acquired by the ``RunEngine``, accessed from the `VirtualBus` signals.
+
+Each controller is associated with a ``ControllerInfo`` object,
+which contains a series of user-defined properties that
 describe the controller and provides further customization options.
-
-Controllers can access specific hardware devices through the :class:`~sunflare.engine.handler.EngineHandler`, which holds
-references to all the devices available in the application.
 """
 
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable, Mapping
 
 from bluesky.utils import MsgGenerator
 
+from sunflare.model import ModelProtocol
 from sunflare.config import ControllerInfo
-from sunflare.engine import EngineHandler
 from sunflare.virtual import VirtualBus
 
 
@@ -29,26 +36,21 @@ class ControllerProtocol(Protocol):
     ----------
     ctrl_info : :class:`~sunflare.config.ControllerInfo`
         Controller information.
-    handler : :class:`~sunflare.engine.handler.EngineHandler`
-        Engine handler.
+    models : Mapping[str, :class:`~sunflare.model.ModelProtocol`]
+        Models currently loaded in the active RedSun session.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-    module_bus : :class:`~sunflare.virtual.VirtualBus`
-        Module bus.
     """
 
     _ctrl_info: ControllerInfo
-    _handler: EngineHandler
     _virtual_bus: VirtualBus
-    _module_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
         ctrl_info: ControllerInfo,
-        handler: EngineHandler,
+        models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
-        module_bus: VirtualBus,
     ) -> None: ...
 
     def shutdown(self) -> None:
@@ -75,13 +77,10 @@ class ControllerProtocol(Protocol):
 
             def registration_phase(self) -> None:
                 # you can register all signals...
-                self._module_bus.register_signals(self)
+                self._virtual_bus.register_signals(self)
                 
                 # ... or only a selection of them
-                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
-                
-                # you can also register signals to the module bus
-                self._module_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+                self._virtual_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
         """
         ...
 
@@ -112,14 +111,6 @@ class ControllerProtocol(Protocol):
 
                 # ... or connect to widgets
                 self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
-                    self._my_slot
-                )
-
-                # you can also connect to the module bus
-                self._module_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self._my_slot
-                )
-                self._module_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
                     self._my_slot
                 )
         """

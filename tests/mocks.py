@@ -1,68 +1,24 @@
-from typing import Any, ClassVar, Callable, Optional
+from typing import Any, ClassVar
 from functools import partial
 
 from psygnal import SignalGroupDescriptor
 
 from attrs import define, field, validators
 
-from sunflare.engine.handler import EngineHandler, EventName
-from sunflare.config import ModelInfo, ControllerInfo, RedSunSessionInfo
+from sunflare.config import ModelInfo, ControllerInfo
 from sunflare.model import ModelProtocol
 from sunflare.controller import ControllerProtocol
-from sunflare.virtual import VirtualBus, ModuleVirtualBus, Signal
+from sunflare.virtual import VirtualBus, Signal
 
 from bluesky.run_engine import RunEngine
 from bluesky.protocols import Reading
-from bluesky.utils import DuringTask, MsgGenerator
+from bluesky.utils import MsgGenerator
 from bluesky.plan_stubs import open_run, close_run, read, rel_set
 
 from event_model.documents.event_descriptor import DataKey
 
 class MockVirtualBus(VirtualBus):
     sigFoo = Signal()
-
-class MockEngineHandler(EngineHandler):
-    def __init__(self, 
-                config: RedSunSessionInfo, 
-                virtual_bus: MockVirtualBus, 
-                module_bus: ModuleVirtualBus, 
-                during_task: DuringTask) -> None:
-        self._config = config
-        self._virtual_bus = virtual_bus
-        self._module_bus = module_bus
-        self._engine = RunEngine(during_task=during_task) # type: ignore
-        self._plans: dict[str, list[partial[MsgGenerator[Any]]]] = {}
-        self._models: dict[str, ModelProtocol] = {}
-        
-    
-    def shutdown(self) -> None:
-        ...
-
-    def register_plan(self, name: str, plan: partial[MsgGenerator[Any]]) -> None:
-        ...
-    
-    def load_model(self, name: str, device: ModelProtocol) -> None:
-        raise NotImplemented
-
-    def subscribe(self, 
-                  func: Callable[[EventName, dict[str, Any]], None], 
-                  name: Optional[EventName] = "all") -> int:
-        raise NotImplemented
-
-    def unsubscribe(self, token: int) -> None:
-        raise NotImplemented
-    
-    @property
-    def plans(
-        self,
-    ) -> dict[str, list[partial[MsgGenerator[Any]]]]:
-        """Plans dictionary."""
-        return self._plans
-
-    @property
-    def models(self) -> dict[str, ModelProtocol]:
-        """Models dictionary."""
-        return self._models
 
 class ReadableModel(ModelProtocol):
 
@@ -212,14 +168,11 @@ class MockController(ControllerProtocol):
     sigNewPlan = Signal(object)
 
     def __init__(self, 
-                ctrl_info: MockControllerInfo, 
-                handler: MockEngineHandler, 
-                virtual_bus: MockVirtualBus, 
-                module_bus: ModuleVirtualBus) -> None:
+                ctrl_info: MockControllerInfo,
+                virtual_bus: MockVirtualBus) -> None:
         self._ctrl_info = ctrl_info
-        self._handler = handler
+        self._engine = RunEngine({})
         self._virtual_bus = virtual_bus
-        self._module_bus = module_bus
         self._plans: list[partial[MsgGenerator[Any]]] = []
 
         def mock_plan_no_device() -> MsgGenerator[Any]:
