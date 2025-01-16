@@ -17,9 +17,17 @@ which contains a series of user-defined properties that
 describe the controller and provides further customization options.
 """
 
+import sys
+
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Protocol, runtime_checkable, Mapping
+
+if sys.version_info >= (3, 11):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
+
+from typing import Any, runtime_checkable, Mapping
 
 from bluesky.utils import MsgGenerator
 

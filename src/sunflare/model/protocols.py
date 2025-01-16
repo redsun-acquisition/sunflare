@@ -8,8 +8,15 @@ SunFlare provides a set of pre-shipped built-in protocols for the most common us
 
 from __future__ import annotations
 
+import sys
+
+if sys.version_info >= (3, 11):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
+
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, runtime_checkable
 
 if TYPE_CHECKING:
     from typing import Any, Optional, Union
