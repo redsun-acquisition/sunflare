@@ -1,19 +1,29 @@
 """RedSun uses controllers to manage the interaction between the user interface and the hardware.
 
-Controllers can either render information (i.e. process some data and send it to the upper layer for visualization),
-notify of changes in the hardware state or publish Bluesky plans for the run engine to execute.
+They have access to the `VirtualBus` to enable interaction with other controllers and/or
+widgets by exchanging data via either the built-in signals or custom signals that can be defined by the user.
 
-Each controller is associated with a ``ControllerInfo`` object, which contains a series of user-defined properties that
+They can keep a reference of hardware devices for exclusive control by selecting the appropriate model from the
+`models` dictionary.
+
+Functionally wise, they can:
+
+- publish plans to provide information on their capabilities;
+- allocate a reference to the ``RunEngine`` to execute said plans;
+- simply process the data acquired by the ``RunEngine``, accessed from the `VirtualBus` signals.
+
+Each controller is associated with a ``ControllerInfo`` object,
+which contains a series of user-defined properties that
 describe the controller and provides further customization options.
 """
 
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable, Mapping
 
-from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
+from sunflare.model import ModelProtocol
 from sunflare.config import ControllerInfo
 from sunflare.virtual import VirtualBus
 
@@ -26,24 +36,20 @@ class ControllerProtocol(Protocol):
     ----------
     ctrl_info : :class:`~sunflare.config.ControllerInfo`
         Controller information.
+    models : Mapping[str, :class:`~sunflare.model.ModelProtocol`]
+        Models currently loaded in the active RedSun session.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-
-    Attributes
-    ----------
-    _engine : :class:`~bluesky.run_engine.RunEngine`
-        Bluesky run engine instance.
-        This must be set by the controller in the ``__init__`` method.
     """
 
     _ctrl_info: ControllerInfo
-    _engine: RunEngine
     _virtual_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
         ctrl_info: ControllerInfo,
+        models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
     ) -> None: ...
 
