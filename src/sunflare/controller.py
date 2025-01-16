@@ -32,8 +32,8 @@ class ControllerProtocol(Protocol):
     Attributes
     ----------
     _engine : :class:`~bluesky.run_engine.RunEngine`
-        Bluesky run engine instance. This must be set by the controller
-        during the initialization phase.
+        Bluesky run engine instance.
+        This must be set by the controller in the ``__init__`` method.
     """
 
     _ctrl_info: ControllerInfo
