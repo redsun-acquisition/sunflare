@@ -45,8 +45,8 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Callable, Iterable, Optional, TypeVar, Union, overload
 
-from psygnal import Signal, SignalInstance
 from event_model.documents import Event, EventDescriptor, RunStart, RunStop
+from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 

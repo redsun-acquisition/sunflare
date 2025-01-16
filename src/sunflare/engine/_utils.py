@@ -1,4 +1,5 @@
-from typing import Optional, MutableMapping, Any
+from typing import Any, MutableMapping, Optional
+
 from bluesky.run_engine import RunEngine
 
 # main engine instance is created outside of sunflare;
