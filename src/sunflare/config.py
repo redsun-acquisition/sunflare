@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC
 from enum import Enum, unique
 from pathlib import Path
 from typing import Any, ClassVar, Tuple
@@ -52,7 +51,7 @@ class FrontendTypes(str, Enum):
 
 
 @define(kw_only=True)
-class ControllerInfo(ABC):
+class ControllerInfo:
     """Controller information model.
 
     All controller information models inherit from this class.
@@ -62,7 +61,7 @@ class ControllerInfo(ABC):
 
 
 @define(kw_only=True)
-class ModelInfo(ABC):
+class ModelInfo:
     """Base model for device information.
 
     All device information models inherit from this class.
