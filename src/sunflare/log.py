@@ -73,7 +73,7 @@ logger = logging.getLogger("redsun")
 
 class Loggable:
     """
-    Class to extend log records with the class name and the user defined ID.
+    Mixin class to extend log records with the class name and the user defined ID.
 
     Models and controllers can inherit from this class to have a consistent log format.
 
