@@ -125,7 +125,7 @@ class Loggable:
         self._extend(kwargs)
         logger.debug(msg, *args, **kwargs)
 
-    def warning(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def warning(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log a warning message in the core logger.
 
@@ -141,7 +141,7 @@ class Loggable:
         self._extend(kwargs)
         logger.warning(msg, *args, **kwargs)
 
-    def error(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def error(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log an error. message in the core logger.
 
@@ -157,7 +157,7 @@ class Loggable:
         self._extend(kwargs)
         logger.error(msg, *args, **kwargs)
 
-    def critical(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def critical(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log a critical message in the core logger.
 
@@ -173,7 +173,7 @@ class Loggable:
         self._extend(kwargs)
         logger.critical(msg, *args, **kwargs)
 
-    def exception(self, msg: str, *args: "Any", **kwargs: "Any") -> None:
+    def exception(self, msg: str, *args: Any, **kwargs: Any) -> None:
         """
         Log an exception message in the core logger.
 
