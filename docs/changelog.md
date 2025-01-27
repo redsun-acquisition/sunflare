@@ -11,7 +11,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 ### Changed 
 
-- Refactor: `simplify` virtual module and remove `EngineHandler`
+- Refactor: simplify `virtual` module and remove `EngineHandler`
 - Use `typing_extensions.Protocol` in case of `Python < 3.11`
 
 ### Added
