@@ -3,10 +3,12 @@
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any, Union
 
-from bluesky.run_engine import RunEngine, RunEngineResult
+from bluesky.run_engine import RunEngine as BlueskyRunEngine, RunEngineResult
+
+__all__ = ["RunEngine", "RunEngineResult"]
 
 
-class EngineWrapper(RunEngine):
+class RunEngine(BlueskyRunEngine):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # force the context_managers to be empty,
         # otherwise the RunEngine will try to use the
