@@ -1,6 +1,6 @@
 # Status
 
 ```{eval-rst}
-.. automodule:: sunflare.engine.status
+.. automodule:: sunflare.engine._status
     :members:
 ```

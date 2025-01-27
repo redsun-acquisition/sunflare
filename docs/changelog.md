@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.3.0] - 27-01-2025
+
+### Changed 
+
+- Refactor: `simplify` virtual module and remove `EngineHandler`
+- Use `typing_extensions.Protocol` in case of `Python < 3.11`
+
+### Added
+
+- Added a wrapper of `RunEngine` which leaves the main thread unblocked
+
 ## [v0.2.2] - 02-01-2025
 
 ### Changed
@@ -64,6 +75,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[v0.3.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.2...v0.3.0
 [v0.2.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.1...v0.2.2
 [v0.2.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.1...v0.2.0
