@@ -1,4 +1,3 @@
-# type: ignore
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -23,13 +22,16 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     "sphinx.ext.githubpages",
+    'sphinx.ext.intersphinx',
     'myst_parser',
 ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
+intersphinx_mapping = {
+    'bluesky': ('https://blueskyproject.io/bluesky/', None),
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

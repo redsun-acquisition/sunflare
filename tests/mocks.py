@@ -99,6 +99,8 @@ class MockDetector(ReadableModel):
     def configure(self, name: str, value: Any) -> None:
         raise NotImplemented
 
+    def shutdown(self) -> None:
+        ...
 
     @property
     def name(self) -> str:
@@ -130,6 +132,9 @@ class MockMotor(SettableModel):
     
     def configure(self, name: str, value: Any) -> None:
         raise NotImplemented
+    
+    def shutdown(self) -> None:
+        ...
     
     @property
     def name(self) -> str:

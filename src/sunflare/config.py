@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Sized, Tuple
+from typing import Any, Sized
 
 import yaml
-from attrs import Attribute, asdict, define, field, setters, validators
+from attrs import asdict, define, field, setters, validators
 
 from sunflare.log import get_logger
 
@@ -180,83 +180,6 @@ class ModelInfo:
                 if key != "model_name"
             }
         }
-
-
-@define(kw_only=True)
-class DetectorInfo(ModelInfo):
-    """Detector model information class.
-
-    Attributes
-    ----------
-    exposure : ``float``
-        Initial exposure time for the detector.
-    egu : ``str``
-        Engineering unit for exposure time. Defaults to ``s``.
-    sensor_shape : ``Tuple[int, int]``
-        Shape of the detector sensor.
-    pixel_size : ``Tuple[float, float, float]``
-        Detector pixel size.
-    timings: ``ListParameter``, optional
-        Detector trigger informations. Optional
-    """
-
-    exposure: float = field(validator=validators.instance_of(float))
-    egu: str = field(
-        default="s", validator=validators.instance_of(str), on_setattr=setters.frozen
-    )
-    sensor_shape: Tuple[int, int] = field(converter=tuple, on_setattr=setters.frozen)
-    pixel_size: Tuple[float, float, float] = field(converter=tuple)
-
-    @sensor_shape.validator
-    def _validate_sensor_shape(
-        self, _: Attribute[Tuple[int, ...]], value: Tuple[int, ...]
-    ) -> None:
-        if not all(isinstance(val, int) for val in value):
-            raise ValueError("All values in the tuple must be integers.")
-        if len(value) != 2:
-            raise ValueError("The tuple must contain exactly two values.")
-
-    @pixel_size.validator
-    def _validate_pixel_size(
-        self, _: Attribute[Tuple[float, ...]], value: Tuple[float, ...]
-    ) -> None:
-        if not all(isinstance(val, float) for val in value):
-            raise ValueError("All values in the tuple must be floats.")
-        if len(value) != 3:
-            raise ValueError("The tuple must contain exactly three values.")
-
-
-@define(kw_only=True)
-class MotorInfo(ModelInfo):
-    """Motor model information class.
-
-    Attributes
-    ----------
-    axis : ``list[str]``
-        Motor axis names.
-    step_size : ``float``
-        Motor step size.
-    egu : ``str``
-        Engineering unit for motor position.
-    """
-
-    axis: list[str] = field(factory=list, on_setattr=setters.frozen)
-    step_size: dict[str, float] = field(factory=dict)
-    egu: str = field(validator=validators.instance_of(str), on_setattr=setters.frozen)
-
-    @axis.validator
-    def _validate_axis(self, _: str, value: list[str]) -> None:
-        if not all(isinstance(val, str) for val in value):
-            raise ValueError("All values in the list must be strings.")
-        if len(value) == 0:
-            raise ValueError("The list must contain at least one element.")
-
-    @step_size.validator
-    def _validate_step_size(self, _: str, value: dict[str, float]) -> None:
-        if not all(isinstance(val, float) for val in value.values()):
-            raise ValueError("All values in the dictionary must be floats.")
-        if len(value) == 0:
-            raise ValueError("The dictionary must contain at least one element.")
 
 
 @define(kw_only=True)
