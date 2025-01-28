@@ -1,7 +1,5 @@
-from typing import Any, ClassVar
+from typing import Any
 from functools import partial
-
-from psygnal import SignalGroupDescriptor
 
 from attrs import define, field, validators
 
@@ -96,7 +94,7 @@ class MockDetector(ReadableModel):
     def describe_configuration(self) -> dict[str, DataKey]:
         raise NotImplemented
 
-    def configure(self, name: str, value: Any) -> None:
+    def configure(self, name: str, value: Any, /, **kwargs: Any) -> None:
         raise NotImplemented
 
     def shutdown(self) -> None:
@@ -130,7 +128,7 @@ class MockMotor(SettableModel):
     def describe_configuration(self) -> dict[str, DataKey]:
         raise NotImplemented
     
-    def configure(self, name: str, value: Any) -> None:
+    def configure(self, name: str, value: Any, /, **kwargs: Any) -> None:
         raise NotImplemented
     
     def shutdown(self) -> None:
