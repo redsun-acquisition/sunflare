@@ -4,6 +4,7 @@ import yaml
 import pytest
 
 from typing import Any, cast
+from attrs import asdict
 
 from sunflare.config import RedSunSessionInfo
 from mocks import MockDetector, MockMotor, MockDetectorInfo, MockMotorInfo
@@ -186,18 +187,28 @@ def test_multi_model(config_path: str) -> None:
         else:
             config_dict["models"][name] = MockMotorInfo(**cfg_info)
 
-    session = RedSunSessionInfo(**yaml.safe_load(open(config_file)))
+    session = RedSunSessionInfo(**config_dict)
 
     for (name, det_info), (truth_name, det_cfg_info) in zip(session.models.items(), truth_config_detectors.items()):
-        if "Detector" in name:
+        if "detector" in name:
             detector = MockDetector(name=name, cfg_info=cast(MockDetectorInfo, det_info))
             assert detector.name == truth_name
             assert detector.parent is None
             assert detector.model_info == det_cfg_info
+            doc = detector.model_info.read_configuration()
+            bs_config = {key: doc[key]["value"] for key in doc}
+            truth = asdict(det_cfg_info)
+            del truth["model_name"]
+            assert bs_config == truth
     
     for (name, mot_info), (truth_name, mot_cfg_info) in zip(session.models.items(), truth_configs_motors.items()):
-        if "Motor" in name:
+        if "motor" in name:
             motor = MockMotor(name=name, cfg_info=cast(MockMotorInfo, mot_info))
             assert motor.name == truth_name
             assert motor.parent is None
             assert motor.model_info == mot_cfg_info
+            doc = motor.model_info.read_configuration()
+            bs_config = {key: doc[key]["value"] for key in doc}
+            truth = asdict(det_cfg_info)
+            del truth["model_name"]
+            assert bs_config == truth

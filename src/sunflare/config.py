@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, ClassVar, Tuple
+from typing import Any, Sized, Tuple
 
 import yaml
-from attrs import Attribute, define, field, setters, validators
-from psygnal import SignalGroupDescriptor
+from attrs import Attribute, asdict, define, field, setters, validators
 
 from sunflare.log import get_logger
 
@@ -55,9 +54,23 @@ class ControllerInfo:
     """Controller information model.
 
     All controller information models inherit from this class.
+
+    Parameters
+    ----------
+    plugin_name : ``str``, optional
+        Controller plugin name.
+        Equivalent to the name of the PyPI/Conda package.
+        Defaults to ``N/A``.
+    repository : ``str``, optional
+        Controller repository URL. Defaults to ``N/A``.
     """
 
-    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
+    plugin_name: str = field(
+        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
+    repository: str = field(
+        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
 
 
 @define(kw_only=True)
@@ -74,6 +87,12 @@ class ModelInfo:
         Detector vendor.
     serial_number : ``str``, optional
         Detector serial number.
+    plugin_name : ``str``, optional
+        Model plugin name.
+        Equivalent to the name of the PyPI/Conda package.
+        Defaults to ``N/A``.
+    repository : ``str``, optional
+        Model repository URL. Defaults to ``N/A``.
     """
 
     model_name: str = field(
@@ -87,6 +106,80 @@ class ModelInfo:
         converter=str,
         on_setattr=setters.frozen,
     )
+
+    plugin_name: str = field(
+        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
+    repository: str = field(
+        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
+
+    __type_map = {
+        str: "string",
+        float: "number",
+        int: "integer",
+        bool: "boolean",
+        list: "array",
+        tuple: "array",
+    }
+
+    def __get_shape(self, value: Any) -> list[int]:
+        if isinstance(value, Sized):
+            if hasattr(value, "shape"):
+                return list(getattr(value, "shape"))
+            else:
+                return [len(value)]
+        return []
+
+    def read_configuration(self) -> dict[str, Any]:
+        """Read the model information as a Bluesky configuration dictionary.
+
+        Returns
+        -------
+        ``dict[str, Any]``
+            A dictionary containing the model information,
+            compatible with Bluesky configuration representation.
+
+        Notes
+        -----
+        See the `Configurable`_ protocol.
+
+        .. _Configurable: https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Configurable
+        """
+        return {
+            **{
+                key: {"value": value, "timestamp": 0}
+                for key, value in asdict(self).items()
+                if key != "model_name"
+            }
+        }
+
+    def describe_configuration(self) -> dict[str, Any]:
+        """Describe the model information as a Bluesky configuration dictionary.
+
+        Returns
+        -------
+        ``dict[str, Any]``
+            A dictionary containing the model information description,
+            compatible with Bluesky configuration representation.
+
+        Notes
+        -----
+        See the `Configurable`_ protocol.
+
+        .. _Configurable: https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Configurable
+        """
+        return {
+            **{
+                key: {
+                    "source": "model_info",
+                    "dtype": self.__type_map[type(value)],
+                    "shape": self.__get_shape(value),
+                }
+                for key, value in asdict(self).items()
+                if key != "model_name"
+            }
+        }
 
 
 @define(kw_only=True)

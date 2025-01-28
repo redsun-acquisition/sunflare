@@ -35,7 +35,6 @@ class MockDetectorInfo(ModelInfo):
     sensor_size: tuple[int, int] = field(converter=tuple)
     exposure_egu: str = field(default="ms", converter=str)
     pixel_size: tuple[int, int, int] = field(default=(1, 1, 1), converter=tuple)
-    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
     @sensor_size.validator
     def _validate_size(self, _: str, value: tuple[int, int]) -> None:
@@ -80,19 +79,18 @@ class MockControllerInfo(ControllerInfo):
     floating: float = field(validator=validators.instance_of(float))
     boolean: bool = field(validator=validators.instance_of(bool))
     string: str = field(validator=validators.instance_of(str))
-    events: ClassVar[SignalGroupDescriptor] = SignalGroupDescriptor()
 
 class MockDetector(ReadableModel):
     """Mock detector model."""
 
     def __init__(self, name: str, cfg_info: MockDetectorInfo) -> None:
         self._name = name
-        self._cfg_info = cfg_info
+        self._cfg_info = cfg_info        
 
     def read(self) -> dict[str, Any]:
         raise NotImplemented
     
-    def read_configuration(self) -> dict[str, Reading]:
+    def read_configuration(self) -> dict[str, Reading[Any]]:
         raise NotImplemented
     
     def describe_configuration(self) -> dict[str, DataKey]:

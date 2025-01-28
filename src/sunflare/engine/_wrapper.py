@@ -3,7 +3,8 @@
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any, Union
 
-from bluesky.run_engine import RunEngine as BlueskyRunEngine, RunEngineResult
+from bluesky.run_engine import RunEngine as BlueskyRunEngine
+from bluesky.run_engine import RunEngineResult
 
 __all__ = ["RunEngine", "RunEngineResult"]
 

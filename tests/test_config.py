@@ -78,10 +78,10 @@ def test_detectors_info(config_path: Path):
         assert mock.model_name == "MockDetectorModel"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
+        assert mock.plugin_name == "N/A"
+        assert mock.repository == "N/A"
         assert mock.sensor_size == (10, 10)
         assert mock.pixel_size == (1, 1, 1)
-        assert len(mock.events.signals) == 6
-        assert all([x in mock.events.signals for x in ["model_name", "vendor", "serial_number", "sensor_size", "exposure_egu", "pixel_size"]])
 
     mocks = list(session.models.values())
     assert mocks[0].exposure_egu == "ms"

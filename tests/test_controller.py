@@ -20,4 +20,5 @@ def test_controller(config_path: Path) -> None:
         controller = MockController(cast(MockControllerInfo, ctrl), virtual_bus)
         assert controller.controller_info == ctrl
         assert len(controller.plans) == 2
-        assert len(controller.controller_info.events.signals) == 4
+        assert controller.controller_info.plugin_name == "N/A"
+        assert controller.controller_info.repository == "N/A"
