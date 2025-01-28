@@ -60,11 +60,13 @@ class ControllerProtocol(Protocol):
         virtual_bus: VirtualBus,
     ) -> None: ...
 
+    @abstractmethod
     def shutdown(self) -> None:
         """Shutdown the controller. Performs cleanup operations.
 
         If the controller holds any kind of resources,
         this method should invoke any equivalent shutdown method for each resource.
+        If no resources are held, this method can be left empty.
         """
         ...
 
@@ -126,11 +128,11 @@ class ControllerProtocol(Protocol):
     @property
     @abstractmethod
     def controller_info(self) -> ControllerInfo:
-        """Controller class name."""
+        """Controller information container."""
         ...
 
     @property
     @abstractmethod
     def plans(self) -> list[partial[MsgGenerator[Any]]]:
-        """Set of available plans."""
+        """List of available plans."""
         ...
