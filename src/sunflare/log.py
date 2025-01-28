@@ -67,7 +67,7 @@ config = {
 # Set configuration
 logging.config.dictConfig(config)
 
-# Base logger for the entire system
+# base logger for the session
 logger = logging.getLogger("redsun")
 
 
