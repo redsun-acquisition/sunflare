@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.3.2] - 29-01-2025
+
+### Added
+
+- `session` field in `RedSunSessionInfo`
+  - used as main window title and as bluesky metadata
+- added `**kwargs` to `configure` method
+  - need investigation on how to actually use it
+- added optional `shutdown` method in `ModelProtocol`
+  - it still must be implemented although not mandatory
+
+### Removed
+- removed built-in protocols `Detector` and `Motor`
+  - each plugin should take care of deciding what they are
+
+### Changed
+- fixed metaclass error in `BaseQtWidget`
+
 ## [0.3.1] - 27-01-2025
 
 ### Added
