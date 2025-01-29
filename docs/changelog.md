@@ -31,7 +31,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 - Added parts of `Configurable` protocol in `ModelInfo` for easier handling
 
-## [0.3.0] - 27-01-2025
+## [v0.3.0] - 27-01-2025
 
 ### Changed 
 
