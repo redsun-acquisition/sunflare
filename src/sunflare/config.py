@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Sized
+from typing import Any, Sized, Union
 
 import yaml
 from attrs import asdict, define, field, setters, validators
@@ -182,6 +182,17 @@ class ModelInfo:
         }
 
 
+# helper private functions for type conversion
+def _convert_engine_type(
+    x: Union[str, AcquisitionEngineTypes],
+) -> AcquisitionEngineTypes:
+    return x if isinstance(x, AcquisitionEngineTypes) else AcquisitionEngineTypes(x)
+
+
+def _convert_frontend_type(x: Union[str, FrontendTypes]) -> FrontendTypes:
+    return x if isinstance(x, FrontendTypes) else FrontendTypes(x)
+
+
 @define(kw_only=True)
 class RedSunSessionInfo:
     """RedSun session configuration class.
@@ -214,13 +225,14 @@ class RedSunSessionInfo:
         on_setattr=setters.frozen,
     )
     engine: AcquisitionEngineTypes = field(
-        converter=AcquisitionEngineTypes,
+        default=AcquisitionEngineTypes.BLUESKY,
+        converter=_convert_engine_type,
         validator=validators.in_(AcquisitionEngineTypes),
         on_setattr=setters.frozen,
     )
     frontend: FrontendTypes = field(
         default=FrontendTypes.QT,
-        converter=FrontendTypes,
+        converter=_convert_frontend_type,
         validator=validators.in_(FrontendTypes),
         on_setattr=setters.frozen,
     )
