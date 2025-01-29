@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
-## [0.3.2] - 29-01-2025
+## [v0.3.2] - 29-01-2025
 
 ### Added
 
@@ -25,7 +25,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 ### Changed
 - fixed metaclass error in `BaseQtWidget`
 
-## [0.3.1] - 27-01-2025
+## [v0.3.1] - 27-01-2025
 
 ### Added
 
