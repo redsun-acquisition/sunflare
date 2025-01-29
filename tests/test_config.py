@@ -113,3 +113,15 @@ def test_motors_info(config_path: Path):
     assert mocks[0].axes == ["X"]
     assert mocks[1].step_egu == "mm"
     assert mocks[1].axes == ["X", "Y"]
+
+def test_session_name(config_path: Path):
+    """Test the redsun session info with a different session name."""
+
+    config = RedSunSessionInfo.load_yaml(config_path / "session_name.yaml")
+    session = RedSunSessionInfo(**config)
+
+    assert session.session == "My test session"
+    assert session.engine == "bluesky"
+    assert session.frontend == "qt"
+    assert session.controllers == {}
+    assert session.models == {}

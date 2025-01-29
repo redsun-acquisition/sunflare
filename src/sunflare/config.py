@@ -193,6 +193,9 @@ class RedSunSessionInfo:
 
     Attributes
     ----------
+    session: ``str``
+        The name of the current session. Defaults to ``RedSun``.
+        It will be shown as the main window title.
     engine : ``AcquisitionEngineTypes``
         Acquisition engine selected for the current session. Mandatory.
     frontend : ``FrontendTypes``
@@ -205,6 +208,11 @@ class RedSunSessionInfo:
         Defaults to an empty dictionary.
     """
 
+    session: str = field(
+        default="RedSun",
+        validator=validators.instance_of(str),
+        on_setattr=setters.frozen,
+    )
     engine: AcquisitionEngineTypes = field(
         converter=AcquisitionEngineTypes,
         validator=validators.in_(AcquisitionEngineTypes),
