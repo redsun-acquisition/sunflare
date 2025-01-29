@@ -13,8 +13,18 @@ if TYPE_CHECKING:
     from sunflare.config import RedSunSessionInfo
     from sunflare.virtual import VirtualBus
 
+QWidgetMeta = type(QWidget)
 
-class BaseQtWidget(QWidget, WidgetProtocol):
+
+# Create a common metaclass that inherits from both metaclasses.
+# This apparently seem to work when launching redsun empty, but
+# it has not been tested yet; anyway we keep mypy happy by ignoring it
+# https://stackoverflow.com/a/76681565/4437552
+class _QWidgetBaseMeta(QWidgetMeta, WidgetProtocol):  # type: ignore[valid-type,misc]
+    """Common metaclass for QWidget and WidgetProtocol."""
+
+
+class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
     """Qt base widget class that implemenents the WidgetProtocol.
 
     Parameters
