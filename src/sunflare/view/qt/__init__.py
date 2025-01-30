@@ -32,7 +32,7 @@ class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
     config : RedSunSessionInfo
         The session configuration.
     virtual_bus : VirtualBus
-        Virtual bus for the RedSun session.
+        Virtual bus for the Redsun session.
     *args : Any
         Additional positional arguments for QWidget.
     **kwargs : Any

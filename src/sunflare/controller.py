@@ -1,4 +1,4 @@
-"""RedSun uses controllers to manage the interaction between the user interface and the hardware.
+"""Redsun uses controllers to manage the interaction between the user interface and the hardware.
 
 They have access to the `VirtualBus` to enable interaction with other controllers and/or
 widgets by exchanging data via either the built-in signals or custom signals that can be defined by the user.
@@ -44,7 +44,7 @@ class ControllerProtocol(Protocol):
     ctrl_info : :class:`~sunflare.config.ControllerInfo`
         Controller information.
     models : Mapping[str, :class:`~sunflare.model.ModelProtocol`]
-        Models currently loaded in the active RedSun session.
+        Models currently loaded in the active Redsun session.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
     """
@@ -97,7 +97,7 @@ class ControllerProtocol(Protocol):
     def connection_phase(self) -> None:
         """Connect to other controllers or widgets.
 
-        At application start-up, controllers can't know what signals are available from other parts of RedSun.
+        At application start-up, controllers can't know what signals are available from other parts of Redsun.
         This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
         connect to all available registered signals in both virtual buses.
         Controllers may be able to connect to other signals even after this phase (provided those signals
@@ -109,14 +109,14 @@ class ControllerProtocol(Protocol):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self._my_slot
-                )
+                self._virtual_bus["OtherController"][
+                    "sigOtherControllerSignal"
+                ].connect(self._my_slot)
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self.sigMySignal
-                )
+                self._virtual_bus["OtherController"][
+                    "sigOtherControllerSignal"
+                ].connect(self.sigMySignal)
 
                 # ... or connect to widgets
                 self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(

@@ -1,4 +1,4 @@
-"""RedSun configuration classes and enumerators."""
+"""Redsun configuration classes and enumerators."""
 
 from __future__ import annotations
 
@@ -17,10 +17,10 @@ class AcquisitionEngineTypes(str, Enum):
     """ 
     Supported acquisition engines.
 
-    Acquisition engines are objects created within RedSun and operate
+    Acquisition engines are objects created within Redsun and operate
     as Bluesky plan managers for the acquisition process. 
     They are responsible for the orchestration of the different hardware 
-    components currently loaded in RedSun.
+    components currently loaded in Redsun.
 
     It is expected that new acquisition engines implement Bluesky's ``RunEngine`` public API.
 
@@ -195,9 +195,9 @@ def _convert_frontend_type(x: Union[str, FrontendTypes]) -> FrontendTypes:
 
 @define(kw_only=True)
 class RedSunSessionInfo:
-    """RedSun session configuration class.
+    """Redsun session configuration class.
 
-    This class is used to store the configuration of a running RedSun application;
+    This class is used to store the configuration of a running Redsun application;
     it provides information about the hardware layout and the selected acquisition engine.
 
     A minimal configuration must include the selected acquisition engine.
@@ -205,7 +205,7 @@ class RedSunSessionInfo:
     Attributes
     ----------
     session: ``str``
-        The name of the current session. Defaults to ``RedSun``.
+        The name of the current session. Defaults to ``Redsun``.
         It will be shown as the main window title.
     engine : ``AcquisitionEngineTypes``
         Acquisition engine selected for the current session. Mandatory.
@@ -220,7 +220,7 @@ class RedSunSessionInfo:
     """
 
     session: str = field(
-        default="RedSun",
+        default="Redsun",
         validator=validators.instance_of(str),
         on_setattr=setters.frozen,
     )

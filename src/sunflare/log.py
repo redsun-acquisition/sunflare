@@ -1,7 +1,7 @@
 """
-RedSun logging module.
+Redsun logging module.
 
-In each RedSun application, only one logger is created.
+In each Redsun application, only one logger is created.
 
 All classes inheriting the :class:`~sunflare.log.Loggable` class can log messages via the core logger.
 """
