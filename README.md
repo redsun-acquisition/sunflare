@@ -18,4 +18,4 @@ The aim is to provide reusable patterns in developing software applications for 
 For more information, see the [documentation].
 
 [redsun]: https://redsun-acquisition.github.io/redsun/
-[documentation]: (https://redsun-acquisition.github.io/sunflare/)
+[documentation]: https://redsun-acquisition.github.io/sunflare/
