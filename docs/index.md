@@ -6,13 +6,13 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# SunFlare, toolkit for ReSun development
+# Sunflare, toolkit for Redsun development
 
 ```{warning}
 This project is currently under active development and it may (and most likely will) receive breaking changes. Use at your own risk.
 ```
 
-SunFlare is a separate package used to build both RedSun and its plugins.
+Sunflare is a separate package used to build both Redsun and its plugins.
 
 ## Contents
 
