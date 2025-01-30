@@ -1,5 +1,5 @@
 r"""
-SunFlare virtual module.
+Sunflare virtual module.
 
 This module implements the communication mechanism between the controller layer and the view layer.
 

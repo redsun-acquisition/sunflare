@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## Unreleased
+
+### Changed
+
+- Minor renaming
+  - RedSun -> Redsun
+  - SunFlare -> Sunflare
+
 ## [v0.3.2] - 29-01-2025
 
 ### Added
