@@ -4,3 +4,7 @@ html[data-theme="dark"] img {
 html[data-theme="dark"] .bd-content img:not(.only-dark):not(.dark-light) {
     background: unset;
 }
+
+html[data-theme="dark"] .only-light ~ figcaption {
+    display: block !important;
+}

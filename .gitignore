@@ -113,3 +113,6 @@ _version.py
 
 sunflare/_version.py
 wheelhouse/
+
+# excalidraw files
+*.excalidraw
