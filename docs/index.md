@@ -21,8 +21,9 @@ Sunflare is a separate package used to build both Redsun and its plugins.
 
 statement
 getting_started
-tools/index
+overview/index
 api/index
+crash_course/index
 changelog
 ```
 

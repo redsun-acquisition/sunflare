@@ -25,8 +25,15 @@ extensions = [
     'sphinx.ext.napoleon',
     "sphinx.ext.githubpages",
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.mermaid',
     'myst_parser'
 ]
+
+myst_enable_extensions = {
+    'attrs_block'
+}
+
+myst_fence_as_directive = ["mermaid"]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -40,12 +47,20 @@ intersphinx_mapping = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'pydata_sphinx_theme'
-html_static_path = ['_static']
+html_static_path = ['_static', 'images']
 html_context = {
    # this doesn't really matter;
    # adding it only for completion
    "default_mode": "auto"
 }
+
+# prevent copying to _images
+html_copy_source = False
+html_scaled_image_link = False
+
+mermaid_version = "11.4.0"
+myst_fence_as_directive = ["mermaid"]
+myst_enable_extensions = ["attrs_block"]
 
 html_css_files = [
     'custom.css',

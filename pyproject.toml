@@ -41,6 +41,7 @@ dependencies = [
 docs = [
     "sphinx",
     "pydata-sphinx-theme",
+    "sphinxcontrib-mermaid",
     "myst-parser"
 ]
 dev = [
