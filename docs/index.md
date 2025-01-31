@@ -19,7 +19,9 @@ Sunflare is a separate package used to build both Redsun and its plugins.
 ```{toctree}
 :maxdepth: 1
 
+statement
 getting_started
+tools/index
 api/index
 changelog
 ```

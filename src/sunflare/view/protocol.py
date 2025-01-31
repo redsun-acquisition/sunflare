@@ -27,9 +27,9 @@ class WidgetProtocol(Protocol):
     Parameters
     ----------
     config : RedSunSessionInfo
-        The RedSun instance configuration.
+        The Redsun instance configuration.
     virtual_bus : VirtualBus
-        Main virtual bus for the RedSun instance.
+        Main virtual bus for the Redsun instance.
     """
 
     _config: RedSunSessionInfo
@@ -71,7 +71,7 @@ class WidgetProtocol(Protocol):
     def connection_phase(self) -> None:
         """Connect to other controllers or widgets.
 
-        At application start-up, widgets can't know what signals are available from other parts of RedSun.
+        At application start-up, widgets can't know what signals are available from other parts of Redsun.
         This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
         connect to all available registered signals in both virtual buses.
         Controllers may be able to connect to other signals even after this phase (provided those signals
@@ -83,14 +83,14 @@ class WidgetProtocol(Protocol):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self._my_slot
-                )
+                self._virtual_bus["OtherController"][
+                    "sigOtherControllerSignal"
+                ].connect(self._my_slot)
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"]["sigOtherControllerSignal"].connect(
-                    self.sigMySignal
-                )
+                self._virtual_bus["OtherController"][
+                    "sigOtherControllerSignal"
+                ].connect(self.sigMySignal)
 
                 # ... or connect to widgets
                 self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(

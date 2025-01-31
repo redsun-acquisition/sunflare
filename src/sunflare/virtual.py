@@ -1,5 +1,5 @@
 r"""
-SunFlare virtual module.
+Sunflare virtual module.
 
 This module implements the communication mechanism between the controller layer and the view layer.
 
@@ -28,7 +28,7 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
     ctrl = MyController()
     ctrl.sigMySignal.connect(my_slot)
 
-- The ``VirtualBus`` class is a signal router for data exchange between the backend and frontend. Plugins can expose signals to other plugins or different RedSun modules, as well as connect to built-in signals or signals provided from other system components.
+- The ``VirtualBus`` class is a signal router for data exchange between the backend and frontend. Plugins can expose signals to other plugins or different Redsun modules, as well as connect to built-in signals or signals provided from other system components.
 
 - The ``slot`` decorator is used to mark a function as a slot. In practice, it provides no benefit at runtime; it's used to facilitate code readability.
 
@@ -104,7 +104,7 @@ class VirtualBus(Loggable):
     well as between different layers of the system.
 
     It can be used to emit notifications, as well as carry information
-    to other plugins and/or different RedSun modules.
+    to other plugins and/or different Redsun modules.
 
     ``VirtualBus``' signals are implemented using the ``psygnal`` library;
     they can be dynamically registered as class attributes,

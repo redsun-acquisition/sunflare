@@ -1,7 +1,7 @@
 """Models represent device interfaces that Bluesky can interact with.
 
 Models offer a subset of Bluesky protocols to execute actions.
-A minimal recognizable device in RedSun must implement the :class:`~sunflare.model.ModelProtocol` protocol.
+A minimal recognizable device in Redsun must implement the :class:`~sunflare.model.ModelProtocol` protocol.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ __all__ = ["ModelProtocol"]
 
 @runtime_checkable
 class ModelProtocol(Protocol):
-    """Minimal required protocol for a recognizable device in RedSun.
+    """Minimal required protocol for a recognizable device in Redsun.
 
     Exposes the following Bluesky protocols:
 
