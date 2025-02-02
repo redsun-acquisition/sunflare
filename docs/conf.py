@@ -25,15 +25,23 @@ extensions = [
     'sphinx.ext.napoleon',
     "sphinx.ext.githubpages",
     'sphinx.ext.intersphinx',
+    'sphinx.ext.autosummary',
+    'sphinxcontrib.mermaid',
     'myst_parser'
 ]
+
+myst_enable_extensions = {
+    'attrs_block'
+}
+
+myst_fence_as_directive = ["mermaid"]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 intersphinx_mapping = {
-    # TODO: figure out how this works
-    # 'bluesky': ('https://blueskyproject.io/bluesky/', None),
+    'bluesky': ('https://blueskyproject.io/bluesky/main', None),
+    'event_model': ('https://blueskyproject.io/event-model/main', None),
 }
 
 # -- Options for HTML output -------------------------------------------------
@@ -46,6 +54,14 @@ html_context = {
    # adding it only for completion
    "default_mode": "auto"
 }
+
+# prevent copying to _images
+html_copy_source = False
+html_scaled_image_link = False
+
+mermaid_version = "11.4.0"
+myst_fence_as_directive = ["mermaid"]
+myst_enable_extensions = ["attrs_block"]
 
 html_css_files = [
     'custom.css',

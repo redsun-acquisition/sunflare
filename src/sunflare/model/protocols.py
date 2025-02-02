@@ -69,7 +69,7 @@ class ModelProtocol(Protocol):
 
         Returns
         -------
-        ``dict[str, Reading]``
+        dict[``str``, :class:`~bluesky.protocols.Reading`]
             A dictionary with the current values of the model configuration.
         """
         ...
@@ -82,7 +82,7 @@ class ModelProtocol(Protocol):
 
         Returns
         -------
-        ``dict[str, DataKey]``
+        dict[``str``, :class:`~event_model.DataKey`]
             A dictionary with the description of each field of the model configuration.
         """
         ...
@@ -100,10 +100,10 @@ class ModelProtocol(Protocol):
     def name(self) -> str:
         """Model identifier.
 
-        Used to populate object_keys in the Event DataKey.
+        Used to populate object_keys in the Event :class:`~event_model.DataKey`.
 
         See the following link for more information:
-        https://blueskyproject.io/event-model/event-descriptors.html#object-keys
+        https://blueskyproject.io/event-model/main/explanations/event-descriptors.html
         """
         ...
 
@@ -120,7 +120,7 @@ class ModelProtocol(Protocol):
     @property
     @abstractmethod
     def model_info(self) -> ModelInfo:
-        """The object associated model information.
+        """The associated model information.
 
         It can return a subclass of :class:`~sunflare.config.ModelInfo`.
         """
