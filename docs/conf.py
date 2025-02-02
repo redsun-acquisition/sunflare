@@ -25,6 +25,7 @@ extensions = [
     'sphinx.ext.napoleon',
     "sphinx.ext.githubpages",
     'sphinx.ext.intersphinx',
+    'sphinx.ext.autosummary',
     'sphinxcontrib.mermaid',
     'myst_parser'
 ]
@@ -39,8 +40,8 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 intersphinx_mapping = {
-    # TODO: figure out how this works
-    # 'bluesky': ('https://blueskyproject.io/bluesky/', None),
+    'bluesky': ('https://blueskyproject.io/bluesky/main', None),
+    'event_model': ('https://blueskyproject.io/event-model/main', None),
 }
 
 # -- Options for HTML output -------------------------------------------------

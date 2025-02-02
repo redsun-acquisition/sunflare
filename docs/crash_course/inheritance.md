@@ -11,6 +11,7 @@ In Python, parent classes can provide *abstract methods*, functions without actu
 
     classDiagram
         class Animal{
+            +int paws
             fly()*void
             talk()*void
             how_many_paws() int

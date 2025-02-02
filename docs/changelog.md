@@ -14,6 +14,9 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Minor renaming
   - RedSun -> Redsun
   - SunFlare -> Sunflare
+- Added documentation
+  - Notions of O.O.P.
+  - Minimal model doc 
 
 ## [v0.3.2] - 29-01-2025
 
