@@ -67,10 +67,6 @@ html_css_files = [
     'custom.css',
 ]
 
-html_js_files = [
-    'custom.js',
-]
-
 source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
