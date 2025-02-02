@@ -4,7 +4,7 @@ This sections offers a **very quick** crash course in commonly used programming 
 
 Python is a multi-paradigm language (meaning that it leverages OOP but also other paradigms), but the Redsun ecosystem mostly focuses on this paradigm.
 
-We will use _Unified Modeling Language_ ([UML]) diagrams made with [mermaid] diagrams for visual representation of these patterns.
+We will use _Unified Modeling Language_ ([UML]) diagrams made with [mermaid] for visual representation of these patterns.
 
 ```{toctree}
 :maxdepth: 1
