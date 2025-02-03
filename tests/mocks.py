@@ -30,9 +30,9 @@ class SettableModel(ModelProtocol):
 
 @define
 class MockDetectorInfo(ModelInfo):
-    sensor_size: tuple[int, int] = field(converter=tuple)
+    sensor_size: tuple[int, int] = field(converter=tuple[int, int])
     exposure_egu: str = field(default="ms", converter=str)
-    pixel_size: tuple[int, int, int] = field(default=(1, 1, 1), converter=tuple)
+    pixel_size: tuple[int, int, int] = field(default=(1, 1, 1), converter=tuple[int, int, int])
 
     @sensor_size.validator
     def _validate_size(self, _: str, value: tuple[int, int]) -> None:
