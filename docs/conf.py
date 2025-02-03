@@ -15,6 +15,9 @@ project = 'SunFlare'
 copyright = '2024, Jacopo Abramo'
 author = 'Jacopo Abramo'
 
+github_user = "redsun-acquisition"
+github_repo = "sunflare"
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -51,6 +54,17 @@ html_context = {
    # this doesn't really matter;
    # adding it only for completion
    "default_mode": "auto"
+}
+
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": f"https://github.com/{github_repo}/{github_user}",
+            "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        }
+   ]
 }
 
 # prevent copying to _images
