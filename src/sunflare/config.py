@@ -42,11 +42,13 @@ class FrontendTypes(str, Enum):
 
     Attributes
     ----------
-    QT
-        Qt frontend.
+    PYQT
+        PyQt6 frontend.
+    PYSIDE
+        PySide6 frontend.
     """
 
-    QT = "qt"
+    PYQT = "pyqt"
 
 
 @define(kw_only=True)
@@ -231,7 +233,7 @@ class RedSunSessionInfo:
         on_setattr=setters.frozen,
     )
     frontend: FrontendTypes = field(
-        default=FrontendTypes.QT,
+        default=FrontendTypes.PYQT,
         converter=_convert_frontend_type,
         validator=validators.in_(FrontendTypes),
         on_setattr=setters.frozen,

@@ -1,2 +1,2 @@
 engine: bluesky
-frontend: qt
+frontend: pyqt

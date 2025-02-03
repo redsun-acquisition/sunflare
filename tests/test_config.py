@@ -122,6 +122,6 @@ def test_session_name(config_path: Path):
 
     assert session.session == "My test session"
     assert session.engine == "bluesky"
-    assert session.frontend == "qt"
+    assert session.frontend == "pyqt"
     assert session.controllers == {}
     assert session.models == {}
