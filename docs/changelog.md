@@ -19,7 +19,8 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 - Added documentation
   - Notions of O.O.P.
-  - Minimal model doc 
+  - Minimal model doc
+- Added test for VirtualBus connection mechanism
 
 ## [v0.3.2] - 29-01-2025
 
