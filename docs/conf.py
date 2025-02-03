@@ -37,7 +37,7 @@ myst_enable_extensions = {
 myst_fence_as_directive = ["mermaid"]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build']
 
 intersphinx_mapping = {
     'bluesky': ('https://blueskyproject.io/bluesky/main', None),
