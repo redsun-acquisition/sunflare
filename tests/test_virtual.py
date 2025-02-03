@@ -53,6 +53,58 @@ def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture) -> None:
     assert caplog.records[0].levelname == "ERROR"
     assert caplog.records[0].message == "Class MockOwner not found in the registry."
 
+
+def test_virtual_bus_connection() -> None:
+    """Tests the connection of signals in the virtual bus."""
+
+    class FirstMockOwner:
+        sigFirstSignal = Signal(int)
+
+        def __init__(self, bus: VirtualBus) -> None:
+            self.bus = bus
+
+        def registration_phase(self) -> None:
+            self.bus.register_signals(self)
+
+        def connection_phase(self) -> None:
+            self.bus["SecondMockOwner"]["sigSecondSignal"].connect(self.second_to_first)
+
+        def second_to_first(self, x: int) -> None:
+            assert x == 5
+
+    class SecondMockOwner:
+        sigSecondSignal = Signal(int)
+
+        def __init__(self, bus: VirtualBus) -> None:
+            self.bus = bus
+        
+        def registration_phase(self) -> None:
+            self.bus.register_signals(self)
+        
+        def connection_phase(self) -> None:
+            self.bus["FirstMockOwner"]["sigFirstSignal"].connect(self.first_to_second)
+
+        def first_to_second(self, x: int) -> None:
+            assert x == 5
+
+    bus = MockVirtualBus()
+
+    first_owner = FirstMockOwner(bus)
+    second_owner = SecondMockOwner(bus)
+
+    first_owner.registration_phase()
+    second_owner.registration_phase()
+
+    first_owner.connection_phase()
+    second_owner.connection_phase()
+
+    assert "FirstMockOwner" in bus
+    assert "SecondMockOwner" in bus
+
+    first_owner.sigFirstSignal.emit(5)
+    second_owner.sigSecondSignal.emit(5)
+    
+
 def test_slot() -> None:
     """Tests the slot decorator."""
 
