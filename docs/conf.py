@@ -7,11 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import sys
-import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path('..', 'src').resolve()))
-sys.path.insert(0, os.path.abspath('_extension'))
 
 project = 'SunFlare'
 copyright = '2024, Jacopo Abramo'
