@@ -3,7 +3,7 @@ from functools import partial
 
 from attrs import define, field, validators
 
-from sunflare.config import ModelInfo, ControllerInfo
+from sunflare.config import ModelInfo, ControllerInfo, WidgetInfo
 from sunflare.model import ModelProtocol
 from sunflare.controller import ControllerProtocol
 from sunflare.virtual import VirtualBus, Signal
@@ -77,6 +77,12 @@ class MockControllerInfo(ControllerInfo):
     floating: float = field(validator=validators.instance_of(float))
     boolean: bool = field(validator=validators.instance_of(bool))
     string: str = field(validator=validators.instance_of(str))
+
+@define
+class MockWidgetInfo(WidgetInfo):
+    gui_int_param: int = field(validator=validators.instance_of(int))
+    gui_choices: list[str] = field(factory=list, validator=validators.instance_of(list))
+
 
 class MockDetector(ReadableModel):
     """Mock detector model."""

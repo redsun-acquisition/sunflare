@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Sized, Union
+from typing import Any, Sized, Union, TypeVar
 
 import yaml
 from attrs import asdict, define, field, setters, validators
 
 from sunflare.log import get_logger
+
+T = TypeVar("T")
 
 
 @unique
@@ -49,6 +51,75 @@ class FrontendTypes(str, Enum):
     """
 
     PYQT = "pyqt"
+    PYSIDE = "pyside"
+
+
+@unique
+class WidgetPositionTypes(str, Enum):
+    """Supported widget position types.
+
+    This enum is used to to define the
+    position of a widget in the main view of the GUI.
+
+    .. warning::
+
+        This enumerator refers to the usage of `QtWidget.DockWidget`;
+        it may be changed in the future to support other GUI frameworks.
+
+    Attributes
+    ----------
+    LEFT
+        Left widget position.
+    RIGHT
+        Right widget position.
+    TOP
+        Top widget position.
+    BOTTOM
+        Bottom widget position.
+    """
+
+    CENTER = "center"
+    LEFT = "left"
+    RIGHT = "right"
+    TOP = "top"
+    BOTTOM = "bottom"
+
+
+def _convert_widget_position_type(
+    x: Union[str, WidgetPositionTypes],
+) -> WidgetPositionTypes:
+    return x if isinstance(x, WidgetPositionTypes) else WidgetPositionTypes(x)
+
+
+@define(kw_only=True)
+class WidgetInfo:
+    """Widget information model.
+
+    All widget information models inherit from this class.
+
+    Parameters
+    ----------
+    plugin_name : ``str``, optional
+        Widget plugin name.
+        Equivalent to the name of the PyPI/Conda package.
+        Defaults to ``N/A``.
+    repository : ``str``, optional
+        Widget repository URL. Defaults to ``N/A``.
+    position : ``WidgetPositionTypes``
+        Widget position in the main view of the GUI.
+    """
+
+    plugin_name: str = field(
+        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
+    repository: str = field(
+        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
+    position: WidgetPositionTypes = field(
+        converter=_convert_widget_position_type,
+        validator=validators.in_(WidgetPositionTypes),
+        on_setattr=setters.frozen,
+    )
 
 
 @define(kw_only=True)
@@ -219,6 +290,9 @@ class RedSunSessionInfo:
     models : ``dict[str, ModelInfo]``
         Model informations dictionary.
         Defaults to an empty dictionary.
+    widgets : ``dict[str, WidgetInfo]``
+        Widget informations dictionary.
+        Defaults to an empty dictionary.
     """
 
     session: str = field(
@@ -240,6 +314,7 @@ class RedSunSessionInfo:
     )
     controllers: dict[str, ControllerInfo] = field(factory=dict)
     models: dict[str, ModelInfo] = field(factory=dict)
+    widgets: dict[str, WidgetInfo] = field(factory=dict)
 
     @staticmethod
     def load_yaml(path: str) -> dict[str, Any]:

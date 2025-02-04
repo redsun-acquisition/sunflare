@@ -5,9 +5,9 @@ from typing import Any
 from pytest import LogCaptureFixture
 
 from pathlib import Path
-from sunflare.config import RedSunSessionInfo
+from sunflare.config import RedSunSessionInfo, WidgetPositionTypes
 
-from mocks import MockDetectorInfo, MockMotorInfo
+from mocks import MockDetectorInfo, MockMotorInfo, MockControllerInfo, MockWidgetInfo
 
 
 def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None:
@@ -113,6 +113,47 @@ def test_motors_info(config_path: Path):
     assert mocks[0].axes == ["X"]
     assert mocks[1].step_egu == "mm"
     assert mocks[1].axes == ["X", "Y"]
+
+def test_controller_info(config_path: Path):
+    """Test the redsun session info with controllers."""
+
+    config = RedSunSessionInfo.load_yaml(config_path / "controller_instance.yaml")
+    config["controllers"] = {
+        name : MockControllerInfo(**info) for name, info in config["controllers"].items()
+    }
+    session = RedSunSessionInfo(**config)
+
+    assert session.engine == "bluesky"
+    assert session.models == {}
+    assert session.widgets == {}
+    assert session.controllers != {}
+
+    for _, controller in session.controllers.items():
+        assert controller.integer == 42
+        assert controller.floating == 3.14
+        assert controller.string == "hello"
+        assert controller.boolean == True
+        assert controller.plugin_name == "N/A"
+        assert controller.repository == "N/A"
+
+def test_widget_info(config_path: Path):
+    """Test the redsun session info with widgets."""
+
+    config = RedSunSessionInfo.load_yaml(config_path / "widget_instance.yaml")
+    config["widgets"] = {
+        name : MockWidgetInfo(**info) for name, info in config["widgets"].items()
+    }
+    session = RedSunSessionInfo(**config)
+
+    assert session.engine == "bluesky"
+    assert session.frontend == "pyqt"
+    assert session.controllers == {}
+    assert session.models == {}
+
+    for _, widget in session.widgets.items():
+        assert widget.gui_int_param == 100
+        assert widget.gui_choices == ["a", "b", "c"]
+        assert widget.position == WidgetPositionTypes.CENTER
 
 def test_session_name(config_path: Path):
     """Test the redsun session info with a different session name."""
