@@ -1,9 +1,8 @@
 # type: ignore
+from __future__ import annotations
 
 import pytest
 import sys
-
-from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
