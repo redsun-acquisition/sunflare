@@ -1,0 +1,10 @@
+engine: bluesky
+frontend: pyqt
+widgets:
+  MockWidget:
+    gui_int_param: 100
+    gui_choices:
+      - 'a'
+      - 'b'
+      - 'c'
+    position: "center"
