@@ -95,7 +95,6 @@ source = ["sunflare"]
 omit = [
     "src/sunflare/tests/conftest.py",
     "src/sunflare/view/**",
-    "src/sunflare/engine/handler.py",
     "src/sunflare/controller/**",
 ]
 
