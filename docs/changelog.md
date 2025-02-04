@@ -22,7 +22,7 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Minimal model doc
 - Added test for VirtualBus connection mechanism
 
-## [v0.3.2] - 29-01-2025
+## [0.3.2] - 29-01-2025
 
 ### Added
 
@@ -40,13 +40,13 @@ Dates are specified in the format `DD-MM-YYYY`.
 ### Changed
 - fixed metaclass error in `BaseQtWidget`
 
-## [v0.3.1] - 27-01-2025
+## [0.3.1] - 27-01-2025
 
 ### Added
 
 - Added parts of `Configurable` protocol in `ModelInfo` for easier handling
 
-## [v0.3.0] - 27-01-2025
+## [0.3.0] - 27-01-2025
 
 ### Changed 
 
@@ -57,14 +57,14 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 - Added a wrapper of `RunEngine` which leaves the main thread unblocked
 
-## [v0.2.2] - 02-01-2025
+## [0.2.2] - 02-01-2025
 
 ### Changed
 
 - Correct engine handler API.
 - Update CI action versions.
 
-## [v0.2.1] - 02-01-2025
+## [0.2.1] - 02-01-2025
 
 ### Changed
 
@@ -74,19 +74,19 @@ Dates are specified in the format `DD-MM-YYYY`.
     - Keys are the plan names;
     - Values are plans built with `functools.partial`
 
-## [v0.2.0] - 31-12-2024
+## [0.2.0] - 31-12-2024
 
 ### Added
 
 * Change configuration classes to use attrs in https://github.com/redsun-acquisition/sunflare/pull/8
 * Model API rework in https://github.com/redsun-acquisition/sunflare/pull/9
 
-## [v0.1.1] - 26-12-2024
+## [0.1.1] - 26-12-2024
 
 - Same changes as [v0.1.1a1]
 - Some typo adjustments
 
-## [v0.1.1a1] - 25-12-2024
+## [0.1.1a1] - 25-12-2024
 
 (Only available on TestPyPI)
 
@@ -98,14 +98,14 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Using RedSunInstanceInfo in handler
   - RedSunInstance info now holds logic to load and check yaml file as static method
 
-## [v0.1.0] - 23-12-2024
+## [0.1.0] - 23-12-2024
 
 ### Added
 
 - First release on PyPI;
 - Reached above 90% coverage;
 
-## [v0.1.0a1] - 22-12-2024
+## [0.1.0a1] - 22-12-2024
 
 (Only available on TestPyPI)
 
@@ -114,13 +114,13 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
-[v0.3.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.1...v0.3.2
-[v0.3.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.0...v0.3.1
-[v0.3.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.2...v0.3.0
-[v0.2.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.1...v0.2.2
-[v0.2.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.1...v0.2.0
-[v0.1.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1
-[v0.1.1a1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1a1
-[v0.1.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0a1...v0.1.0
-[v0.1.0a1]: https://github.com/redsun-acquisition/sunflare/commits/v0.1.0a1/
+[0.3.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1
+[0.1.1a1]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0...v0.1.1a1
+[0.1.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.1.0a1...v0.1.0
+[0.1.0a1]: https://github.com/redsun-acquisition/sunflare/commits/v0.1.0a1/
