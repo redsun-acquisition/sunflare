@@ -1,0 +1,43 @@
+engine: bluesky
+frontend: pyqt
+controllers:
+  MyController:
+    integer: 42
+    floating: 3.14
+    string: hello
+    boolean: true
+models:
+  First mock detector:
+    vendor: "Greenheart GmbH"
+    serial_number: "1234"
+    plugin_name: "redsun-greenheart"
+    repository: "greenheart@github"
+    model_name: MockDetectorModel
+    sensor_size: [10, 10]
+  Second mock detector:
+    vendor: "Bluesapphire GmbH"
+    serial_number: "5678"
+    plugin_name: "redsun-bluesapphire"
+    repository: "bluesapphire@github"
+    model_name: MockDetectorModel
+    sensor_size: [20, 20]
+    pixel_size: [2, 2, 2]
+    exposure_egu: s
+  Single axis motor:
+    model_name: MockMotorModel
+    axes:
+      - X
+  Double axis motor:
+    model_name: MockMotorModel
+    axes:
+      - X
+      - Y
+    step_egu: mm
+widgets:
+  MockWidget:
+    gui_int_param: 100
+    gui_choices:
+      - 'a'
+      - 'b'
+      - 'c'
+    position: "center"

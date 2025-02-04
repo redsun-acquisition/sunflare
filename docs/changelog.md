@@ -26,6 +26,8 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Redsun uses it to correctly allocate dock widgets in the main view
   - Currently adapted to be used with `PyQt` and `PySide`
     - For web-based frameworks may require adjustments somehow
+- Added `RedSunSessionInfo.store_yaml` to save the configuration file elsewhere
+  - We **could** think of supporting dynamic plugin loading; this would mean changing the content of `RedSunSessionInfo` on the fly.
 
 ## [0.3.2] - 29-01-2025
 

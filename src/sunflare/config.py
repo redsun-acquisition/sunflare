@@ -373,3 +373,15 @@ class RedSunSessionInfo:
             raise yaml.YAMLError(f"Error loading YAML file {path}: {e}")
 
         return data
+
+    def store_yaml(self, path: str) -> None:
+        """Store the configuration in a YAML file.
+
+        Parameters
+        ----------
+        path : ``str``
+            Path to the desired YAML file.
+        """
+        path_obj = Path(path)
+        with open(path_obj, "w") as file:
+            yaml.dump(asdict(self), file)
