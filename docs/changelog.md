@@ -21,6 +21,11 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Notions of O.O.P.
   - Minimal model doc
 - Added test for VirtualBus connection mechanism
+- Added `WidgetInfo` class
+  - Provides information for widgets
+  - Redsun uses it to correctly allocate dock widgets in the main view
+  - Currently adapted to be used with `PyQt` and `PySide`
+    - For web-based frameworks may require adjustments somehow
 
 ## [0.3.2] - 29-01-2025
 
