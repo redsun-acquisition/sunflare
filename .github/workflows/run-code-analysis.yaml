@@ -16,27 +16,34 @@ on:
 
 jobs:
   ruff:
-    name: Launch Ruff
+    name: ruff
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/ruff-action@v3
         with:
-          version: 0.8.4
+          version: 0.9.3
           args: "check --fix"
           src: "src/sunflare"
-  mypy:
-    name: Launch mypy
-    runs-on: ubuntu-latest
+
+  mypy-pyqt:
+    strategy:
+        matrix:
+            python-version: ["3.9", "3.10", "3.11", "3.12"]
+            frontend: ["pyside", "pyqt"]
+            os: [ubuntu-latest, windows-latest, macos-latest]
+
+    name: mypy with PyQt
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: "${{ matrix.python-version }}"
       - name: Install dependencies
         run: |
           python -m pip install -U pip mypy
-          python -m pip install -e .
+          python -m pip install -e .[${{ matrix.frontend }}]
       - name: Run mypy
         run: |
           mypy src/sunflare --ignore-missing-imports
