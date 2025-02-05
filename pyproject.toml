@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "sunflare"
 dynamic = ["version"]
-description = "RedSun plugin development toolkit"
+description = "Redsun plugin development toolkit"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
