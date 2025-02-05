@@ -67,10 +67,6 @@ html_theme_options = {
    ]
 }
 
-# prevent copying to _images
-html_copy_source = False
-html_scaled_image_link = False
-
 mermaid_version = "11.4.0"
 myst_fence_as_directive = ["mermaid"]
 myst_enable_extensions = ["attrs_block"]
