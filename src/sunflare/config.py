@@ -314,8 +314,8 @@ class RedSunSessionInfo:
         validator=validators.in_(FrontendTypes),
         on_setattr=setters.frozen,
     )
-    controllers: dict[str, ControllerInfo] = field(factory=dict)
     models: dict[str, ModelInfo] = field(factory=dict)
+    controllers: dict[str, ControllerInfo] = field(factory=dict)
     widgets: dict[str, WidgetInfo] = field(factory=dict)
 
     @staticmethod
