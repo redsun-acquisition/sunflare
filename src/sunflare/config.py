@@ -394,7 +394,4 @@ class RedSunSessionInfo:
 
         path_obj = Path(path)
         with open(path_obj, "w") as file:
-            yaml.dump(
-                asdict(self, value_serializer=_serializer),
-                file,
-            )
+            yaml.dump(asdict(self, value_serializer=_serializer), file, sort_keys=False)
