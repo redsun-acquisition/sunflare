@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## Unreleased
+
+### Changed
+
+- Fixed bug in `RedSunSessionInfo.store_yaml` which was not correctly parsing `Enum` and `tuple` types
+
 ## [0.3.3] - 04-02-2025
 
 ### Changed
