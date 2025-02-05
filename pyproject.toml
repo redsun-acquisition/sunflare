@@ -42,6 +42,7 @@ docs = [
     "sphinx",
     "pydata-sphinx-theme",
     "sphinxcontrib-mermaid",
+    "sphinx-design",
     "myst-parser"
 ]
 dev = [

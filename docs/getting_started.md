@@ -4,31 +4,53 @@
 
 It is reccomended to install the package in a virtual environment.
 
-```bash
-python -m venv venv
-source venv/bin/activate
+::::{tab-set}
+:::{tab-item} venv
+```{code-block} shell
+# python version depends
+# on the globally installed python
+python -m venv sunflare-env
+
+venv\Scripts\activate
+
+# for Windows...
+# ... command prompt
+venv\Scripts\activate.bat
+
+# ... powershell
+venv\Scripts\Activate.ps1
 ```
-
-Alternatively, you can also use [`conda`] or [`mamba`] to create a new environment.
-
-```bash
-conda create -n sunflare python=3.10
-conda activate sunflare
+:::
+:::{tab-item} conda
+```{code-block} shell
+conda create -n redsun-env python=3.9
+conda activate redsun-env
 ```
-
-The package is available on [PyPI].
-
-```bash
-pip install sunflare
+:::
+:::{tab-item} mamba
+```{code-block} shell
+mamba create -n redsun-env python=3.9
+mamba activate redsun-env
 ```
+:::
+::::
 
-Alternatively, you can also install the package from source by cloning the [repository].
+You can install the package from [PyPI] or directly from the GitHub [repository].
 
-```bash
+::::{tab-set}
+:::{tab-item} PyPI
+```{code-block} shell
+pip install -U sunflare
+```
+:::
+:::{tab-item} GitHub
+```{code-block} shell
 git clone https://github.com/redsun-acquisition/sunflare.git
 cd sunflare
 pip install -e .
 ```
+:::
+::::
 
 ## Usage from source
 

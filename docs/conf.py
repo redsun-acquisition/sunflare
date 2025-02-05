@@ -28,6 +28,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'sphinxcontrib.mermaid',
+    'sphinx_design',
     'myst_parser'
 ]
 
@@ -54,7 +55,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": f"https://github.com/{github_repo}/{github_user}",
+            "url": f"https://github.com/{github_user}/{github_repo}",
             "icon": "fa-brands fa-square-github",
             "type": "fontawesome",
         }
@@ -63,7 +64,7 @@ html_theme_options = {
 
 mermaid_version = "11.4.0"
 myst_fence_as_directive = ["mermaid"]
-myst_enable_extensions = ["attrs_block"]
+myst_enable_extensions = ['attrs_block', 'colon_fence']
 
 html_css_files = [
     'custom.css',
@@ -79,3 +80,5 @@ numfig = True
 
 napoleon_numpy_docstring = True
 autodoc_typehints = 'description'
+
+myst_heading_anchors = 3
