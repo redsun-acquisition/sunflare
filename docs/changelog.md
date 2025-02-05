@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
-## Unreleased
+## [0.3.4] - 05-02-2025
 
 ### Changed
 
@@ -127,6 +127,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.3.4]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.0...v0.3.1
