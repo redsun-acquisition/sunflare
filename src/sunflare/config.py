@@ -273,7 +273,10 @@ class RedSunSessionInfo:
     This class is used to store the configuration of a running Redsun application;
     it provides information about the hardware layout and the selected acquisition engine.
 
-    A minimal configuration must include the selected acquisition engine.
+    A minimal configuration must include:
+
+    - the selected frontend;
+    - the selected acquisition engine;
 
     Attributes
     ----------
@@ -303,13 +306,11 @@ class RedSunSessionInfo:
         on_setattr=setters.frozen,
     )
     engine: AcquisitionEngineTypes = field(
-        default=AcquisitionEngineTypes.BLUESKY,
         converter=_convert_engine_type,
         validator=validators.in_(AcquisitionEngineTypes),
         on_setattr=setters.frozen,
     )
     frontend: FrontendTypes = field(
-        default=FrontendTypes.PYQT,
         converter=_convert_frontend_type,
         validator=validators.in_(FrontendTypes),
         on_setattr=setters.frozen,
