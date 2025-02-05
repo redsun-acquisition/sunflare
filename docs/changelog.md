@@ -9,9 +9,9 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 ## [0.3.4] - 05-02-2025
 
-### Changed
+### Fixed
 
-- Fixed bug in `RedSunSessionInfo.store_yaml` which was not correctly parsing `Enum` and `tuple` types
+- bug in `RedSunSessionInfo.store_yaml` which was not correctly parsing `Enum` and `tuple` types
 
 ## [0.3.3] - 04-02-2025
 
