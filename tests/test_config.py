@@ -244,14 +244,23 @@ def test_full_config(config_path: Path, tmp_path: Path):
         assert widget.gui_choices == ["a", "b", "c"]
         assert widget.position == WidgetPositionTypes.CENTER
 
+    def _serializer(inst: Any, field: Any, value: Any) -> Any:
+        from enum import Enum
+
+        if isinstance(value, Enum):
+            return value.value
+        if isinstance(value, tuple):
+            return list(value)
+        return value
+
     # save the session and check if the 
     # temporary file content is the same
     # as the original configuration
     test_session_path = tmp_path / "test_session.yaml"
     session.store_yaml(test_session_path)
     with open(test_session_path, "r") as file:
-        stored_content = file.read()
-    expected_content = yaml.dump(asdict(session))
+        stored_content = yaml.safe_load(file.read())
+    expected_content = asdict(session, value_serializer=_serializer)
     assert stored_content == expected_content, "The configuration files are different."
 
 

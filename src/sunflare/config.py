@@ -266,7 +266,7 @@ def _convert_frontend_type(x: Union[str, FrontendTypes]) -> FrontendTypes:
     return x if isinstance(x, FrontendTypes) else FrontendTypes(x)
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class RedSunSessionInfo:
     """Redsun session configuration class.
 
@@ -281,9 +281,11 @@ class RedSunSessionInfo:
         The name of the current session. Defaults to ``Redsun``.
         It will be shown as the main window title.
     engine : ``AcquisitionEngineTypes``
-        Acquisition engine selected for the current session. Mandatory.
+        Acquisition engine selected for the current session.
+        Defaults to ``AcquisitionEngineTypes.BLUESKY``.
     frontend : ``FrontendTypes``
-        Frontend selected for the current session. Defaults to ``FrontendTypes.QT``.
+        Frontend selected for the current session.
+        Defaults to ``FrontendTypes.PYQT``.
     controllers : ``dict[str, ControllerInfo]``
         Controller informations dictionary.
         Defaults to an empty dictionary.
@@ -382,6 +384,17 @@ class RedSunSessionInfo:
         path : ``str``
             Path to the desired YAML file.
         """
+
+        def _serializer(inst: Any, field: Any, value: Any) -> Any:
+            if isinstance(value, Enum):
+                return value.value
+            if isinstance(value, tuple):
+                return list(value)
+            return value
+
         path_obj = Path(path)
         with open(path_obj, "w") as file:
-            yaml.dump(asdict(self), file)
+            yaml.dump(
+                asdict(self, value_serializer=_serializer),
+                file,
+            )
