@@ -35,7 +35,7 @@ class ClassFormatter(logging.Formatter):
         record.asctime = self.formatTime(record, self.datefmt)
         if "clsname" in record.__dict__:
             fmt += " [%(clsname)s"
-            if "uid" in record.__dict__ and record.__dict__["uid"] is not None:
+            if "uid" in record.__dict__ and len(record.__dict__["uid"]) > 0:
                 fmt += " -> %(uid)s"
             fmt += "]"
         fmt += " %(message)s"
