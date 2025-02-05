@@ -31,12 +31,6 @@ extensions = [
     'myst_parser'
 ]
 
-myst_enable_extensions = {
-    'attrs_block'
-}
-
-myst_fence_as_directive = ["mermaid"]
-
 templates_path = ['_templates']
 exclude_patterns = ['_build']
 
