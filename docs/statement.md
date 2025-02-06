@@ -13,7 +13,7 @@ As Redsun heavily leverages the concept of plugins, there is a need to provide a
         Plugins -->|used in| Redsun
 ```
 
-The diagram shows the relationship between Redsun, Sunflare and the custom plugins. Effectively, Redsun is nothing more than "glue" code that allows your custom application. What it does is:
+The diagram shows the relationship between Redsun, Sunflare and the custom plugins. Effectively, Redsun is nothing more than "glue" code that constructs your custom application. What it does is:
 
 - retrieve the user plugins via [Python entry points];
 - build said plugins and catch any possible exception throw by them;
