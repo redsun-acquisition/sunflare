@@ -205,7 +205,7 @@ class Loggable:
         """Class instance unique identifier.
 
         This property should be implemented by
-        all model and controller classes by default.
+        model classes by default.
 
         :meta-private:
         """
