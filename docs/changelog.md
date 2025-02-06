@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## Unreleased
+
+### Added
+
+- Added protocol equivalent for `ModelInfo`
+  - Currently untested
+  - This can be used in combination with `ModelProtocol` to define a Model interface from an external package without direct dependency to the `sunflare` package.
+
 ## [0.3.4] - 05-02-2025
 
 ### Fixed

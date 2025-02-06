@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Sized, Union, TypeVar
+from typing import Any, Sized, Union, TypeVar, Protocol, runtime_checkable
 
 import yaml
-from attrs import asdict, define, field, setters, validators
+from attrs import asdict, define, field, setters, validators, AttrsInstance
 
 from sunflare.log import get_logger
 
@@ -253,6 +253,33 @@ class ModelInfo:
                 if key != "model_name"
             }
         }
+
+
+@runtime_checkable
+class ModelInfoProtocol(AttrsInstance, Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.ModelInfo`.
+
+    This protocol allows to implement the ``ModelInfo`` class
+    in packages that do not depend on ``sunflare`` directly.
+
+    The only required dependency is `attrs`_.
+
+    _attrs: https://www.attrs.org/en/stable/
+    """
+
+    model_name: str
+    vendor: str
+    serial_number: str
+    plugin_name: str
+    repository: str
+
+    def read_configuration(self) -> dict[str, Any]:
+        """See :meth:`sunflare.config.ModelInfo.read_configuration`."""
+        ...
+
+    def describe_configuration(self) -> dict[str, Any]:
+        """See :meth:`sunflare.config.ModelInfo.describe_configuration`."""
+        ...
 
 
 # helper private functions for type conversion
