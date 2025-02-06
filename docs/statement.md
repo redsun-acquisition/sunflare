@@ -1,7 +1,7 @@
 # Statement of need
 
 The goal of Sunflare is to provide shared and recognizable programming patterns accross the entire Redsun ecosystem.
-As Redsun heavy leverages the concept of plugins, there is a need to provide a clear representation and a shared communication channel between the plugins that in the end build the desired application.
+As Redsun heavily leverages the concept of plugins, there is a need to provide a clear representation and a shared communication channel between the plugins that in the end build the desired application.
 
 ```mermaid
 :config: {"theme": "base"}
