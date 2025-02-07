@@ -15,6 +15,11 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Currently untested
   - This can be used in combination with `ModelProtocol` to define a Model interface from an external package without direct dependency to the `sunflare` package.
 
+### Changed
+
+- Minor docstring and renaming fixes
+- `engine` and `frontend` fields of `RedSunSessionInfo` are not optional anymore
+
 ## [0.3.4] - 05-02-2025
 
 ### Fixed

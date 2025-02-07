@@ -75,9 +75,6 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-# Enable figure numbering
-numfig = True
-
 napoleon_numpy_docstring = True
 autodoc_typehints = 'description'
 

@@ -2,10 +2,20 @@
 
 This section illustrates the contents of the package, how to use the provided components for each layer and how these components fit in the Bluesky ecosystem.
 
-```{toctree}
-:maxdepth: 1
+## Models
 
-model
+The `Model` represents an interface with a device.
+
+The definition of a model is quite fluid, as there are many ways that it can interact with the hardware depending on your needs.
+
+Sunflare provides a {py:class}`~sunflare.model.protocols.ModelProtocol` with a minimal required interface to be recognized by a Redsun application.
+
+Additional parameters can be passed to the `ModelProtocol` via the {py:class}`~sunflare.config.ModelInfo` configuration class, by subclassing the latter to provide additional configuration informations.
+
+```{toctree}
+:maxdepth: 2
+
+in_process_model
 ```
 
 [UML]: https://it.wikipedia.org/wiki/Unified_Modeling_Language
