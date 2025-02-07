@@ -1,4 +1,23 @@
-"""Wrapper for the RunEngine class to allow execution without blocking the main thread."""
+"""Wrapper for the :class:`~bluesky.run_engine.RunEngine` class to allow execution without blocking the main thread.
+
+The original implementation of the ``RunEngine`` blocks the
+execution of the main thread when the ``__call__`` method is used.
+This wrapper uses a ``ThreadPoolExecutor`` to run the execution
+in a separate thread, allowing the main thread to continue executing other tasks.
+
+.. note::
+
+    The ``context_manager`` attribute is forced to be an empty list to
+    avoid the use of the built-in ``SignalHandler`` context manager.
+    The rationale is that the original implementation is meant
+    for interactive usage (e.g., Jupyter notebooks, scripts) and not for
+    applications relying on an event loop.
+
+    When invoking ``RunEngine.__call__`` not in the main thread,
+    this will cause an exception as in Python
+    signal handlers (e.g. ``SIGINT``) can not
+    be handled in threads other than the main thread.
+"""
 
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any, Union
@@ -12,6 +31,8 @@ REResultType = Union[RunEngineResult, tuple[str, ...]]
 
 
 class RunEngine(BlueskyRunEngine):
+    __doc__ = BlueskyRunEngine.__doc__
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # force the context_managers to be empty,
         # otherwise the RunEngine will try to use the

@@ -4,7 +4,7 @@
 :maxdepth: 1
 
 config
-engine/index
+engine
 model
 controller
 virtual
