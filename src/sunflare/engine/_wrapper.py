@@ -8,6 +8,8 @@ from bluesky.run_engine import RunEngineResult
 
 __all__ = ["RunEngine", "RunEngineResult"]
 
+REResultType = Union[RunEngineResult, tuple[str, ...]]
+
 
 class RunEngine(BlueskyRunEngine):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -16,17 +18,17 @@ class RunEngine(BlueskyRunEngine):
         # SignalHandler context manager
         kwargs["context_managers"] = []
         self._executor = ThreadPoolExecutor(max_workers=1)
-        self._result: Union[RunEngineResult, tuple[str, ...]]
+        self._result: REResultType
         super().__init__(*args, **kwargs)  # type: ignore[no-untyped-call]
 
-    def __call__(self, *args: Any, **metadata_kw: Any) -> Future[Any]:
+    def __call__(self, *args: Any, **metadata_kw: Any) -> Future[REResultType]:
         self._fut = self._executor.submit(super().__call__, *args, **metadata_kw)
         self._fut.add_done_callback(self._set_result)
         return self._fut
 
-    def _set_result(self, fut: Future[Any]) -> None:
+    def _set_result(self, fut: Future[REResultType]) -> None:
         self._result = fut.result()
 
     @property
-    def result(self) -> Union[RunEngineResult, tuple[str, ...]]:
+    def result(self) -> Union[REResultType]:
         return self._result
