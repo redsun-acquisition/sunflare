@@ -22,6 +22,10 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Minor docstring and renaming fixes
 - `engine` and `frontend` fields of `RedSunSessionInfo` are not optional anymore
 
+### Fixed
+
+- `RunEngine.__call__` fails in Python 3.9 unless explictly setting the event loop in the executor
+
 ## [0.3.4] - 05-02-2025
 
 ### Fixed
