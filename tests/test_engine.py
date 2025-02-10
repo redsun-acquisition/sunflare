@@ -1,6 +1,6 @@
 import logging
 import platform
-from concurrent.futures import wait
+from concurrent.futures import wait, Future
 from time import sleep
 
 import pytest
@@ -172,3 +172,14 @@ def test_engine_wrapper_run_with_result() -> None:
 
     assert type(RE.result) == RunEngineResult
     assert RE.result.exit_status == "success"
+
+def test_engine_with_callback() -> None:
+
+    def callback(future: Future) -> None:
+        assert len(future.result()) == 1
+
+    RE = RunEngine()
+    fut = RE(count([det1], num=5))
+    fut.add_done_callback(callback)
+
+    wait([fut])
