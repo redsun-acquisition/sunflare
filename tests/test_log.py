@@ -1,10 +1,10 @@
 # type: ignore
 from __future__ import annotations
 
-import pytest
 import sys
-
 from typing import TYPE_CHECKING
+
+import pytest
 
 from sunflare.log import Loggable, get_logger
 

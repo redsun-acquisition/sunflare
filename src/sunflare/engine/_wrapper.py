@@ -42,6 +42,9 @@ class RunEngine(BlueskyRunEngine):
         self._result: REResultType
         super().__init__(*args, **kwargs)  # type: ignore[no-untyped-call]
 
+        # override pause message to be an empty string
+        self.pause_msg = ""
+
     def __call__(self, *args: Any, **metadata_kw: Any) -> Future[REResultType]:
         self._fut = self._executor.submit(super().__call__, *args, **metadata_kw)
         self._fut.add_done_callback(self._set_result)

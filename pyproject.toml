@@ -50,6 +50,7 @@ dev = [
   "ruff",
   "pytest",
   "pytest-cov",
+  "ophyd",
   "mypy"
 ]
 

@@ -1,13 +1,13 @@
 import os
-import yaml
+from typing import Any, cast
 
 import pytest
-
-from typing import Any, cast
+import yaml
 from attrs import asdict
+from mocks import MockDetector, MockDetectorInfo, MockMotor, MockMotorInfo
 
 from sunflare.config import RedSunSessionInfo
-from mocks import MockDetector, MockMotor, MockDetectorInfo, MockMotorInfo
+
 
 def test_detector_model(config_path: str) -> None:
     """Test the detector model info."""

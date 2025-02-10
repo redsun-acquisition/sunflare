@@ -1,15 +1,18 @@
 import logging
 import platform
+from concurrent.futures import wait
 from time import sleep
 
 import pytest
+from bluesky.plans import count
+from ophyd.sim import det1
 
+from sunflare.engine import RunEngine, Status, RunEngineResult
 from sunflare.engine._exceptions import (
     InvalidState,
     StatusTimeoutError,
-    WaitTimeoutError
+    WaitTimeoutError,
 )
-from sunflare.engine._status import Status
 from sunflare.log import get_logger
 
 
@@ -144,3 +147,28 @@ def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
     # Check that the exception was logged
     # TODO: find a way to do this properly;
     #       the test passes though
+
+
+def test_engine_wrapper_construction() -> None:
+    RE = RunEngine()
+
+    assert RE.context_managers == []
+    assert RE.pause_msg == ""
+
+def test_engine_wrapper_run() -> None:
+    RE = RunEngine()
+    fut = RE(count([det1], num=5))
+    
+    wait([fut])
+
+    assert type(RE.result) == tuple
+    assert len(RE.result) == 1
+
+def test_engine_wrapper_run_with_result() -> None:
+    RE = RunEngine(call_returns_result=True)
+    fut = RE(count([det1], num=5))
+    
+    wait([fut])
+
+    assert type(RE.result) == RunEngineResult
+    assert RE.result.exit_status == "success"

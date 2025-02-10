@@ -1,19 +1,18 @@
-from typing import Any
 from functools import partial
+from typing import Any
 
 from attrs import define, field, validators
-
-from sunflare.config import ModelInfo, ControllerInfo, WidgetInfo
-from sunflare.model import ModelProtocol
-from sunflare.controller import ControllerProtocol
-from sunflare.virtual import VirtualBus, Signal
-
-from bluesky.run_engine import RunEngine
+from bluesky.plan_stubs import close_run, open_run, read, rel_set
 from bluesky.protocols import Reading
+from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
-from bluesky.plan_stubs import open_run, close_run, read, rel_set
-
 from event_model.documents.event_descriptor import DataKey
+
+from sunflare.config import ControllerInfo, ModelInfo, WidgetInfo
+from sunflare.controller import ControllerProtocol
+from sunflare.model import ModelProtocol
+from sunflare.virtual import Signal, VirtualBus
+
 
 class MockVirtualBus(VirtualBus):
     sigFoo = Signal()

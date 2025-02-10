@@ -1,7 +1,10 @@
-from typing import cast
 from pathlib import Path
-from mocks import MockControllerInfo, MockController, MockVirtualBus
-from sunflare.config import RedSunSessionInfo, ControllerInfo
+from typing import cast
+
+from mocks import MockController, MockControllerInfo, MockVirtualBus
+
+from sunflare.config import ControllerInfo, RedSunSessionInfo
+
 
 def test_controller(config_path: Path) -> None:
     config_file = config_path / "controller_instance.yaml"

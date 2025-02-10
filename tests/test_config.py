@@ -1,15 +1,16 @@
 # type: ignore
 
+from pathlib import Path
+from typing import Any
+
 import pytest
 import yaml
 from attrs import asdict
-from typing import Any
+from mocks import MockControllerInfo, MockDetectorInfo, MockMotorInfo, MockWidgetInfo
 from pytest import LogCaptureFixture
 
-from pathlib import Path
 from sunflare.config import RedSunSessionInfo, WidgetPositionTypes
 
-from mocks import MockDetectorInfo, MockMotorInfo, MockControllerInfo, MockWidgetInfo
 
 def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None:
     """Test non-existent file."""
