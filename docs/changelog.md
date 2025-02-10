@@ -14,6 +14,8 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Added protocol equivalent for `ModelInfo`
   - Currently untested
   - This can be used in combination with `ModelProtocol` to define a Model interface from an external package without direct dependency to the `sunflare` package.
+- Added documentation for `Controller`
+- Added tests for `RunEngine` wrapper
 
 ### Changed
 
