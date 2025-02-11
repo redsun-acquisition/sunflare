@@ -42,7 +42,6 @@ docs = [
     "sphinx",
     "pydata-sphinx-theme",
     "sphinxcontrib-mermaid",
-    "sphinx-multiversion",
     "sphinx-design",
     "myst-parser"
 ]
