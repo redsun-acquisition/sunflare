@@ -42,9 +42,12 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
 
 from __future__ import annotations
 
+import threading
+import weakref
 from types import MappingProxyType
-from typing import Callable, Iterable, Optional, TypeVar, Union, overload
+from typing import Callable, Iterable, Optional, TypeVar, Union, overload, ClassVar
 
+import zmq
 from event_model.documents import Event, EventDescriptor, RunStart, RunStop
 from psygnal import Signal, SignalInstance
 
@@ -54,6 +57,9 @@ __all__ = ["Signal", "VirtualBus", "slot"]
 
 
 F = TypeVar("F", bound=Callable[..., object])
+
+_INPROC_PUB = "inproc://virtual_xpub"
+_INPROC_SUB = "inproc://virtual_xsub"
 
 
 @overload
@@ -135,6 +141,8 @@ class VirtualBus(Loggable):
         Signal to forward ``EventDescriptor`` documents to the frontend.
     sigNewRunStop : ``Signal(str, RunStop)``
         Signal to forward ``RunStop`` documents to the frontend.
+    contetx: ``zmq.SyncContext``
+        The ZMQ context of the virtual bus.
     """
 
     sigNewRunStart = Signal(str, RunStart)
@@ -142,8 +150,46 @@ class VirtualBus(Loggable):
     sigNewDescriptor = Signal(str, EventDescriptor)
     sigNewRunStop = Signal(str, RunStop)
 
+    _INPROC_MAP: ClassVar[dict[int, str]] = {
+        zmq.SUB: _INPROC_PUB,
+        zmq.PUB: _INPROC_PUB,
+    }
+
+    _SOCKET_MAP: weakref.WeakValueDictionary[str, zmq.SyncSocket] = (
+        weakref.WeakValueDictionary()
+    )
+
+    _POLLER_MAP: weakref.WeakValueDictionary[str, zmq.Poller] = (
+        weakref.WeakValueDictionary()
+    )
+
     def __init__(self) -> None:
         self._cache: dict[str, dict[str, SignalInstance]] = {}
+
+        # this should be configurable
+        # from RedSunSessionInfo...
+        self._ctx = zmq.Context()
+        self._xsub = zmq.Socket(self._ctx, zmq.XSUB)
+        self._xsub.bind(_INPROC_SUB)
+        self._xpub = zmq.Socket(self._ctx, zmq.XPUB)
+        self._xpub.bind(_INPROC_PUB)
+        self._poller = zmq.Poller()
+        self._poller.register(self._xsub, zmq.POLLIN)
+        self._poller.register(self._xpub, zmq.POLLIN)
+
+        self._proxy_thread = threading.Thread(target=self._run_proxy, daemon=True)
+        self._proxy_thread.start()
+
+    def shutdown(self) -> None:
+        """Shutdown the virtual bus.
+
+        Closes the ZMQ context and terminates the streamer queue.
+        """
+        for owner, poller in self._POLLER_MAP.items():
+            poller.unregister(self._SOCKET_MAP[owner])
+        for socket in self._SOCKET_MAP.values():
+            socket.close()
+        self._ctx.term()
 
     def register_signals(
         self, owner: object, only: Optional[Iterable[str]] = None
@@ -153,9 +199,9 @@ class VirtualBus(Loggable):
 
         Parameters
         ----------
-        owner : object
+        owner : ``object``
             The instance whose class's signals are to be cached.
-        only : iterable of str, optional
+        only : ``Iterable[str]``, optional
             A list of signal names to cache. If not provided, all
             signals in the class will be cached automatically by inspecting
             the class attributes.
@@ -171,7 +217,7 @@ class VirtualBus(Loggable):
         class_name = owner_class.__name__  # Name of the class
 
         if only is None:
-            # Automatically detect all attributes of the class that are psygnal Signal descriptors
+            # Automatically detect all attributes of the class that are psygnal.Signal descriptors
             only = [
                 name
                 for name in dir(owner_class)
@@ -226,3 +272,87 @@ class VirtualBus(Loggable):
             True if the class is in the registry, False otherwise.
         """
         return class_name in self._cache
+
+    def _run_proxy(self) -> None:
+        """Run the proxy in a daemon thread.
+
+        Messages are forwarded from the XSUB socket to the XPUB socket,
+        where are then forwarded to multiple SUB sockets.
+        """
+        try:
+            while True:
+                try:
+                    events = dict(self._poller.poll())
+                    if self._xsub in events:
+                        msg = self._xsub.recv()
+                        self._xsub.send(msg)
+                    if self._xpub in events:
+                        msg = self._xpub.recv()
+                        self._xpub.send(msg)
+                except zmq.error.ContextTerminated:
+                    break
+        finally:
+            self._poller.unregister(self._xsub)
+            self._poller.unregister(self._xpub)
+            self._xpub.close()
+            self._xsub.close()
+
+    def connect(
+        self, owner: object, socket_type: int
+    ) -> Union[Optional[zmq.SyncSocket], Optional[tuple[zmq.SyncSocket, zmq.Poller]]]:
+        """Return a new socket connected to the virtual bus context.
+
+        Class instances may use this method to
+        create a new socket which will be automatically
+        connected to the virtual bus.
+
+        Parameters
+        ----------
+        owner: ``object``
+            The object that will own the socket.
+            Used to retrieve the class name as a string.
+            Typical usage:
+
+            .. code-block:: python
+
+                    class MyClass:
+                        def __init__(self, bus: VirtualBus):
+                            # create a new publisher socket
+                            self.socket = bus.socket(self, zmq.PUB)
+
+        socket_type : ``int | zmq.SocketType``
+            The type of the socket to create.
+            Accepted values are:
+
+            - ``1`` / ``zmq.PUB``: Publisher socket.
+            - ``2`` / ``zmq.SUB``: Subscriber socket.
+
+        Returns
+        -------
+        ``zmq.Socket | None``
+            A new socket for the virtual bus.
+            If the socket type is invalid,
+            logs the error returns ``None``.
+        """
+        owner_name = owner.__class__.__name__
+        if socket_type not in [zmq.PUB, zmq.SUB]:
+            self.error(
+                f"Invalid socket type: {zmq.SocketType(socket_type)}. Aborting connection."
+            )
+            return None
+        socket = self._ctx.socket(socket_type)
+        socket.connect(self._INPROC_MAP[socket_type])
+        self._SOCKET_MAP[owner_name] = socket
+
+        if socket_type == zmq.SUB:
+            poller = zmq.Poller()
+            poller.register(socket, zmq.POLLIN)
+            self._POLLER_MAP[owner_name] = poller
+            return socket, poller
+        else:
+            return socket
+
+    @property
+    def context(self) -> zmq.SyncContext:
+        """The ZMQ context of the virtual bus."""
+        return self._ctx
