@@ -21,7 +21,6 @@ in a separate thread, allowing the main thread to continue executing other tasks
 
 import asyncio
 import sys
-
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any, Union
 
