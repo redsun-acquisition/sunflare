@@ -149,14 +149,12 @@ def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
     #       the test passes though
 
 
-def test_engine_wrapper_construction() -> None:
-    RE = RunEngine()
+def test_engine_wrapper_construction(RE: RunEngine) -> None:
 
     assert RE.context_managers == []
     assert RE.pause_msg == ""
 
-def test_engine_wrapper_run() -> None:
-    RE = RunEngine()
+def test_engine_wrapper_run(RE: RunEngine) -> None:
     fut = RE(count([det1], num=5))
     
     wait([fut])
@@ -164,8 +162,8 @@ def test_engine_wrapper_run() -> None:
     assert type(RE.result) == tuple
     assert len(RE.result) == 1
 
-def test_engine_wrapper_run_with_result() -> None:
-    RE = RunEngine(call_returns_result=True)
+def test_engine_wrapper_run_with_result(RE: RunEngine) -> None:
+    RE._call_returns_result = True
     fut = RE(count([det1], num=5))
     
     wait([fut])
@@ -173,12 +171,13 @@ def test_engine_wrapper_run_with_result() -> None:
     assert type(RE.result) == RunEngineResult
     assert RE.result.exit_status == "success"
 
-def test_engine_with_callback() -> None:
+    RE._call_returns_result = False
+
+def test_engine_with_callback(RE: RunEngine) -> None:
 
     def callback(future: Future) -> None:
         assert len(future.result()) == 1
 
-    RE = RunEngine()
     fut = RE(count([det1], num=5))
     fut.add_done_callback(callback)
 
