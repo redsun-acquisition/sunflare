@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import logging.config
 
-__all__ = ["Loggable", "get_logger"]
+__all__ = ["Loggable"]
 
 from typing import TYPE_CHECKING
 
@@ -210,15 +210,3 @@ class Loggable:
         :meta-private:
         """
         return str()
-
-
-def get_logger() -> logging.Logger:
-    """
-    Return the core logger.
-
-    Returns
-    -------
-    ``logging.Logger``
-        The core logger instance.
-    """
-    return logger

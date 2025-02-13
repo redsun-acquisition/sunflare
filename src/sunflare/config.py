@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Protocol, Sized, TypeVar, Union, runtime_checkable
 
 import yaml
 from attrs import AttrsInstance, asdict, define, field, setters, validators
-
-from sunflare.log import get_logger
 
 T = TypeVar("T")
 
@@ -374,7 +373,7 @@ class RedSunSessionInfo:
         ``yaml.YAMLError``
             If an error occurs while loading the file.
         """
-        logger = get_logger()
+        logger = logging.getLogger("redsun")
 
         path_obj = Path(path)
 

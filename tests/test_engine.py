@@ -13,7 +13,6 @@ from sunflare.engine._exceptions import (
     StatusTimeoutError,
     WaitTimeoutError,
 )
-from sunflare.log import get_logger
 
 
 def test_status() -> None:
@@ -127,7 +126,7 @@ def test_status_settle_time() -> None:
 
 
 def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
-    logger = get_logger()
+    logger = logging.getLogger("redsun")
     logger.setLevel(logging.DEBUG)
 
     # Create a callback that will raise an exception

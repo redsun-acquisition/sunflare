@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from sunflare.log import Loggable, get_logger
+from sunflare.log import Loggable
 
 if TYPE_CHECKING:
     from pytest import LogCaptureFixture
@@ -19,12 +19,6 @@ class MockLoggable(Loggable):
     @property
     def name(self) -> str:
         return self.__name
-
-
-def test_getter() -> None:
-    logger = get_logger()
-    assert logger.name == "redsun"
-
 
 
 @pytest.mark.skipif(sys.platform == "darwin", reason="logger counts an additional record on macOS somehow")

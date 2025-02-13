@@ -1,34 +1,50 @@
 # type: ignore
 import logging
+import threading
+import time
 
+from typing import Generator
+
+import zmq
 import pytest
 
-from sunflare.log import get_logger
 from sunflare.virtual import Signal, VirtualBus, slot
-
+from sunflare.log import Loggable
 
 class MockVirtualBus(VirtualBus):
     sigMySignal = Signal(int, description="My signal")
 
-    def __init__(self):
-        super().__init__()
+@pytest.fixture(scope="function")
+def bus() -> Generator[MockVirtualBus, None, None]:
+
+    context = zmq.Context.instance()
+    context.term()
+    zmq.Context._instance = None
+
+    _bus = MockVirtualBus()
+
+    yield _bus
+
+    _bus.shutdown()
+
+    context = zmq.Context.instance()
+    context.term()
+    zmq.Context._instance = None
 
 
-def test_virtual_bus() -> None:
+def test_virtual_bus(bus: MockVirtualBus) -> None:
     """Tests the creation of a singleton virtual bus."""
-    bus = MockVirtualBus()
 
     assert hasattr(bus, "sigMySignal")
 
 
-def test_virtual_bus_psygnal_registration() -> None:
+def test_virtual_bus_psygnal_registration(bus: MockVirtualBus) -> None:
     """Tests the registration of signals in the virtual bus."""
 
     class MockOwner:
         sigMySignal = Signal(int, description="My signal")
 
     owner = MockOwner()
-    bus = MockVirtualBus()
 
     bus.register_signals(owner)
 
@@ -40,13 +56,12 @@ def test_virtual_bus_psygnal_registration() -> None:
     bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
     bus["MockOwner"]["sigMySignal"].emit(5)
 
-def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture) -> None:
+def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture,bus: VirtualBus) -> None:
     """Test that trying to access a non-existent signal raises an error."""
 
-    logger = get_logger()
+    logger = logging.getLogger("redsun")
     logger.setLevel(logging.DEBUG)
 
-    bus = MockVirtualBus()
     signals = bus["MockOwner"]
 
     assert len(signals) == 0
@@ -54,7 +69,7 @@ def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture) -> None:
     assert caplog.records[0].message == "Class MockOwner not found in the registry."
 
 
-def test_virtual_bus_psygnal_connection() -> None:
+def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     """Tests the connection of signals in the virtual bus."""
 
     class FirstMockOwner:
@@ -87,8 +102,6 @@ def test_virtual_bus_psygnal_connection() -> None:
         def first_to_second(self, x: int) -> None:
             assert x == 5
 
-    bus = MockVirtualBus()
-
     first_owner = FirstMockOwner(bus)
     second_owner = SecondMockOwner(bus)
 
@@ -105,7 +118,7 @@ def test_virtual_bus_psygnal_connection() -> None:
     second_owner.sigSecondSignal.emit(5)
 
 
-def test_virtual_bus_psygnal_connection_only() -> None:
+def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
     """Test "register_signals" using the 'only' parameter. """
 
     def callback(x: int) -> None:
@@ -115,7 +128,6 @@ def test_virtual_bus_psygnal_connection_only() -> None:
         sigSignalOne = Signal(int)
         sigSignalTwo = Signal(int)
 
-    bus = MockVirtualBus()
     owner = MockOwner()
 
     bus.register_signals(owner, only=["sigSignalOne"])
@@ -149,43 +161,151 @@ def test_slot_private() -> None:
     assert hasattr(_test_slot, "__isprivate__")
 
 
-def test_virtual_bus_zmq() -> None:
+def test_virtual_bus_zmq(bus: VirtualBus) -> None:
     """Test the bus ZMQ context."""
 
-    import zmq, threading
-
-    class Publisher():
+    class Publisher(Loggable):
         def __init__(self, bus: VirtualBus) -> None:
             self.bus = bus
-            self.socket = self.bus.connect(self, zmq.PUB)
+            self.socket = self.bus.connect(zmq.PUB)
 
         def send(self, msg: str) -> None:
+            self.debug(f"Sending message: {msg}")
             self.socket.send_string(msg)
 
-    class Subscriber():
+        def shutdown(self) -> None:
+            self.socket.close()
+
+    class Subscriber(Loggable):
         def __init__(self, bus: VirtualBus) -> None:
             self.msg = ""
             self.bus = bus
-            self.socket, self.poller = self.bus.connect(self, zmq.SUB)
+            self.socket, self.poller = self.bus.connect(zmq.SUB)
+            self.socket.subscribe("")
+
+            self._shutdown_event = threading.Event()
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
 
-        def _polling_thread(self) -> None:
-            while True:
-                try:
-                    socks = dict(self.poller.poll())
-                    if self.socket in socks:
-                        self.msg = self.socket.recv_string()
-                except zmq.error.ContextTerminated:
-                    break
+        def shutdown(self) -> None:
+            self._shutdown_event.set()
 
-    bus = VirtualBus()
+        def _polling_thread(self) -> None:
+            try:
+                while not self._shutdown_event.is_set():
+                    try:
+                        socks = dict(self.poller.poll(timeout=10))
+                        if self.socket in socks:
+                            self.msg = self.socket.recv_string()
+                            self.debug(f"Received message: {self.msg}")
+                    except zmq.error.ContextTerminated:
+                        break
+            finally:
+                self.poller.unregister(self.socket)
+                self.socket.close()
+                self.debug("Subscriber socket closed.")
+
     pub = Publisher(bus)
     sub = Subscriber(bus)
 
-    pub.send("Hello, World!")
+    # give time for
+    # subscrbier to connect
+    time.sleep(0.1)
 
-    bus.shutdown()
+    test_msg = "Hello, World!"
+    pub.send(test_msg)
 
-    assert sub.msg == "Hello, World!"
+    # give some time
+    # for message transmission
+    time.sleep(0.1)
+
+    # close the publisher
+    sub.shutdown()
+    pub.shutdown()
+
+    assert sub.msg == test_msg, f"Expected '{test_msg}', but got '{sub.msg}'"
+
+def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
+    """Test that subscribers only receive messages they're subscribed to."""
+
+    class Publisher(Loggable):
+        def __init__(self, bus: VirtualBus) -> None:
+            self.bus = bus
+            self.socket = self.bus.connect(zmq.PUB)
+
+        def send(self, topic: str, value: float) -> None:
+            msg = f"{topic} {value}"
+            self.debug(f"Sending message: {msg}")
+            self.socket.send_string(msg)
+
+        def shutdown(self) -> None:
+            self.socket.close()
+
+    class Subscriber(Loggable):
+        def __init__(self, bus: VirtualBus, topics: list[str]) -> None:
+            self.received_messages: list[str] = []
+            self.bus = bus
+            self.socket, self.poller = self.bus.connect(zmq.SUB, topic=topics)
+            self.debug(f"Subscribed to: {topics}")
+
+            self._shutdown_event = threading.Event()
+            self.thread = threading.Thread(target=self._polling_thread, daemon=True)
+            self.thread.start()
+
+        def _polling_thread(self) -> None:
+            try:
+                while not self._shutdown_event.is_set():
+                    try:
+                        socks = dict(self.poller.poll(timeout=1))
+                        if self.socket in socks:
+                            msg = self.socket.recv_string()
+                            self.debug(f"Received message: {msg}")
+                            self.received_messages.append(msg)
+                    except zmq.error.ContextTerminated:
+                        break
+            finally:
+                self.poller.unregister(self.socket)
+                self.socket.close()
+                self.debug("Subscriber socket closed.")
+
+        def shutdown(self) -> None:
+            self._shutdown_event.set()
+            self.thread.join()
+
+    # Create publisher and subscribers
+    pub = Publisher(bus)
+    
+    # Create subscribers with different topic subscriptions
+    sub_temp = Subscriber(bus, ["temperature"])  # Only temperature messages
+    sub_humidity = Subscriber(bus, ["humidity"])  # Only humidity messages
+    
+    # Wait for subscriptions to be set up
+    time.sleep(0.1)
+
+    # Send various messages
+    pub.send("temperature", 25.5)
+    pub.send("humidity", 60.0)
+    pub.send("pressure", 1013.25)  # Neither subscriber should receive this
+
+    # Wait for message processing
+    time.sleep(0.1)
+
+    # Clean shutdown
+    sub_temp.shutdown()
+    sub_humidity.shutdown()
+    pub.shutdown()
+
+    # Verify temperature subscriber
+    temp_messages = sub_temp.received_messages
+    assert len(temp_messages) == 1, f"Expected 1 temperature message, got {len(temp_messages)}"
+    assert temp_messages[0] == "temperature 25.5", f"Unexpected message: {temp_messages[0]}"
+    assert not any("humidity" in msg for msg in temp_messages), "Temperature subscriber received humidity message"
+    assert not any("pressure" in msg for msg in temp_messages), "Temperature subscriber received pressure message"
+
+    # Verify humidity subscriber
+    humid_messages = sub_humidity.received_messages
+    assert len(humid_messages) == 1, f"Expected 1 humidity message, got {len(humid_messages)}"
+    assert humid_messages[0] == "humidity 60.0", f"Unexpected message: {humid_messages[0]}"
+    assert not any("temperature" in msg for msg in humid_messages), "Humidity subscriber received temperature message"
+    assert not any("pressure" in msg for msg in humid_messages), "Humidity subscriber received pressure message"
