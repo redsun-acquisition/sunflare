@@ -140,8 +140,6 @@ class VirtualBus(Loggable):
         Signal to forward ``EventDescriptor`` documents to the frontend.
     sigNewRunStop : ``Signal(str, RunStop)``
         Signal to forward ``RunStop`` documents to the frontend.
-    contetx: ``zmq.SyncContext``
-        The ZMQ context of the virtual bus.
     """
 
     sigNewRunStart = Signal(str, RunStart)
