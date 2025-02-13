@@ -28,6 +28,8 @@ else:
 
 from typing import Any, Mapping, runtime_checkable
 
+import zmq
+
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo
@@ -136,3 +138,14 @@ class ControllerProtocol(Protocol):
     def plans(self) -> list[partial[MsgGenerator[Any]]]:
         """List of available plans."""
         ...
+
+
+class SyncPublisher:
+    """Mixin class for synchronous ZMQ publishers."""
+
+    socket: zmq.SyncSocket
+    _virtual_bus: VirtualBus
+
+    def connect(self) -> None:
+        """Connect to the virtual bus."""
+        self.socket = self._virtual_bus.connect(zmq.PUB)
