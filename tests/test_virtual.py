@@ -183,19 +183,17 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
             self.socket, self.poller = self.bus.connect(zmq.SUB)
             self.socket.subscribe("")
 
-            self._shutdown_event = threading.Event()
-
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
 
         def shutdown(self) -> None:
-            self._shutdown_event.set()
+            self.thread.join()
 
         def _polling_thread(self) -> None:
             try:
-                while not self._shutdown_event.is_set():
+                while True:
                     try:
-                        socks = dict(self.poller.poll(timeout=10))
+                        socks = dict(self.poller.poll())
                         if self.socket in socks:
                             self.msg = self.socket.recv_string()
                             self.debug(f"Received message: {self.msg}")
@@ -221,13 +219,21 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
     time.sleep(0.1)
 
     # close the publisher
-    sub.shutdown()
     pub.shutdown()
+
+    # shutdown the bus;
+    # this will kill
+    # all connected
+    # subscribers
+    bus.shutdown()
 
     assert sub.msg == test_msg, f"Expected '{test_msg}', but got '{sub.msg}'"
 
 def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
     """Test that subscribers only receive messages they're subscribed to."""
+
+    logger = logging.getLogger("redsun")
+    logger.setLevel(logging.DEBUG)
 
     class Publisher(Loggable):
         def __init__(self, bus: VirtualBus) -> None:
@@ -249,15 +255,14 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
             self.socket, self.poller = self.bus.connect(zmq.SUB, topic=topics)
             self.debug(f"Subscribed to: {topics}")
 
-            self._shutdown_event = threading.Event()
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
 
         def _polling_thread(self) -> None:
             try:
-                while not self._shutdown_event.is_set():
+                while True:
                     try:
-                        socks = dict(self.poller.poll(timeout=1))
+                        socks = dict(self.poller.poll())
                         if self.socket in socks:
                             msg = self.socket.recv_string()
                             self.debug(f"Received message: {msg}")
@@ -270,7 +275,6 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
                 self.debug("Subscriber socket closed.")
 
         def shutdown(self) -> None:
-            self._shutdown_event.set()
             self.thread.join()
 
     # Create publisher and subscribers
@@ -283,6 +287,8 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
     # Wait for subscriptions to be set up
     time.sleep(0.1)
 
+    logger.debug(bus._forwarder._sockets)    
+
     # Send various messages
     pub.send("temperature", 25.5)
     pub.send("humidity", 60.0)
@@ -291,10 +297,14 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
     # Wait for message processing
     time.sleep(0.1)
 
-    # Clean shutdown
-    sub_temp.shutdown()
-    sub_humidity.shutdown()
+    # close the publisher
     pub.shutdown()
+
+    # shutdown the bus;
+    # this will kill
+    # all connected
+    # subscribers
+    bus.shutdown()
 
     # Verify temperature subscriber
     temp_messages = sub_temp.received_messages

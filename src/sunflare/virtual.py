@@ -173,8 +173,14 @@ class VirtualBus(Loggable):
 
         Closes the ZMQ context and terminates the streamer queue.
         """
-        self._context.term()
-        self._forwarder.join()
+        self.debug("Shutting down the virtual bus.")
+        try:
+            self._context.term()
+        except zmq.error.ZMQError:
+            self.debug("ZMQ context already terminated.")
+        finally:
+            if not self._forwarder.done:
+                self._forwarder.join()
 
     def register_signals(
         self, owner: object, only: Optional[Iterable[str]] = None
