@@ -267,19 +267,20 @@ class VirtualBus(Loggable):
         return class_name in self._cache
 
     @overload
-    def connect(
-        self, socket_type: int, *, topic: None = None
-    ) -> Optional[Union[zmq.SyncSocket, tuple[zmq.SyncSocket, zmq.Poller]]]: ...
+    def connect(self, socket_type: int) -> zmq.SyncSocket: ...
+
+    @overload
+    def connect(self, socket_type: int, *, topic: None) -> zmq.SyncSocket: ...
 
     @overload
     def connect(
         self, socket_type: int, *, topic: str
-    ) -> Optional[Union[zmq.SyncSocket, tuple[zmq.SyncSocket, zmq.Poller]]]: ...
+    ) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
 
     @overload
     def connect(
         self, socket_type: int, *, topic: Iterable[str]
-    ) -> Optional[Union[zmq.SyncSocket, tuple[zmq.SyncSocket, zmq.Poller]]]: ...
+    ) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
 
     def connect(
         self,
