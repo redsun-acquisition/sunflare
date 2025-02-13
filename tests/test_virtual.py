@@ -173,9 +173,6 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
             self.debug(f"Sending message: {msg}")
             self.socket.send_string(msg)
 
-        def shutdown(self) -> None:
-            self.socket.close()
-
     class Subscriber(Loggable):
         def __init__(self, bus: VirtualBus) -> None:
             self.msg = ""
@@ -185,9 +182,6 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
-
-        def shutdown(self) -> None:
-            self.thread.join()
 
         def _polling_thread(self) -> None:
             try:
@@ -218,9 +212,6 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
     # for message transmission
     time.sleep(0.1)
 
-    # close the publisher
-    pub.shutdown()
-
     # shutdown the bus;
     # this will kill
     # all connected
@@ -244,9 +235,6 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
             msg = f"{topic} {value}"
             self.debug(f"Sending message: {msg}")
             self.socket.send_string(msg)
-
-        def shutdown(self) -> None:
-            self.socket.close()
 
     class Subscriber(Loggable):
         def __init__(self, bus: VirtualBus, topics: list[str]) -> None:
@@ -274,9 +262,6 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
                 self.socket.close()
                 self.debug("Subscriber socket closed.")
 
-        def shutdown(self) -> None:
-            self.thread.join()
-
     # Create publisher and subscribers
     pub = Publisher(bus)
     
@@ -296,9 +281,6 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
 
     # Wait for message processing
     time.sleep(0.1)
-
-    # close the publisher
-    pub.shutdown()
 
     # shutdown the bus;
     # this will kill

@@ -154,6 +154,8 @@ class VirtualBus(Loggable):
         zmq.PUB: _INPROC_XSUB,
     }
 
+    _PUB_SOCKETS: ClassVar[set[zmq.SyncSocket]] = set()
+
     def __init__(self) -> None:
         self._cache: dict[str, dict[str, SignalInstance]] = {}
 
@@ -171,7 +173,9 @@ class VirtualBus(Loggable):
 
         Closes the ZMQ context and terminates the streamer queue.
         """
-        self.debug("Shutting down the virtual bus.")
+        self.debug("Closing publisher sockets.")
+        for socket in self._PUB_SOCKETS:
+            socket.close()
         try:
             self._context.term()
         except zmq.error.ZMQError:
@@ -333,4 +337,5 @@ class VirtualBus(Loggable):
                     socket.subscribe(t)
             return socket, poller
         else:
+            self._PUB_SOCKETS.add(socket)
             return socket
