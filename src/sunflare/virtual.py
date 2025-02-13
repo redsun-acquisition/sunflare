@@ -336,8 +336,3 @@ class VirtualBus(Loggable):
             return socket, poller
         else:
             return socket
-
-    @property
-    def context(self) -> zmq.SyncContext:
-        """The ZMQ context of the virtual bus."""
-        return self._forwarder._context
