@@ -7,6 +7,7 @@ from weakref import WeakValueDictionary
 from event_model import (
     Datum,
     DatumPage,
+    DocumentNames,
     Event,
     EventDescriptor,
     EventPage,
@@ -15,7 +16,6 @@ from event_model import (
     RunStop,
     StreamDatum,
     StreamResource,
-    DocumentNames,
 )
 
 from sunflare.virtual import encode
