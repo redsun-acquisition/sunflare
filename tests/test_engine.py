@@ -1,5 +1,8 @@
 import logging
 import platform
+import threading
+import zmq
+from typing import Any, NamedTuple
 from concurrent.futures import wait, Future
 from time import sleep
 
@@ -8,6 +11,7 @@ from bluesky.plans import count
 from ophyd.sim import det1
 
 from sunflare.engine import RunEngine, Status, RunEngineResult
+from sunflare.engine._wrapper import CallableToken
 from sunflare.engine._exceptions import (
     InvalidState,
     StatusTimeoutError,
@@ -181,3 +185,77 @@ def test_engine_with_callback(RE: RunEngine) -> None:
     fut.add_done_callback(callback)
 
     wait([fut])
+
+def test_engine_callbacks(RE: RunEngine) -> None:
+
+    def all_callback(name: str, doc: dict[str, Any]) -> None:
+        assert name in ["start", "descriptor", "event", "stop"]
+        assert threading.current_thread().name == "bluesky-run-engine"
+
+    def start_callback(name: str, doc: dict[str, Any]) -> None:
+        assert name == "start"
+        assert threading.current_thread().name == "bluesky-run-engine"
+    
+    def descriptor_callback(name: str, doc: dict[str, Any]) -> None:
+        assert name == "descriptor"
+        assert threading.current_thread().name == "bluesky-run-engine"
+    
+    def event_callback(name: str, doc: dict[str, Any]) -> None:
+        assert name == "event"
+        assert threading.current_thread().name == "bluesky-run-engine"
+    
+    def stop_callback(name: str, doc: dict[str, Any]) -> None:
+        assert name == "stop"
+        assert threading.current_thread().name == "bluesky-run-engine"
+
+    RE.subscribe(all_callback)
+    RE.subscribe(start_callback, "start")
+    RE.subscribe(descriptor_callback, "descriptor")
+    RE.subscribe(event_callback, "event")
+    RE.subscribe(stop_callback, "stop")
+
+    fut = RE(count([det1], num=5))
+    wait([fut])
+
+    RE.clear_suspenders
+
+    counter = 0
+
+    def callback(name: str, doc: dict[str, Any]) -> None:
+        nonlocal counter
+        counter += 1
+
+    token = RE.subscribe(callback)
+    RE.unsubscribe(token)
+
+    assert isinstance(token, int)
+    assert isinstance(token, CallableToken)
+
+    fut = RE(count([det1], num=5))
+    wait([fut])
+
+    assert counter == 0
+
+def test_engine_sockets(RE: RunEngine) -> None:
+
+    class Message(NamedTuple):
+        name: str
+        document: dict[str, Any]
+
+    def receiver_socket(self) -> None:
+        context = zmq.Context().instance()
+        socket = context.socket(zmq.PULL)
+        poller = zmq.Poller()
+        socket.connect("inproc://test")
+        socket.setsockopt(zmq.LINGER, 0)
+        poller.register(socket, zmq.POLLIN)
+
+        while True:
+            try:
+                socks = dict(poller.poll())
+                if socket in socks and socks[socket] == zmq.POLLIN:
+                    ...
+            except zmq.ContextTerminated:
+                break
+            finally:
+                socket.close()

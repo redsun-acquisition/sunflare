@@ -75,7 +75,7 @@ class TokenGenerator(Generic[T]):
 
 
 REResultType = Union[RunEngineResult, tuple[str, ...]]
-FuncSocket = Union[Callable[[str, object], None], zmq.SyncSocket]
+FuncSocket = Union[Callable[[str, dict[str, Any]], None], zmq.Socket[bytes]]
 Token = Union[CallableToken, SocketToken]
 
 
@@ -103,6 +103,52 @@ class RunEngine(BlueskyRunEngine):
 
         # override the original dispatcher with our own
         self.dispatcher = Dispatcher()
+
+        # aliases for back-compatibility
+        self.subscribe_lossless = self.dispatcher.subscribe
+        self.unsubscribe_lossless = self.dispatcher.unsubscribe
+        self._subscribe_lossless = self.dispatcher.subscribe
+        self._unsubscribe_lossless = self.dispatcher.unsubscribe
+
+    def subscribe(self, func_or_socket: FuncSocket, name: str = "all") -> Token:
+        """Subscribe a callback function or a ZMQ socket to the engine.
+
+        Sockets are called before the callback functions.
+
+        For callback functions, the expected signature is:
+
+        .. code-block:: python
+
+            def callback(name: str, doc: dict) -> None: ...
+
+        Parameters
+        ----------
+        func_or_socket : ``Callable[[str, object], None] | zmq.Socket[bytes]``
+            The callback function or ZMQ socket to subscribe.
+        name : ``str``, optional
+            The name of the document type to subscribe to. Defaults to "all".
+
+        Returns
+        -------
+        ``CallableToken | SocketToken``
+            The token to use for unsubscribing from the engine.
+        """
+        # our custom dispatcher should have
+        # the return type correctly hinted,
+        # but mypy complains about it and
+        # thinks that we're returning Any;
+        # we suppress it for now
+        return self.dispatcher.subscribe(func_or_socket, name)  # type: ignore[no-untyped-call,no-any-return]
+
+    def unsubscribe(self, token: Token) -> None:
+        """Unsubscribe a callback function or a ZMQ socket from the engine.
+
+        Parameters
+        ----------
+        token: ``CallableToken | SocketToken``
+            The token to unsubscribe from the engine.
+        """
+        self.dispatcher.unsubscribe(token)  # type: ignore[no-untyped-call]
 
     def __run_in_executor_explicit(self, *args: Any, **kwargs: Any) -> REResultType:
         asyncio.set_event_loop(self.loop)
@@ -166,12 +212,14 @@ class Dispatcher(BlueskyDispatcher):
 
     @overload
     def subscribe(
-        self, func_or_socket: zmq.SyncSocket, name: AllowedSigs = "all"
+        self, func_or_socket: zmq.Socket[bytes], name: AllowedSigs = "all"
     ) -> SocketToken: ...
 
     @overload
     def subscribe(
-        self, func_or_socket: Callable[[str, object], None], name: AllowedSigs = "all"
+        self,
+        func_or_socket: Callable[[str, dict[str, Any]], None],
+        name: AllowedSigs = "all",
     ) -> CallableToken: ...
 
     def subscribe(self, func_or_socket: FuncSocket, name: AllowedSigs = "all") -> Token:
@@ -185,7 +233,7 @@ class Dispatcher(BlueskyDispatcher):
 
         Parameters
         ----------
-        func_or_socket : ``zmq.SyncSocket | Callable[[str, object], None]``
+        func_or_socket : ``zmq.Socket[bytes] | Callable[[str, object], None]``
             The callback function or ZMQ socket to register.
         name : ``'all' | 'start' | 'descriptor' | 'event' | 'stop'``, optional
             The name of the document type to subscribe to. Defaults to "all".
@@ -198,7 +246,7 @@ class Dispatcher(BlueskyDispatcher):
             - If a callback function is subscribed, the token is a ``CallableToken``.
             - If a ZMQ socket is subscribed, the token is a ``SocketToken``.
         """
-        if isinstance(func_or_socket, zmq.SyncSocket):
+        if isinstance(func_or_socket, zmq.Socket):
             private_tokens: list[int] = []
             if name == "all":
                 for key in DocumentNames:

@@ -42,13 +42,15 @@ class SocketRegistry:
 
     def __init__(self) -> None:
         self._allowed_sigs = {"start", "descriptor", "event", "stop"}
-        self._sockets: WeakValueDictionary[int, zmq.SyncSocket] = WeakValueDictionary()
+        self._sockets: WeakValueDictionary[int, zmq.Socket[bytes]] = (
+            WeakValueDictionary()
+        )
         self._token_count = count()
 
     def connect(
         self,
         sig: AllowedSigs,
-        socket: zmq.SyncSocket,
+        socket: zmq.Socket[bytes],
     ) -> int:
         """Connect a socket to the registry.
 
@@ -56,7 +58,7 @@ class SocketRegistry:
         ----------
         sig : ``"all" | "start" | "descriptor" | "event" | "stop"``
             The signal to connect to. Defaults to ``"all"``.
-        socket : ``zmq.SyncSocket``
+        socket : ``zmq.Socket[bytes]``
             The socket to connect.
 
         Returns

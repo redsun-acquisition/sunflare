@@ -142,7 +142,7 @@ class ControllerProtocol(Protocol):
 class SyncPublisher:
     """Mixin class for synchronous ZMQ publishers."""
 
-    socket: zmq.SyncSocket
+    socket: zmq.Socket[bytes]
     _virtual_bus: VirtualBus
 
     def connect(self) -> None:
