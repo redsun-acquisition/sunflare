@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import count
-from typing import TYPE_CHECKING, Literal, Union
+from typing import TYPE_CHECKING, Union
 from weakref import WeakValueDictionary
 
 from event_model import (
@@ -15,6 +15,7 @@ from event_model import (
     RunStop,
     StreamDatum,
     StreamResource,
+    DocumentNames,
 )
 
 from sunflare.virtual import encode
@@ -34,14 +35,13 @@ DocumentType = Union[
     StreamDatum,
     StreamResource,
 ]
-AllowedSigs = Literal["all", "start", "descriptor", "event", "stop"]
 
 
 class SocketRegistry:
     """A registry for ZMQ sockets."""
 
     def __init__(self) -> None:
-        self._allowed_sigs = {"start", "descriptor", "event", "stop"}
+        self._allowed_sigs = DocumentNames
         self._sockets: WeakValueDictionary[int, zmq.Socket[bytes]] = (
             WeakValueDictionary()
         )
@@ -49,7 +49,7 @@ class SocketRegistry:
 
     def connect(
         self,
-        sig: AllowedSigs,
+        sig: str,
         socket: zmq.Socket[bytes],
     ) -> int:
         """Connect a socket to the registry.
@@ -71,7 +71,7 @@ class SocketRegistry:
         ``ValueError``
             If the signal value is not allowed.
         """
-        if not any(sig == "all" or sig == s for s in self._allowed_sigs):
+        if sig not in self._allowed_sigs:
             raise ValueError(f"Signal '{sig}' is not allowed.")
         token = next(self._token_count)
         self._sockets[token] = socket

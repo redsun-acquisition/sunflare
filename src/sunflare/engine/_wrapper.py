@@ -37,7 +37,7 @@ from bluesky.run_engine import (
 from bluesky.run_engine import RunEngineResult
 from event_model import DocumentNames
 
-from sunflare.engine._utils import AllowedSigs, DocumentType, SocketRegistry
+from sunflare.engine._utils import DocumentType, SocketRegistry
 
 __all__ = ["RunEngine", "RunEngineResult"]
 
@@ -212,17 +212,17 @@ class Dispatcher(BlueskyDispatcher):
 
     @overload
     def subscribe(
-        self, func_or_socket: zmq.Socket[bytes], name: AllowedSigs = "all"
+        self, func_or_socket: zmq.Socket[bytes], name: str = "all"
     ) -> SocketToken: ...
 
     @overload
     def subscribe(
         self,
         func_or_socket: Callable[[str, dict[str, Any]], None],
-        name: AllowedSigs = "all",
+        name: str = "all",
     ) -> CallableToken: ...
 
-    def subscribe(self, func_or_socket: FuncSocket, name: AllowedSigs = "all") -> Token:
+    def subscribe(self, func_or_socket: FuncSocket, name: str = "all") -> Token:
         """Register a callback function or a ZMQ socket to dispatch documents.
 
         For callback functions, the expected signature is:

@@ -2,7 +2,7 @@ import logging
 import platform
 import threading
 import zmq
-from typing import Any, NamedTuple
+from typing import Any, Generator
 from concurrent.futures import wait, Future
 from time import sleep
 
@@ -10,14 +10,13 @@ import pytest
 from bluesky.plans import count
 from ophyd.sim import det1
 
-from sunflare.engine import RunEngine, Status, RunEngineResult
-from sunflare.engine._wrapper import CallableToken
+from sunflare.engine import RunEngine, Status, RunEngineResult, CallableToken, SocketToken
 from sunflare.engine._exceptions import (
     InvalidState,
     StatusTimeoutError,
     WaitTimeoutError,
 )
-
+from sunflare.virtual import decode
 
 def test_status() -> None:
     def callback(_: Status) -> None:
@@ -238,12 +237,9 @@ def test_engine_callbacks(RE: RunEngine) -> None:
 
 def test_engine_sockets(RE: RunEngine) -> None:
 
-    class Message(NamedTuple):
-        name: str
-        document: dict[str, Any]
+    context = zmq.Context()
 
-    def receiver_socket(self) -> None:
-        context = zmq.Context().instance()
+    def receiver_socket() -> None:
         socket = context.socket(zmq.PULL)
         poller = zmq.Poller()
         socket.connect("inproc://test")
@@ -254,8 +250,30 @@ def test_engine_sockets(RE: RunEngine) -> None:
             try:
                 socks = dict(poller.poll())
                 if socket in socks and socks[socket] == zmq.POLLIN:
-                    ...
+                    name, doc = socket.recv_multipart()
+                    name = name.decode()
+                    doc = decode(doc)
+                    assert name in ["start", "descriptor", "event", "stop"]
+                    assert isinstance(doc, dict)
             except zmq.ContextTerminated:
                 break
             finally:
                 socket.close()
+
+    socket = context.socket(zmq.PUSH)
+    socket.bind("inproc://test")
+
+    thread = threading.Thread(target=receiver_socket)
+    thread.start()
+
+    token = RE.subscribe(socket)
+    assert isinstance(token, int)
+    assert isinstance(token, SocketToken)
+
+    fut = RE(count([det1], num=5))
+    wait([fut])
+
+    socket.close()
+    context.term()
+
+    thread.join()
