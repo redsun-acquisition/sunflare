@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import zmq
-from typing import Literal, Union
-from itertools import count
-from weakref import WeakValueDictionary
 from enum import Enum
+from itertools import count
+from typing import Literal, Union
+from weakref import WeakValueDictionary
+
+import zmq
 
 
 class DocumentNames(str, Enum):

@@ -50,15 +50,14 @@ from typing import (
     Optional,
     TypeVar,
     Union,
-    overload,
     cast,
+    overload,
 )
 
-
-import zmq
-import zmq.devices
 import msgspec
 import numpy as np
+import zmq
+import zmq.devices
 from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable

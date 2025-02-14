@@ -29,7 +29,6 @@ else:
 from typing import Any, Mapping, runtime_checkable
 
 import zmq
-
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo
