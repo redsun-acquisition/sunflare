@@ -184,7 +184,7 @@ class VirtualBus(Loggable):
     and accessed as a read-only dictionary.
     """
 
-    _INPROC_MAP: Final[dict[int, str]] = {
+    INPROC_MAP: Final[dict[int, str]] = {
         # a subscriber publishes to the XPUB socket;
         # a publisher subscribes to the XSUB socket
         zmq.SUB: _INPROC_XPUB,
@@ -361,7 +361,7 @@ class VirtualBus(Loggable):
             )
             return None
         socket: zmq.SyncSocket = self._context.socket(socket_type)
-        socket.connect(self._INPROC_MAP[socket_type])
+        socket.connect(self.INPROC_MAP[socket_type])
 
         if socket_type == zmq.SUB:
             poller = zmq.Poller()
