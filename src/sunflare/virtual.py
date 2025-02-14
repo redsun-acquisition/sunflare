@@ -54,6 +54,7 @@ from typing import (
     cast,
     overload,
 )
+from weakref import WeakSet
 
 import msgspec
 import numpy as np
@@ -190,11 +191,9 @@ class VirtualBus(Loggable):
         zmq.PUB: _INPROC_XSUB,
     }
 
-    _PUB_SOCKETS: ClassVar[set[zmq.SyncSocket]] = set()
-
     def __init__(self) -> None:
         self._cache: dict[str, dict[str, SignalInstance]] = {}
-
+        self._pub_sockets: WeakSet[zmq.SyncSocket] = WeakSet()
         self._context = zmq.Context.instance()
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
         self._forwarder.daemon = True
@@ -210,7 +209,7 @@ class VirtualBus(Loggable):
         Closes the ZMQ context and terminates the streamer queue.
         """
         self.debug("Closing publisher sockets.")
-        for socket in self._PUB_SOCKETS:
+        for socket in self._pub_sockets:
             socket.close()
         try:
             self._context.term()
@@ -374,5 +373,5 @@ class VirtualBus(Loggable):
                     socket.subscribe(t)
             return socket, poller
         else:
-            self._PUB_SOCKETS.add(socket)
+            self._pub_sockets.add(socket)
             return socket
