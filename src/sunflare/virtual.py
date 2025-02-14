@@ -46,7 +46,7 @@ from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
     Callable,
-    ClassVar,
+    Final,
     Iterable,
     Optional,
     TypeVar,
@@ -184,7 +184,7 @@ class VirtualBus(Loggable):
     and accessed as a read-only dictionary.
     """
 
-    _INPROC_MAP: ClassVar[dict[int, str]] = {
+    _INPROC_MAP: Final[dict[int, str]] = {
         # a subscriber publishes to the XPUB socket;
         # a publisher subscribes to the XSUB socket
         zmq.SUB: _INPROC_XPUB,
