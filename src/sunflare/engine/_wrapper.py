@@ -19,17 +19,64 @@ in a separate thread, allowing the main thread to continue executing other tasks
     be handled in threads other than the main thread.
 """
 
+from __future__ import annotations
+
 import asyncio
 import sys
 from concurrent.futures import Future, ThreadPoolExecutor
-from typing import Any, Union
+from itertools import count
+from typing import Any, Callable, Generic, TypeVar, Union, cast, overload
 
-from bluesky.run_engine import RunEngine as BlueskyRunEngine
+import zmq
+from bluesky.run_engine import (
+    Dispatcher as BlueskyDispatcher,
+)
+from bluesky.run_engine import (
+    RunEngine as BlueskyRunEngine,
+)
 from bluesky.run_engine import RunEngineResult
+from event_model import DocumentNames
+
+from sunflare.engine._utils import AllowedSigs, DocumentType, SocketRegistry
 
 __all__ = ["RunEngine", "RunEngineResult"]
 
+
+class CallableToken(int):
+    """Helper class to generate unique tokens for function subscriptions."""
+
+    ...
+
+
+class SocketToken(int):
+    """Helper class to generate unique tokens for socket subscriptions."""
+
+    ...
+
+
+T = TypeVar("T", bound=int)
+
+
+class TokenGenerator(Generic[T]):
+    """Custom generator for unique tokens.
+
+    Helps differentiate between function and socket tokens.
+    """
+
+    def __init__(self, token_type: type[T]) -> None:
+        self._count = count()
+        self._token_type = token_type
+
+    def __iter__(self) -> TokenGenerator[T]:
+        return self
+
+    def __next__(self) -> T:
+        return self._token_type(next(self._count))
+
+
 REResultType = Union[RunEngineResult, tuple[str, ...]]
+FuncSocket = Union[Callable[[str, object], None], zmq.SyncSocket]
+Token = Union[CallableToken, SocketToken]
 
 
 class RunEngine(BlueskyRunEngine):
@@ -49,10 +96,13 @@ class RunEngine(BlueskyRunEngine):
 
         # Python 3.9 explicitly requires the event loop to be set
         # when running in a separate thread
-        if sys.version_info <= (3, 10):
+        if sys.version_info < (3, 10):
             self._run_in_executor = self.__run_in_executor_explicit
         else:
             self._run_in_executor = self.__run_in_executor
+
+        # override the original dispatcher with our own
+        self.dispatcher = Dispatcher()
 
     def __run_in_executor_explicit(self, *args: Any, **kwargs: Any) -> REResultType:
         asyncio.set_event_loop(self.loop)
@@ -74,3 +124,122 @@ class RunEngine(BlueskyRunEngine):
     @property
     def result(self) -> Union[REResultType]:
         return self._result
+
+
+class Dispatcher(BlueskyDispatcher):
+    """Subclass of the original bluesky Dispatcher to host a socket registry.
+
+    This version implements a secondary registry to keep track of
+    the sockets used for the subscriptions. This is necessary to allow
+    the unsubscription of sockets when the user decides to unsubscribe
+    from a specific socket (or all sockets).
+
+    The socket registry keeps weak references to the sockets to avoid
+    memory leaks when the sockets are no longer used.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()  # type: ignore[no-untyped-call]
+        self.socket_registry = SocketRegistry()
+
+        # override the original _counter
+        # with our own TokenGenerator
+        self._counter = TokenGenerator(CallableToken)  # type: ignore[assignment]
+        self._socket_counter = TokenGenerator(SocketToken)
+        self._socket_token_mapping: dict[SocketToken, list[int]] = {}
+
+    def process(self, name: str, doc: DocumentType) -> None:
+        """Process a document by dispatching it to the subscribed callbacks.
+
+        Documents are first emitted on registered ZMQ sockets before
+        being dispatched to the callback functions.
+
+        Parameters
+        ----------
+        name : ``str``
+            The name of the document type.
+        doc : ``dict``
+            The document to dispatch.
+        """
+        self.socket_registry.process(name, doc)
+        super().process(name, doc)  # type: ignore[no-untyped-call]
+
+    @overload
+    def subscribe(
+        self, func_or_socket: zmq.SyncSocket, name: AllowedSigs = "all"
+    ) -> SocketToken: ...
+
+    @overload
+    def subscribe(
+        self, func_or_socket: Callable[[str, object], None], name: AllowedSigs = "all"
+    ) -> CallableToken: ...
+
+    def subscribe(self, func_or_socket: FuncSocket, name: AllowedSigs = "all") -> Token:
+        """Register a callback function or a ZMQ socket to dispatch documents.
+
+        For callback functions, the expected signature is:
+
+        .. code-block:: python
+
+            def callback(name: str, doc: dict) -> None: ...
+
+        Parameters
+        ----------
+        func_or_socket : ``zmq.SyncSocket | Callable[[str, object], None]``
+            The callback function or ZMQ socket to register.
+        name : ``'all' | 'start' | 'descriptor' | 'event' | 'stop'``, optional
+            The name of the document type to subscribe to. Defaults to "all".
+
+        Returns
+        -------
+        ``CallableToken | SocketToken``
+            The token to use for unsubscribing from the dispatcher.
+
+            - If a callback function is subscribed, the token is a ``CallableToken``.
+            - If a ZMQ socket is subscribed, the token is a ``SocketToken``.
+        """
+        if isinstance(func_or_socket, zmq.SyncSocket):
+            private_tokens: list[int] = []
+            if name == "all":
+                for key in DocumentNames:
+                    private_tokens.append(
+                        self.socket_registry.connect(key, func_or_socket)
+                    )
+            else:
+                name = DocumentNames[name]
+                private_tokens = [self.socket_registry.connect(name, func_or_socket)]
+            public_token = next(self._socket_counter)
+            self._socket_token_mapping[public_token] = private_tokens
+            return public_token
+        else:
+            # we don't have control over the original implementation;
+            # casting is the best we can do;
+            # at runtime the effective type will be CallableToken anyway
+            # because we're overriding the _counter attribute
+            return cast(CallableToken, super().subscribe(func_or_socket, name))  # type: ignore[no-untyped-call]
+
+    @overload
+    def unsubscribe(self, token: SocketToken) -> None: ...
+
+    @overload
+    def unsubscribe(self, token: CallableToken) -> None: ...
+
+    def unsubscribe(self, token: Token) -> None:
+        """Unsubscribe a previously registered callback function or ZMQ socket.
+
+        Parameters
+        ----------
+        token: ``SocketToken | CallableToken``
+            The token to unsubscribe from the dispatcher.
+        """
+        if isinstance(token, SocketToken):
+            for private_token in self._socket_token_mapping.pop(token, []):
+                self.socket_registry.disconnect(private_token)
+        else:
+            super().unsubscribe(token)  # type: ignore[no-untyped-call]
+
+    def unsubscribe_all(self) -> None:
+        """Unsubscribe all registered callback functions and ZMQ sockets."""
+        for public_token in self._socket_token_mapping.keys():
+            self.unsubscribe(public_token)
+        super().unsubscribe_all()  # type: ignore[no-untyped-call]

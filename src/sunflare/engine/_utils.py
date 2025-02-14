@@ -1,48 +1,95 @@
 from __future__ import annotations
 
-from enum import Enum
 from itertools import count
-from typing import Literal, Union
+from typing import TYPE_CHECKING, Literal, Union
 from weakref import WeakValueDictionary
 
-import zmq
+from event_model import (
+    Datum,
+    DatumPage,
+    Event,
+    EventDescriptor,
+    EventPage,
+    Resource,
+    RunStart,
+    RunStop,
+    StreamDatum,
+    StreamResource,
+)
 
+from sunflare.virtual import encode
 
-class DocumentNames(str, Enum):
-    """Mirror of event_model.DocumentNames, subclassed from str.
+if TYPE_CHECKING:
+    import zmq
 
-    Deprecated events are omitted.
-    """
-
-    stop = "stop"
-    start = "start"
-    descriptor = "descriptor"
-    event = "event"
-    datum = "datum"
-    resource = "resource"
-    event_page = "event_page"
-    datum_page = "datum_page"
-    stream_resource = "stream_resource"
-    stream_datum = "stream_datum"
+DocumentType = Union[
+    Datum,
+    DatumPage,
+    Event,
+    EventDescriptor,
+    EventPage,
+    Resource,
+    RunStart,
+    RunStop,
+    StreamDatum,
+    StreamResource,
+]
+AllowedSigs = Literal["all", "start", "descriptor", "event", "stop"]
 
 
 class SocketRegistry:
+    """A registry for ZMQ sockets."""
+
     def __init__(self) -> None:
-        self._allowed_sigs = DocumentNames
+        self._allowed_sigs = {"start", "descriptor", "event", "stop"}
         self._sockets: WeakValueDictionary[int, zmq.SyncSocket] = WeakValueDictionary()
         self._token_count = count()
 
     def connect(
-        self, sig: Union[Literal["all"], DocumentNames], socket: zmq.SyncSocket
-    ) -> None:
-        if sig not in self._allowed_sigs and sig != "all":
+        self,
+        sig: AllowedSigs,
+        socket: zmq.SyncSocket,
+    ) -> int:
+        """Connect a socket to the registry.
+
+        Parameters
+        ----------
+        sig : ``"all" | "start" | "descriptor" | "event" | "stop"``
+            The signal to connect to. Defaults to ``"all"``.
+        socket : ``zmq.SyncSocket``
+            The socket to connect.
+
+        Returns
+        -------
+        ``int``
+            The token representing the connection.
+
+        Raises
+        ------
+        ``ValueError``
+            If the signal value is not allowed.
+        """
+        if not any(sig == "all" or sig == s for s in self._allowed_sigs):
             raise ValueError(f"Signal '{sig}' is not allowed.")
         token = next(self._token_count)
         self._sockets[token] = socket
+        return token
 
     def disconnect(self, token: int) -> None:
+        """Disconnect a socket from the registry.
+
+        Parameters
+        ----------
+        token : ``int``
+            The token representing the connection.
+        """
         self._sockets.pop(token)
 
-    def process(self, sig: DocumentNames) -> None:
+    def process(self, sig: str, doc: DocumentType) -> None:
+        """Process a signal.
+
+        All connected sockets will send an
+        encoded
+        """
         for socket in self._sockets.values():
-            socket.send_string(sig)
+            socket.send_multipart([sig.encode(), encode(doc)])

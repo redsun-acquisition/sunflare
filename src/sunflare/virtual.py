@@ -44,6 +44,7 @@ from __future__ import annotations
 
 from types import MappingProxyType
 from typing import (
+    TYPE_CHECKING,
     Callable,
     ClassVar,
     Iterable,
@@ -62,6 +63,9 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
+if TYPE_CHECKING:
+    from sunflare.engine import DocumentType
+
 __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
 
 
@@ -73,7 +77,7 @@ _INPROC_XSUB = "inproc://virtual_xsub"
 
 def _msgpack_enc_hook(obj: object) -> object:
     if isinstance(obj, np.ndarray):
-        # obj.data is memoryview
+        # TODO: this can be done more efficiently
         return (obj.tobytes(), str(obj.dtype), obj.shape)
     raise NotImplementedError(
         f"Object of type {type(obj)} is not a supported type for encoding"
@@ -82,6 +86,7 @@ def _msgpack_enc_hook(obj: object) -> object:
 
 def _msgpack_dec_hook(expected_type: type, obj: object) -> object:
     if expected_type is np.ndarray:
+        # TODO: this can be done more efficiently
         data, dtype, shape = cast(tuple[bytes, str, tuple[int, ...]], obj)
         return np.frombuffer(data, dtype=dtype).reshape(shape)
     return obj
@@ -91,13 +96,13 @@ _encoder = msgspec.msgpack.Encoder(enc_hook=_msgpack_enc_hook)
 _decoder = msgspec.msgpack.Decoder(dec_hook=_msgpack_dec_hook)
 
 
-def encode(obj: msgspec.Struct) -> bytes:
-    """Encode a msgspec.Struct in msgpack format.
+def encode(obj: DocumentType) -> bytes:
+    """Encode a document in msgpack format.
 
     Parameters
     ----------
-    obj : ``msgspec.Struct``
-        The struct to encode.
+    obj : ``DocumentType``
+        The document to encode.
 
     Returns
     -------
@@ -107,20 +112,20 @@ def encode(obj: msgspec.Struct) -> bytes:
     return _encoder.encode(obj)
 
 
-def decode(data: bytes) -> msgspec.Struct:
-    """Decode a msgspec.Struct in msgpack format.
+def decode(data: bytes) -> DocumentType:
+    """Decode a serialized message to a document.
 
     Parameters
     ----------
-    data : ``msgspec.Struct``
+    data : ``bytes``
         The encoded data.
 
     Returns
     -------
-    ``msgspec.Struct``
-        The decoded struct.
+    ``DocumentType``
+        The decoded document.
     """
-    return _decoder.decode(data)  # type: ignore
+    return _decoder.decode(data)
 
 
 @overload
@@ -134,7 +139,7 @@ def slot(*, private: bool) -> Callable[[F], F]: ...
 def slot(
     func: Optional[F] = None, *, private: bool = False
 ) -> Union[F, Callable[[F], F]]:
-    """Decorate a function as a slot.
+    """Decorate a function (or class method) as a slot.
 
     Parameters
     ----------
