@@ -5,7 +5,7 @@ import zmq
 
 from typing import Generator
 from sunflare.engine import RunEngine
-from sunflare.virtual import VirtualBus, Signal
+from sunflare.virtual import VirtualBus
 
 
 @pytest.fixture
@@ -16,17 +16,14 @@ def config_path() -> Path:
 def RE() -> RunEngine:
     return RunEngine()
 
-class MockVirtualBus(VirtualBus):
-    sigMySignal = Signal(int, description="My signal")
-
 @pytest.fixture(scope="function")
-def bus() -> Generator[MockVirtualBus, None, None]:
+def bus() -> Generator[VirtualBus, None, None]:
 
     context = zmq.Context.instance()
     context.term()
     zmq.Context._instance = None
 
-    _bus = MockVirtualBus()
+    _bus = VirtualBus()
 
     yield _bus
 

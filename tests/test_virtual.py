@@ -2,7 +2,6 @@
 import logging
 import threading
 import time
-
 from typing import Generator
 
 import zmq
@@ -11,60 +10,78 @@ import pytest
 from sunflare.virtual import Signal, VirtualBus, slot
 from sunflare.log import Loggable
 
-from .conftest import MockVirtualBus
+class MockVirtualBus(VirtualBus):
+    sigMySignal = Signal(int, description="My signal")
+
+@pytest.fixture(scope="function")
+def mock_bus() -> Generator[MockVirtualBus, None, None]:
+
+    context = zmq.Context.instance()
+    context.term()
+    zmq.Context._instance = None
+
+    _bus = MockVirtualBus()
+
+    yield _bus
+
+    _bus.shutdown()
+
+    context = zmq.Context.instance()
+    context.term()
+    zmq.Context._instance = None
 
 
-def test_virtual_bus(bus: MockVirtualBus) -> None:
-    """Tests the creation of a singleton virtual bus."""
+def test_virtual_bus(mock_bus: MockVirtualBus) -> None:
+    """Tests the creation of a singleton virtual mock_bus."""
 
-    assert hasattr(bus, "sigMySignal")
+    assert hasattr(mock_bus, "sigMySignal")
 
 
-def test_virtual_bus_psygnal_registration(bus: MockVirtualBus) -> None:
-    """Tests the registration of signals in the virtual bus."""
+def test_virtual_bus_psygnal_registration(mock_bus: MockVirtualBus) -> None:
+    """Tests the registration of signals in the virtual mock_bus."""
 
     class MockOwner:
         sigMySignal = Signal(int, description="My signal")
 
     owner = MockOwner()
 
-    bus.register_signals(owner)
+    mock_bus.register_signals(owner)
 
-    assert "MockOwner" in bus
+    assert "MockOwner" in mock_bus
 
     def test_slot(x: int) -> None:
         assert x == 5
 
-    bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
-    bus["MockOwner"]["sigMySignal"].emit(5)
+    mock_bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
+    mock_bus["MockOwner"]["sigMySignal"].emit(5)
 
-def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture,bus: VirtualBus) -> None:
+def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture,mock_bus: VirtualBus) -> None:
     """Test that trying to access a non-existent signal raises an error."""
 
     logger = logging.getLogger("redsun")
     logger.setLevel(logging.DEBUG)
 
-    signals = bus["MockOwner"]
+    signals = mock_bus["MockOwner"]
 
     assert len(signals) == 0
     assert caplog.records[0].levelname == "ERROR"
     assert caplog.records[0].message == "Class MockOwner not found in the registry."
 
 
-def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
-    """Tests the connection of signals in the virtual bus."""
+def test_virtual_bus_psygnal_connection(mock_bus: VirtualBus) -> None:
+    """Tests the connection of signals in the virtual mock_bus."""
 
     class FirstMockOwner:
         sigFirstSignal = Signal(int)
 
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
+        def __init__(self, mock_bus: VirtualBus) -> None:
+            self.mock_bus = mock_bus
 
         def registration_phase(self) -> None:
-            self.bus.register_signals(self)
+            self.mock_bus.register_signals(self)
 
         def connection_phase(self) -> None:
-            self.bus["SecondMockOwner"]["sigSecondSignal"].connect(self.second_to_first)
+            self.mock_bus["SecondMockOwner"]["sigSecondSignal"].connect(self.second_to_first)
 
         def second_to_first(self, x: int) -> None:
             assert x == 5
@@ -72,20 +89,20 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     class SecondMockOwner:
         sigSecondSignal = Signal(int)
 
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
+        def __init__(self, mock_bus: VirtualBus) -> None:
+            self.mock_bus = mock_bus
         
         def registration_phase(self) -> None:
-            self.bus.register_signals(self)
+            self.mock_bus.register_signals(self)
         
         def connection_phase(self) -> None:
-            self.bus["FirstMockOwner"]["sigFirstSignal"].connect(self.first_to_second)
+            self.mock_bus["FirstMockOwner"]["sigFirstSignal"].connect(self.first_to_second)
 
         def first_to_second(self, x: int) -> None:
             assert x == 5
 
-    first_owner = FirstMockOwner(bus)
-    second_owner = SecondMockOwner(bus)
+    first_owner = FirstMockOwner(mock_bus)
+    second_owner = SecondMockOwner(mock_bus)
 
     first_owner.registration_phase()
     second_owner.registration_phase()
@@ -93,14 +110,14 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     first_owner.connection_phase()
     second_owner.connection_phase()
 
-    assert "FirstMockOwner" in bus
-    assert "SecondMockOwner" in bus
+    assert "FirstMockOwner" in mock_bus
+    assert "SecondMockOwner" in mock_bus
 
     first_owner.sigFirstSignal.emit(5)
     second_owner.sigSecondSignal.emit(5)
 
 
-def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
+def test_virtual_bus_psygnal_connection_only(mock_bus: VirtualBus) -> None:
     """Test "register_signals" using the 'only' parameter. """
 
     def callback(x: int) -> None:
@@ -112,14 +129,14 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
 
     owner = MockOwner()
 
-    bus.register_signals(owner, only=["sigSignalOne"])
+    mock_bus.register_signals(owner, only=["sigSignalOne"])
 
-    assert "MockOwner" in bus
-    assert len(bus["MockOwner"]) == 1
-    assert "sigSignalOne" in bus["MockOwner"]
-    assert "sigSignalTwo" not in bus["MockOwner"]
+    assert "MockOwner" in mock_bus
+    assert len(mock_bus["MockOwner"]) == 1
+    assert "sigSignalOne" in mock_bus["MockOwner"]
+    assert "sigSignalTwo" not in mock_bus["MockOwner"]
 
-    bus["MockOwner"]["sigSignalOne"].connect(callback)
+    mock_bus["MockOwner"]["sigSignalOne"].connect(callback)
     owner.sigSignalOne.emit(5)
 
 def test_slot() -> None:
@@ -143,23 +160,23 @@ def test_slot_private() -> None:
     assert hasattr(_test_slot, "__isprivate__")
 
 
-def test_virtual_bus_zmq(bus: VirtualBus) -> None:
-    """Test the bus ZMQ context."""
+def test_virtual_bus_zmq(mock_bus: VirtualBus) -> None:
+    """Test the mock_bus ZMQ context."""
 
     class Publisher(Loggable):
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
-            self.socket = self.bus.connect(zmq.PUB)
+        def __init__(self, mock_bus: VirtualBus) -> None:
+            self.mock_bus = mock_bus
+            self.socket = self.mock_bus.connect(zmq.PUB)
 
         def send(self, msg: str) -> None:
             self.debug(f"Sending message: {msg}")
             self.socket.send_string(msg)
 
     class Subscriber(Loggable):
-        def __init__(self, bus: VirtualBus) -> None:
+        def __init__(self, mock_bus: VirtualBus) -> None:
             self.msg = ""
-            self.bus = bus
-            self.socket, self.poller = self.bus.connect(zmq.SUB)
+            self.mock_bus = mock_bus
+            self.socket, self.poller = self.mock_bus.connect(zmq.SUB)
             self.socket.subscribe("")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
@@ -180,8 +197,8 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
                 self.socket.close()
                 self.debug("Subscriber socket closed.")
 
-    pub = Publisher(bus)
-    sub = Subscriber(bus)
+    pub = Publisher(mock_bus)
+    sub = Subscriber(mock_bus)
 
     # give time for
     # subscrbier to connect
@@ -194,24 +211,24 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
     # for message transmission
     time.sleep(0.1)
 
-    # shutdown the bus;
+    # shutdown the mock_bus;
     # this will kill
     # all connected
     # subscribers
-    bus.shutdown()
+    mock_bus.shutdown()
 
     assert sub.msg == test_msg, f"Expected '{test_msg}', but got '{sub.msg}'"
 
-def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
+def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
     """Test that subscribers only receive messages they're subscribed to."""
 
     logger = logging.getLogger("redsun")
     logger.setLevel(logging.DEBUG)
 
     class Publisher(Loggable):
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
-            self.socket = self.bus.connect(zmq.PUB)
+        def __init__(self, mock_bus: VirtualBus) -> None:
+            self.mock_bus = mock_bus
+            self.socket = self.mock_bus.connect(zmq.PUB)
 
         def send(self, topic: str, value: float) -> None:
             msg = f"{topic} {value}"
@@ -219,10 +236,10 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
             self.socket.send_string(msg)
 
     class Subscriber(Loggable):
-        def __init__(self, bus: VirtualBus, topics: list[str]) -> None:
+        def __init__(self, mock_bus: VirtualBus, topics: list[str]) -> None:
             self.received_messages: list[str] = []
-            self.bus = bus
-            self.socket, self.poller = self.bus.connect(zmq.SUB, topic=topics)
+            self.mock_bus = mock_bus
+            self.socket, self.poller = self.mock_bus.connect(zmq.SUB, topic=topics)
             self.debug(f"Subscribed to: {topics}")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
@@ -245,16 +262,16 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
                 self.debug("Subscriber socket closed.")
 
     # Create publisher and subscribers
-    pub = Publisher(bus)
+    pub = Publisher(mock_bus)
     
     # Create subscribers with different topic subscriptions
-    sub_temp = Subscriber(bus, ["temperature"])  # Only temperature messages
-    sub_humidity = Subscriber(bus, ["humidity"])  # Only humidity messages
+    sub_temp = Subscriber(mock_bus, ["temperature"])  # Only temperature messages
+    sub_humidity = Subscriber(mock_bus, ["humidity"])  # Only humidity messages
     
     # Wait for subscriptions to be set up
     time.sleep(0.1)
 
-    logger.debug(bus._forwarder._sockets)    
+    logger.debug(mock_bus._forwarder._sockets)    
 
     # Send various messages
     pub.send("temperature", 25.5)
@@ -264,11 +281,11 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
     # Wait for message processing
     time.sleep(0.1)
 
-    # shutdown the bus;
+    # shutdown the mock_bus;
     # this will kill
     # all connected
     # subscribers
-    bus.shutdown()
+    mock_bus.shutdown()
 
     # Verify temperature subscriber
     temp_messages = sub_temp.received_messages
