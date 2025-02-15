@@ -81,7 +81,7 @@ include = [
 [tool.mypy]
 files = "src/**/*.py"
 exclude = ["docs", "tests", "build"]
-disable_error_code = ["import-untyped"]
+disable_error_code = ["import-untyped", "no-untyped-call"]
 pretty = true
 
 # Use strict defaults

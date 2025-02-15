@@ -216,8 +216,6 @@ def test_engine_callbacks(RE: RunEngine) -> None:
     fut = RE(count([det1], num=5))
     wait([fut])
 
-    RE.clear_suspenders
-
     counter = 0
 
     def callback(name: str, doc: dict[str, Any]) -> None:

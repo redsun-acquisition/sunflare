@@ -76,7 +76,7 @@ class RunEngine(BlueskyRunEngine):
         self.socket: Optional[zmq.Socket[bytes]] = kwargs.pop("socket", None)
         self._executor = ThreadPoolExecutor(max_workers=1)
         self._result: REResultType
-        super().__init__(*args, **kwargs)  # type: ignore[no-untyped-call]
+        super().__init__(*args, **kwargs)
 
         # override pause message to be an empty string
         self.pause_msg = ""
@@ -91,14 +91,14 @@ class RunEngine(BlueskyRunEngine):
     def emit_sync(self, name: str, doc: dict[str, Any]) -> None:
         if self.socket is not None:
             self.socket.send_multipart([name.encode(), encode(doc)])
-        super().emit_sync(name, doc)  # type: ignore[no-untyped-call]
+        super().emit_sync(name, doc)
 
     def __run_in_executor_explicit(self, *args: Any, **kwargs: Any) -> REResultType:
         asyncio.set_event_loop(self.loop)
-        return super().__call__(*args, **kwargs)  # type: ignore[no-any-return,no-untyped-call]
+        return super().__call__(*args, **kwargs)  # type: ignore[no-any-return]
 
     def __run_in_executor(self, *args: Any, **kwargs: Any) -> REResultType:
-        return super().__call__(*args, **kwargs)  # type: ignore[no-any-return,no-untyped-call]
+        return super().__call__(*args, **kwargs)  # type: ignore[no-any-return]
 
     def __call__(self, *args: Any, **metadata_kw: Any) -> Future[REResultType]:
         self._fut = self._executor.submit(
