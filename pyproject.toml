@@ -122,7 +122,11 @@ extend-exclude = ["docs", "tests"]
 docstring-code-format = true
 
 [tool.ruff.lint]
-extend-select = ["D"] # enable docstring checks
+extend-select = [
+    "D", # enable docstring checks
+    "I", # enable imports checks
+    "TC" # enable type check imports
+] 
 ignore = ["D100", "D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
 
 [tool.ruff.lint.pydocstyle]
