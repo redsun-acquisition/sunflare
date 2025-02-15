@@ -2,7 +2,7 @@ import logging
 import platform
 import threading
 import zmq
-from typing import Any, Generator
+from typing import Any
 from concurrent.futures import wait, Future
 from time import sleep
 
@@ -16,7 +16,8 @@ from sunflare.engine._exceptions import (
     StatusTimeoutError,
     WaitTimeoutError,
 )
-from sunflare.virtual import decode
+from sunflare.virtual import decode, VirtualBus
+from sunflare.log import Loggable
 
 def test_status() -> None:
     def callback(_: Status) -> None:
@@ -235,10 +236,11 @@ def test_engine_sockets(RE: RunEngine) -> None:
     context = zmq.Context()
 
     def receiver_socket() -> None:
-        socket = context.socket(zmq.PULL)
+        socket = context.socket(zmq.SUB)
         poller = zmq.Poller()
         socket.connect("inproc://test")
         socket.setsockopt(zmq.LINGER, 0)
+        socket.setsockopt(zmq.SUBSCRIBE, b"RE0")
         poller.register(socket, zmq.POLLIN)
 
         while True:
@@ -248,14 +250,14 @@ def test_engine_sockets(RE: RunEngine) -> None:
                     name, doc = socket.recv_multipart()
                     name = name.decode()
                     doc = decode(doc)
-                    assert name in ["start", "descriptor", "event", "stop"]
+                    assert name in ["RE0:start", "RE0:descriptor", "RE0:event", "RE0:stop"]
                     assert isinstance(doc, dict)
             except zmq.ContextTerminated:
                 break
             finally:
                 socket.close()
 
-    socket = context.socket(zmq.PUSH)
+    socket = context.socket(zmq.PUB)
     socket.bind("inproc://test")
 
     thread = threading.Thread(target=receiver_socket)
@@ -264,7 +266,7 @@ def test_engine_sockets(RE: RunEngine) -> None:
     RE.socket = socket
 
     assert RE.socket is not None
-    assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUSH
+    assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUB
 
     fut = RE(count([det1], num=5))
     wait([fut])
@@ -273,3 +275,58 @@ def test_engine_sockets(RE: RunEngine) -> None:
     context.term()
 
     thread.join()
+
+
+def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
+
+    class Subscriber(Loggable):
+        def __init__(self, bus: VirtualBus, topics: list[str]) -> None:
+            self.received_messages: list[str] = []
+            self.bus = bus
+            self.topics = topics
+            self.socket, self.poller = self.bus.connect(zmq.SUB, topic=topics)
+            for topic in topics:
+                self.socket.subscribe(topic)
+            self.debug(f"Subscribed to: {topics}")
+
+            self.thread = threading.Thread(target=self._polling_thread, daemon=True)
+            self.thread.start()
+
+        def _polling_thread(self) -> None:
+            try:
+                while True:
+                    try:
+                        socks = dict(self.poller.poll())
+                        if self.socket in socks:
+                            name, doc = self.socket.recv_multipart()
+                            name = name.decode()
+                            doc = decode(doc)
+                            assert name in self.topics
+                    except zmq.error.ContextTerminated:
+                        break
+            finally:
+                self.poller.unregister(self.socket)
+                self.socket.close()
+                self.debug("Subscriber socket closed.")
+
+    all_sub = Subscriber(bus, topics=["RE0"])
+    start_sub = Subscriber(bus, topics=["RE0:start"])
+    desc_sub = Subscriber(bus, topics=["RE0:descriptor"])
+    event_sub = Subscriber(bus, topics=["RE0:event"])
+    stop_sub = Subscriber(bus, topics=["RE0:stop"])
+
+    RE.socket = bus.connect(zmq.PUB)
+    assert RE.socket is not None
+    assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUB
+
+
+    fut = RE(count([det1], num=5))
+    wait([fut])
+
+    bus.shutdown()
+
+    all_sub.thread.join()
+    start_sub.thread.join()
+    desc_sub.thread.join()
+    event_sub.thread.join()
+    stop_sub.thread.join()

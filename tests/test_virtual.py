@@ -11,25 +11,7 @@ import pytest
 from sunflare.virtual import Signal, VirtualBus, slot
 from sunflare.log import Loggable
 
-class MockVirtualBus(VirtualBus):
-    sigMySignal = Signal(int, description="My signal")
-
-@pytest.fixture(scope="function")
-def bus() -> Generator[MockVirtualBus, None, None]:
-
-    context = zmq.Context.instance()
-    context.term()
-    zmq.Context._instance = None
-
-    _bus = MockVirtualBus()
-
-    yield _bus
-
-    _bus.shutdown()
-
-    context = zmq.Context.instance()
-    context.term()
-    zmq.Context._instance = None
+from .conftest import MockVirtualBus
 
 
 def test_virtual_bus(bus: MockVirtualBus) -> None:

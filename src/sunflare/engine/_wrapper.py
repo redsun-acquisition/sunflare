@@ -1,29 +1,11 @@
-"""Wrapper for the :class:`~bluesky.run_engine.RunEngine` class to allow execution without blocking the main thread.
-
-The original implementation of the ``RunEngine`` blocks the
-execution of the main thread when the ``__call__`` method is used.
-This wrapper uses a ``ThreadPoolExecutor`` to run the execution
-in a separate thread, allowing the main thread to continue executing other tasks.
-
-.. note::
-
-    The ``context_manager`` attribute is forced to be an empty list to
-    avoid the use of the built-in ``SignalHandler`` context manager.
-    The rationale is that the original implementation is meant
-    for interactive usage (e.g., Jupyter notebooks, scripts) and not for
-    applications relying on an event loop.
-
-    When invoking ``RunEngine.__call__`` not in the main thread,
-    this will cause an exception as in Python
-    signal handlers (e.g. ``SIGINT``) can not
-    be handled in threads other than the main thread.
-"""
+"""Wrapper for the :class:`~bluesky.run_engine.RunEngine` class to allow execution without blocking the main thread."""
 
 from __future__ import annotations
 
 import asyncio
 import sys
 from concurrent.futures import Future, ThreadPoolExecutor
+from itertools import count
 from typing import Any, Callable, Optional, Union
 
 import zmq
@@ -31,9 +13,11 @@ from bluesky.run_engine import (
     RunEngine as BlueskyRunEngine,
 )
 from bluesky.run_engine import RunEngineResult
+from bluesky.utils import DuringTask
 from event_model import (
     Datum,
     DatumPage,
+    DocumentNames,
     Event,
     EventDescriptor,
     EventPage,
@@ -64,15 +48,53 @@ DocumentType = Union[
 REResultType = Union[RunEngineResult, tuple[str, ...]]
 FuncSocket = Union[Callable[[str, dict[str, Any]], None], zmq.Socket[bytes]]
 
+_prefix_counter = count()
+
 
 class RunEngine(BlueskyRunEngine):
-    __doc__ = BlueskyRunEngine.__doc__
+    """Subclass of ``bluesky.run_engine.RunEngine`` to allow execution in a separate thread.
+
+    Additional features:
+
+    - ``socket`: A ZMQ socket to send messages to a remote endpoint;
+    - ``socket_prefix``: A prefix to be used in the ZMQ topic when sending messages.
+        - The default value is ``RE{N}``, where ``{N}`` is a counter that increments for each instance.
+    - When launching a plan, the ``RunEngine``, the ``__call__`` method returns a ``Future`` object.
+        - This allows to set a callback on the future to retrieve the result of the execution.
+        - Alternatively, the result can be accessed directly from the ``result`` attribute.
+
+    Suppressed features:
+
+    - ``context_managers``: The context managers are forced to be an empty list to
+      avoid the use of the built-in ``SignalHandler`` context manager.
+        - The rationale is that the original implementation is meant for
+          interactive usage (e.g., Jupyter notebooks, scripts) and not
+          for applications relying on an event loop.
+    - ``pause_msg``: Overridden to be an empty string.
+    - ``during_task``: Overridden to ``DuringTask``, so the ``RunEngine``
+        does not interact with any possible event loop in the main thread.
+
+    For the original function signature, refer to the :class:`~bluesky.run_engine.RunEngine` documentation.
+
+    Parameters
+    ----------
+    socket_prefix : ``str``, keyword-only, optional
+        Prefix to be used in the ZMQ topic when sending messages.
+        Default is ``RE{N}``, where ``{N}`` is a counter that increments for each instance.
+    socket : ``zmq.Socket[bytes]``, keyword-only, optional
+        ZMQ socket to send messages to a remote endpoint.
+        Default is ``None`` (no messages are sent).
+    """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # force the context_managers to be empty,
         # otherwise the RunEngine will try to use the
         # SignalHandler context manager
         kwargs["context_managers"] = []
+        kwargs["during_task"] = DuringTask()
+        self.socket_prefix: str = kwargs.pop(
+            "socket_prefix", f"RE{next(_prefix_counter)}"
+        )
         self.socket: Optional[zmq.Socket[bytes]] = kwargs.pop("socket", None)
         self._executor = ThreadPoolExecutor(max_workers=1)
         self._result: REResultType
@@ -88,9 +110,10 @@ class RunEngine(BlueskyRunEngine):
         else:
             self._run_in_executor = self.__run_in_executor
 
-    def emit_sync(self, name: str, doc: dict[str, Any]) -> None:
+    def emit_sync(self, name: DocumentNames, doc: dict[str, Any]) -> None:
         if self.socket is not None:
-            self.socket.send_multipart([name.encode(), encode(doc)])
+            topic = f"{self.socket_prefix}:{str(DocumentNames[name])}"
+            self.socket.send_multipart([topic.encode(), encode(doc)])
         super().emit_sync(name, doc)
 
     def __run_in_executor_explicit(self, *args: Any, **kwargs: Any) -> REResultType:
