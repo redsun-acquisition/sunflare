@@ -10,7 +10,7 @@ import pytest
 from bluesky.plans import count
 from ophyd.sim import det1
 
-from sunflare.engine import RunEngine, Status, RunEngineResult, CallableToken, SocketToken
+from sunflare.engine import RunEngine, Status, RunEngineResult
 from sunflare.engine._exceptions import (
     InvalidState,
     StatusTimeoutError,
@@ -227,9 +227,6 @@ def test_engine_callbacks(RE: RunEngine) -> None:
     token = RE.subscribe(callback)
     RE.unsubscribe(token)
 
-    assert isinstance(token, int)
-    assert isinstance(token, CallableToken)
-
     fut = RE(count([det1], num=5))
     wait([fut])
 
@@ -266,9 +263,7 @@ def test_engine_sockets(RE: RunEngine) -> None:
     thread = threading.Thread(target=receiver_socket)
     thread.start()
 
-    token = RE.subscribe(socket)
-    assert isinstance(token, int)
-    assert isinstance(token, SocketToken)
+    RE.socket = socket
 
     fut = RE(count([det1], num=5))
     wait([fut])
