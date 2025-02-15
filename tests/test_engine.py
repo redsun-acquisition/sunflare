@@ -265,6 +265,9 @@ def test_engine_sockets(RE: RunEngine) -> None:
 
     RE.socket = socket
 
+    assert RE.socket is not None
+    assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUSH
+
     fut = RE(count([det1], num=5))
     wait([fut])
 
