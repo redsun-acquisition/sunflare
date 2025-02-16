@@ -302,76 +302,58 @@ class VirtualBus(Loggable):
         return class_name in self._cache
 
     @overload
-    def connect(self, socket_type: int) -> zmq.SyncSocket: ...
+    def connect_subscriber(self) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
 
     @overload
-    def connect(self, socket_type: int, *, topic: None) -> zmq.SyncSocket: ...
+    def connect_subscriber(self, topic: str) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
 
     @overload
-    def connect(
-        self, socket_type: int, *, topic: str
+    def connect_subscriber(
+        self, topic: Iterable[str]
     ) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
 
-    @overload
-    def connect(
-        self, socket_type: int, *, topic: Iterable[str]
-    ) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
-
-    def connect(
-        self,
-        socket_type: int,
-        *,
-        topic: Optional[Union[str, Iterable[str]]] = None,
-    ) -> Optional[Union[zmq.SyncSocket, tuple[zmq.SyncSocket, zmq.Poller]]]:
-        """Return a new socket connected to the virtual bus context.
-
-        Class instances may use this method to
-        create a new socket which will be automatically
-        connected to the virtual bus.
+    def connect_subscriber(
+        self, topic: Optional[Union[str, Iterable[str]]] = None
+    ) -> tuple[zmq.SyncSocket, zmq.Poller]:
+        """
+        Connect a subscriber to the virtual bus.
 
         Parameters
         ----------
-        socket_type : ``int | zmq.SocketType``
-            The type of the socket to create.
-            Accepted values are:
-
-            - ``1`` / ``zmq.PUB``: Publisher socket.
-            - ``2`` / ``zmq.SUB``: Subscriber socket.
-        topic: ``str | Iterable[str] ``, optional (subscribers only)
-            Topic(s) to subscribe to.
-            If not provided, the subscriber is in charge
-            of specifying the topic.
+        topic : ``str | Iterable[str]``, optional
+            The topic(s) to subscribe to.
+            If not provided, subscription
+            is left to the user.
 
         Returns
         -------
-        socket : ``zmq.SyncSocket | None``
-            A new socket for the virtual bus.
-            If the socket type is invalid,
-            logs the error returns ``None``.
-        socket, poller : ``tuple[zmq.SyncSocket, zmq.Poller] | None``
-            A new socket and a poller for the virtual bus
-            (only for ``zmq.SUB`` sockets).
-            If the socket type is invalid,
-            returns ``None``.
-
+        ``tuple[zmq.SyncSocket, zmq.Poller]``
+            A tuple containing the subscriber socket and its poller.
         """
-        if socket_type not in [zmq.PUB, zmq.SUB]:
-            self.error(
-                f"Invalid socket type: {zmq.SocketType(socket_type)}. Aborting connection."
-            )
-            return None
-        socket: zmq.SyncSocket = self._context.socket(socket_type)
-        socket.connect(self.INPROC_MAP[socket_type])
-
-        if socket_type == zmq.SUB:
-            poller = zmq.Poller()
-            poller.register(socket, zmq.POLLIN)
-            if isinstance(topic, str):
-                socket.subscribe(topic)
-            elif isinstance(topic, Iterable):
-                for t in topic:
-                    socket.subscribe(t)
+        socket: zmq.SyncSocket = self._context.socket(zmq.SUB)
+        socket.connect(self.INPROC_MAP[zmq.SUB])
+        poller = zmq.Poller()
+        poller.register(socket, zmq.POLLIN)
+        if topic is None:
             return socket, poller
+        if isinstance(topic, str):
+            socket.subscribe(topic)
         else:
-            self._pub_sockets.add(socket)
-            return socket
+            for topic in topic:
+                socket.subscribe(topic)
+        return socket, poller
+
+    def connect_publisher(
+        self,
+    ) -> zmq.SyncSocket:
+        """Connect a publisher to the virtual bus.
+
+        Returns
+        -------
+        ``zmq.SyncSocket``
+            The publisher socket.
+        """
+        socket: zmq.SyncSocket = self._context.socket(zmq.PUB)
+        socket.connect(self.INPROC_MAP[zmq.PUB])
+        self._pub_sockets.add(socket)
+        return socket

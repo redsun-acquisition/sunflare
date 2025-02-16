@@ -284,7 +284,7 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
             self.received_messages: list[str] = []
             self.bus = bus
             self.topics = topics
-            self.socket, self.poller = self.bus.connect(zmq.SUB, topic=topics)
+            self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
             for topic in topics:
                 self.socket.subscribe(topic)
             self.debug(f"Subscribed to: {topics}")
@@ -315,7 +315,7 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
     event_sub = Subscriber(bus, topics=["RE0:event"])
     stop_sub = Subscriber(bus, topics=["RE0:stop"])
 
-    RE.socket = bus.connect(zmq.PUB)
+    RE.socket = bus.connect_publisher()
     assert RE.socket is not None
     assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUB
 

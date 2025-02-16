@@ -166,7 +166,7 @@ def test_virtual_bus_zmq(mock_bus: VirtualBus) -> None:
     class Publisher(Loggable):
         def __init__(self, mock_bus: VirtualBus) -> None:
             self.mock_bus = mock_bus
-            self.socket = self.mock_bus.connect(zmq.PUB)
+            self.socket = self.mock_bus.connect_publisher()
 
         def send(self, msg: str) -> None:
             self.debug(f"Sending message: {msg}")
@@ -176,7 +176,7 @@ def test_virtual_bus_zmq(mock_bus: VirtualBus) -> None:
         def __init__(self, mock_bus: VirtualBus) -> None:
             self.msg = ""
             self.mock_bus = mock_bus
-            self.socket, self.poller = self.mock_bus.connect(zmq.SUB)
+            self.socket, self.poller = self.mock_bus.connect_subscriber()
             self.socket.subscribe("")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
@@ -228,7 +228,7 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
     class Publisher(Loggable):
         def __init__(self, mock_bus: VirtualBus) -> None:
             self.mock_bus = mock_bus
-            self.socket = self.mock_bus.connect(zmq.PUB)
+            self.socket = self.mock_bus.connect_publisher()
 
         def send(self, topic: str, value: float) -> None:
             msg = f"{topic} {value}"
@@ -239,7 +239,7 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
         def __init__(self, mock_bus: VirtualBus, topics: list[str]) -> None:
             self.received_messages: list[str] = []
             self.mock_bus = mock_bus
-            self.socket, self.poller = self.mock_bus.connect(zmq.SUB, topic=topics)
+            self.socket, self.poller = self.mock_bus.connect_subscriber(topic=topics)
             self.debug(f"Subscribed to: {topics}")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
