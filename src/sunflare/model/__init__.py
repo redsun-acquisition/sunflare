@@ -1,6 +1,6 @@
 from bluesky.protocols import check_supports
 
-from .protocols import ModelProtocol
+from ._protocols import ModelProtocol
 
 __all__ = [
     "ModelProtocol",
