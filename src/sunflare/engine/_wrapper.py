@@ -56,12 +56,12 @@ class RunEngine(BlueskyRunEngine):
 
     Additional features:
 
-    - ``socket`: A ZMQ socket to send messages to a remote endpoint;
+    - ``socket``: A ZMQ socket to send messages to a remote endpoint;
     - ``socket_prefix``: A prefix to be used in the ZMQ topic when sending messages.
-        - The default value is ``RE{N}``, where ``{N}`` is a counter that increments for each instance.
     - When launching a plan, the ``RunEngine``, the ``__call__`` method returns a ``Future`` object.
         - This allows to set a callback on the future to retrieve the result of the execution.
-        - Alternatively, the result can be accessed directly from the ``result`` attribute.
+        - Alternatively, the result can be accessed directly from the ``result`` attribute
+          when the future is done.
 
     Suppressed features:
 
