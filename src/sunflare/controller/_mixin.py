@@ -8,7 +8,7 @@ from sunflare.virtual import VirtualBus
 
 
 class SyncPublisher:
-    """SyncPublisher protocol class.
+    """Synchronous publisher protocol class.
 
     A protocol class for controllers that need to publish data synchronously.
 
@@ -33,7 +33,7 @@ class SyncPublisher:
 
 
 class SyncSubscriber:
-    """SyncSubscriber mixin class.
+    """Synchronous subscriber mixin class.
 
     The synchronous subscriber deploys a background thread
     which will poll the virtual bus for incoming messages.
