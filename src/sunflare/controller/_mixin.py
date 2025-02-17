@@ -127,5 +127,5 @@ class SyncPubSub(SyncPublisher, SyncSubscriber):
     def __init__(
         self, virtual_bus: VirtualBus, topics: Optional[Union[str, list[str]]] = None
     ) -> None:
-        SyncSubscriber.__init__(self, virtual_bus, topics)
         SyncPublisher.__init__(self, virtual_bus)
+        SyncSubscriber.__init__(self, virtual_bus, topics)
