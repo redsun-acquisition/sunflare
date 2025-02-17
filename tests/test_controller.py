@@ -1,6 +1,6 @@
-import threading
+import time
 from pathlib import Path
-from typing import cast, Iterable
+from typing import cast
 
 import zmq
 
@@ -51,12 +51,10 @@ def test_sync(bus: VirtualBus) -> None:
             super().__init__(virtual_bus, "test")
             self.info = info
             self.virtual_bus = virtual_bus
+            self.msg_queue: list[tuple[str, ...]] = []
 
         def consume(self, content: list[bytes]) -> None:
-            content[0] = content[0].decode()
-            content[1] = content[1].decode()
-            assert content[0] == "test"
-            assert content[1] == "message"
+            self.msg_queue.append(tuple(c.decode() for c in content))
 
         def registration_phase(self):
             ...
@@ -70,6 +68,9 @@ def test_sync(bus: VirtualBus) -> None:
     pub = TestPublisher(pub_info, {}, bus)
     sub = TestSubscriber(sub_info, {}, bus)
 
+    # wait for the startup
+    time.sleep(0.1)
+
     assert pub.pub_socket is not None, "Publisher socket not initialized"
     assert pub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
 
@@ -78,35 +79,50 @@ def test_sync(bus: VirtualBus) -> None:
     assert sub.sub_thread.is_alive(), "Consumer thread not started"
 
     pub.pub_socket.send_multipart([b"test", b"message"])
+    pub.pub_socket.send_multipart([b"other-topic", b"message"])
 
     bus.shutdown()
 
-    assert not sub.sub_thread.is_alive(), "Subscriber thread not terminated"
+    # wait for cleanup
+    time.sleep(0.1)
 
-def test_sync_single_class() -> None:
+    assert not sub.sub_thread.is_alive(), "Subscriber thread not terminated"
+    assert len(sub.msg_queue) == 1, "Subscriber received more than one message or no message"
+    assert sub.msg_queue == [("test", "message")], "Subscriber did not receive message"
+
+def test_sync_single_class(bus: VirtualBus) -> None:
     class TestController(SyncPubSub):
         def __init__(self, info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
             super().__init__(virtual_bus, "test")
             self.info = info
             self.models = models
             self.virtual_bus = virtual_bus
+            self.msg_queue: list[tuple[str, ...]] = []
 
         def consume(self, content: list[bytes]) -> None:
-            content = [c.decode() for c in content]
-            assert content[0] == "test"
-            assert content[1] == "message"
+            self.msg_queue.append(tuple(c.decode() for c in content))
             
 
     pub_sub_info = ControllerInfo()
-    pub_sub = TestController(pub_sub_info, {}, VirtualBus())
+    pub_sub = TestController(pub_sub_info, {}, bus)
+
+    # wait for the startup
+    time.sleep(0.1)
 
     assert pub_sub.pub_socket is not None, "Publisher socket not initialized"
     assert pub_sub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
     assert pub_sub.sub_socket is not None, "Subscriber socket not initialized"
     assert pub_sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+    assert pub_sub.sub_thread.is_alive(), "Consumer thread not started"
 
     pub_sub.pub_socket.send_multipart([b"test", b"message"])
+    pub_sub.pub_socket.send_multipart([b"other-topic", b"message"])
 
-    pub_sub.virtual_bus.shutdown()
+    bus.shutdown()
+
+    # wait for cleanup
+    time.sleep(0.1)
 
     assert not pub_sub.sub_thread.is_alive(), "Subscriber thread not terminated"
+    assert len(pub_sub.msg_queue) == 1, "Subscriber received more than one message or no message"
+    assert pub_sub.msg_queue == [("test", "message")], "Subscriber did not receive message"
