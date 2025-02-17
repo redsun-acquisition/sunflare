@@ -10,7 +10,6 @@ import zmq.asyncio
 from typing_extensions import TypeIs
 
 from ._bus import VirtualBus
-from ._utils import _loop_manager
 
 T = TypeVar("T")
 
@@ -191,10 +190,11 @@ class AsyncSubscriber(Consumer):
     ) -> None:
         self._logger = logging.getLogger("redsun")
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(
-            topics, asyncio=True
+            topics, is_async=True
         )
-        loop = _loop_manager()
-        self.sub_future = asyncio.run_coroutine_threadsafe(self._spin(), loop)
+        self.sub_future = asyncio.run_coroutine_threadsafe(
+            self._spin(), virtual_bus.loop
+        )
 
     async def _spin(self) -> None:
         """Spin the subscriber.

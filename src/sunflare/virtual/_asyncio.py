@@ -1,53 +1,61 @@
 import asyncio
 import sys
 import threading
-from typing import Optional
+
+import zmq
+import zmq.asyncio
 
 from sunflare.log import Loggable
 
 
-class LoopManager(Loggable):
-    """Helper class to launch the async subscribers loop."""
+class SubscriberLoop(Loggable):
+    """Background thread to run the async subscribers event loop.
 
-    _loop: Optional[asyncio.AbstractEventLoop]
+    Spawns a daemon thread to run an asyncio event loop.
+    At initialization, it will create a shadow
+    ZMQ context compatible with asyncio.
+
+    Parameters
+    ----------
+    ctx : ``zmq.Context``
+        The synchronous context to shadow.
+    """
+
+    _ctx: zmq.asyncio.Context
+    _loop: asyncio.AbstractEventLoop
     _thread: threading.Thread
 
-    def __init__(self) -> None:
-        self._loop = None
+    def __init__(self, ctx: zmq.Context) -> None:
+        if sys.platform == "win32":
+            self.debug(
+                "Setting WindowsSelectorEventLoopPolicy (required for ZMQ on Windows)"
+            )
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            self._loop = asyncio.new_event_loop()
+        else:
+            self._loop = asyncio.new_event_loop()
 
-    def __call__(self) -> asyncio.AbstractEventLoop:
-        """Return the async subscribers event loop is running.
+        self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
+        self._thread.name = "async-subscribers-loop"
+        self._thread.start()
+        self.debug("Loop started in thread %s", self._thread.name)
 
-        If no loop is running, it will be created and started
-        in a background thread.
+        async def _inner_init(ctx: zmq.Context) -> None:
+            self._ctx = zmq.asyncio.Context(ctx)
 
-        Returns
-        -------
-        asyncio.AbstractEventLoop
-            The async subscribers event loop.
-        """
-        if self._loop is None:
-            self.debug("No loop found, creating a new one")
-            if sys.platform == "win32":
-                self.debug(
-                    "Setting WindowsSelectorEventLoopPolicy (required for ZMQ on Windows)"
-                )
-                asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-                self._loop = asyncio.new_event_loop()
-            else:
-                self._loop = asyncio.new_event_loop()
-            self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
-            self._thread.name = "async-subscribers-loop"
-            self._thread.start()
-            self.debug("Loop started in thread %s", self._thread.name)
-        return self._loop
+        fut = asyncio.run_coroutine_threadsafe(_inner_init(ctx), self._loop)
+
+        # wait for initialization
+        while not fut.done():
+            ...
 
     def stop(self) -> None:
         """Stop the async subscribers event loop."""
-        if self._loop is not None:
-            self._loop.call_soon_threadsafe(self._loop.stop)
-            self._thread.join()
-            self.debug(f"{self._thread.name} stopped")
+        self._loop.call_soon_threadsafe(self._loop.stop)
+        self._thread.join()
+        self.debug(f"{self._thread.name} stopped")
 
-
-_loop_manager = LoopManager()
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        """Get the event loop."""
+        return self._loop

@@ -190,12 +190,16 @@ def test_async(bus: VirtualBus) -> None:
     pub.pub_socket.send_multipart([b"test", b"message"])
     pub.pub_socket.send_multipart([b"other-topic", b"message"])
 
+    # wait for wait for
+    # reception
+    time.sleep(0.5)
+
     bus.shutdown()
 
     # wait for cleanup
-    time.sleep(0.2)
+    time.sleep(0.1)
 
-    # assert sub.sub_future.done(), "Subscriber task not terminated"
+    assert sub.sub_future.done(), "Subscriber task not terminated"
 
     # check the received messages
     messages = asyncio.run(retrieve_messages(sub.msg_queue))
