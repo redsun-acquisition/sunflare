@@ -20,7 +20,7 @@ describe the controller and provides further customization options.
 import sys
 import threading
 from abc import abstractmethod
-from collections import deque
+from queue import Queue
 
 if sys.version_info >= (3, 11):
     from typing import Protocol
@@ -186,7 +186,7 @@ class SyncSubscriber:
     sub_poller: zmq.Poller
     sub_thread: threading.Thread
     sub_topics: Optional[Union[str, Iterable[str]]]
-    msg_queue: deque[Iterable[bytes]]
+    msg_queue: Queue[Optional[Iterable[bytes]]]
 
     def __init__(
         self,
@@ -195,7 +195,7 @@ class SyncSubscriber:
     ) -> None:
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
         self.sub_topics = topics
-        self.msg_queue = deque()
+        self.msg_queue = Queue()
         self.sub_thread = threading.Thread(target=self._spin, daemon=True)
         self.sub_thread.start()
 
@@ -210,10 +210,11 @@ class SyncSubscriber:
                 try:
                     socks = dict(self.sub_poller.poll())
                     if self.sub_socket in socks:
-                        self.msg_queue.append(self.sub_socket.recv_multipart())
+                        self.msg_queue.put(self.sub_socket.recv_multipart())
                 except zmq.error.ContextTerminated:
                     break
         finally:
+            self.msg_queue.put(None)
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
 
