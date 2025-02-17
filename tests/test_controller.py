@@ -192,17 +192,17 @@ def test_async(bus: VirtualBus) -> None:
 
     # wait for wait for
     # reception
-    time.sleep(0.5)
+    time.sleep(0.1)
+
+    fut = asyncio.run_coroutine_threadsafe(retrieve_messages(sub.msg_queue), sub.virtual_bus.loop)
+    messages = fut.result()
 
     bus.shutdown()
 
     # wait for cleanup
-    time.sleep(0.1)
+    time.sleep(1)
 
     assert sub.sub_future.done(), "Subscriber task not terminated"
-
-    # check the received messages
-    messages = asyncio.run(retrieve_messages(sub.msg_queue))
 
     assert len(messages) == 1, "Subscriber received more than one message or no message"
     assert messages == [("test", "message")], "Subscriber did not receive message"
