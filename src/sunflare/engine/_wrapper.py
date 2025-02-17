@@ -74,7 +74,7 @@ class RunEngine(BlueskyRunEngine):
     - ``during_task``: Overridden to ``DuringTask``, so the ``RunEngine``
         does not interact with any possible event loop in the main thread.
 
-    For the original function signature, refer to the :class:`~bluesky.run_engine.RunEngine` documentation.
+    For the original class initializer signature, refer to the :class:`~bluesky.run_engine.RunEngine` documentation.
 
     Parameters
     ----------
