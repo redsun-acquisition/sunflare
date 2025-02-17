@@ -1,6 +1,6 @@
 import threading
 from pathlib import Path
-from typing import cast
+from typing import cast, Iterable
 
 import zmq
 
@@ -9,7 +9,7 @@ from mocks import MockController, MockControllerInfo
 from sunflare.model import ModelProtocol
 from sunflare.config import ControllerInfo, RedSunSessionInfo
 from sunflare.virtual import VirtualBus
-from sunflare.controller import SyncPublisher, SyncSubscriber
+from sunflare.controller import SyncPublisher, SyncSubscriber, SyncPubSub
 
 
 def test_controller(config_path: Path, bus: VirtualBus) -> None:
@@ -52,6 +52,12 @@ def test_sync(bus: VirtualBus) -> None:
             self.info = info
             self.virtual_bus = virtual_bus
 
+        def consume(self, content: list[bytes]) -> None:
+            content[0] = content[0].decode()
+            content[1] = content[1].decode()
+            assert content[0] == "test"
+            assert content[1] == "message"
+
         def registration_phase(self):
             ...
 
@@ -69,9 +75,38 @@ def test_sync(bus: VirtualBus) -> None:
 
     assert sub.sub_socket is not None, "Subscriber socket not initialized"
     assert sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+    assert sub.sub_thread.is_alive(), "Consumer thread not started"
 
-
+    pub.pub_socket.send_multipart([b"test", b"message"])
 
     bus.shutdown()
 
     assert not sub.sub_thread.is_alive(), "Subscriber thread not terminated"
+
+def test_sync_single_class() -> None:
+    class TestController(SyncPubSub):
+        def __init__(self, info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
+            super().__init__(virtual_bus, "test")
+            self.info = info
+            self.models = models
+            self.virtual_bus = virtual_bus
+
+        def consume(self, content: list[bytes]) -> None:
+            content = [c.decode() for c in content]
+            assert content[0] == "test"
+            assert content[1] == "message"
+            
+
+    pub_sub_info = ControllerInfo()
+    pub_sub = TestController(pub_sub_info, {}, VirtualBus())
+
+    assert pub_sub.pub_socket is not None, "Publisher socket not initialized"
+    assert pub_sub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
+    assert pub_sub.sub_socket is not None, "Subscriber socket not initialized"
+    assert pub_sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+
+    pub_sub.pub_socket.send_multipart([b"test", b"message"])
+
+    pub_sub.virtual_bus.shutdown()
+
+    assert not pub_sub.sub_thread.is_alive(), "Subscriber thread not terminated"
