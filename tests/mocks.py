@@ -174,12 +174,12 @@ class MockController(ControllerProtocol):
     sigNewPlan = Signal(object)
 
     def __init__(self, 
-                ctrl_info: MockControllerInfo,
+                info: MockControllerInfo,
                 virtual_bus: MockVirtualBus) -> None:
-        self._ctrl_info = ctrl_info
-        self._engine = RunEngine({})
-        self._virtual_bus = virtual_bus
-        self._plans: list[partial[MsgGenerator[Any]]] = []
+        self.info = info
+        self.engine = RunEngine({})
+        self.virtual_bus = virtual_bus
+        self.plans: list[partial[MsgGenerator[Any]]] = []
 
         def mock_plan_no_device() -> MsgGenerator[Any]:
             yield from [open_run(), close_run()]
@@ -190,8 +190,8 @@ class MockController(ControllerProtocol):
             yield from rel_set(mot, 1)
             yield from close_run()
 
-        self._plans.append(partial(mock_plan_no_device))
-        self._plans.append(partial(mock_plan_device, mock_detector, mock_motor))
+        self.plans.append(partial(mock_plan_no_device))
+        self.plans.append(partial(mock_plan_device, mock_detector, mock_motor))
         
 
     def registration_phase(self) -> None:
@@ -202,11 +202,3 @@ class MockController(ControllerProtocol):
     
     def shutdown(self) -> None:
         ...
-    
-    @property
-    def controller_info(self) -> MockControllerInfo:
-        return self._ctrl_info
-
-    @property
-    def plans(self) -> list[partial[MsgGenerator[Any]]]:
-        return self._plans

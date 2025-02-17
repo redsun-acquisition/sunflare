@@ -1,10 +1,10 @@
 """Redsun uses controllers to manage the interaction between the user interface and the hardware.
 
-They have access to the `VirtualBus` to enable interaction with other controllers and/or
+They have access to the ``VirtualBus`` to enable interaction with other controllers and/or
 widgets by exchanging data via either the built-in signals or custom signals that can be defined by the user.
 
 They can keep a reference of hardware devices for exclusive control by selecting the appropriate model from the
-`models` dictionary.
+``models`` map.
 
 Functionally wise, they can:
 
@@ -18,18 +18,18 @@ describe the controller and provides further customization options.
 """
 
 import sys
+import threading
 from abc import abstractmethod
-from functools import partial
+from collections import deque
 
 if sys.version_info >= (3, 11):
     from typing import Protocol
 else:
     from typing_extensions import Protocol
 
-from typing import Any, Mapping, runtime_checkable
+from typing import Iterable, Mapping, Optional, Union, runtime_checkable
 
 import zmq
-from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo
 from sunflare.model import ModelProtocol
@@ -50,26 +50,16 @@ class ControllerProtocol(Protocol):
         Virtual bus.
     """
 
-    _ctrl_info: ControllerInfo
-    _virtual_bus: VirtualBus
+    info: ControllerInfo
+    virtual_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
-        ctrl_info: ControllerInfo,
+        info: ControllerInfo,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
     ) -> None: ...
-
-    @abstractmethod
-    def shutdown(self) -> None:
-        """Shutdown the controller. Performs cleanup operations.
-
-        If the controller holds any kind of resources,
-        this method should invoke any equivalent shutdown method for each resource.
-        If no resources are held, this method can be left empty.
-        """
-        ...
 
     @abstractmethod
     def registration_phase(self) -> None:
@@ -87,10 +77,10 @@ class ControllerProtocol(Protocol):
 
             def registration_phase(self) -> None:
                 # you can register all signals...
-                self._virtual_bus.register_signals(self)
+                self.virtual_bus.register_signals(self)
                 
                 # ... or only a selection of them
-                self._virtual_bus.register_signals(self, only=["signal"])
+                self.virtual_bus.register_signals(self, only=["signal"])
         """
         ...
 
@@ -110,35 +100,130 @@ class ControllerProtocol(Protocol):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"]["signal"].connect(self._my_slot)
+                self.virtual_bus["OtherController"]["signal"].connect(self._my_slot)
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
+                self.virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
 
                 # ... or connect to widgets
-                self._virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
+                self.virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
         """
         ...
 
-    @property
-    @abstractmethod
-    def controller_info(self) -> ControllerInfo:
-        """Controller information container."""
-        ...
 
-    @property
+class HasShutdown(Protocol):
+    """Shutdown protocol class.
+
+    Provides the ``shutdown`` method.
+    """
+
     @abstractmethod
-    def plans(self) -> list[partial[MsgGenerator[Any]]]:
-        """List of available plans."""
+    def shutdown(self) -> None:
+        """Shutdown the controller. Performs cleanup operations.
+
+        If the controller holds any kind of resources,
+        this method should invoke any equivalent shutdown method for each resource.
+        """
         ...
 
 
 class SyncPublisher:
-    """Mixin class for synchronous ZMQ publishers."""
+    """SyncPublisher protocol class.
 
-    socket: zmq.Socket[bytes]
-    _virtual_bus: VirtualBus
+    A protocol class for controllers that need to publish data synchronously.
 
-    def connect(self) -> None:
-        """Connect to the virtual bus."""
-        self.socket = self._virtual_bus.connect(zmq.PUB)
+    Parameters
+    ----------
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+        Virtual bus.
+
+    Attributes
+    ----------
+    pub_socket : ``zmq.Socket[bytes]``
+        Publisher socket.
+    """
+
+    pub_socket: zmq.Socket[bytes]
+
+    def __init__(
+        self,
+        virtual_bus: VirtualBus,
+    ) -> None:
+        """Pre-initialization method.
+
+        Initializes the publisher socket.
+        """
+        self.pub_socket = virtual_bus.connect_publisher()
+
+
+class SyncSubscriber:
+    """SyncSubscriber protocol class.
+
+    A protocol class for controllers that need to subscribe to data synchronously.
+
+    Parameters
+    ----------
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+        Virtual bus.
+    topics : ``str | Iterable[str]``
+        Subscriber topics.
+
+    Attributes
+    ----------
+    sub_socket : ``zmq.Socket[bytes]``
+        Subscriber socket.
+    sub_poller : ``zmq.Poller``
+        Poller for the subscriber socket.
+    sub_thread : ``threading.Thread``
+        Subscriber thread.
+    sub_topics : ``str | Iterable[str]``
+        Subscriber topics.
+    msg_queue : ``deque[Iterable[bytes]]``
+        Incoming message queue.
+    """
+
+    sub_socket: zmq.Socket[bytes]
+    sub_poller: zmq.Poller
+    sub_thread: threading.Thread
+    sub_topics: Optional[Union[str, Iterable[str]]]
+    msg_queue: deque[Iterable[bytes]]
+
+    def __init__(
+        self,
+        virtual_bus: VirtualBus,
+        topics: Optional[Union[str, Iterable[str]]] = None,
+    ) -> None:
+        self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
+        self.sub_topics = topics
+        self.msg_queue = deque()
+        self.sub_thread = threading.Thread(target=self._spin, daemon=True)
+        self.sub_thread.start()
+
+    def _spin(self) -> None:
+        """Spin the subscriber.
+
+        The subscriber thread will poll the subscriber socket for incoming messages.
+        When the virtual bus is shut down, the subscriber will stop polling.
+        """
+        try:
+            while True:
+                try:
+                    socks = dict(self.sub_poller.poll())
+                    if self.sub_socket in socks:
+                        self.msg_queue.append(self.sub_socket.recv_multipart())
+                except zmq.error.ContextTerminated:
+                    break
+        finally:
+            self.sub_poller.unregister(self.sub_socket)
+            self.sub_socket.close()
+
+
+class SyncPubSub(SyncPublisher, SyncSubscriber):
+    """Mixin class for synchronous simultaneous publishing and subscribing.
+
+    See :class:`~sunflare.virtual.SyncPublisher` and :class:`~sunflare.virtual.SyncSubscriber` for reference.
+    """
+
+    def __init__(self, virtual_bus: VirtualBus) -> None:
+        SyncSubscriber.__init__(self, virtual_bus)
+        SyncPublisher.__init__(self, virtual_bus)
