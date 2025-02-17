@@ -1,13 +1,37 @@
+import asyncio
 import threading
 from abc import abstractmethod
-from typing import Iterable, Optional, Union
+from concurrent.futures import Future
+from typing import Awaitable, Iterable, Optional, Protocol, TypeVar, Union
 
 import zmq
+import zmq.asyncio
+from typing_extensions import TypeIs
 
+from sunflare.log import Loggable
 from sunflare.virtual import VirtualBus
 
+from .._utils import _loop_manager
 
-class SyncPublisher:
+T = TypeVar("T")
+
+
+def _isawaitable(ret: Union[T, Awaitable[T]]) -> TypeIs[Awaitable[T]]:
+    return hasattr(ret, "__await__")
+
+
+async def maybe_await(ret: Union[T, Awaitable[T]]) -> T:
+    """Await (possibly) for the return value.
+
+    Helper function to support both synchronous and asynchronous
+    return values from a method.
+    """
+    if _isawaitable(ret):
+        return await ret
+    return ret
+
+
+class Publisher:
     """Synchronous publisher protocol class.
 
     A protocol class for controllers that need to publish data synchronously.
@@ -32,22 +56,42 @@ class SyncPublisher:
         self.pub_socket = virtual_bus.connect_publisher()
 
 
-class SyncSubscriber:
+class Consumer(Protocol):
+    """Helper protocol for subscribers."""
+
+    @abstractmethod
+    def consume(self, content: list[bytes]) -> Union[None, Awaitable[None]]:
+        """Consume the incoming message.
+
+        Provided by the user to perform operations
+        on incoming messages.
+
+        ``consume`` can be synchronous, e.g.:
+
+        .. code-block:: python
+
+            def consume(self, content: list[bytes]) -> None:
+                pass
+
+        ... or asynchronous, e.g.:
+
+        .. code-block:: python
+
+            async def consume(self, content: list[bytes]) -> None:
+                pass
+
+        Parameters
+        ----------
+        content : ``Iterable[bytes]``
+            Incoming message.
+        """
+
+
+class SyncSubscriber(Consumer, Loggable):
     """Synchronous subscriber mixin class.
 
     The synchronous subscriber deploys a background thread
     which will poll the virtual bus for incoming messages.
-    When a new message is received and the subscriber
-    is registered to the topic the message carries,
-    the message is put in a queue to be consumed
-    by the controller (possibly in another thread).
-
-    When the virtual bus is shut down, the
-    subscriber will:
-
-    - put a ``None`` in the queue (which signals the consumer to finish);
-    - unregister the subscriber from the poller;
-    - close the subscriber socket.
 
     Parameters
     ----------
@@ -66,8 +110,6 @@ class SyncSubscriber:
         Subscriber thread.
     sub_topics : ``str | Iterable[str]``
         Subscriber topics.
-    msg_queue : ``deque[Iterable[bytes]]``
-        Incoming message queue.
     """
 
     sub_socket: zmq.Socket[bytes]
@@ -91,6 +133,7 @@ class SyncSubscriber:
         The subscriber thread will poll the subscriber socket for incoming messages.
         When the virtual bus is shut down, the subscriber will stop polling.
         """
+        self.debug("Starting subscriber")
         try:
             while True:
                 try:
@@ -100,32 +143,75 @@ class SyncSubscriber:
                 except zmq.error.ContextTerminated:
                     break
         finally:
+            self.debug("Shutting down subscriber")
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
 
-    @abstractmethod
-    def consume(self, content: list[bytes]) -> None:
-        """Consume the incoming message.
 
-        Provided by the user to perform operations
-        on incoming messages.
+class AsyncSubscriber(Consumer, Loggable):
+    """Mixin class for asynchronous subscribing.
 
-        Parameters
-        ----------
-        content : ``Iterable[bytes]``
-            Incoming message content.
-        """
-        ...
+    Just like its synchronous counterpart,
+    the asynchronous subscriber will poll
+    the virtual bus for incoming messages
+    to registered topics.
 
+    Instead of a background thread,
+    a shared background event loop
+    is used, where multiple async.
+    subscribers can coexist.
 
-class SyncPubSub(SyncPublisher, SyncSubscriber):
-    """Mixin class for synchronous simultaneous publishing and subscribing.
+    Parameters
+    ----------
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+        Virtual bus.
+    topics : ``str | Iterable[str]``
+        Subscriber topics.
 
-    See :class:`~sunflare.virtual.SyncPublisher` and :class:`~sunflare.virtual.SyncSubscriber` for reference.
+    Attributes
+    ----------
+    sub_socket : ``zmq.asyncio.Socket``
+        Subscriber socket.
+    sub_poller : ``zmq.asyncio.Poller``
+        Poller for the subscriber socket.
+    sub_future : ``concurrent.futures.Future[None]``
+        Future object of the subscriber task.
+    sub_topics : ``str | Iterable[str]``
+        Subscriber topics.
     """
 
+    sub_socket: zmq.asyncio.Socket
+    sub_poller: zmq.asyncio.Poller
+    sub_future: Future[None]
+    sub_topics: Optional[Union[str, Iterable[str]]]
+
     def __init__(
-        self, virtual_bus: VirtualBus, topics: Optional[Union[str, list[str]]] = None
+        self, virtual_bus: VirtualBus, topics: Optional[Union[str, Iterable[str]]]
     ) -> None:
-        SyncPublisher.__init__(self, virtual_bus)
-        SyncSubscriber.__init__(self, virtual_bus, topics)
+        self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(
+            topics, asyncio=True
+        )
+        loop = _loop_manager()
+        self.sub_future = asyncio.run_coroutine_threadsafe(self._spin(), loop)
+
+    async def _spin(self) -> None:
+        """Spin the subscriber.
+
+        The subscriber thread will poll the subscriber socket for incoming messages.
+        When the virtual bus is shut down, the subscriber will stop polling.
+        """
+        self.debug("Starting subscriber")
+        try:
+            while True:
+                try:
+                    socks = dict(await self.sub_poller.poll())
+                    if self.sub_socket in socks:
+                        await maybe_await(
+                            self.consume(await self.sub_socket.recv_multipart())
+                        )
+                except zmq.error.ContextTerminated:
+                    break
+        finally:
+            self.debug("Shutting down subscriber")
+            self.sub_poller.unregister(self.sub_socket)
+            self.sub_socket.close()

@@ -58,9 +58,11 @@ from weakref import WeakSet
 import msgspec
 import numpy as np
 import zmq
+import zmq.asyncio
 import zmq.devices
 from psygnal import Signal, SignalInstance
 
+from sunflare._utils import _loop_manager
 from sunflare.log import Loggable
 
 __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
@@ -189,8 +191,7 @@ class VirtualBus(Loggable):
 
     def __init__(self) -> None:
         self._cache: dict[str, dict[str, SignalInstance]] = {}
-        self._pub_sockets: WeakSet[zmq.SyncSocket] = WeakSet()
-        self._context = zmq.Context.instance()
+        self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
         self._forwarder.daemon = True
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
@@ -208,12 +209,12 @@ class VirtualBus(Loggable):
         for socket in self._pub_sockets:
             socket.close()
         try:
-            self._context.term()
+            zmq.Context.instance().term()
         except zmq.error.ZMQError:
             self.debug("ZMQ context already terminated.")
         finally:
-            if not self._forwarder.done:
-                self._forwarder.join()
+            _loop_manager.stop()
+            self._forwarder.join()
 
     def register_signals(
         self, owner: object, only: Optional[Iterable[str]] = None
@@ -298,22 +299,43 @@ class VirtualBus(Loggable):
         return class_name in self._cache
 
     @overload
-    def connect_subscriber(self) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
+    def connect_subscriber(
+        self, topic: None
+    ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
     @overload
-    def connect_subscriber(self, topic: str) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
+    def connect_subscriber(
+        self, topic: str
+    ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
     @overload
     def connect_subscriber(
         self, topic: Iterable[str]
-    ) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
+    ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
     @overload
-    def connect_subscriber(self, topic: None) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
+    def connect_subscriber(
+        self, topic: None, asyncio: bool
+    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]: ...
+
+    @overload
+    def connect_subscriber(
+        self, topic: str, asyncio: bool
+    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]: ...
+
+    @overload
+    def connect_subscriber(
+        self, topic: Iterable[str], asyncio: bool
+    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]: ...
 
     def connect_subscriber(
-        self, topic: Optional[Union[str, Iterable[str]]] = None
-    ) -> tuple[zmq.SyncSocket, zmq.Poller]:
+        self,
+        topic: Optional[Union[str, Iterable[str]]] = None,
+        asyncio: Optional[bool] = False,
+    ) -> tuple[
+        Union[zmq.Socket[bytes], zmq.asyncio.Socket],
+        Union[zmq.Poller, zmq.asyncio.Poller],
+    ]:
         """
         Connect a subscriber to the virtual bus.
 
@@ -323,15 +345,33 @@ class VirtualBus(Loggable):
             The topic(s) to subscribe to.
             If not provided, subscription
             is left to the user.
+        asyncio : ``bool``, optional
+            Whether to return an asyncio-compatible socket.
+            Default is ``False``.
 
         Returns
         -------
         ``tuple[zmq.SyncSocket, zmq.Poller]``
             A tuple containing the subscriber socket and its poller.
         """
-        socket: zmq.SyncSocket = self._context.socket(zmq.SUB)
-        socket.connect(self.INPROC_MAP[zmq.SUB])
-        poller = zmq.Poller()
+        poller: Union[zmq.Poller, zmq.asyncio.Poller]
+        socket: Union[zmq.Socket[bytes], zmq.asyncio.Socket]
+
+        if asyncio:
+            # this should work as intended,
+            # but the stubs are maybe incomplete;
+            # ignore for now
+            actx = zmq.asyncio.Context.instance()
+            asocket = actx.socket(zmq.SUB)
+            apoller = zmq.asyncio.Poller()
+            socket = asocket
+            poller = apoller
+        else:
+            ctx = zmq.Context.instance()
+            ssocket: zmq.Socket[bytes] = ctx.socket(zmq.SUB)
+            spoller = zmq.Poller()
+            socket = ssocket
+            poller = spoller
         poller.register(socket, zmq.POLLIN)
         if topic is None:
             return socket, poller
@@ -342,17 +382,22 @@ class VirtualBus(Loggable):
                 socket.subscribe(topic)
         return socket, poller
 
-    def connect_publisher(
-        self,
-    ) -> zmq.SyncSocket:
+    def connect_publisher(self) -> zmq.Socket[bytes]:
         """Connect a publisher to the virtual bus.
+
+        Parameters
+        ----------
+        asyncio : ``bool``, keyword-only, optional
+            Whether to return an asyncio-compatible socket.
+            Default is ``False``.
 
         Returns
         -------
-        ``zmq.SyncSocket``
+        ``zmq.SyncSocket | zmq.asyncio.Socket``
             The publisher socket.
         """
-        socket: zmq.SyncSocket = self._context.socket(zmq.PUB)
+        ctx = zmq.Context.instance()
+        socket: zmq.Socket[bytes] = ctx.socket(zmq.PUB)
         socket.connect(self.INPROC_MAP[zmq.PUB])
         self._pub_sockets.add(socket)
         return socket
