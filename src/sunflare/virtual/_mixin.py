@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import threading
 from abc import abstractmethod
 from concurrent.futures import Future
@@ -8,10 +9,8 @@ import zmq
 import zmq.asyncio
 from typing_extensions import TypeIs
 
-from sunflare.log import Loggable
-from sunflare.virtual import VirtualBus
-
-from .._utils import _loop_manager
+from ._bus import VirtualBus
+from ._utils import _loop_manager
 
 T = TypeVar("T")
 
@@ -87,7 +86,7 @@ class Consumer(Protocol):
         """
 
 
-class SyncSubscriber(Consumer, Loggable):
+class SyncSubscriber(Consumer):
     """Synchronous subscriber mixin class.
 
     The synchronous subscriber deploys a background thread
@@ -122,6 +121,7 @@ class SyncSubscriber(Consumer, Loggable):
         virtual_bus: VirtualBus,
         topics: Optional[Union[str, Iterable[str]]] = None,
     ) -> None:
+        self._logger = logging.getLogger("redsun")
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
         self.sub_topics = topics
         self.sub_thread = threading.Thread(target=self._spin, daemon=True)
@@ -133,7 +133,7 @@ class SyncSubscriber(Consumer, Loggable):
         The subscriber thread will poll the subscriber socket for incoming messages.
         When the virtual bus is shut down, the subscriber will stop polling.
         """
-        self.debug("Starting subscriber")
+        self._logger.debug("Starting subscriber")
         try:
             while True:
                 try:
@@ -141,14 +141,15 @@ class SyncSubscriber(Consumer, Loggable):
                     if self.sub_socket in socks:
                         self.consume(self.sub_socket.recv_multipart())
                 except zmq.error.ContextTerminated:
+                    self._logger.debug("Context terminated")
                     break
         finally:
-            self.debug("Shutting down subscriber")
+            self._logger.debug("Shutting down subscriber")
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
 
 
-class AsyncSubscriber(Consumer, Loggable):
+class AsyncSubscriber(Consumer):
     """Mixin class for asynchronous subscribing.
 
     Just like its synchronous counterpart,
@@ -188,6 +189,7 @@ class AsyncSubscriber(Consumer, Loggable):
     def __init__(
         self, virtual_bus: VirtualBus, topics: Optional[Union[str, Iterable[str]]]
     ) -> None:
+        self._logger = logging.getLogger("redsun")
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(
             topics, asyncio=True
         )
@@ -200,7 +202,7 @@ class AsyncSubscriber(Consumer, Loggable):
         The subscriber thread will poll the subscriber socket for incoming messages.
         When the virtual bus is shut down, the subscriber will stop polling.
         """
-        self.debug("Starting subscriber")
+        self._logger.debug("Starting async subscriber")
         try:
             while True:
                 try:
@@ -210,8 +212,14 @@ class AsyncSubscriber(Consumer, Loggable):
                             self.consume(await self.sub_socket.recv_multipart())
                         )
                 except zmq.error.ContextTerminated:
+                    self._logger.debug("Context terminated")
                     break
         finally:
-            self.debug("Shutting down subscriber")
+            self._logger.debug("Shutting down subscriber")
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
+            self._logger.debug("Shutdown complete")
+
+    @property
+    def __clsname__(self) -> str:
+        return self.__class__.__name__

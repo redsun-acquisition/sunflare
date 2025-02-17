@@ -1,4 +1,4 @@
-from ._mixin import AsyncSubscriber, Publisher, SyncSubscriber
+from ..virtual._mixin import AsyncSubscriber, Publisher, SyncSubscriber
 from ._protocols import ControllerProtocol, HasShutdown
 
 __all__ = [

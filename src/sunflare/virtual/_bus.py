@@ -62,8 +62,9 @@ import zmq.asyncio
 import zmq.devices
 from psygnal import Signal, SignalInstance
 
-from sunflare._utils import _loop_manager
 from sunflare.log import Loggable
+
+from ._utils import _loop_manager
 
 __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
 
@@ -192,6 +193,7 @@ class VirtualBus(Loggable):
     def __init__(self) -> None:
         self._cache: dict[str, dict[str, SignalInstance]] = {}
         self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
+        self._context = zmq.Context.instance()
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
         self._forwarder.daemon = True
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
@@ -209,7 +211,7 @@ class VirtualBus(Loggable):
         for socket in self._pub_sockets:
             socket.close()
         try:
-            zmq.Context.instance().term()
+            self._context.term()
         except zmq.error.ZMQError:
             self.debug("ZMQ context already terminated.")
         finally:
@@ -357,30 +359,21 @@ class VirtualBus(Loggable):
         poller: Union[zmq.Poller, zmq.asyncio.Poller]
         socket: Union[zmq.Socket[bytes], zmq.asyncio.Socket]
 
-        if asyncio:
-            # this should work as intended,
-            # but the stubs are maybe incomplete;
-            # ignore for now
-            actx = zmq.asyncio.Context.instance()
-            asocket = actx.socket(zmq.SUB)
-            apoller = zmq.asyncio.Poller()
-            socket = asocket
-            poller = apoller
-        else:
-            ctx = zmq.Context.instance()
-            ssocket: zmq.Socket[bytes] = ctx.socket(zmq.SUB)
-            spoller = zmq.Poller()
-            socket = ssocket
-            poller = spoller
+        socket = self._context.socket(zmq.SUB)
+        poller = zmq.asyncio.Poller() if asyncio else zmq.Poller()
+
+        socket.connect(self.INPROC_MAP[zmq.SUB])
         poller.register(socket, zmq.POLLIN)
-        if topic is None:
-            return socket, poller
         if isinstance(topic, str):
             socket.subscribe(topic)
-        else:
+        elif isinstance(topic, Iterable):
             for topic in topic:
                 socket.subscribe(topic)
-        return socket, poller
+        if asyncio:
+            asocket = zmq.asyncio.Socket(socket)
+            return asocket, poller
+        else:
+            return socket, poller
 
     def connect_publisher(self) -> zmq.Socket[bytes]:
         """Connect a publisher to the virtual bus.
@@ -396,8 +389,7 @@ class VirtualBus(Loggable):
         ``zmq.SyncSocket | zmq.asyncio.Socket``
             The publisher socket.
         """
-        ctx = zmq.Context.instance()
-        socket: zmq.Socket[bytes] = ctx.socket(zmq.PUB)
+        socket: zmq.Socket[bytes] = self._context.socket(zmq.PUB)
         socket.connect(self.INPROC_MAP[zmq.PUB])
         self._pub_sockets.add(socket)
         return socket

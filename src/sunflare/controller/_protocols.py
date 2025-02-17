@@ -47,7 +47,7 @@ class ControllerProtocol(Protocol):
     @abstractmethod
     def __init__(
         self,
-        info: ControllerInfo,
+        ctrl_info: ControllerInfo,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
     ) -> None: ...
