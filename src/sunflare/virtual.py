@@ -44,7 +44,6 @@ from __future__ import annotations
 
 from types import MappingProxyType
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Final,
     Iterable,
@@ -63,9 +62,6 @@ import zmq.devices
 from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
-
-if TYPE_CHECKING:
-    from sunflare.engine import DocumentType
 
 __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
 
@@ -97,8 +93,8 @@ _encoder = msgspec.msgpack.Encoder(enc_hook=_msgpack_enc_hook)
 _decoder = msgspec.msgpack.Decoder(dec_hook=_msgpack_dec_hook)
 
 
-def encode(obj: DocumentType) -> bytes:
-    """Encode a document in msgpack format.
+def encode(obj: object) -> bytes:
+    """Encode an object in msgpack format.
 
     Parameters
     ----------
@@ -113,8 +109,8 @@ def encode(obj: DocumentType) -> bytes:
     return _encoder.encode(obj)
 
 
-def decode(data: bytes) -> DocumentType:
-    """Decode a serialized message to a document.
+def decode(data: bytes) -> object:
+    """Decode a serialized message to an object.
 
     Parameters
     ----------
@@ -311,6 +307,9 @@ class VirtualBus(Loggable):
     def connect_subscriber(
         self, topic: Iterable[str]
     ) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
+
+    @overload
+    def connect_subscriber(self, topic: None) -> tuple[zmq.SyncSocket, zmq.Poller]: ...
 
     def connect_subscriber(
         self, topic: Optional[Union[str, Iterable[str]]] = None
