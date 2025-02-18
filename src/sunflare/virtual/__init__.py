@@ -1,12 +1,11 @@
-from ._bus import Signal, VirtualBus, decode, encode, slot
-from ._mixin import Publisher, SyncSubscriber
+from ._bus import Publisher, Signal, SyncSubscriber, VirtualBus, decode, encode, slot
 
 __all__ = [
     "VirtualBus",
+    "slot",
     "Signal",
-    "SyncSubscriber",
     "Publisher",
+    "SyncSubscriber",
     "encode",
     "decode",
-    "slot",
 ]

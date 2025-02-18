@@ -1,49 +1,11 @@
-r"""
-Sunflare virtual module.
-
-This module implements the communication mechanism between the controller layer and the view layer.
-
-It achieves this by using the `psygnal <https://psygnal.readthedocs.io/en/stable/>`_ library.
-
-The module exposes the following:
-
-- the ``psygnal.Signal`` class;
-- the ``VirtualBus`` class;
-- the ``slot`` decorator.
-
-``psygnal.Signal`` is the main communication mechanism between controllers and the view layer.
-
-It provides a syntax similar to the Qt signal/slot mechanism, i.e.
-
-.. code-block:: python
-
-    class MyController:
-        sigMySignal = Signal()
-
-
-    def a_slot():
-        print("My signal was emitted!")
-
-
-    ctrl = MyController()
-    ctrl.sigMySignal.connect(my_slot)
-
-- The ``VirtualBus`` class is a signal router for data exchange between the backend and frontend. Plugins can expose signals to other plugins or different Redsun modules, as well as connect to built-in signals or signals provided from other system components.
-
-- The ``slot`` decorator is used to mark a function as a slot. In practice, it provides no benefit at runtime; it's used to facilitate code readability.
-
-.. code-block:: python
-
-    # slot will mark the function as a slot
-    @slot
-    def my_slot():
-        print("My slot was called!")
-"""
-
 from __future__ import annotations
 
+import logging
+import threading
+from abc import abstractmethod
 from types import MappingProxyType
 from typing import (
+    Awaitable,
     Callable,
     Final,
     Iterable,
@@ -61,6 +23,7 @@ import zmq
 import zmq.asyncio
 import zmq.devices
 from psygnal import Signal, SignalInstance
+from typing_extensions import TypeIs
 
 from sunflare.log import Loggable
 
@@ -68,6 +31,7 @@ __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
 
 
 F = TypeVar("F", bound=Callable[..., object])
+T = TypeVar("T")
 
 _INPROC_XPUB = "inproc://virtual_xpub"
 _INPROC_XSUB = "inproc://virtual_xsub"
@@ -94,13 +58,13 @@ _encoder = msgspec.msgpack.Encoder(enc_hook=_msgpack_enc_hook)
 _decoder = msgspec.msgpack.Decoder(dec_hook=_msgpack_dec_hook)
 
 
-def encode(obj: object) -> bytes:
+def encode(obj: T) -> bytes:
     """Encode an object in msgpack format.
 
     Parameters
     ----------
-    obj : ``DocumentType``
-        The document to encode.
+    obj : ``T``
+        The object to encode.
 
     Returns
     -------
@@ -113,6 +77,14 @@ def encode(obj: object) -> bytes:
 def decode(data: bytes) -> object:
     """Decode a serialized message to an object.
 
+    .. note::
+
+        For correct type checking,
+        the decoded object should
+        be casted by the caller of
+        this function using
+        ``typing.cast``.
+
     Parameters
     ----------
     data : ``bytes``
@@ -120,8 +92,8 @@ def decode(data: bytes) -> object:
 
     Returns
     -------
-    ``DocumentType``
-        The decoded document.
+    ``object``
+        The decoded object.
     """
     return _decoder.decode(data)
 
@@ -193,9 +165,6 @@ class VirtualBus(Loggable):
         self._cache: dict[str, dict[str, SignalInstance]] = {}
         self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
         self._context = zmq.Context.instance()
-        # TODO: asyncio subscribers are not shutting down correctly;
-        # when a solution is found this will be added again
-        # self._asub_loop = SubscriberLoop(self._context)
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
         self._forwarder.daemon = True
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
@@ -372,12 +341,6 @@ class VirtualBus(Loggable):
 
         if is_async:
             raise NotImplementedError("Async subscriber not implemented yet.")
-            # fut = asyncio.run_coroutine_threadsafe(
-            #     self.__async_connect_subscriber(topic), self.loop
-            # )
-            # while not fut.done():
-            #     ...
-            # return fut.result()
         else:
             socket = self._context.socket(zmq.SUB)
             socket.setsockopt(zmq.LINGER, -1)
@@ -390,21 +353,6 @@ class VirtualBus(Loggable):
                 for topic in topic:
                     socket.subscribe(topic)
             return socket, poller
-
-    # async def __async_connect_subscriber(
-    #     self, topic: Optional[Union[str, Iterable[str]]] = None
-    # ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]:
-    #     socket = self._asub_loop._ctx.socket(zmq.SUB)
-    #     poller = zmq.asyncio.Poller()
-    #     socket.connect(self.INPROC_MAP[zmq.SUB])
-    #     socket.setsockopt(zmq.LINGER, -1)
-    #     poller.register(socket, zmq.POLLIN)
-    #     if isinstance(topic, str):
-    #         socket.subscribe(topic)
-    #     elif isinstance(topic, Iterable):
-    #         for topic in topic:
-    #             socket.subscribe(topic)
-    #     return socket, poller
 
     def connect_publisher(self) -> zmq.Socket[bytes]:
         """Connect a publisher to the virtual bus.
@@ -426,7 +374,120 @@ class VirtualBus(Loggable):
         self._pub_sockets.add(socket)
         return socket
 
-    # @property
-    # def loop(self) -> asyncio.AbstractEventLoop:
-    #     """The asyncio event loop running in the subscriber thread."""
-    #     return self._asub_loop.loop
+
+def _isawaitable(ret: Union[T, Awaitable[T]]) -> TypeIs[Awaitable[T]]:
+    return hasattr(ret, "__await__")
+
+
+async def maybe_await(ret: Union[T, Awaitable[T]]) -> T:
+    """Await (possibly) for the return value.
+
+    Helper function to support both synchronous and asynchronous
+    return values from a method.
+    """
+    if _isawaitable(ret):
+        return await ret
+    return ret
+
+
+class Publisher:
+    """Publisher mixin class.
+
+    Creates a publisher socket for the virtual bus,
+    which can be used to send messages to subscribers
+    over the virtual bus.
+
+    Parameters
+    ----------
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+        Virtual bus.
+
+    Attributes
+    ----------
+    pub_socket : ``zmq.Socket[bytes]``
+        Publisher socket.
+    """
+
+    pub_socket: zmq.Socket[bytes]
+
+    def __init__(
+        self,
+        virtual_bus: VirtualBus,
+    ) -> None:
+        self.pub_socket = virtual_bus.connect_publisher()
+
+
+class SyncSubscriber:
+    """Synchronous subscriber mixin class.
+
+    The synchronous subscriber deploys a background thread
+    which will poll the virtual bus for incoming messages.
+
+    Parameters
+    ----------
+    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+        Virtual bus.
+    topics : ``str | Iterable[str]``
+        Subscriber topics.
+
+    Attributes
+    ----------
+    sub_socket : ``zmq.Socket[bytes]``
+        Subscriber socket.
+    sub_poller : ``zmq.Poller``
+        Poller for the subscriber socket.
+    sub_thread : ``threading.Thread``
+        Subscriber thread.
+    sub_topics : ``str | Iterable[str]``
+        Subscriber topics.
+    """
+
+    sub_socket: zmq.Socket[bytes]
+    sub_poller: zmq.Poller
+    sub_thread: threading.Thread
+    sub_topics: Optional[Union[str, Iterable[str]]]
+
+    def __init__(
+        self,
+        virtual_bus: VirtualBus,
+        topics: Optional[Union[str, Iterable[str]]] = None,
+    ) -> None:
+        self._logger = logging.getLogger("redsun")
+        self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
+        self.sub_topics = topics
+        self.sub_thread = threading.Thread(target=self._spin, daemon=True)
+        self.sub_thread.start()
+
+    def _spin(self) -> None:
+        """Spin the subscriber.
+
+        The subscriber thread will poll the subscriber socket for incoming messages.
+        When the virtual bus is shut down, the subscriber will stop polling.
+        """
+        self._logger.debug("Starting subscriber")
+        try:
+            while True:
+                try:
+                    socks = dict(self.sub_poller.poll())
+                    if self.sub_socket in socks:
+                        self.consume(self.sub_socket.recv_multipart())
+                except zmq.error.ContextTerminated:
+                    self._logger.debug("Context terminated")
+                    break
+        finally:
+            self._logger.debug("Shutting down subscriber")
+            self.sub_poller.unregister(self.sub_socket)
+            self.sub_socket.close()
+
+    @abstractmethod
+    def consume(self, content: list[bytes]) -> None:
+        """Consume the incoming message.
+
+        The user must implement this method to process incoming messages.
+
+        Parameters
+        ----------
+        content : ``list[bytes]``
+            Incoming message.
+        """
+        ...

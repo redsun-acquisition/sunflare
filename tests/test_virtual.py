@@ -2,12 +2,15 @@
 import logging
 import threading
 import time
+import queue
 from typing import Generator
 
 import zmq
 import pytest
 
 from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
+from sunflare.config import ControllerInfo
+from sunflare.model import ModelProtocol
 from sunflare.log import Loggable
 
 class MockVirtualBus(VirtualBus):

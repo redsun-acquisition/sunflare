@@ -20,9 +20,8 @@ It is good practice to mark your handler object via a double underscore `__`, i.
 ::::{tab-set}
 :::{tab-item} UML
 ```mermaid
-:config: {"theme": "base"}
+:config: { "theme": "neutral", "fontFamily": "Courier New" }
 :align: center
-%%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#fefefe', 'lineColor': '#fefefe', } } }%%
 
     classDiagram
         class DeviceModel {
@@ -150,9 +149,8 @@ Using aggregation to control your device interface may be impractical if `Device
 ::::{tab-set}
 :::{tab-item} UML
 ```mermaid
-:config: {"theme": "base"}
+:config: { "theme": "neutral", "fontFamily": "Courier New" }
 :align: center
-%%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#fefefe', 'lineColor': '#fefefe', } } }%%
 
     classDiagram
         class DeviceModel {
