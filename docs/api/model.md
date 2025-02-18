@@ -1,7 +1,7 @@
 # Model API
 
 ```{eval-rst}
-.. automodule:: sunflare.model.protocols
+.. automodule:: sunflare.model
     :members:
     :member-order: bysource
 

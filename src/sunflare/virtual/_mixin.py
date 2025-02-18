@@ -29,9 +29,11 @@ async def maybe_await(ret: Union[T, Awaitable[T]]) -> T:
 
 
 class Publisher:
-    """Synchronous publisher protocol class.
+    """Publisher mixin class.
 
-    A protocol class for controllers that need to publish data synchronously.
+    Creates a publisher socket for the virtual bus,
+    which can be used to send messages to subscribers
+    over the virtual bus.
 
     Parameters
     ----------
@@ -149,6 +151,10 @@ class SyncSubscriber(Consumer):
 
 class AsyncSubscriber(Consumer):
     """Mixin class for asynchronous subscribing.
+
+    .. warning::
+
+        Currently not implemented!
 
     Just like its synchronous counterpart,
     the asynchronous subscriber will poll

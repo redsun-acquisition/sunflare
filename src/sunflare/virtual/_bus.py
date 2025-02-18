@@ -173,12 +173,13 @@ class VirtualBus(Loggable):
     can happen between plugins on the same layer as
     well as between different layers of the system.
 
-    It can be used to emit notifications, as well as carry information
-    to other plugins and/or different Redsun modules.
+    It can be used to emit notifications and carry information
+    to other plugins.
 
-    ``VirtualBus``' signals are implemented using the ``psygnal`` library;
-    they can be dynamically registered as class attributes,
-    and accessed as a read-only dictionary.
+    The bus offers two communication mechanisms:
+
+    - `psygnal.Signal` for control signaling;
+    - ZMQ sockets for data exchange.
     """
 
     INPROC_MAP: Final[dict[int, str]] = {
@@ -342,6 +343,10 @@ class VirtualBus(Loggable):
         """
         Connect a subscriber to the virtual bus.
 
+        .. warning::
+
+            Async subscribers are not supported yet.
+
         Parameters
         ----------
         topic : ``str | Iterable[str]``, optional
@@ -356,6 +361,11 @@ class VirtualBus(Loggable):
         -------
         ``tuple[zmq.SyncSocket, zmq.Poller]``
             A tuple containing the subscriber socket and its poller.
+
+        Raises
+        ------
+        ``NotImplementedError``
+            If ``is_async`` is ``True``.
         """
         poller: Union[zmq.Poller, zmq.asyncio.Poller]
         socket: Union[zmq.Socket[bytes], zmq.asyncio.Socket]
