@@ -213,6 +213,7 @@ class VirtualBus(Loggable):
         for socket in self._pub_sockets:
             socket.close()
         try:
+            self._asub_loop.stop()
             self._context.term()
         except zmq.error.ZMQError:
             self.debug("ZMQ context already terminated.")
@@ -369,6 +370,7 @@ class VirtualBus(Loggable):
             return fut.result()
         else:
             socket = self._context.socket(zmq.SUB)
+            socket.setsockopt(zmq.LINGER, -1)
             poller = zmq.Poller()
             socket.connect(self.INPROC_MAP[zmq.SUB])
             poller.register(socket, zmq.POLLIN)
@@ -385,6 +387,7 @@ class VirtualBus(Loggable):
         socket = self._asub_loop._ctx.socket(zmq.SUB)
         poller = zmq.asyncio.Poller()
         socket.connect(self.INPROC_MAP[zmq.SUB])
+        socket.setsockopt(zmq.LINGER, -1)
         poller.register(socket, zmq.POLLIN)
         if isinstance(topic, str):
             socket.subscribe(topic)
@@ -409,6 +412,7 @@ class VirtualBus(Loggable):
         """
         socket: zmq.Socket[bytes] = self._context.socket(zmq.PUB)
         socket.connect(self.INPROC_MAP[zmq.PUB])
+        socket.setsockopt(zmq.LINGER, -1)
         self._pub_sockets.add(socket)
         return socket
 
