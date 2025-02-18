@@ -219,7 +219,3 @@ class AsyncSubscriber(Consumer):
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
             self._logger.debug("Shutdown complete")
-
-    @property
-    def __clsname__(self) -> str:
-        return self.__class__.__name__
