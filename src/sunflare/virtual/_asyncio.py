@@ -25,7 +25,7 @@ class SubscriberLoop(Loggable):
     _loop: asyncio.AbstractEventLoop
     _thread: threading.Thread
 
-    def __init__(self, ctx: zmq.Context) -> None:
+    def __init__(self, ctx: zmq.Context[zmq.Socket[bytes]]) -> None:
         if sys.platform == "win32":
             self.debug(
                 "Setting WindowsSelectorEventLoopPolicy (required for ZMQ on Windows)"
@@ -40,7 +40,7 @@ class SubscriberLoop(Loggable):
         self._thread.start()
         self.debug("Loop started in thread %s", self._thread.name)
 
-        async def _inner_init(ctx: zmq.Context) -> None:
+        async def _inner_init(ctx: zmq.Context[zmq.Socket[bytes]]) -> None:
             self._ctx = zmq.asyncio.Context(ctx)
 
         fut = asyncio.run_coroutine_threadsafe(_inner_init(ctx), self._loop)
