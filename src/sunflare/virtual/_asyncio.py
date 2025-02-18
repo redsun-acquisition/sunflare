@@ -49,8 +49,13 @@ class SubscriberLoop(Loggable):
         while not fut.done():
             ...
 
+    async def _stop_ctx(self) -> None:
+        """Stop the shadow context."""
+        self._ctx.term()
+
     def stop(self) -> None:
         """Stop the async subscribers event loop."""
+        asyncio.run_coroutine_threadsafe(self._stop_ctx(), self._loop)
         self._loop.call_soon_threadsafe(self._loop.stop)
         self._thread.join()
         self.debug(f"{self._thread.name} stopped")

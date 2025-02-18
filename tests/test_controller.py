@@ -1,6 +1,7 @@
 import time
 import asyncio
 import queue
+import pytest
 from pathlib import Path
 from typing import cast
 
@@ -143,6 +144,7 @@ def test_sync_single_class(bus: VirtualBus) -> None:
     assert len(messages) == 1, "Subscriber received more than one message or no message"
     assert messages == [("test", "message")], "Subscriber did not receive message"
 
+@pytest.mark.skip(reason="asyncio subscribers currently not supported")
 def test_async(bus: VirtualBus) -> None:
 
     async def retrieve_messages(q: asyncio.Queue[tuple[str, ...]]) -> list[tuple[str, ...]]:

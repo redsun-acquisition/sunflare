@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import threading
 from abc import abstractmethod
@@ -188,13 +187,7 @@ class AsyncSubscriber(Consumer):
     def __init__(
         self, virtual_bus: VirtualBus, topics: Optional[Union[str, Iterable[str]]]
     ) -> None:
-        self._logger = logging.getLogger("redsun")
-        self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(
-            topics, is_async=True
-        )
-        self.sub_future = asyncio.run_coroutine_threadsafe(
-            self._spin(), virtual_bus.loop
-        )
+        raise NotImplementedError("Async subscriber not implemented yet.")
 
     async def _spin(self) -> None:
         """Spin the subscriber.
@@ -202,7 +195,6 @@ class AsyncSubscriber(Consumer):
         The subscriber thread will poll the subscriber socket for incoming messages.
         When the virtual bus is shut down, the subscriber will stop polling.
         """
-        self._logger.debug("Starting async subscriber")
         try:
             while True:
                 try:
@@ -212,10 +204,7 @@ class AsyncSubscriber(Consumer):
                             self.consume(await self.sub_socket.recv_multipart())
                         )
                 except zmq.error.ContextTerminated:
-                    self._logger.debug("Context terminated")
                     break
         finally:
-            self._logger.debug("Shutting down subscriber")
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
-            self._logger.debug("Shutdown complete")

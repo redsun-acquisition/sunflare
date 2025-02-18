@@ -42,9 +42,9 @@ It provides a syntax similar to the Qt signal/slot mechanism, i.e.
 
 from __future__ import annotations
 
-import asyncio
 from types import MappingProxyType
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Final,
     Iterable,
@@ -66,6 +66,9 @@ from psygnal import Signal, SignalInstance
 from sunflare.log import Loggable
 
 from ._asyncio import SubscriberLoop
+
+if TYPE_CHECKING:
+    import asyncio
 
 __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
 
@@ -362,12 +365,13 @@ class VirtualBus(Loggable):
         socket: Union[zmq.Socket[bytes], zmq.asyncio.Socket]
 
         if is_async:
-            fut = asyncio.run_coroutine_threadsafe(
-                self.__async_connect_subscriber(topic), self.loop
-            )
-            while not fut.done():
-                ...
-            return fut.result()
+            raise NotImplementedError("Async subscriber not implemented yet.")
+            # fut = asyncio.run_coroutine_threadsafe(
+            #     self.__async_connect_subscriber(topic), self.loop
+            # )
+            # while not fut.done():
+            #     ...
+            # return fut.result()
         else:
             socket = self._context.socket(zmq.SUB)
             socket.setsockopt(zmq.LINGER, -1)
@@ -381,20 +385,20 @@ class VirtualBus(Loggable):
                     socket.subscribe(topic)
             return socket, poller
 
-    async def __async_connect_subscriber(
-        self, topic: Optional[Union[str, Iterable[str]]] = None
-    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]:
-        socket = self._asub_loop._ctx.socket(zmq.SUB)
-        poller = zmq.asyncio.Poller()
-        socket.connect(self.INPROC_MAP[zmq.SUB])
-        socket.setsockopt(zmq.LINGER, -1)
-        poller.register(socket, zmq.POLLIN)
-        if isinstance(topic, str):
-            socket.subscribe(topic)
-        elif isinstance(topic, Iterable):
-            for topic in topic:
-                socket.subscribe(topic)
-        return socket, poller
+    # async def __async_connect_subscriber(
+    #     self, topic: Optional[Union[str, Iterable[str]]] = None
+    # ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]:
+    #     socket = self._asub_loop._ctx.socket(zmq.SUB)
+    #     poller = zmq.asyncio.Poller()
+    #     socket.connect(self.INPROC_MAP[zmq.SUB])
+    #     socket.setsockopt(zmq.LINGER, -1)
+    #     poller.register(socket, zmq.POLLIN)
+    #     if isinstance(topic, str):
+    #         socket.subscribe(topic)
+    #     elif isinstance(topic, Iterable):
+    #         for topic in topic:
+    #             socket.subscribe(topic)
+    #     return socket, poller
 
     def connect_publisher(self) -> zmq.Socket[bytes]:
         """Connect a publisher to the virtual bus.
