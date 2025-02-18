@@ -7,7 +7,7 @@ from typing import Generator
 import zmq
 import pytest
 
-from sunflare.virtual import Signal, VirtualBus, slot
+from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
 from sunflare.log import Loggable
 
 class MockVirtualBus(VirtualBus):
@@ -300,3 +300,114 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
     assert humid_messages[0] == "humidity 60.0", f"Unexpected message: {humid_messages[0]}"
     assert not any("temperature" in msg for msg in humid_messages), "Humidity subscriber received temperature message"
     assert not any("pressure" in msg for msg in humid_messages), "Humidity subscriber received pressure message"
+
+def test_sync(bus: VirtualBus) -> None:
+
+    def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
+        messages: list[tuple[str, ...]] = []
+        try:
+            messages.append(q.get(block=False))
+        except queue.Empty:
+            pass
+        return messages
+
+    class TestPublisher(Publisher):
+        def __init__(self, info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
+            super().__init__(virtual_bus)
+            self.info = info
+            self.models = models
+            self.virtual_bus = virtual_bus
+
+
+    class TestSubscriber(SyncSubscriber):
+        def __init__(self, info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
+            super().__init__(virtual_bus, "test")
+            self.info = info
+            self.virtual_bus = virtual_bus
+            self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
+
+        def consume(self, content: list[bytes]) -> None:
+            self.msg_queue.put(tuple(c.decode() for c in content))
+
+
+    pub_info = ControllerInfo()
+    sub_info = ControllerInfo()
+    pub = TestPublisher(pub_info, {}, bus)
+    sub = TestSubscriber(sub_info, {}, bus)
+
+    # wait for the startup
+    time.sleep(0.1)
+
+    assert pub.pub_socket is not None, "Publisher socket not initialized"
+    assert pub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
+
+    assert sub.sub_socket is not None, "Subscriber socket not initialized"
+    assert sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+    assert sub.sub_thread.is_alive(), "Consumer thread not started"
+
+    pub.pub_socket.send_multipart([b"test", b"message"])
+    pub.pub_socket.send_multipart([b"other-topic", b"message"])
+
+    bus.shutdown()
+
+    # wait for cleanup
+    time.sleep(0.1)
+
+    assert not sub.sub_thread.is_alive(), "Subscriber thread not terminated"
+
+    # check the received messages
+    messages = retrieve_messages(sub.msg_queue)
+
+    assert len(messages) == 1, "Subscriber received more than one message or no message"
+    assert messages == [("test", "message")], "Subscriber did not receive message"
+
+def test_sync_single_class(bus: VirtualBus) -> None:
+
+    def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
+        messages: list[tuple[str, ...]] = []
+        try:
+            messages.append(q.get(block=False))
+        except queue.Empty:
+            pass
+        return messages
+
+    class TestController(Publisher, SyncSubscriber):
+        def __init__(self, ctrl_info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
+            Publisher.__init__(self, virtual_bus)
+            SyncSubscriber.__init__(self, virtual_bus, "test")
+            self.ctrl_info = ctrl_info
+            self.models = models
+            self.virtual_bus = virtual_bus
+            self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
+
+        def consume(self, content: list[bytes]) -> None:
+            self.msg_queue.put(tuple(c.decode() for c in content))
+            
+
+    pub_sub_info = ControllerInfo()
+    pub_sub = TestController(pub_sub_info, {}, bus)
+
+    # wait for the startup
+    time.sleep(0.1)
+
+    assert pub_sub.pub_socket is not None, "Publisher socket not initialized"
+    assert pub_sub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
+    assert pub_sub.sub_socket is not None, "Subscriber socket not initialized"
+    assert pub_sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+    assert pub_sub.sub_thread.is_alive(), "Consumer thread not started"
+
+    pub_sub.pub_socket.send_multipart([b"test", b"message"])
+    pub_sub.pub_socket.send_multipart([b"other-topic", b"message"])
+
+    bus.shutdown()
+
+    # wait for cleanup
+    time.sleep(0.1)
+
+    assert not pub_sub.sub_thread.is_alive(), "Subscriber thread not terminated"
+
+    # check the received messages
+    messages = retrieve_messages(pub_sub.msg_queue)
+
+    assert len(messages) == 1, "Subscriber received more than one message or no message"
+    assert messages == [("test", "message")], "Subscriber did not receive message"

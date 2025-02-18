@@ -148,6 +148,19 @@ class SyncSubscriber(Consumer):
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
 
+    @abstractmethod
+    def consume(self, content: list[bytes]) -> None:
+        """Consume the incoming message.
+
+        The user must implement this method to process incoming messages.
+
+        Parameters
+        ----------
+        content : ``list[bytes]``
+            Incoming message.
+        """
+        ...
+
 
 class AsyncSubscriber(Consumer):
     """Mixin class for asynchronous subscribing.
