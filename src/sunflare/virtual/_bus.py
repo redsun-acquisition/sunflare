@@ -44,7 +44,6 @@ from __future__ import annotations
 
 from types import MappingProxyType
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Final,
     Iterable,
@@ -64,11 +63,6 @@ import zmq.devices
 from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
-
-from ._asyncio import SubscriberLoop
-
-if TYPE_CHECKING:
-    import asyncio
 
 __all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
 
@@ -198,7 +192,9 @@ class VirtualBus(Loggable):
         self._cache: dict[str, dict[str, SignalInstance]] = {}
         self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
         self._context = zmq.Context.instance()
-        self._asub_loop = SubscriberLoop(self._context)
+        # TODO: asyncio subscribers are not shutting down correctly;
+        # when a solution is found this will be added again
+        # self._asub_loop = SubscriberLoop(self._context)
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
         self._forwarder.daemon = True
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
@@ -216,7 +212,7 @@ class VirtualBus(Loggable):
         for socket in self._pub_sockets:
             socket.close()
         try:
-            self._asub_loop.stop()
+            # self._asub_loop.stop()
             self._context.term()
         except zmq.error.ZMQError:
             self.debug("ZMQ context already terminated.")
@@ -420,7 +416,7 @@ class VirtualBus(Loggable):
         self._pub_sockets.add(socket)
         return socket
 
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        """The asyncio event loop running in the subscriber thread."""
-        return self._asub_loop.loop
+    # @property
+    # def loop(self) -> asyncio.AbstractEventLoop:
+    #     """The asyncio event loop running in the subscriber thread."""
+    #     return self._asub_loop.loop
