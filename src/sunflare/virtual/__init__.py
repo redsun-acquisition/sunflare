@@ -1,4 +1,4 @@
-from ._bus import Signal, VirtualBus, decode, encode
+from ._bus import Signal, VirtualBus, decode, encode, slot
 from ._mixin import Publisher, SyncSubscriber
 
 __all__ = [
@@ -8,4 +8,5 @@ __all__ = [
     "Publisher",
     "encode",
     "decode",
+    "slot",
 ]
