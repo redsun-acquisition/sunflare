@@ -273,11 +273,6 @@ class VirtualBus(Loggable):
 
     @overload
     def connect_subscriber(
-        self, topic: None
-    ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
-
-    @overload
-    def connect_subscriber(
         self, topic: str
     ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
@@ -285,11 +280,6 @@ class VirtualBus(Loggable):
     def connect_subscriber(
         self, topic: Iterable[str]
     ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
-
-    @overload
-    def connect_subscriber(
-        self, topic: None, is_async: bool
-    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]: ...
 
     @overload
     def connect_subscriber(
@@ -303,7 +293,7 @@ class VirtualBus(Loggable):
 
     def connect_subscriber(
         self,
-        topic: Optional[Union[str, Iterable[str]]] = None,
+        topic: Union[str, Iterable[str]] = "",
         is_async: Optional[bool] = False,
     ) -> tuple[
         Union[zmq.Socket[bytes], zmq.asyncio.Socket],
@@ -311,6 +301,41 @@ class VirtualBus(Loggable):
     ]:
         """
         Connect a subscriber to the virtual bus.
+
+        A subscriber can be attached to different
+        topics (or receive all messages if no topic)
+        via the ``topic`` parameter.
+
+        A subtopic of a given topic
+        can be specified as "<main_topic>/<sub_topic>/...".
+
+        .. code-block:: python
+
+        Usage::
+
+        .. code-block:: python
+            # registering to all topics
+            socket, poller = bus.connect_subscriber()
+            # or more explicitly
+            socket, poller = bus.connect_subscriber("")
+
+            # registering to a specific topic
+            socket, poller = bus.connect_subscriber("topic")
+
+            # you can also use a list, where the first
+            # entry is the main topic and the rest are subtopics
+
+            # "topic/subtopic"
+            socket, poller = bus.connect_subscriber("topic/subtopic")
+            socket, poller = bus.connect_subscriber(["topic", "subtopic"])
+
+            # "topic/subtopic/subsubtopic"
+            socket, poller = bus.connect_subscriber("topic/subtopic/subsubtopic")
+            socket, poller = bus.connect_subscriber(
+                ["topic", "subtopic", "subsubtopic"]
+            )
+
+
 
         .. warning::
 
@@ -320,8 +345,8 @@ class VirtualBus(Loggable):
         ----------
         topic : ``str | Iterable[str]``, optional
             The topic(s) to subscribe to.
-            If not provided, subscription
-            is left to the user.
+            If not provided, socket
+            is subscribed to all topics.
         is_async : ``bool``, optional
             Whether to return an asyncio-compatible socket.
             Default is ``False``.
@@ -349,9 +374,9 @@ class VirtualBus(Loggable):
             poller.register(socket, zmq.POLLIN)
             if isinstance(topic, str):
                 socket.subscribe(topic)
-            elif isinstance(topic, Iterable):
-                for topic in topic:
-                    socket.subscribe(topic)
+            else:
+                final_topic = "/".join(topic)
+                socket.subscribe(final_topic)
             return socket, poller
 
     def connect_publisher(self) -> zmq.Socket[bytes]:
@@ -397,6 +422,8 @@ class Publisher:
     which can be used to send messages to subscribers
     over the virtual bus.
 
+    Provides a built-in reference to the application logger.
+
     Parameters
     ----------
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
@@ -406,6 +433,8 @@ class Publisher:
     ----------
     pub_socket : ``zmq.Socket[bytes]``
         Publisher socket.
+    logger : ``logging.Logger``
+        Reference to application logger.
     """
 
     pub_socket: zmq.Socket[bytes]
@@ -414,6 +443,7 @@ class Publisher:
         self,
         virtual_bus: VirtualBus,
     ) -> None:
+        self.logger = logging.getLogger("redsun")
         self.pub_socket = virtual_bus.connect_publisher()
 
 
@@ -423,12 +453,15 @@ class SyncSubscriber:
     The synchronous subscriber deploys a background thread
     which will poll the virtual bus for incoming messages.
 
+    Provides a built-in reference to the application logger.
+
     Parameters
     ----------
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-    topics : ``str | Iterable[str]``
+    topics : ``str | Iterable[str]``, optional
         Subscriber topics.
+        Default is ``""`` (receive all messages).
 
     Attributes
     ----------
@@ -440,6 +473,8 @@ class SyncSubscriber:
         Subscriber thread.
     sub_topics : ``str | Iterable[str]``
         Subscriber topics.
+    logger: ``logging.Logger``
+        Reference to application logger.
     """
 
     sub_socket: zmq.Socket[bytes]
@@ -450,10 +485,11 @@ class SyncSubscriber:
     def __init__(
         self,
         virtual_bus: VirtualBus,
-        topics: Optional[Union[str, Iterable[str]]] = None,
+        topics: Union[str, Iterable[str]] = "",
     ) -> None:
-        self._logger = logging.getLogger("redsun")
+        self.logger = logging.getLogger("redsun")
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
+        self.logger.debug(f"Registered to topics {topics}")
         self.sub_topics = topics
         self.sub_thread = threading.Thread(target=self._spin, daemon=True)
         self.sub_thread.start()
@@ -464,7 +500,7 @@ class SyncSubscriber:
         The subscriber thread will poll the subscriber socket for incoming messages.
         When the virtual bus is shut down, the subscriber will stop polling.
         """
-        self._logger.debug("Starting subscriber")
+        self.logger.debug("Starting subscriber")
         try:
             while True:
                 try:
@@ -472,10 +508,10 @@ class SyncSubscriber:
                     if self.sub_socket in socks:
                         self.consume(self.sub_socket.recv_multipart())
                 except zmq.error.ContextTerminated:
-                    self._logger.debug("Context terminated")
+                    self.logger.debug("Context terminated")
                     break
         finally:
-            self._logger.debug("Shutting down subscriber")
+            self.logger.debug("Shutting down subscriber")
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
 
