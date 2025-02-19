@@ -26,3 +26,5 @@ The {py:class}`~sunflare.controller.ControllerProtocol` requires three things in
 
 orchestrator_controllers
 ```
+
+[documents]: https://blueskyproject.io/bluesky/main/documents.html
