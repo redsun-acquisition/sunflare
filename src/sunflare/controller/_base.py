@@ -289,7 +289,7 @@ class Sender(Controller[CI]):
         This method is called from Redsun during
         application initialization.
         """
-        self.virtual_bus.register_signals(self.signals)
+        self.virtual_bus.register_signals(self, self.signals)
 
 
 class Receiver(Controller[CI]):

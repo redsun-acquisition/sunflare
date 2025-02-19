@@ -44,7 +44,7 @@ def test_base_controller(bus: VirtualBus) -> None:
 
     assert isinstance(ctrl, ControllerProtocol)
 
-def test_sender_conntroller(bus: VirtualBus) -> None:
+def test_sender_controller(bus: VirtualBus) -> None:
 
     cnt = 0
 
@@ -69,7 +69,7 @@ def test_sender_conntroller(bus: VirtualBus) -> None:
     assert isinstance(ctrl, ControllerProtocol)
     assert isinstance(ctrl, HasRegistration)
 
-    bus.register_signals(ctrl)
+    ctrl.registration_phase()
 
     assert len(bus._cache) == 1
     assert len(bus._cache[ctrl.__class__.__name__]) == 1
