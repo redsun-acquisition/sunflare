@@ -496,3 +496,56 @@ def test_one_to_many(bus: VirtualBus) -> None:
         assert messages == expected_messages[sub.id], (
             "Subscriber did not receive message"
         )
+
+
+def test_many_to_one(bus: VirtualBus) -> None:
+    topics = ["topic1", "topic2", "topic3"]
+    publishers = [MockPublisher(bus) for _ in range(3)]
+    sub = MockSubscriber(bus)
+    sub.sub_socket.subscribe(b"topic1")
+    sub.sub_socket.subscribe(b"topic2")
+    sub.sub_socket.subscribe(b"topic3")
+
+    for p, t in zip(publishers, topics):
+        p.pub_socket.send_multipart([t.encode(), b"message"])
+
+    # wait for the messages to be processed
+    time.sleep(0.5)
+
+    bus.shutdown()
+
+    # wait for cleanup
+    time.sleep(0.1)
+
+    messages = retrieve_messages(sub.msg_queue)
+
+    assert len(messages) == 3, "Subscriber received incorrect amount of messages"
+    assert messages == [
+        ("topic1", "message"),
+        ("topic2", "message"),
+        ("topic3", "message"),
+    ], "Subscriber did not receive message"
+
+
+def test_many_to_many(bus: VirtualBus) -> None:
+    topics = ["topic1", "topic2", "topic3"]
+    publishers = [MockPublisher(bus) for _ in range(3)]
+    subscribers = [MockSubscriber(bus, topic) for _, topic in zip(range(3), topics)]
+
+    for p, t in zip(publishers, topics):
+        p.pub_socket.send_multipart([t.encode(), b"message"])
+
+    # wait for the messages to be processed
+    time.sleep(0.5)
+
+    bus.shutdown()
+
+    # wait for cleanup
+    time.sleep(0.1)
+
+    for sub in subscribers:
+        messages = retrieve_messages(sub.msg_queue)
+        assert len(messages) == 1, "Subscriber received incorrect amount of messages"
+        assert messages == [(sub.sub_topics, "message")], (
+            "Subscriber did not receive message"
+        )
