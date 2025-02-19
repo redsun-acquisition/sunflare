@@ -88,13 +88,7 @@ Then, you can run the tests by running the following command:
 pytest
 ```
 
-You can get a coverage report by running the following command:
-
-```bash
-pytest --cov=sunflare --cov-report=html
-```
-
-This will generate a `htmlcov` directory with the coverage report, which you can open in your browser by opening the `index.html` file.
+This will automatically generate a `htmlcov` directory with the test coverage report, which you can open in your browser by opening the `index.html` file.
 
 [conda]: https://docs.conda.io/en/latest/
 [mamba]: https://mamba.readthedocs.io/en/latest/
