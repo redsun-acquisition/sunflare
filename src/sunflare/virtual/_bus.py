@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import threading
 from abc import abstractmethod
 from types import MappingProxyType
@@ -35,6 +36,8 @@ T = TypeVar("T")
 
 _INPROC_XPUB = "inproc://virtual_xpub"
 _INPROC_XSUB = "inproc://virtual_xsub"
+_TCP_XPUB = "tcp://127.0.0.1:5555"
+_TCP_XSUB = "tcp://127.0.0.1:5556"
 
 
 def _msgpack_enc_hook(obj: object) -> object:
@@ -154,22 +157,31 @@ class VirtualBus(Loggable):
     - ZMQ sockets for data exchange.
     """
 
-    INPROC_MAP: Final[dict[int, str]] = {
-        # a subscriber publishes to the XPUB socket;
-        # a publisher subscribes to the XSUB socket
-        zmq.SUB: _INPROC_XPUB,
-        zmq.PUB: _INPROC_XSUB,
+    FWD_MAP: Final[dict[str, dict[int, str]]] = {
+        "inproc": {zmq.SUB: _INPROC_XPUB, zmq.PUB: _INPROC_XSUB},
+        "tcp": {zmq.SUB: _TCP_XPUB, zmq.PUB: _TCP_XSUB},
     }
 
     def __init__(self) -> None:
+        self._map: dict[int, str]
+        xsub: str
+        xpub: str
+        if sys.platform == "darwin":
+            self._map = self.FWD_MAP["tcp"]
+            xsub = _TCP_XSUB
+            xpub = _TCP_XPUB
+        else:
+            self._map = self.FWD_MAP["inproc"]
+            xsub = _INPROC_XSUB
+            xpub = _INPROC_XPUB
         self._cache: dict[str, dict[str, SignalInstance]] = {}
         self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
         self._context = zmq.Context.instance()
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
         self._forwarder.setsockopt_out(zmq.LINGER, 0)
-        self._forwarder.bind_in(_INPROC_XSUB)
-        self._forwarder.bind_out(_INPROC_XPUB)
+        self._forwarder.bind_in(xsub)
+        self._forwarder.bind_out(xpub)
         self._forwarder.start()
 
     def shutdown(self) -> None:
@@ -369,7 +381,7 @@ class VirtualBus(Loggable):
             socket = self._context.socket(zmq.SUB)
             socket.setsockopt(zmq.LINGER, 0)
             poller = zmq.Poller()
-            socket.connect(self.INPROC_MAP[zmq.SUB])
+            socket.connect(self._map[zmq.SUB])
             poller.register(socket, zmq.POLLIN)
             if isinstance(topic, str):
                 socket.subscribe(topic)
@@ -393,7 +405,7 @@ class VirtualBus(Loggable):
             The publisher socket.
         """
         socket: zmq.Socket[bytes] = self._context.socket(zmq.PUB)
-        socket.connect(self.INPROC_MAP[zmq.PUB])
+        socket.connect(self._map[zmq.PUB])
         socket.setsockopt(zmq.LINGER, -1)
         self._pub_sockets.add(socket)
         return socket
