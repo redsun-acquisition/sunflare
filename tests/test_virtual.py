@@ -33,10 +33,14 @@ class MockSubscriber(SyncSubscriber, Loggable):
     def __init__(
         self,
         virtual_bus: VirtualBus,
+        cond: threading.Condition,
+        monitorer: list[object],
         topics: list[str] = ["test"],
         id: int = 0,
     ) -> None:
         super().__init__(virtual_bus, topics)
+        self.cond = cond
+        self.monitorer = monitorer
         self.id = id
         self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
 
@@ -44,6 +48,9 @@ class MockSubscriber(SyncSubscriber, Loggable):
         msg = tuple(c.decode() for c in content)
         self.debug(f"Received message: {msg}")
         self.msg_queue.put(msg)
+        with self.cond:
+            self.monitorer.append(object())
+            self.cond.notify()
 
     @property
     def name(self) -> str:
@@ -54,15 +61,22 @@ class MockPubSync(Publisher, SyncSubscriber):
     def __init__(
         self,
         virtual_bus: VirtualBus,
+        cond: threading.Condition,
+        monitorer: list[object],
         topics: list[str] = ["test"],
     ) -> None:
         Publisher.__init__(self, virtual_bus)
         SyncSubscriber.__init__(self, virtual_bus, topics)
         self.virtual_bus = virtual_bus
         self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
+        self.cond = cond
+        self.monitorer = monitorer
 
     def consume(self, content: list[bytes]) -> None:
         self.msg_queue.put(tuple(c.decode() for c in content))
+        with self.cond:
+            self.monitorer.append(object())
+            self.cond.notify()
 
 
 def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
@@ -312,6 +326,8 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
 
     logger = logging.getLogger("redsun")
     logger.setLevel(logging.DEBUG)
+    condition = threading.Condition()
+    monitorer: list[object] = []
 
     class Publisher(Loggable):
         def __init__(self, mock_bus: VirtualBus) -> None:
@@ -324,9 +340,17 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
             self.socket.send_string(msg)
 
     class Subscriber(Loggable):
-        def __init__(self, mock_bus: VirtualBus, topics: list[str]) -> None:
+        def __init__(
+            self,
+            mock_bus: VirtualBus,
+            topics: list[str],
+            cond: threading.Condition,
+            monitorer: list[object],
+        ) -> None:
             self.received_messages: list[str] = []
             self.mock_bus = mock_bus
+            self.condition = cond
+            self.monitorer = monitorer
             self.socket, self.poller = self.mock_bus.connect_subscriber(topic=topics)
             self.debug(f"Subscribed to: {topics}")
 
@@ -342,6 +366,9 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
                             msg = self.socket.recv_string()
                             self.debug(f"Received message: {msg}")
                             self.received_messages.append(msg)
+                            with self.condition:
+                                self.monitorer.append(None)
+                                self.condition.notify()
                     except zmq.error.ContextTerminated:
                         break
             finally:
@@ -353,21 +380,24 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
     pub = Publisher(mock_bus)
 
     # Create subscribers with different topic subscriptions
-    sub_temp = Subscriber(mock_bus, ["temperature"])  # Only temperature messages
-    sub_humidity = Subscriber(mock_bus, ["humidity"])  # Only humidity messages
+    sub_temp = Subscriber(
+        mock_bus, "temperature", cond=condition, monitorer=monitorer
+    )  # Only temperature messages
+    sub_humidity = Subscriber(
+        mock_bus, "humidity", cond=condition, monitorer=monitorer
+    )  # Only humidity messages
 
     # Wait for subscriptions to be set up
-    time.sleep(0.1)
-
-    logger.debug(mock_bus._forwarder._sockets)
+    time.sleep(0.5)
 
     # Send various messages
     pub.send("temperature", 25.5)
     pub.send("humidity", 60.0)
     pub.send("pressure", 1013.25)  # Neither subscriber should receive this
 
-    # Wait for message processing
-    time.sleep(0.1)
+    with condition:
+        while len(monitorer) < 2:
+            condition.wait(timeout=1.0)
 
     # shutdown the mock_bus;
     # this will kill
@@ -407,8 +437,11 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
 
 
 def test_sync(bus: VirtualBus) -> None:
+    monitorer: list[object] = []
+    cond = threading.Condition()
+
     pub = MockPublisher(bus)
-    sub = MockSubscriber(bus)
+    sub = MockSubscriber(bus, cond, monitorer)
 
     # wait for the startup
     time.sleep(0.1)
@@ -427,6 +460,10 @@ def test_sync(bus: VirtualBus) -> None:
     pub.pub_socket.send_multipart([b"test", b"message"])
     pub.pub_socket.send_multipart([b"other-topic", b"message"])
 
+    with cond:
+        while len(monitorer) < 1:
+            cond.wait(timeout=3.0)
+
     bus.shutdown()
 
     # wait for cleanup
@@ -442,7 +479,9 @@ def test_sync(bus: VirtualBus) -> None:
 
 
 def test_sync_single_class(bus: VirtualBus) -> None:
-    pub_sub = MockPubSync(bus)
+    cond = threading.Condition()
+    monitorer: list[object] = []
+    pub_sub = MockPubSync(bus, cond, monitorer)
 
     # wait for the startup
     time.sleep(0.1)
@@ -460,6 +499,10 @@ def test_sync_single_class(bus: VirtualBus) -> None:
     pub_sub.pub_socket.send_multipart([b"test", b"message"])
     pub_sub.pub_socket.send_multipart([b"other-topic", b"message"])
 
+    with cond:
+        while len(monitorer) < 1:
+            cond.wait(timeout=3.0)
+
     bus.shutdown()
 
     # wait for cleanup
@@ -475,10 +518,13 @@ def test_sync_single_class(bus: VirtualBus) -> None:
 
 
 def test_one_to_many(bus: VirtualBus) -> None:
+    cond = threading.Condition()
+    monitorer: list[object] = []
+
     def create_subscribers(topics: list[list[str]]) -> list[MockSubscriber]:
         subscribers = []
         for t in topics:
-            sub = MockSubscriber(bus, t, next(sub_cnt))
+            sub = MockSubscriber(bus, cond, monitorer, t, next(sub_cnt))
             subscribers.append(sub)
         return subscribers
 
@@ -492,8 +538,9 @@ def test_one_to_many(bus: VirtualBus) -> None:
     pub.pub_socket.send_multipart([b"topic2", b"message2"])
     pub.pub_socket.send_multipart([b"topic3", b"message3"])
 
-    # wait for the messages to be processed
-    time.sleep(0.5)
+    with cond:
+        while len(monitorer) < 6:
+            cond.wait(timeout=5.0)
 
     bus.shutdown()
 
@@ -518,9 +565,12 @@ def test_one_to_many(bus: VirtualBus) -> None:
 
 
 def test_many_to_one(bus: VirtualBus) -> None:
+    cond = threading.Condition()
+    monitorer: list[object] = []
+
     topics = ["topic1", "topic2", "topic3"]
     publishers = [MockPublisher(bus) for _ in range(3)]
-    sub = MockSubscriber(bus)
+    sub = MockSubscriber(bus, cond, monitorer)
     sub.sub_socket.subscribe(b"topic1")
     sub.sub_socket.subscribe(b"topic2")
     sub.sub_socket.subscribe(b"topic3")
@@ -528,8 +578,9 @@ def test_many_to_one(bus: VirtualBus) -> None:
     for p, t in zip(publishers, topics):
         p.pub_socket.send_multipart([t.encode(), b"message"])
 
-    # wait for the messages to be processed
-    time.sleep(0.5)
+    with cond:
+        while len(monitorer) < 3:
+            cond.wait(timeout=5.0)
 
     bus.shutdown()
 
@@ -547,15 +598,21 @@ def test_many_to_one(bus: VirtualBus) -> None:
 
 
 def test_many_to_many(bus: VirtualBus) -> None:
+    cond = threading.Condition()
+    monitorer: list[object] = []
     topics = ["topic1", "topic2", "topic3"]
     publishers = [MockPublisher(bus) for _ in range(3)]
-    subscribers = [MockSubscriber(bus, topic) for _, topic in zip(range(3), topics)]
+    subscribers = [
+        MockSubscriber(bus, cond, monitorer, topic)
+        for _, topic in zip(range(3), topics)
+    ]
 
     for p, t in zip(publishers, topics):
         p.pub_socket.send_multipart([t.encode(), b"message"])
 
-    # wait for the messages to be processed
-    time.sleep(0.5)
+    with cond:
+        while len(monitorer) < 3:
+            cond.wait(timeout=5.0)
 
     bus.shutdown()
 
