@@ -317,10 +317,10 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
                 self.debug("Subscriber socket closed.")
 
     all_sub = Subscriber(bus, topics=["RE0"])
-    start_sub = Subscriber(bus, topics=["RE0:start"])
-    desc_sub = Subscriber(bus, topics=["RE0:descriptor"])
-    event_sub = Subscriber(bus, topics=["RE0:event"])
-    stop_sub = Subscriber(bus, topics=["RE0:stop"])
+    start_sub = Subscriber(bus, topics=["RE0/start"])
+    desc_sub = Subscriber(bus, topics=["RE0/descriptor"])
+    event_sub = Subscriber(bus, topics=["RE0/event"])
+    stop_sub = Subscriber(bus, topics=["RE0/stop"])
 
     RE.socket = bus.connect_publisher()
     assert RE.socket is not None
