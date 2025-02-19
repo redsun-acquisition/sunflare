@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import logging
 import logging.config
+from typing import ClassVar
 
 __all__ = ["Loggable"]
 
@@ -34,7 +35,7 @@ class ClassFormatter(logging.Formatter):
         record.message = " ".join(message)
         record.asctime = self.formatTime(record, self.datefmt)
         if "clsname" in record.__dict__:
-            fmt += " [%(clsname)s"
+            fmt += "[%(clsname)s"
             if "uid" in record.__dict__ and len(record.__dict__["uid"]) > 0:
                 fmt += " -> %(uid)s"
             fmt += "]"
@@ -79,6 +80,8 @@ class Loggable:
 
     All methods allow to forward extra arguments to the logger calls as documented in the `logging` module.
     """
+
+    logger: ClassVar[logging.Logger] = logging.getLogger("redsun")
 
     def _extend(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         """
