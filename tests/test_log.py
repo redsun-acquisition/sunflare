@@ -21,7 +21,10 @@ class MockLoggable(Loggable):
         return self.__name
 
 
-@pytest.mark.skipif(sys.platform == "darwin", reason="logger counts an additional record on macOS somehow")
+@pytest.mark.skipif(
+    sys.platform == "darwin",
+    reason="logger counts an additional record on macOS somehow",
+)
 def test_loggable(caplog: LogCaptureFixture) -> None:
     obj = MockLoggable()
     assert obj.name == "Test instance"

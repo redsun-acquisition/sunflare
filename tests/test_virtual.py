@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import threading
 import time
@@ -9,6 +10,7 @@ import zmq
 import pytest
 
 from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
+from sunflare.virtual._bus import maybe_await
 from sunflare.log import Loggable
 
 sub_cnt = count()
@@ -89,6 +91,23 @@ def mock_bus() -> Generator[MockVirtualBus, None, None]:
     context = zmq.Context.instance()
     context.term()
     zmq.Context._instance = None
+
+
+@pytest.mark.asyncio
+async def test_maybe_await() -> None:
+    def sync_function() -> int:
+        time.sleep(0.05)
+        return 5
+
+    async def async_function() -> int:
+        await asyncio.sleep(0.05)
+        return 5
+
+    ret = await maybe_await(sync_function())
+    assert ret == 5
+
+    ret = await maybe_await(async_function())
+    assert ret == 5
 
 
 def test_virtual_bus(mock_bus: MockVirtualBus) -> None:
