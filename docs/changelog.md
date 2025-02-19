@@ -19,6 +19,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Reorganized code in different modules to avoid circular imports
 - Split controller in different protocols
 - Added `ModelInfoProtocol` to deploy models from packages that don't have a strict dependency with Sunflare
+- Added more tests, both for existing and new code
 
 ## [0.3.5] - 11-02-2025
 
