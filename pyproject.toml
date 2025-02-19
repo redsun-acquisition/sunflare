@@ -99,7 +99,13 @@ source = ["sunflare"]
 omit = [
     "src/sunflare/tests/conftest.py",
     "src/sunflare/view/**",
-    "src/sunflare/controller/**",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=sunflare --cov-report=html"
+testpaths = [
+    "tests"
 ]
 
 # https://coverage.readthedocs.io/en/latest/config.html
