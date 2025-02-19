@@ -104,7 +104,6 @@ omit = [
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--cov=sunflare --cov-report=html"
 testpaths = [
     "tests"
 ]
