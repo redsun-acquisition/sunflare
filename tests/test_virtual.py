@@ -2,15 +2,16 @@ import logging
 import threading
 import time
 import queue
+from itertools import count
 from typing import Generator
 
 import zmq
 import pytest
 
 from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
-from sunflare.config import ControllerInfo
-from sunflare.model import ModelProtocol
 from sunflare.log import Loggable
+
+sub_cnt = count()
 
 
 class MockVirtualBus(VirtualBus):
@@ -20,45 +21,41 @@ class MockVirtualBus(VirtualBus):
 class MockPublisher(Publisher):
     def __init__(
         self,
-        info: ControllerInfo,
-        models: dict[str, ModelProtocol],
         virtual_bus: VirtualBus,
     ) -> None:
         super().__init__(virtual_bus)
-        self.info = info
-        self.models = models
         self.virtual_bus = virtual_bus
 
 
-class MockSubscriber(SyncSubscriber):
+class MockSubscriber(SyncSubscriber, Loggable):
     def __init__(
         self,
-        info: ControllerInfo,
-        models: dict[str, ModelProtocol],
         virtual_bus: VirtualBus,
         topics: list[str] = ["test"],
+        id: int = 0,
     ) -> None:
         super().__init__(virtual_bus, topics)
-        self.info = info
-        self.virtual_bus = virtual_bus
+        self.id = id
         self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
 
     def consume(self, content: list[bytes]) -> None:
-        self.msg_queue.put(tuple(c.decode() for c in content))
+        msg = tuple(c.decode() for c in content)
+        self.debug(f"Received message: {msg}")
+        self.msg_queue.put(msg)
+
+    @property
+    def name(self) -> str:
+        return "SUB[{}]".format(self.id)
 
 
 class MockPubSync(Publisher, SyncSubscriber):
     def __init__(
         self,
-        ctrl_info: ControllerInfo,
-        models: dict[str, ModelProtocol],
         virtual_bus: VirtualBus,
         topics: list[str] = ["test"],
     ) -> None:
         Publisher.__init__(self, virtual_bus)
         SyncSubscriber.__init__(self, virtual_bus, topics)
-        self.ctrl_info = ctrl_info
-        self.models = models
         self.virtual_bus = virtual_bus
         self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
 
@@ -69,7 +66,9 @@ class MockPubSync(Publisher, SyncSubscriber):
 def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
     messages: list[tuple[str, ...]] = []
     try:
-        messages.append(q.get(block=False))
+        while True:
+            messages.append(q.get(block=False))
+            q.task_done()
     except queue.Empty:
         pass
     return messages
@@ -389,10 +388,8 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
 
 
 def test_sync(bus: VirtualBus) -> None:
-    pub_info = ControllerInfo()
-    sub_info = ControllerInfo()
-    pub = MockPublisher(pub_info, {}, bus)
-    sub = MockSubscriber(sub_info, {}, bus)
+    pub = MockPublisher(bus)
+    sub = MockSubscriber(bus)
 
     # wait for the startup
     time.sleep(0.1)
@@ -426,8 +423,7 @@ def test_sync(bus: VirtualBus) -> None:
 
 
 def test_sync_single_class(bus: VirtualBus) -> None:
-    pub_sub_info = ControllerInfo()
-    pub_sub = MockPubSync(pub_sub_info, {}, bus)
+    pub_sub = MockPubSync(bus)
 
     # wait for the startup
     time.sleep(0.1)
@@ -457,3 +453,46 @@ def test_sync_single_class(bus: VirtualBus) -> None:
 
     assert len(messages) == 1, "Subscriber received more than one message or no message"
     assert messages == [("test", "message")], "Subscriber did not receive message"
+
+
+def test_one_to_many(bus: VirtualBus) -> None:
+    def create_subscribers(topics: list[list[str]]) -> list[MockSubscriber]:
+        subscribers = []
+        for t in topics:
+            sub = MockSubscriber(bus, t, next(sub_cnt))
+            subscribers.append(sub)
+        return subscribers
+
+    pub = MockPublisher(bus)
+
+    # "" is for catching all messages
+    topics = ["", "topic1", "topic2", "topic3"]
+    subscribers = create_subscribers(topics)
+
+    pub.pub_socket.send_multipart([b"topic1", b"message1"])
+    pub.pub_socket.send_multipart([b"topic2", b"message2"])
+    pub.pub_socket.send_multipart([b"topic3", b"message3"])
+
+    # wait for the messages to be processed
+    time.sleep(0.5)
+
+    bus.shutdown()
+
+    # wait for cleanup
+    time.sleep(0.1)
+
+    expected_messages = {
+        0: [("topic1", "message1"), ("topic2", "message2"), ("topic3", "message3")],
+        1: [("topic1", "message1")],
+        2: [("topic2", "message2")],
+        3: [("topic3", "message3")],
+    }
+
+    for sub in subscribers:
+        messages = retrieve_messages(sub.msg_queue)
+        assert len(messages) == len(expected_messages[sub.id]), (
+            "Subscriber received incorrect amount of messages"
+        )
+        assert messages == expected_messages[sub.id], (
+            "Subscriber did not receive message"
+        )
