@@ -166,7 +166,6 @@ class VirtualBus(Loggable):
         self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
         self._context = zmq.Context.instance()
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
-        self._forwarder.daemon = True
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
         self._forwarder.setsockopt_out(zmq.LINGER, 0)
         self._forwarder.bind_in(_INPROC_XSUB)
@@ -368,7 +367,7 @@ class VirtualBus(Loggable):
             raise NotImplementedError("Async subscriber not implemented yet.")
         else:
             socket = self._context.socket(zmq.SUB)
-            socket.setsockopt(zmq.LINGER, -1)
+            socket.setsockopt(zmq.LINGER, 0)
             poller = zmq.Poller()
             socket.connect(self.INPROC_MAP[zmq.SUB])
             poller.register(socket, zmq.POLLIN)
