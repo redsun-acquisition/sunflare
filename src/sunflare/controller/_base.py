@@ -263,7 +263,7 @@ class Sender(Controller[CI]):
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
-    signals : ``Iterable[str]``, optional
+    signals : ``Iterable[str]``, keyword-only, optional
         Iterable of signals to register.
         Default is ``None`` (no signals registered).
 
@@ -278,6 +278,7 @@ class Sender(Controller[CI]):
         ctrl_info: CI,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
+        /,
         signals: Optional[Iterable[str]] = None,
     ) -> None:
         self.signals = signals
@@ -366,7 +367,7 @@ class Receiver(Controller[CI]):
 
     Attributes
     ----------
-    connection_map : ``Mapping[str, list[Connection]]``, optional
+    connection_map : ``Mapping[str, list[Connection]]``, keyword-only, optional
         Mapping of emitters to a list of connections.
     """
 
@@ -375,6 +376,7 @@ class Receiver(Controller[CI]):
         ctrl_info: CI,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
+        /,
         connection_map: Optional[Mapping[str, list[Connection]]] = None,
     ) -> None:
         self.connection_map = connection_map
@@ -482,6 +484,7 @@ class SenderReceiver(Controller[CI]):
         ctrl_info: CI,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
+        /,
         signals: Optional[Iterable[str]] = None,
         connection_map: Optional[Mapping[str, list[Connection]]] = None,
     ) -> None:
@@ -495,7 +498,7 @@ class SenderReceiver(Controller[CI]):
         This method is called from Redsun during
         application initialization.
         """
-        self.virtual_bus.register_signals(self.signals)
+        self.virtual_bus.register_signals(self, self.signals)
 
     def connection_phase(self) -> None:
         """Connect the signals defined in ``self.connection_map``.

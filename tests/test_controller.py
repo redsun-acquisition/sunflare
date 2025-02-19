@@ -101,7 +101,7 @@ def test_receiver_controller(bus: VirtualBus) -> None:
             connection_map = {
                 "DummySender": [Connection(signal="dummySignal", slot=self.mock_slot)]
             }
-            super().__init__(info, test_models, bus, connection_map)
+            super().__init__(info, test_models, bus, connection_map=connection_map)
 
         def mock_slot(self) -> None:
             nonlocal cnt
@@ -114,7 +114,7 @@ def test_receiver_controller(bus: VirtualBus) -> None:
     assert isinstance(ctrl, ControllerProtocol)
     assert isinstance(ctrl, HasConnection)
 
-    bus.register_signals(sender)
+    sender.registration_phase()
     ctrl.connection_phase()
 
     assert len(bus._cache) == 1
@@ -143,7 +143,7 @@ def test_sender_receiver(bus: VirtualBus) -> None:
             connection_map = {
                 "TestController": [Connection(signal="dummySignal", slot=self.mock_slot)]
             }
-            super().__init__(info, test_models, bus, connection_map)
+            super().__init__(info, test_models, bus, connection_map=connection_map)
 
         def mock_slot(self) -> None:
             nonlocal cnt
@@ -157,7 +157,7 @@ def test_sender_receiver(bus: VirtualBus) -> None:
     assert isinstance(ctrl, HasRegistration)
     assert isinstance(ctrl, HasConnection)
 
-    bus.register_signals(ctrl)
+    ctrl.registration_phase()
     ctrl.connection_phase()
 
     assert len(bus._cache) == 1
