@@ -160,7 +160,7 @@ graph LR
     q --> subB["zmq.SUB"]
     q --> subC["zmq.SUB"]
 ```
-- many-to-one: multiple publishers forward data to a multiple subscribers.
+- many-to-one: multiple publishers forward data to a single subscriber.
 ```mermaid
 :config: { "theme": "neutral" }
 :align: center
