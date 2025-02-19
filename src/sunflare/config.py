@@ -196,7 +196,7 @@ class ModelInfo:
     }
 
     def __get_shape(self, value: Any) -> list[int]:
-        if isinstance(value, Sized):
+        if isinstance(value, Sized) and not isinstance(value, str):
             if hasattr(value, "shape"):
                 return list(getattr(value, "shape"))
             else:

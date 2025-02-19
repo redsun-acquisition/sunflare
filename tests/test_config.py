@@ -1,15 +1,13 @@
-# type: ignore
-
 from pathlib import Path
 from typing import Any
 
 import pytest
 import yaml
-from attrs import asdict
+from attrs import asdict, define
 from mocks import MockControllerInfo, MockDetectorInfo, MockMotorInfo, MockWidgetInfo
 from pytest import LogCaptureFixture
 
-from sunflare.config import RedSunSessionInfo, WidgetPositionTypes
+from sunflare.config import RedSunSessionInfo, WidgetPositionTypes, ModelInfo
 
 
 def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None:
@@ -277,3 +275,58 @@ def test_session_name(config_path: Path):
     assert session.frontend == "pyqt"
     assert session.controllers == {}
     assert session.models == {}
+
+
+def test_model_info_descriptor():
+    @define
+    class MyModelInfo(ModelInfo):
+        list_param: list[int] = [1, 2, 3, 4]
+        string_param: str = "default"
+        int_param: int = 42
+        float_param: float = 3.14
+
+    info = MyModelInfo(model_name="MyModel")
+
+    descriptor = info.describe_configuration()
+    assert descriptor == {
+        "plugin_name": {
+            "source": "model_info",
+            "dtype": "string",
+            "shape": [],
+        },
+        "repository": {
+            "source": "model_info",
+            "dtype": "string",
+            "shape": [],
+        },
+        "vendor": {
+            "source": "model_info",
+            "dtype": "string",
+            "shape": [],
+        },
+        "serial_number": {
+            "source": "model_info",
+            "dtype": "string",
+            "shape": [],
+        },
+        "list_param": {
+            "source": "model_info",
+            "dtype": "array",
+            "shape": [4],
+        },
+        "string_param": {
+            "source": "model_info",
+            "dtype": "string",
+            "shape": [],
+        },
+        "int_param": {
+            "source": "model_info",
+            "dtype": "integer",
+            "shape": [],
+        },
+        "float_param": {
+            "source": "model_info",
+            "dtype": "number",
+            "shape": [],
+        },
+    }
