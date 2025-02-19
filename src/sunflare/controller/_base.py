@@ -278,7 +278,7 @@ class Sender(Controller[CI]):
         ctrl_info: CI,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
-        /,
+        *,
         signals: Optional[Iterable[str]] = None,
     ) -> None:
         self.signals = signals
@@ -376,7 +376,7 @@ class Receiver(Controller[CI]):
         ctrl_info: CI,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
-        /,
+        *,
         connection_map: Optional[Mapping[str, list[Connection]]] = None,
     ) -> None:
         self.connection_map = connection_map
@@ -484,7 +484,7 @@ class SenderReceiver(Controller[CI]):
         ctrl_info: CI,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
-        /,
+        *,
         signals: Optional[Iterable[str]] = None,
         connection_map: Optional[Mapping[str, list[Connection]]] = None,
     ) -> None:
