@@ -122,7 +122,7 @@ exclude_lines = [
 
 [tool.ruff]
 target-version = "py39"
-extend-exclude = ["docs", "tests"]
+extend-exclude = ["docs"]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -134,6 +134,7 @@ extend-select = [
     "TC" # enable type check imports
 ] 
 ignore = ["D100", "D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
+exclude = ["tests/**"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

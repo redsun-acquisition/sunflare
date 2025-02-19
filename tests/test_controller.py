@@ -1,12 +1,21 @@
 from pathlib import Path
-from typing import cast, Mapping
+from typing import Mapping, cast
 
 from mocks import MockController, MockControllerInfo
 
-from sunflare.model import ModelProtocol
 from sunflare.config import ControllerInfo, RedSunSessionInfo
-from sunflare.controller import Controller, ControllerProtocol, Sender, HasRegistration, Receiver, HasConnection, SenderReceiver, Connection
-from sunflare.virtual import VirtualBus, Signal
+from sunflare.controller import (
+    Connection,
+    Controller,
+    ControllerProtocol,
+    HasConnection,
+    HasRegistration,
+    Receiver,
+    Sender,
+    SenderReceiver,
+)
+from sunflare.model import ModelProtocol
+from sunflare.virtual import Signal, VirtualBus
 
 
 def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
@@ -27,16 +36,21 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
         assert controller.info.plugin_name == "N/A"
         assert controller.info.repository == "N/A"
 
+
 def test_base_controller(bus: VirtualBus) -> None:
-    
     class TestInfo(ControllerInfo):
         def __init__(self, **kwargs) -> None:
             super().__init__(**kwargs)
-    
+
     class TestController(Controller[TestInfo]):
         # changing the name of __init__ parameters does not
         # affect the protocol behavior
-        def __init__(self, info: TestInfo, test_models: Mapping[str, ModelProtocol], bus: VirtualBus) -> None:
+        def __init__(
+            self,
+            info: TestInfo,
+            test_models: Mapping[str, ModelProtocol],
+            bus: VirtualBus,
+        ) -> None:
             super().__init__(info, test_models, bus)
 
     ctrl_info = TestInfo()
@@ -44,8 +58,8 @@ def test_base_controller(bus: VirtualBus) -> None:
 
     assert isinstance(ctrl, ControllerProtocol)
 
-def test_sender_controller(bus: VirtualBus) -> None:
 
+def test_sender_controller(bus: VirtualBus) -> None:
     cnt = 0
 
     def mock_slot() -> None:
@@ -57,10 +71,14 @@ def test_sender_controller(bus: VirtualBus) -> None:
             super().__init__(**kwargs)
 
     class TestController(Sender[TestInfo]):
-
         dummySignal = Signal()
 
-        def __init__(self, info: TestInfo, test_models: Mapping[str, ModelProtocol], bus: VirtualBus) -> None:
+        def __init__(
+            self,
+            info: TestInfo,
+            test_models: Mapping[str, ModelProtocol],
+            bus: VirtualBus,
+        ) -> None:
             super().__init__(info, test_models, bus)
 
     info = TestInfo()
@@ -81,8 +99,8 @@ def test_sender_controller(bus: VirtualBus) -> None:
 
     assert cnt == 1
 
+
 def test_receiver_controller(bus: VirtualBus) -> None:
-    
     cnt = 0
 
     class TestInfo(ControllerInfo):
@@ -92,12 +110,21 @@ def test_receiver_controller(bus: VirtualBus) -> None:
     class DummySender(Sender[TestInfo]):
         dummySignal = Signal()
 
-        def __init__(self, info: TestInfo, test_models: Mapping[str, ModelProtocol], bus: VirtualBus) -> None:
+        def __init__(
+            self,
+            info: TestInfo,
+            test_models: Mapping[str, ModelProtocol],
+            bus: VirtualBus,
+        ) -> None:
             super().__init__(info, test_models, bus)
 
     class TestController(Receiver[TestInfo]):
-
-        def __init__(self, info: TestInfo, test_models: Mapping[str, ModelProtocol], bus: VirtualBus) -> None:
+        def __init__(
+            self,
+            info: TestInfo,
+            test_models: Mapping[str, ModelProtocol],
+            bus: VirtualBus,
+        ) -> None:
             connection_map = {
                 "DummySender": [Connection(signal="dummySignal", slot=self.mock_slot)]
             }
@@ -125,30 +152,35 @@ def test_receiver_controller(bus: VirtualBus) -> None:
 
     assert cnt == 1
 
+
 def test_sender_receiver(bus: VirtualBus) -> None:
-    
     cnt = 0
 
     class TestInfo(ControllerInfo):
         def __init__(self, **kwargs) -> None:
             super().__init__(**kwargs)
 
-
     class TestController(SenderReceiver[TestInfo]):
         dummySignal = Signal()
 
-        def __init__(self, info: TestInfo, test_models: Mapping[str, ModelProtocol], bus: VirtualBus) -> None:
+        def __init__(
+            self,
+            info: TestInfo,
+            test_models: Mapping[str, ModelProtocol],
+            bus: VirtualBus,
+        ) -> None:
             # connect to myself...
             # ... for testing, ya know
             connection_map = {
-                "TestController": [Connection(signal="dummySignal", slot=self.mock_slot)]
+                "TestController": [
+                    Connection(signal="dummySignal", slot=self.mock_slot)
+                ]
             }
             super().__init__(info, test_models, bus, connection_map=connection_map)
 
         def mock_slot(self) -> None:
             nonlocal cnt
             cnt += 1
-
 
     info = TestInfo()
     ctrl = TestController(info, {}, bus)

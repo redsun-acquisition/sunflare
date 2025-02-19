@@ -14,7 +14,6 @@ from sunflare.config import RedSunSessionInfo, WidgetPositionTypes
 
 def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None:
     """Test non-existent file."""
-
     path_to_test = config_path / "non_existent.yaml"
 
     with pytest.raises(FileExistsError):
@@ -25,7 +24,6 @@ def test_non_existent_file(config_path: Path, caplog: LogCaptureFixture) -> None
 
 def test_not_a_file(caplog: LogCaptureFixture) -> None:
     """Test not a file."""
-
     path_to_test = Path(__file__).parent / "data"
 
     with pytest.raises(FileNotFoundError):
@@ -33,9 +31,9 @@ def test_not_a_file(caplog: LogCaptureFixture) -> None:
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
+
 def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
     """Test not a YAML file."""
-
     path_to_test = config_path / "fake_yaml.yeml"
 
     with pytest.raises(ValueError):
@@ -43,18 +41,18 @@ def test_not_a_yaml_file(config_path: Path, caplog: LogCaptureFixture) -> None:
 
     assert str(path_to_test) in caplog.handler.records[0].msg
 
+
 def test_not_absolute_path() -> None:
     """Test not an absolute path."""
-
     path_to_test = Path("tests") / "data" / "empty_instance.yaml"
 
     config = RedSunSessionInfo.load_yaml(str(path_to_test))
 
     assert config["engine"] == "bluesky"
 
+
 def test_empty_info(config_path: Path) -> None:
     """Test empty redsun session info."""
-
     config = RedSunSessionInfo.load_yaml(config_path / "empty_instance.yaml")
     session = RedSunSessionInfo(**config)
 
@@ -65,10 +63,11 @@ def test_empty_info(config_path: Path) -> None:
 
 def test_detectors_info(config_path: Path):
     """Test the redsun session info with detectors."""
-
-    config: dict[str, Any] = RedSunSessionInfo.load_yaml(config_path / "detector_instance.yaml")
+    config: dict[str, Any] = RedSunSessionInfo.load_yaml(
+        config_path / "detector_instance.yaml"
+    )
     config["models"] = {
-        name : MockDetectorInfo(**info) for name, info in config["models"].items()
+        name: MockDetectorInfo(**info) for name, info in config["models"].items()
     }
 
     session = RedSunSessionInfo(**config)
@@ -92,10 +91,9 @@ def test_detectors_info(config_path: Path):
 
 def test_motors_info(config_path: Path):
     """Test the redsun session info with motors."""
-
     config = RedSunSessionInfo.load_yaml(config_path / "motor_instance.yaml")
     config["models"] = {
-        name : MockMotorInfo(**info) for name, info in config["models"].items()
+        name: MockMotorInfo(**info) for name, info in config["models"].items()
     }
 
     session = RedSunSessionInfo(**config)
@@ -116,12 +114,12 @@ def test_motors_info(config_path: Path):
     assert mocks[1].step_egu == "mm"
     assert mocks[1].axes == ["X", "Y"]
 
+
 def test_controller_info(config_path: Path, tmp_path: Path):
     """Test the redsun session info with controllers."""
-
     config = RedSunSessionInfo.load_yaml(config_path / "controller_instance.yaml")
     config["controllers"] = {
-        name : MockControllerInfo(**info) for name, info in config["controllers"].items()
+        name: MockControllerInfo(**info) for name, info in config["controllers"].items()
     }
     session = RedSunSessionInfo(**config)
 
@@ -138,12 +136,12 @@ def test_controller_info(config_path: Path, tmp_path: Path):
         assert controller.plugin_name == "N/A"
         assert controller.repository == "N/A"
 
+
 def test_widget_info(config_path: Path):
     """Test the redsun session info with widgets."""
-
     config = RedSunSessionInfo.load_yaml(config_path / "widget_instance.yaml")
     config["widgets"] = {
-        name : MockWidgetInfo(**info) for name, info in config["widgets"].items()
+        name: MockWidgetInfo(**info) for name, info in config["widgets"].items()
     }
     session = RedSunSessionInfo(**config)
 
@@ -157,15 +155,15 @@ def test_widget_info(config_path: Path):
         assert widget.gui_choices == ["a", "b", "c"]
         assert widget.position == WidgetPositionTypes.CENTER
 
+
 def test_full_config(config_path: Path, tmp_path: Path):
     """Test a full configuration.
-    
+
     After loading the configuration, the session is inspected
     to check if the information is correct. Then, the session
     is saved to a temporary file and the hash is computed to
     check if the content is the same as the original configuration.
     """
-
     config_map: dict[str, Any] = {
         "MockDetectorModel": MockDetectorInfo,
         "MockMotorModel": MockMotorInfo,
@@ -173,10 +171,10 @@ def test_full_config(config_path: Path, tmp_path: Path):
 
     config = RedSunSessionInfo.load_yaml(config_path / "full_instance.yaml")
     config["controllers"] = {
-        name : MockControllerInfo(**info) for name, info in config["controllers"].items()
+        name: MockControllerInfo(**info) for name, info in config["controllers"].items()
     }
     config["widgets"] = {
-        name : MockWidgetInfo(**info) for name, info in config["widgets"].items()
+        name: MockWidgetInfo(**info) for name, info in config["widgets"].items()
     }
     for name, info in config["models"].items():
         model_type = config_map[info["model_name"]]
@@ -191,7 +189,9 @@ def test_full_config(config_path: Path, tmp_path: Path):
     assert session.widgets != {}
 
     # inspect the detectors
-    detectors = [det for det in session.models.values() if det.model_name == "MockDetectorModel"]
+    detectors = [
+        det for det in session.models.values() if det.model_name == "MockDetectorModel"
+    ]
     assert len(detectors) == 2
 
     detectors[0].vendor == "Greenheart GmbH"
@@ -213,7 +213,9 @@ def test_full_config(config_path: Path, tmp_path: Path):
     detectors[1].exposure_egu == "s"
 
     # inspect the motors
-    motors = [mot for mot in session.models.values() if mot.model_name == "MockMotorModel"]
+    motors = [
+        mot for mot in session.models.values() if mot.model_name == "MockMotorModel"
+    ]
     assert len(motors) == 2
 
     motors[0].vendor == "N/A"
@@ -237,7 +239,7 @@ def test_full_config(config_path: Path, tmp_path: Path):
         assert controller.boolean == True
         assert controller.plugin_name == "N/A"
         assert controller.repository == "N/A"
-    
+
     # inspect the widgets
     assert len(session.widgets) == 1
     for _, widget in session.widgets.items():
@@ -254,7 +256,7 @@ def test_full_config(config_path: Path, tmp_path: Path):
             return list(value)
         return value
 
-    # save the session and check if the 
+    # save the session and check if the
     # temporary file content is the same
     # as the original configuration
     test_session_path = tmp_path / "test_session.yaml"
@@ -267,7 +269,6 @@ def test_full_config(config_path: Path, tmp_path: Path):
 
 def test_session_name(config_path: Path):
     """Test the redsun session info with a different session name."""
-
     config = RedSunSessionInfo.load_yaml(config_path / "session_name.yaml")
     session = RedSunSessionInfo(**config)
 

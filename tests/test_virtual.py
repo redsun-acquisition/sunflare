@@ -1,4 +1,3 @@
-# type: ignore
 import logging
 import threading
 import time
@@ -13,12 +12,71 @@ from sunflare.config import ControllerInfo
 from sunflare.model import ModelProtocol
 from sunflare.log import Loggable
 
+
 class MockVirtualBus(VirtualBus):
     sigMySignal = Signal(int, description="My signal")
 
+
+class MockPublisher(Publisher):
+    def __init__(
+        self,
+        info: ControllerInfo,
+        models: dict[str, ModelProtocol],
+        virtual_bus: VirtualBus,
+    ) -> None:
+        super().__init__(virtual_bus)
+        self.info = info
+        self.models = models
+        self.virtual_bus = virtual_bus
+
+
+class MockSubscriber(SyncSubscriber):
+    def __init__(
+        self,
+        info: ControllerInfo,
+        models: dict[str, ModelProtocol],
+        virtual_bus: VirtualBus,
+        topics: list[str] = ["test"],
+    ) -> None:
+        super().__init__(virtual_bus, topics)
+        self.info = info
+        self.virtual_bus = virtual_bus
+        self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
+
+    def consume(self, content: list[bytes]) -> None:
+        self.msg_queue.put(tuple(c.decode() for c in content))
+
+
+class MockPubSync(Publisher, SyncSubscriber):
+    def __init__(
+        self,
+        ctrl_info: ControllerInfo,
+        models: dict[str, ModelProtocol],
+        virtual_bus: VirtualBus,
+        topics: list[str] = ["test"],
+    ) -> None:
+        Publisher.__init__(self, virtual_bus)
+        SyncSubscriber.__init__(self, virtual_bus, topics)
+        self.ctrl_info = ctrl_info
+        self.models = models
+        self.virtual_bus = virtual_bus
+        self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
+
+    def consume(self, content: list[bytes]) -> None:
+        self.msg_queue.put(tuple(c.decode() for c in content))
+
+
+def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
+    messages: list[tuple[str, ...]] = []
+    try:
+        messages.append(q.get(block=False))
+    except queue.Empty:
+        pass
+    return messages
+
+
 @pytest.fixture(scope="function")
 def mock_bus() -> Generator[MockVirtualBus, None, None]:
-
     context = zmq.Context.instance()
     context.term()
     zmq.Context._instance = None
@@ -58,7 +116,10 @@ def test_virtual_bus_psygnal_registration(mock_bus: MockVirtualBus) -> None:
     mock_bus["MockOwner"]["sigMySignal"].connect(lambda x: test_slot(x))
     mock_bus["MockOwner"]["sigMySignal"].emit(5)
 
-def test_virtual_bus_no_object(caplog: pytest.LogCaptureFixture,mock_bus: VirtualBus) -> None:
+
+def test_virtual_bus_no_object(
+    caplog: pytest.LogCaptureFixture, mock_bus: VirtualBus
+) -> None:
     """Test that trying to access a non-existent signal raises an error."""
 
     logger = logging.getLogger("redsun")
@@ -84,7 +145,9 @@ def test_virtual_bus_psygnal_connection(mock_bus: VirtualBus) -> None:
             self.mock_bus.register_signals(self)
 
         def connection_phase(self) -> None:
-            self.mock_bus["SecondMockOwner"]["sigSecondSignal"].connect(self.second_to_first)
+            self.mock_bus["SecondMockOwner"]["sigSecondSignal"].connect(
+                self.second_to_first
+            )
 
         def second_to_first(self, x: int) -> None:
             assert x == 5
@@ -94,12 +157,14 @@ def test_virtual_bus_psygnal_connection(mock_bus: VirtualBus) -> None:
 
         def __init__(self, mock_bus: VirtualBus) -> None:
             self.mock_bus = mock_bus
-        
+
         def registration_phase(self) -> None:
             self.mock_bus.register_signals(self)
-        
+
         def connection_phase(self) -> None:
-            self.mock_bus["FirstMockOwner"]["sigFirstSignal"].connect(self.first_to_second)
+            self.mock_bus["FirstMockOwner"]["sigFirstSignal"].connect(
+                self.first_to_second
+            )
 
         def first_to_second(self, x: int) -> None:
             assert x == 5
@@ -121,7 +186,7 @@ def test_virtual_bus_psygnal_connection(mock_bus: VirtualBus) -> None:
 
 
 def test_virtual_bus_psygnal_connection_only(mock_bus: VirtualBus) -> None:
-    """Test "register_signals" using the 'only' parameter. """
+    """Test "register_signals" using the 'only' parameter."""
 
     def callback(x: int) -> None:
         assert x == 5
@@ -141,6 +206,7 @@ def test_virtual_bus_psygnal_connection_only(mock_bus: VirtualBus) -> None:
 
     mock_bus["MockOwner"]["sigSignalOne"].connect(callback)
     owner.sigSignalOne.emit(5)
+
 
 def test_slot() -> None:
     """Tests the slot decorator."""
@@ -222,6 +288,7 @@ def test_virtual_bus_zmq(mock_bus: VirtualBus) -> None:
 
     assert sub.msg == test_msg, f"Expected '{test_msg}', but got '{sub.msg}'"
 
+
 def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
     """Test that subscribers only receive messages they're subscribed to."""
 
@@ -266,15 +333,15 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
 
     # Create publisher and subscribers
     pub = Publisher(mock_bus)
-    
+
     # Create subscribers with different topic subscriptions
     sub_temp = Subscriber(mock_bus, ["temperature"])  # Only temperature messages
     sub_humidity = Subscriber(mock_bus, ["humidity"])  # Only humidity messages
-    
+
     # Wait for subscriptions to be set up
     time.sleep(0.1)
 
-    logger.debug(mock_bus._forwarder._sockets)    
+    logger.debug(mock_bus._forwarder._sockets)
 
     # Send various messages
     pub.send("temperature", 25.5)
@@ -292,60 +359,53 @@ def test_virtual_bus_subscriptions(mock_bus: VirtualBus) -> None:
 
     # Verify temperature subscriber
     temp_messages = sub_temp.received_messages
-    assert len(temp_messages) == 1, f"Expected 1 temperature message, got {len(temp_messages)}"
-    assert temp_messages[0] == "temperature 25.5", f"Unexpected message: {temp_messages[0]}"
-    assert not any("humidity" in msg for msg in temp_messages), "Temperature subscriber received humidity message"
-    assert not any("pressure" in msg for msg in temp_messages), "Temperature subscriber received pressure message"
+    assert len(temp_messages) == 1, (
+        f"Expected 1 temperature message, got {len(temp_messages)}"
+    )
+    assert temp_messages[0] == "temperature 25.5", (
+        f"Unexpected message: {temp_messages[0]}"
+    )
+    assert not any("humidity" in msg for msg in temp_messages), (
+        "Temperature subscriber received humidity message"
+    )
+    assert not any("pressure" in msg for msg in temp_messages), (
+        "Temperature subscriber received pressure message"
+    )
 
     # Verify humidity subscriber
     humid_messages = sub_humidity.received_messages
-    assert len(humid_messages) == 1, f"Expected 1 humidity message, got {len(humid_messages)}"
-    assert humid_messages[0] == "humidity 60.0", f"Unexpected message: {humid_messages[0]}"
-    assert not any("temperature" in msg for msg in humid_messages), "Humidity subscriber received temperature message"
-    assert not any("pressure" in msg for msg in humid_messages), "Humidity subscriber received pressure message"
+    assert len(humid_messages) == 1, (
+        f"Expected 1 humidity message, got {len(humid_messages)}"
+    )
+    assert humid_messages[0] == "humidity 60.0", (
+        f"Unexpected message: {humid_messages[0]}"
+    )
+    assert not any("temperature" in msg for msg in humid_messages), (
+        "Humidity subscriber received temperature message"
+    )
+    assert not any("pressure" in msg for msg in humid_messages), (
+        "Humidity subscriber received pressure message"
+    )
+
 
 def test_sync(bus: VirtualBus) -> None:
-
-    def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
-        messages: list[tuple[str, ...]] = []
-        try:
-            messages.append(q.get(block=False))
-        except queue.Empty:
-            pass
-        return messages
-
-    class TestPublisher(Publisher):
-        def __init__(self, info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
-            super().__init__(virtual_bus)
-            self.info = info
-            self.models = models
-            self.virtual_bus = virtual_bus
-
-
-    class TestSubscriber(SyncSubscriber):
-        def __init__(self, info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
-            super().__init__(virtual_bus, "test")
-            self.info = info
-            self.virtual_bus = virtual_bus
-            self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
-
-        def consume(self, content: list[bytes]) -> None:
-            self.msg_queue.put(tuple(c.decode() for c in content))
-
-
     pub_info = ControllerInfo()
     sub_info = ControllerInfo()
-    pub = TestPublisher(pub_info, {}, bus)
-    sub = TestSubscriber(sub_info, {}, bus)
+    pub = MockPublisher(pub_info, {}, bus)
+    sub = MockSubscriber(sub_info, {}, bus)
 
     # wait for the startup
     time.sleep(0.1)
 
     assert pub.pub_socket is not None, "Publisher socket not initialized"
-    assert pub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
+    assert pub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, (
+        "Publisher socket not of type PUB"
+    )
 
     assert sub.sub_socket is not None, "Subscriber socket not initialized"
-    assert sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+    assert sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, (
+        "Subscriber socket not of type SUB"
+    )
     assert sub.sub_thread.is_alive(), "Consumer thread not started"
 
     pub.pub_socket.send_multipart([b"test", b"message"])
@@ -364,39 +424,22 @@ def test_sync(bus: VirtualBus) -> None:
     assert len(messages) == 1, "Subscriber received more than one message or no message"
     assert messages == [("test", "message")], "Subscriber did not receive message"
 
+
 def test_sync_single_class(bus: VirtualBus) -> None:
-
-    def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
-        messages: list[tuple[str, ...]] = []
-        try:
-            messages.append(q.get(block=False))
-        except queue.Empty:
-            pass
-        return messages
-
-    class TestController(Publisher, SyncSubscriber):
-        def __init__(self, ctrl_info: ControllerInfo, models: dict[str, ModelProtocol], virtual_bus: VirtualBus) -> None:
-            Publisher.__init__(self, virtual_bus)
-            SyncSubscriber.__init__(self, virtual_bus, "test")
-            self.ctrl_info = ctrl_info
-            self.models = models
-            self.virtual_bus = virtual_bus
-            self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
-
-        def consume(self, content: list[bytes]) -> None:
-            self.msg_queue.put(tuple(c.decode() for c in content))
-            
-
     pub_sub_info = ControllerInfo()
-    pub_sub = TestController(pub_sub_info, {}, bus)
+    pub_sub = MockPubSync(pub_sub_info, {}, bus)
 
     # wait for the startup
     time.sleep(0.1)
 
     assert pub_sub.pub_socket is not None, "Publisher socket not initialized"
-    assert pub_sub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, "Publisher socket not of type PUB"
+    assert pub_sub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, (
+        "Publisher socket not of type PUB"
+    )
     assert pub_sub.sub_socket is not None, "Subscriber socket not initialized"
-    assert pub_sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, "Subscriber socket not of type SUB"
+    assert pub_sub.sub_socket.getsockopt(zmq.TYPE) == zmq.SUB, (
+        "Subscriber socket not of type SUB"
+    )
     assert pub_sub.sub_thread.is_alive(), "Consumer thread not started"
 
     pub_sub.pub_socket.send_multipart([b"test", b"message"])

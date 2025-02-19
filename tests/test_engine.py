@@ -1,23 +1,24 @@
 import logging
 import platform
 import threading
-import zmq
-from typing import Any
-from concurrent.futures import wait, Future
+from concurrent.futures import Future, wait
 from time import sleep
+from typing import Any
 
 import pytest
+import zmq
 from bluesky.plans import count
 from ophyd.sim import det1
 
-from sunflare.engine import RunEngine, Status, RunEngineResult
+from sunflare.engine import RunEngine, RunEngineResult, Status
 from sunflare.engine._exceptions import (
     InvalidState,
     StatusTimeoutError,
     WaitTimeoutError,
 )
-from sunflare.virtual import decode, VirtualBus
 from sunflare.log import Loggable
+from sunflare.virtual import VirtualBus, decode
+
 
 def test_status() -> None:
     def callback(_: Status) -> None:
@@ -117,6 +118,7 @@ def test_status_wait_timeout() -> None:
     with pytest.raises(WaitTimeoutError):
         status.wait(timeout=0.1)
 
+
 @pytest.mark.skipif(platform.system() == "Darwin", reason="Sometimes fails on macOS")
 def test_status_settle_time() -> None:
     status = Status(timeout=0.1, settle_time=0.3)
@@ -153,22 +155,23 @@ def test_callback_exception_is_logged(caplog: pytest.LogCaptureFixture) -> None:
 
 
 def test_engine_wrapper_construction(RE: RunEngine) -> None:
-
     assert RE.context_managers == []
     assert RE.pause_msg == ""
 
+
 def test_engine_wrapper_run(RE: RunEngine) -> None:
     fut = RE(count([det1], num=5))
-    
+
     wait([fut])
 
     assert type(RE.result) == tuple
     assert len(RE.result) == 1
 
+
 def test_engine_wrapper_run_with_result(RE: RunEngine) -> None:
     RE._call_returns_result = True
     fut = RE(count([det1], num=5))
-    
+
     wait([fut])
 
     assert type(RE.result) == RunEngineResult
@@ -176,8 +179,8 @@ def test_engine_wrapper_run_with_result(RE: RunEngine) -> None:
 
     RE._call_returns_result = False
 
-def test_engine_with_callback(RE: RunEngine) -> None:
 
+def test_engine_with_callback(RE: RunEngine) -> None:
     def callback(future: Future) -> None:
         assert len(future.result()) == 1
 
@@ -186,8 +189,8 @@ def test_engine_with_callback(RE: RunEngine) -> None:
 
     wait([fut])
 
-def test_engine_callbacks(RE: RunEngine) -> None:
 
+def test_engine_callbacks(RE: RunEngine) -> None:
     def all_callback(name: str, doc: dict[str, Any]) -> None:
         assert name in ["start", "descriptor", "event", "stop"]
         assert threading.current_thread().name == "bluesky-run-engine"
@@ -195,15 +198,15 @@ def test_engine_callbacks(RE: RunEngine) -> None:
     def start_callback(name: str, doc: dict[str, Any]) -> None:
         assert name == "start"
         assert threading.current_thread().name == "bluesky-run-engine"
-    
+
     def descriptor_callback(name: str, doc: dict[str, Any]) -> None:
         assert name == "descriptor"
         assert threading.current_thread().name == "bluesky-run-engine"
-    
+
     def event_callback(name: str, doc: dict[str, Any]) -> None:
         assert name == "event"
         assert threading.current_thread().name == "bluesky-run-engine"
-    
+
     def stop_callback(name: str, doc: dict[str, Any]) -> None:
         assert name == "stop"
         assert threading.current_thread().name == "bluesky-run-engine"
@@ -231,8 +234,8 @@ def test_engine_callbacks(RE: RunEngine) -> None:
 
     assert counter == 0
 
-def test_engine_sockets(RE: RunEngine) -> None:
 
+def test_engine_sockets(RE: RunEngine) -> None:
     context = zmq.Context()
 
     def receiver_socket() -> None:
@@ -250,7 +253,12 @@ def test_engine_sockets(RE: RunEngine) -> None:
                     name, doc = socket.recv_multipart()
                     name = name.decode()
                     doc = decode(doc)
-                    assert name in ["RE0:start", "RE0:descriptor", "RE0:event", "RE0:stop"]
+                    assert name in [
+                        "RE0:start",
+                        "RE0:descriptor",
+                        "RE0:event",
+                        "RE0:stop",
+                    ]
                     assert isinstance(doc, dict)
             except zmq.ContextTerminated:
                 break
@@ -278,7 +286,6 @@ def test_engine_sockets(RE: RunEngine) -> None:
 
 
 def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
-
     class Subscriber(Loggable):
         def __init__(self, bus: VirtualBus, topics: list[str]) -> None:
             self.received_messages: list[str] = []
@@ -318,7 +325,6 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
     RE.socket = bus.connect_publisher()
     assert RE.socket is not None
     assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUB
-
 
     fut = RE(count([det1], num=5))
     wait([fut])
