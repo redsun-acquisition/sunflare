@@ -1,0 +1,60 @@
+name: Sunflare CI Pipeline
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "docs/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "docs/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code_analysis:
+    name: Run Code Analysis
+    uses: ./.github/workflows/run-code-analysis.yaml
+    with:
+      ref: ${{ github.ref }}
+      event_name: ${{ github.event_name }}
+
+  tests:
+    name: Run Tests
+    needs: code_analysis
+    uses: ./.github/workflows/run-tests.yaml
+    with:
+      ref: ${{ github.ref }}
+      event_name: ${{ github.event_name }}
+    secrets: inherit
+
+  docs:
+    name: Deploy Documentation
+    # Only run on main branch push or tag push
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+    needs: tests
+    uses: ./.github/workflows/deploy-docs.yaml
+    with:
+      ref: ${{ github.ref }}
+    secrets: inherit
+
+  pypi:
+    name: Deploy to PyPI
+    # Only run on tag push
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [tests, docs]
+    uses: ./.github/workflows/deploy-pypi.yaml
+    with:
+      ref: ${{ github.ref }}
+    secrets: inherit

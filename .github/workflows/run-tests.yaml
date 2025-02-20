@@ -1,18 +1,17 @@
 name: Run tests
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "tests/**"
-  pull_request:
-    branches:
-      - "*"
-    paths:
-      - "src/**"
-      - "tests/**"
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      event_name:
+        required: true
+        type: string
+    secrets:
+      codecov_token:
+        required: false
 
 env:
   PROJECT_NAME: sunflare
@@ -38,4 +37,4 @@ jobs:
     needs: [test]
     uses: pyapp-kit/workflows/.github/workflows/upload-coverage.yml@v2
     secrets:
-      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+        codecov_token: ${{ secrets.codecov_token }}

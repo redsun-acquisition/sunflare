@@ -1,18 +1,14 @@
 name: Check code formatting and type hints
 
 on:
-  push:
-    tags:
-      - "*"
-    branches:
-      - main
-    paths:
-      - "src/**"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "src/**"
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+      event_name:
+        required: true
+        type: string
 
 jobs:
   ruff:
