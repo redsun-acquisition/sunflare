@@ -406,7 +406,7 @@ class VirtualBus(Loggable):
         """
         socket: zmq.Socket[bytes] = self._context.socket(zmq.PUB)
         socket.connect(self._map[zmq.PUB])
-        socket.setsockopt(zmq.LINGER, -1)
+        socket.setsockopt(zmq.LINGER, 0)
         self._pub_sockets.add(socket)
         return socket
 
