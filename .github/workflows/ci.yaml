@@ -1,4 +1,4 @@
-name: Sunflare CI Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -32,7 +32,6 @@ jobs:
 
   tests:
     name: Run Tests
-    needs: code_analysis
     uses: ./.github/workflows/run-tests.yaml
     with:
       ref: ${{ github.ref }}
