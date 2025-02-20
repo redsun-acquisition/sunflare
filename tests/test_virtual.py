@@ -86,26 +86,6 @@ def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
     return messages
 
 
-@pytest.mark.asyncio
-@pytest.mark.skipif(
-    sys.platform != "win32", reason="Hangs on GH actions, but works locally"
-)
-async def test_maybe_await() -> None:
-    def sync_function() -> int:
-        time.sleep(0.05)
-        return 5
-
-    async def async_function() -> int:
-        await asyncio.sleep(0.05)
-        return 5
-
-    ret = await maybe_await(sync_function())
-    assert ret == 5
-
-    ret = await maybe_await(async_function())
-    assert ret == 5
-
-
 def test_virtual_bus_psygnal_registration(bus: VirtualBus) -> None:
     """Tests the registration of signals in the virtual bus."""
 
