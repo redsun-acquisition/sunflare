@@ -1,8 +1,6 @@
-import asyncio
 import logging
 import threading
 import time
-import sys
 import queue
 from itertools import count
 
@@ -10,7 +8,6 @@ import zmq
 import pytest
 
 from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
-from sunflare.virtual._bus import maybe_await
 from sunflare.log import Loggable
 
 sub_cnt = count()
