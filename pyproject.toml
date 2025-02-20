@@ -50,7 +50,6 @@ docs = [
 dev = [
   "ruff",
   "pytest",
-  "pytest-asyncio",
   "pytest-cov",
   "pre-commit",
   "ophyd",
