@@ -87,7 +87,9 @@ def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="This test is not working on GitHub Actions.")
+@pytest.mark.skipif(
+    sys.platform != "win32", reason="Hangs on GH actions, but works locally"
+)
 async def test_maybe_await() -> None:
     def sync_function() -> int:
         time.sleep(0.05)
