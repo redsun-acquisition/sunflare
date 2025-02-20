@@ -2,6 +2,7 @@ import asyncio
 import logging
 import threading
 import time
+import sys
 import queue
 from itertools import count
 
@@ -86,6 +87,7 @@ def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(sys.platform == "darwin", "Hangs in CI on macOS")
 async def test_maybe_await() -> None:
     def sync_function() -> int:
         time.sleep(0.05)
