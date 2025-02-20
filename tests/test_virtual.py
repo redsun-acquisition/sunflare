@@ -87,7 +87,6 @@ def retrieve_messages(q: queue.Queue) -> list[tuple[str, ...]]:
 
 
 @pytest.mark.asyncio
-@pytest.mark.skipif(condition=sys.platform == "darwin", reason="Hangs in CI on macOS")
 async def test_maybe_await() -> None:
     def sync_function() -> int:
         time.sleep(0.05)
