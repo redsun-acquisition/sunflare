@@ -25,7 +25,7 @@ concurrency:
 jobs:
   code_analysis:
     name: Run Code Analysis
-    uses: ./.github/workflows/run-code-analysis.yaml
+    uses: ./run-code-analysis.yaml
     with:
       ref: ${{ github.ref }}
       event_name: ${{ github.event_name }}
@@ -33,7 +33,7 @@ jobs:
   tests:
     name: Run Tests
     needs: code_analysis
-    uses: ./.github/workflows/run-tests.yaml
+    uses: ./run-tests.yaml
     with:
       ref: ${{ github.ref }}
       event_name: ${{ github.event_name }}
@@ -44,7 +44,9 @@ jobs:
     # Only run on main branch push or tag push
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
     needs: tests
-    uses: ./.github/workflows/deploy-docs.yaml
+    uses: ./deploy-docs.yaml
+    permissions:
+      contents: write
     with:
       ref: ${{ github.ref }}
     secrets: inherit
@@ -54,7 +56,9 @@ jobs:
     # Only run on tag push
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: [tests, docs]
-    uses: ./.github/workflows/deploy-pypi.yaml
+    uses: ./deploy-pypi.yaml
+    permissions:
+      id-token: write
     with:
       ref: ${{ github.ref }}
     secrets: inherit
