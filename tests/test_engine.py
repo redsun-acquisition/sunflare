@@ -336,3 +336,56 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
     desc_sub.thread.join()
     event_sub.thread.join()
     stop_sub.thread.join()
+
+
+def test_engine_prefix(bus: VirtualBus) -> None:
+    class Subscriber(Loggable):
+        def __init__(self, bus: VirtualBus, topics: list[str]) -> None:
+            self.received_messages: list[str] = []
+            self.bus = bus
+            self.topics = topics
+            self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
+            for topic in topics:
+                self.socket.subscribe(topic)
+            self.debug(f"Subscribed to: {topics}")
+
+            self.thread = threading.Thread(target=self._polling_thread, daemon=True)
+            self.thread.start()
+
+        def _polling_thread(self) -> None:
+            try:
+                while True:
+                    try:
+                        socks = dict(self.poller.poll())
+                        if self.socket in socks:
+                            name, doc = self.socket.recv_multipart()
+                            name = name.decode()
+                            doc = decode(doc)
+                            assert name in self.topics
+                    except zmq.error.ContextTerminated:
+                        break
+            finally:
+                self.poller.unregister(self.socket)
+                self.socket.close()
+                self.debug("Subscriber socket closed.")
+
+    all_sub = Subscriber(bus, topics=["MyEngine"])
+    start_sub = Subscriber(bus, topics=["MyEngine/start"])
+    desc_sub = Subscriber(bus, topics=["MyEngine/descriptor"])
+    event_sub = Subscriber(bus, topics=["MyEngine/event"])
+    stop_sub = Subscriber(bus, topics=["MyEngine/stop"])
+
+    RE = RunEngine(socket=bus.connect_publisher(), socket_prefix="MyEngine")
+    assert RE.socket is not None
+    assert RE.socket.getsockopt(zmq.TYPE) == zmq.PUB
+
+    fut = RE(count([det1], num=5))
+    wait([fut])
+
+    bus.shutdown()
+
+    all_sub.thread.join()
+    start_sub.thread.join()
+    desc_sub.thread.join()
+    event_sub.thread.join()
+    stop_sub.thread.join()
