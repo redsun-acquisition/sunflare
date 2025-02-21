@@ -1,4 +1,4 @@
-# Configuration module
+# `sunflare.config`
 
 ```{eval-rst}
 .. automodule:: sunflare.config

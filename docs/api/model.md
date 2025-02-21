@@ -1,4 +1,4 @@
-# Model API
+# `sunflare.model`
 
 ```{eval-rst}
 .. automodule:: sunflare.model

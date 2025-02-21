@@ -1,4 +1,4 @@
-# Logging facilities
+# `sunflare.log`
 
 ```{eval-rst}
 .. automodule:: sunflare.log

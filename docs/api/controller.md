@@ -1,4 +1,4 @@
-# Controller API
+# `sunflare.controller`
 
 Controllers come in two forms:
 

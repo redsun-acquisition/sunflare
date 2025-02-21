@@ -1,4 +1,4 @@
-# Virtual module
+# `sunflare.virtual`
 
 ```{eval-rst}
 .. automodule:: sunflare.virtual
