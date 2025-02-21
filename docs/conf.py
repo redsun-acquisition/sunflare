@@ -17,7 +17,7 @@ copyright = "2024, Jacopo Abramo"
 author = "Jacopo Abramo"
 
 
-release = __version__.split(".dev")[0]
+version = __version__.split(".dev")[0]
 github_user = "redsun-acquisition"
 github_repo = "sunflare"
 
@@ -52,12 +52,6 @@ html_context = {
     # this doesn't really matter;
     # adding it only for completion
     "default_mode": "auto",
-    "version": release,  # Sets the current version dynamically
-    "versions": [
-        ("latest", "/docs/latest/"),  # Development version
-        ("stable", "/docs/stable/"),  # The latest stable version (0.3.5)
-        ("0.3.5", "/docs/0.3.5/"),  # Explicitly tagged 0.3.5 version
-    ],
 }
 
 html_theme_options = {
@@ -69,8 +63,11 @@ html_theme_options = {
             "type": "fontawesome",
         }
     ],
-    "switcher": {"json_url": "docs/_static/switcher.json", "version_match": release},
-    "navbar_start": ["navbar-logo", "version-switcher"],
+    "switcher": {
+        "json_url": "https://redsun-acquisition.github.io/sunflare/docs/latest/_static/switcher.json",
+        "version_match": version,
+    },
+    "navbar_end": ["version-switcher"],
 }
 
 mermaid_version = "11.4.0"

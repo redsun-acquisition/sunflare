@@ -1,16 +1,5 @@
-[
-    {
-        "name": "latest",
-        "version": "0.3.6",
-        "url": "https://mysite.org/en/2.1/"
-    },
-    {
-        "name": "stable",
-        "version": "0.3.5",
-        "url": "https://mysite.org/en/2.0/"
-    },
-    {
-        "version": "0.3.5",
-        "url": "https://mysite.org/en/2.1rc1/"
-    }
-]
+{   
+    "name": "latest",
+    "version": "0.3.6",
+    "url": "https://redsun-acquisition.github.io/sunflare/docs/latest"
+}
