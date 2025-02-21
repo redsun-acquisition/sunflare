@@ -21,7 +21,6 @@ jobs:
       - name: install dependencies
         run: |
           pip install --upgrade pip
-          pip install --upgrade hatchling hatch-vcs
           pip install --no-build-isolation --verbose --editable .[docs]
       - name: build docs
         run: |
