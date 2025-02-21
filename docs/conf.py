@@ -64,7 +64,7 @@ html_theme_options = {
         }
     ],
     "switcher": {
-        "json_url": "https://redsun-acquisition.github.io/sunflare/latest/_static/switcher.json",
+        "json_url": "https://redsun-acquisition.github.io/sunflare/main/_static/switcher.json",
         "version_match": version,
     },
     "navbar_end": ["version-switcher"],
