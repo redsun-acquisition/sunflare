@@ -219,6 +219,9 @@ def test_slot_private() -> None:
 def test_virtual_bus_zmq(bus: VirtualBus) -> None:
     """Test the bus ZMQ context."""
 
+    cond = threading.Condition()
+    sentinel: list[object] = []
+
     class Publisher(Loggable):
         def __init__(self, bus: VirtualBus) -> None:
             self.bus = bus
@@ -229,10 +232,15 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
             self.socket.send_string(msg)
 
     class Subscriber(Loggable):
-        def __init__(self, bus: VirtualBus) -> None:
+        def __init__(
+            self, bus: VirtualBus, cond: threading.Condition, sentinel: list[object]
+        ) -> None:
             self.msg = ""
             self.bus = bus
+            self.cond = cond
+            self.sentinel = sentinel
             self.socket, self.poller = self.bus.connect_subscriber()
+
             self.socket.subscribe("")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
@@ -246,6 +254,9 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
                         if self.socket in socks:
                             self.msg = self.socket.recv_string()
                             self.debug(f"Received message: {self.msg}")
+                            with self.cond:
+                                self.sentinel.append(object)
+                                self.cond.notify()
                     except zmq.error.ContextTerminated:
                         break
             finally:
@@ -254,7 +265,7 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
                 self.debug("Subscriber socket closed.")
 
     pub = Publisher(bus)
-    sub = Subscriber(bus)
+    sub = Subscriber(bus, cond, sentinel)
 
     # give time for
     # subscrbier to connect
@@ -263,9 +274,9 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
     test_msg = "Hello, World!"
     pub.send(test_msg)
 
-    # give some time
-    # for message transmission
-    time.sleep(0.1)
+    with cond:
+        while len(sentinel) < 1:
+            cond.wait(timeout=1.0)
 
     # shutdown the bus;
     # this will kill
