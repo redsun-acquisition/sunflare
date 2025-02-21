@@ -202,7 +202,6 @@ class VirtualBus(Loggable):
         for socket in self._pub_sockets:
             socket.close()
         try:
-            # self._asub_loop.stop()
             self._context.term()
         except zmq.error.ZMQError:
             self.debug("ZMQ context already terminated.")
@@ -483,10 +482,9 @@ class SyncSubscriber:
                     if self.sub_socket in socks:
                         self.consume(self.sub_socket.recv_multipart())
                 except zmq.error.ContextTerminated:
-                    self.logger.debug("Context terminated")
                     break
         finally:
-            self.logger.debug("Shutting down subscriber")
+            self.logger.debug("Context terminated")
             self.sub_poller.unregister(self.sub_socket)
             self.sub_socket.close()
 
