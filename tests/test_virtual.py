@@ -10,8 +10,6 @@ import pytest
 from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
 from sunflare.log import Loggable
 
-sub_cnt = count()
-
 
 class MockPublisher(Publisher):
     def __init__(
@@ -469,6 +467,8 @@ def test_sync_single_class(bus: VirtualBus) -> None:
 def test_one_to_many(bus: VirtualBus) -> None:
     cond = threading.Condition()
     monitorer: list[object] = []
+
+    sub_cnt = count()
 
     def create_subscribers(topics: list[list[str]]) -> list[MockSubscriber]:
         subscribers = []

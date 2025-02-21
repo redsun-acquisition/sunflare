@@ -106,6 +106,7 @@ minversion = "6.0"
 testpaths = [
     "tests"
 ]
+log_cli = true
 
 # https://coverage.readthedocs.io/en/latest/config.html
 [tool.coverage.report]
