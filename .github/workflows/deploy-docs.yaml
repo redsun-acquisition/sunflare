@@ -21,7 +21,7 @@ jobs:
       - name: install dependencies
         run: |
           pip install --upgrade pip
-          pip install --no-build-isolation --verbose --editable .[docs]
+          pip install --verbose --editable .[docs]
       - name: build docs
         run: |
           cd docs
