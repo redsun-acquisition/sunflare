@@ -450,7 +450,7 @@ def test_sync_single_class(bus: VirtualBus) -> None:
     pub_sub = MockPubSync(bus, cond, monitorer)
 
     # wait for the startup
-    time.sleep(0.1)
+    time.sleep(0.3)
 
     assert pub_sub.pub_socket is not None, "Publisher socket not initialized"
     assert pub_sub.pub_socket.getsockopt(zmq.TYPE) == zmq.PUB, (
@@ -498,6 +498,9 @@ def test_one_to_many(bus: VirtualBus) -> None:
 
     pub = MockPublisher(bus)
 
+    # wait for the startup
+    time.sleep(0.3)
+
     # "" is for catching all messages
     topics = ["", "topic1", "topic2", "topic3"]
     subscribers = create_subscribers(topics)
@@ -543,6 +546,8 @@ def test_many_to_one(bus: VirtualBus) -> None:
     sub.sub_socket.subscribe(b"topic2")
     sub.sub_socket.subscribe(b"topic3")
 
+    time.sleep(0.3)
+
     for p, t in zip(publishers, topics):
         p.pub_socket.send_multipart([t.encode(), b"message"])
 
@@ -574,6 +579,8 @@ def test_many_to_many(bus: VirtualBus) -> None:
         MockSubscriber(bus, cond, monitorer, topic)
         for _, topic in zip(range(3), topics)
     ]
+
+    time.sleep(0.3)
 
     for p, t in zip(publishers, topics):
         p.pub_socket.send_multipart([t.encode(), b"message"])
