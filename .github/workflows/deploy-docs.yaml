@@ -39,6 +39,6 @@ jobs:
         with:
           publish_branch: gh-pages
           external_repository: redsun-acquisition/redsun-acquisition.github.io
-          github_token: ${{ secrets.REDSUN_DOCS_PUBLISH_TOKEN }}
+          personal_token: ${{ secrets.REDSUN_DOCS_PUBLISH_TOKEN }}
           publish_dir: docs/_build/dirhtml
           destination_dir: sunflare/${{github.ref_name}}
