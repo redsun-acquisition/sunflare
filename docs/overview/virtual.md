@@ -178,7 +178,7 @@ This is transparent to the plugins: they're not aware of how many agents are cur
 The `sunflare.virtual` module provides a series of pre-shipped classes which allow for easy integration with the `zmq` forwarder:
 
 - {py:class}`~sunflare.virtual.Publisher` (message dispatching);
-- {py:class}`~sunflare.virtual.SyncSubscriber` (message reception).
+- {py:class}`~sunflare.virtual.Subscriber` (message reception).
 
 ### Serialization with `msgspec`
 

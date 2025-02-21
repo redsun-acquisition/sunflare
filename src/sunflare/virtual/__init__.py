@@ -1,11 +1,11 @@
-from ._bus import Publisher, Signal, SyncSubscriber, VirtualBus, decode, encode, slot
+from ._bus import Publisher, Signal, Subscriber, VirtualBus, decode, encode, slot
 
 __all__ = [
     "VirtualBus",
     "slot",
     "Signal",
     "Publisher",
-    "SyncSubscriber",
+    "Subscriber",
     "encode",
     "decode",
 ]

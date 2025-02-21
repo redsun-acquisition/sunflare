@@ -7,7 +7,7 @@ from itertools import count
 import zmq
 import pytest
 
-from sunflare.virtual import Signal, VirtualBus, slot, Publisher, SyncSubscriber
+from sunflare.virtual import Signal, VirtualBus, slot, Publisher, Subscriber
 from sunflare.log import Loggable
 
 
@@ -20,7 +20,7 @@ class MockPublisher(Publisher):
         self.virtual_bus = virtual_bus
 
 
-class MockSubscriber(SyncSubscriber, Loggable):
+class MockSubscriber(Subscriber, Loggable):
     def __init__(
         self,
         virtual_bus: VirtualBus,
@@ -48,7 +48,7 @@ class MockSubscriber(SyncSubscriber, Loggable):
         return "SUB[{}]".format(self.id)
 
 
-class MockPubSync(Publisher, SyncSubscriber):
+class MockPubSync(Publisher, Subscriber):
     def __init__(
         self,
         virtual_bus: VirtualBus,
@@ -57,7 +57,7 @@ class MockPubSync(Publisher, SyncSubscriber):
         topics: list[str] = ["test"],
     ) -> None:
         Publisher.__init__(self, virtual_bus)
-        SyncSubscriber.__init__(self, virtual_bus, topics)
+        Subscriber.__init__(self, virtual_bus, topics)
         self.virtual_bus = virtual_bus
         self.msg_queue: queue.Queue[tuple[str, ...]] = queue.Queue()
         self.cond = cond
