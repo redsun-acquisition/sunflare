@@ -314,11 +314,10 @@ class VirtualBus(Loggable):
         A subtopic of a given topic
         can be specified as "<main_topic>/<sub_topic>/...".
 
-        .. code-block:: python
-
-        Usage::
+        Usage:
 
         .. code-block:: python
+
             # registering to all topics
             socket, poller = bus.connect_subscriber()
             # or more explicitly
@@ -339,6 +338,7 @@ class VirtualBus(Loggable):
             socket, poller = bus.connect_subscriber(
                 ["topic", "subtopic", "subsubtopic"]
             )
+
 
         Parameters
         ----------
@@ -421,8 +421,8 @@ class Publisher:
         self.pub_socket = virtual_bus.connect_publisher()
 
 
-class SyncSubscriber:
-    """Synchronous subscriber mixin class.
+class Subscriber:
+    """Subscriber mixin class.
 
     The synchronous subscriber deploys a background thread
     which will poll the virtual bus for incoming messages.
