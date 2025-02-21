@@ -3,7 +3,8 @@ from typing import Any
 
 import pytest
 import yaml
-from attrs import asdict, define
+import numpy as np
+from attrs import asdict, define, field
 from mocks import MockControllerInfo, MockDetectorInfo, MockMotorInfo, MockWidgetInfo
 from pytest import LogCaptureFixture
 
@@ -284,6 +285,10 @@ def test_model_info_descriptor():
         string_param: str = "default"
         int_param: int = 42
         float_param: float = 3.14
+        array_param: np.ndarray = field(
+            default=np.array([1, 2, 3, 4]), converter=np.array
+        )
+        tuple_param: tuple[int, int] = (1, 2)
 
     info = MyModelInfo(model_name="MyModel")
 
@@ -328,5 +333,15 @@ def test_model_info_descriptor():
             "source": "model_info",
             "dtype": "number",
             "shape": [],
+        },
+        "array_param": {
+            "source": "model_info",
+            "dtype": "array",
+            "shape": [4],
+        },
+        "tuple_param": {
+            "source": "model_info",
+            "dtype": "array",
+            "shape": [2],
         },
     }

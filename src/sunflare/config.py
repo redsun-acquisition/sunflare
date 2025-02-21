@@ -7,6 +7,7 @@ from enum import Enum, unique
 from pathlib import Path
 from typing import Any, Protocol, Sized, TypeVar, Union, runtime_checkable
 
+import numpy as np
 import yaml
 from attrs import AttrsInstance, asdict, define, field, setters, validators
 
@@ -193,6 +194,7 @@ class ModelInfo:
         bool: "boolean",
         list: "array",
         tuple: "array",
+        np.ndarray: "array",
     }
 
     def __get_shape(self, value: Any) -> list[int]:
