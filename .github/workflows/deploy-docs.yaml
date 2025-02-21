@@ -38,6 +38,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           publish_branch: gh-pages
+          external_repository: redsun-acquisition/redsun-acquisition.github.io
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/_build/dirhtml
-          destination_dir: docs/${{github.ref_name}}
+          destination_dir: sunflare/${{github.ref_name}}
