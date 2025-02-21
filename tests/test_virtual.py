@@ -99,6 +99,8 @@ def test_virtual_bus_psygnal_registration(bus: VirtualBus) -> None:
     bus["MockOwner"]["sigMockSignal"].connect(lambda x: test_slot(x))
     bus["MockOwner"]["sigMockSignal"].emit(5)
 
+    bus.shutdown()
+
 
 def test_virtual_bus_no_object(
     caplog: pytest.LogCaptureFixture, bus: VirtualBus
@@ -113,6 +115,8 @@ def test_virtual_bus_no_object(
     assert len(signals) == 0
     assert caplog.records[0].levelname == "ERROR"
     assert caplog.records[0].message == "Class MockOwner not found in the registry."
+
+    bus.shutdown()
 
 
 def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
@@ -163,6 +167,8 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     first_owner.sigFirstSignal.emit(5)
     second_owner.sigSecondSignal.emit(5)
 
+    bus.shutdown()
+
 
 def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
     """Test "register_signals" using the 'only' parameter."""
@@ -185,6 +191,8 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
 
     bus["MockOwner"]["sigSignalOne"].connect(callback)
     owner.sigSignalOne.emit(5)
+
+    bus.shutdown()
 
 
 def test_slot() -> None:
