@@ -1,14 +1,9 @@
 from __future__ import annotations
 
-import sys
-
-if sys.version_info >= (3, 11):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
-
 from abc import abstractmethod
 from typing import TYPE_CHECKING, runtime_checkable
+
+from typing_extensions import Protocol
 
 if TYPE_CHECKING:
     from typing import Any
@@ -63,7 +58,7 @@ class WidgetProtocol(Protocol):
                 self._virtual_bus.register_signals(self)
                 
                 # ... or only a selection of them
-                self._virtual_bus.register_signals(self, only=["sigMySignal", "sigMyOtherSignal"])
+                self._virtual_bus.register_signals(self, only=["signal"])
         """
         ...
 
@@ -83,18 +78,12 @@ class WidgetProtocol(Protocol):
 
             def connection_phase(self) -> None:
                 # you can connect signals from another controller to your local slots...
-                self._virtual_bus["OtherController"][
-                    "sigOtherControllerSignal"
-                ].connect(self._my_slot)
+                self._virtual_bus["OtherController"]["signal"].connect(self._my_slot)
 
                 # ... or to other signals ...
-                self._virtual_bus["OtherController"][
-                    "sigOtherControllerSignal"
-                ].connect(self.sigMySignal)
+                self._virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
 
                 # ... or connect to widgets
-                self._virtual_bus["OtherWidget"]["sigOtherWidgetSignal"].connect(
-                    self._my_slot
-                )
+                self._virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
         """
         ...

@@ -32,7 +32,9 @@ dependencies = [
     "attrs",
     "psygnal",
     "numpy>=1.24, <1.27",
-    "typing_extensions>=4.6.0; python_version < '3.11'",
+    "typing_extensions>=4.10.0",
+    "zmq",
+    "msgspec",
 ]
 
 [project.optional-dependencies]
@@ -55,7 +57,6 @@ dev = [
 ]
 
 [project.urls]
-
 bugs = "https://github.com/redsun-acquisition/sunflare/issues"
 changelog = "https://redsun-acquisition.github.io/sunflare/changelog/"
 homepage = "https://github.com/redsun-acquisition/sunflare"
@@ -80,7 +81,7 @@ include = [
 [tool.mypy]
 files = "src/**/*.py"
 exclude = ["docs", "tests", "build"]
-disable_error_code = ["import-untyped"]
+disable_error_code = ["import-untyped", "no-untyped-call"]
 pretty = true
 
 # Use strict defaults
@@ -98,7 +99,12 @@ source = ["sunflare"]
 omit = [
     "src/sunflare/tests/conftest.py",
     "src/sunflare/view/**",
-    "src/sunflare/controller/**",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests"
 ]
 
 # https://coverage.readthedocs.io/en/latest/config.html
@@ -115,14 +121,19 @@ exclude_lines = [
 
 [tool.ruff]
 target-version = "py39"
-extend-exclude = ["docs", "tests"]
+extend-exclude = ["docs"]
 
 [tool.ruff.format]
 docstring-code-format = true
 
 [tool.ruff.lint]
-extend-select = ["D"] # enable docstring checks
+extend-select = [
+    "D", # enable docstring checks
+    "I", # enable imports checks
+    "TC" # enable type check imports
+] 
 ignore = ["D100", "D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
+exclude = ["tests/**"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

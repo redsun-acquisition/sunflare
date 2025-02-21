@@ -1,18 +1,11 @@
 name: Publish documentation
 
 on:
-  push:
-    tags:
-      - "*"
-    branches:
-      - main
-    paths:
-      - "docs/**"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "docs/**"
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   publish-docs:

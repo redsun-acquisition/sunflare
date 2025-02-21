@@ -5,9 +5,8 @@
 In Python, parent classes can provide *abstract methods*, functions without actual executable code but instead serving as a customizable template.
 
 ```mermaid
-:config: {"theme": "base"}
+:config: { "theme": "neutral", "fontFamily": "Courier New" }
 :align: center
-%%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#fefefe', 'lineColor': '#aaa000', } } }%%
 
     classDiagram
         class Animal{

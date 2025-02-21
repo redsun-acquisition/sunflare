@@ -34,11 +34,10 @@ The ophyd license is reproduced below:
 
 from __future__ import annotations
 
+import logging
 import threading
 from collections import deque
 from typing import Callable, Optional
-
-from sunflare.log import get_logger
 
 from ._exceptions import InvalidState, StatusTimeoutError, WaitTimeoutError
 
@@ -103,7 +102,7 @@ class Status:
         self, *, timeout: Optional[float] = None, settle_time: Optional[float] = 0
     ):
         super().__init__()
-        self._logger = get_logger()
+        self._logger = logging.getLogger("redsun")
         self._tname = None
         self._lock = threading.RLock()
         self._event = threading.Event()  # state associated with done-ness

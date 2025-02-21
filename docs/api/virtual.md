@@ -2,8 +2,6 @@
 
 ```{eval-rst}
 .. automodule:: sunflare.virtual
-    :members: VirtualBus, slot
+    :members: VirtualBus, slot, Publisher, Subscriber, encode, decode
     :member-order: bysource
-    :exclude-members: Signal
-    :show-inheritance:
 ```

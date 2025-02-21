@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [unreleased]
+
+### Added
+
+- Implemented support for ZMQ messaging via `pyzmq`
+- Added initial support for `msgspec`
+- Added mixin classes for creating publisher/subscribers
+- Added mixin classes for `Signal`-enabled controllers
+- Added more documentation for the virtual module
+- Reorganized code in different modules to avoid circular imports
+- Split controller in different protocols
+- Added `ModelInfoProtocol` to deploy models from packages that don't have a strict dependency with Sunflare
+- Added more tests, both for existing and new code
+
 ## [0.3.5] - 11-02-2025
 
 ### Added
@@ -146,6 +160,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[unreleased] https://github.com/redsun-acquisition/sunflare/compare/v0.3.5...main
 [0.3.5]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.2...v0.3.3

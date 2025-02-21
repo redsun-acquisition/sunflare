@@ -4,9 +4,8 @@ The goal of Sunflare is to provide shared and recognizable programming patterns 
 As Redsun heavily leverages the concept of plugins, there is a need to provide a clear representation and a shared communication channel between the plugins that in the end build the desired application.
 
 ```mermaid
-:config: {"theme": "base"}
+:config: { "theme": "neutral" }
 :align: center
-%%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#fefefe', 'lineColor': '#aaa000', } } }%%
     graph TD
         Sunflare -->|builds| Plugins
         Sunflare -->|builds| Redsun

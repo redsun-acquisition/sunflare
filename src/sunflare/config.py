@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Sized, Union, TypeVar, Protocol, runtime_checkable
+from typing import Any, Protocol, Sized, TypeVar, Union, runtime_checkable
 
+import numpy as np
 import yaml
-from attrs import asdict, define, field, setters, validators, AttrsInstance
-
-from sunflare.log import get_logger
+from attrs import AttrsInstance, asdict, define, field, setters, validators
 
 T = TypeVar("T")
 
@@ -194,10 +194,11 @@ class ModelInfo:
         bool: "boolean",
         list: "array",
         tuple: "array",
+        np.ndarray: "array",
     }
 
     def __get_shape(self, value: Any) -> list[int]:
-        if isinstance(value, Sized):
+        if isinstance(value, Sized) and not isinstance(value, str):
             if hasattr(value, "shape"):
                 return list(getattr(value, "shape"))
             else:
@@ -374,7 +375,7 @@ class RedSunSessionInfo:
         ``yaml.YAMLError``
             If an error occurs while loading the file.
         """
-        logger = get_logger()
+        logger = logging.getLogger("redsun")
 
         path_obj = Path(path)
 
