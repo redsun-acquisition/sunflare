@@ -1,5 +1,6 @@
 {   
-    "name": "latest",
+    "name": "0.3.6 (latest)",
     "version": "0.3.6",
-    "url": "https://redsun-acquisition.github.io/sunflare/main"
+    "url": "https://redsun-acquisition.github.io/sunflare/main/",
+    "preferred": true
 }
