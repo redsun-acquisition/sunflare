@@ -7,17 +7,18 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import sys
+from importlib.metadata import version
 from sunflare import __version__
 from pathlib import Path
 
 sys.path.insert(0, str(Path("..", "src").resolve()))
 
-project = "SunFlare"
+project = "Sunflare"
 copyright = "2024, Jacopo Abramo"
 author = "Jacopo Abramo"
 
 
-version = __version__.split(".dev")[0]
+version_match = version("sunflare").split(".dev")[0]
 github_user = "redsun-acquisition"
 github_repo = "sunflare"
 
