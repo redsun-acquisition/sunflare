@@ -6,7 +6,6 @@ import threading
 from abc import abstractmethod
 from types import MappingProxyType
 from typing import (
-    Awaitable,
     Callable,
     Final,
     Iterable,
@@ -24,7 +23,6 @@ import zmq
 import zmq.asyncio
 import zmq.devices
 from psygnal import Signal, SignalInstance
-from typing_extensions import TypeIs
 
 from sunflare.log import Loggable
 
@@ -138,6 +136,15 @@ def slot(
         return decorator(func)  # Directly apply the decorator
 
 
+class ContextFactory:
+    ctx: Optional[zmq.Context[zmq.Socket[bytes]]] = None
+
+    def __call__(self) -> zmq.Context[zmq.Socket[bytes]]:
+        if self.ctx is None:
+            self.ctx = zmq.Context()
+        return self.ctx
+
+
 class VirtualBus(Loggable):
     """``VirtualBus``: signal router for data exchange.
 
@@ -176,8 +183,10 @@ class VirtualBus(Loggable):
             xpub = _INPROC_XPUB
         self._cache: dict[str, dict[str, SignalInstance]] = {}
         self._pub_sockets: WeakSet[zmq.Socket[bytes]] = WeakSet()
-        self._context = zmq.Context.instance()
+        self._factory = ContextFactory()
+        self._context = self._factory()
         self._forwarder = zmq.devices.ThreadDevice(zmq.FORWARDER, zmq.XSUB, zmq.XPUB)
+        self._forwarder.context_factory = self._factory
         self._forwarder.setsockopt_in(zmq.LINGER, 0)
         self._forwarder.setsockopt_out(zmq.LINGER, 0)
         self._forwarder.bind_in(xsub)
@@ -292,24 +301,10 @@ class VirtualBus(Loggable):
         self, topic: Iterable[str]
     ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
-    @overload
-    def connect_subscriber(
-        self, topic: str, is_async: bool
-    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]: ...
-
-    @overload
-    def connect_subscriber(
-        self, topic: Iterable[str], is_async: bool
-    ) -> tuple[zmq.asyncio.Socket, zmq.asyncio.Poller]: ...
-
     def connect_subscriber(
         self,
         topic: Union[str, Iterable[str]] = "",
-        is_async: Optional[bool] = False,
-    ) -> tuple[
-        Union[zmq.Socket[bytes], zmq.asyncio.Socket],
-        Union[zmq.Poller, zmq.asyncio.Poller],
-    ]:
+    ) -> tuple[zmq.Socket[bytes], zmq.Poller]:
         """
         Connect a subscriber to the virtual bus.
 
@@ -346,12 +341,6 @@ class VirtualBus(Loggable):
                 ["topic", "subtopic", "subsubtopic"]
             )
 
-
-
-        .. warning::
-
-            Async subscribers are not supported yet.
-
         Parameters
         ----------
         topic : ``str | Iterable[str]``, optional
@@ -367,28 +356,18 @@ class VirtualBus(Loggable):
         ``tuple[zmq.SyncSocket, zmq.Poller]``
             A tuple containing the subscriber socket and its poller.
 
-        Raises
-        ------
-        ``NotImplementedError``
-            If ``is_async`` is ``True``.
         """
-        poller: Union[zmq.Poller, zmq.asyncio.Poller]
-        socket: Union[zmq.Socket[bytes], zmq.asyncio.Socket]
-
-        if is_async:
-            raise NotImplementedError("Async subscriber not implemented yet.")
+        socket = self._context.socket(zmq.SUB)
+        socket.setsockopt(zmq.LINGER, 0)
+        poller = zmq.Poller()
+        socket.connect(self._map[zmq.SUB])
+        poller.register(socket, zmq.POLLIN)
+        if isinstance(topic, str):
+            socket.subscribe(topic)
         else:
-            socket = self._context.socket(zmq.SUB)
-            socket.setsockopt(zmq.LINGER, 0)
-            poller = zmq.Poller()
-            socket.connect(self._map[zmq.SUB])
-            poller.register(socket, zmq.POLLIN)
-            if isinstance(topic, str):
-                socket.subscribe(topic)
-            else:
-                final_topic = "/".join(topic)
-                socket.subscribe(final_topic)
-            return socket, poller
+            final_topic = "/".join(topic)
+            socket.subscribe(final_topic)
+        return socket, poller
 
     def connect_publisher(self) -> zmq.Socket[bytes]:
         """Connect a publisher to the virtual bus.
@@ -409,21 +388,6 @@ class VirtualBus(Loggable):
         socket.setsockopt(zmq.LINGER, 0)
         self._pub_sockets.add(socket)
         return socket
-
-
-def _isawaitable(ret: Union[T, Awaitable[T]]) -> TypeIs[Awaitable[T]]:
-    return hasattr(ret, "__await__")
-
-
-async def maybe_await(ret: Union[T, Awaitable[T]]) -> T:
-    """Await (possibly) for the return value.
-
-    Helper function to support both synchronous and asynchronous
-    return values from a method.
-    """
-    if _isawaitable(ret):
-        return await ret
-    return ret
 
 
 class Publisher:

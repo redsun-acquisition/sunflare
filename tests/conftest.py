@@ -20,16 +20,4 @@ def RE() -> RunEngine:
 
 @pytest.fixture(scope="function")
 def bus() -> Generator[VirtualBus, None, None]:
-    context = zmq.Context.instance()
-    context.term()
-    zmq.Context._instance = None
-
-    _bus = VirtualBus()
-
-    yield _bus
-
-    _bus.shutdown()
-
-    context = zmq.Context.instance()
-    context.term()
-    zmq.Context._instance = None
+    yield VirtualBus()
