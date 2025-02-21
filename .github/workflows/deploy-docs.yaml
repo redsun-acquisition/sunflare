@@ -40,4 +40,4 @@ jobs:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/_build/dirhtml
-          destination_dir: ${{github.ref_name}}
+          destination_dir: docs/${{github.ref_name}}
