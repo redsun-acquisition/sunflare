@@ -78,6 +78,9 @@ include = [
   "src/sunflare/docs",
 ]
 
+[tool.hatch.build.hooks.vcs]
+version-file = "_version.py"
+
 [tool.mypy]
 files = "src/**/*.py"
 exclude = ["docs", "tests", "build"]
