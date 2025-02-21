@@ -26,6 +26,7 @@ jobs:
       extras: "dev"
       pip-install-flags: --editable
       coverage-upload: artifact
+      pytest-args: "--log-cli-level=DEBUG"
     strategy:
       fail-fast: false
       matrix:
