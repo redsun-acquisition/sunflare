@@ -66,7 +66,7 @@ class RunEngine(BlueskyRunEngine):
     Suppressed features:
 
     - ``context_managers``: The context managers are forced to be an empty list to
-      avoid the use of the built-in ``SignalHandler`` context manager.
+        avoid the use of the built-in ``SignalHandler`` context manager.
         - The rationale is that the original implementation is meant for
           interactive usage (e.g., Jupyter notebooks, scripts) and not
           for applications relying on an event loop.

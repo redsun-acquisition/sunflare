@@ -7,6 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import sys
+from sunflare import __version__
 from pathlib import Path
 
 sys.path.insert(0, str(Path("..", "src").resolve()))
@@ -15,6 +16,8 @@ project = "SunFlare"
 copyright = "2024, Jacopo Abramo"
 author = "Jacopo Abramo"
 
+
+release = __version__.split(".dev")[0]
 github_user = "redsun-acquisition"
 github_repo = "sunflare"
 
@@ -48,7 +51,13 @@ html_static_path = ["_static"]
 html_context = {
     # this doesn't really matter;
     # adding it only for completion
-    "default_mode": "auto"
+    "default_mode": "auto",
+    "version": release,  # Sets the current version dynamically
+    "versions": [
+        ("latest", "/docs/latest/"),  # Development version
+        ("stable", "/docs/stable/"),  # The latest stable version (0.3.5)
+        ("0.3.5", "/docs/0.3.5/"),  # Explicitly tagged 0.3.5 version
+    ],
 }
 
 html_theme_options = {
@@ -59,7 +68,9 @@ html_theme_options = {
             "icon": "fa-brands fa-square-github",
             "type": "fontawesome",
         }
-    ]
+    ],
+    "switcher": {"json_url": "docs/_static/switcher.json", "version_match": release},
+    "navbar_start": ["navbar-logo", "version-switcher"],
 }
 
 mermaid_version = "11.4.0"

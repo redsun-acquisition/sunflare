@@ -116,3 +116,6 @@ wheelhouse/
 
 # excalidraw files
 *.excalidraw
+
+# local versioning doc folders
+docs_build/
