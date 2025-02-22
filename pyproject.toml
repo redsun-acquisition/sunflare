@@ -76,8 +76,8 @@ exclude = [
 [tool.hatch.build.targets.sdist]
 include = [
   "src/sunflare/*.py",
-  "src/sunflare/tests",
-  "src/sunflare/docs",
+  "src/sunflare/docs/**",
+  "tests/**",
 ]
 
 [tool.mypy]
