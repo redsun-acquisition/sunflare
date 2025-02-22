@@ -8,7 +8,6 @@
 
 import sys
 from importlib.metadata import version as get_version
-from sunflare import __version__
 from pathlib import Path
 
 sys.path.insert(0, str(Path("..", "src").resolve()))
