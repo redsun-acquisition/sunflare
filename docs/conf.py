@@ -67,7 +67,7 @@ html_theme_options = {
         "json_url": "https://redsun-acquisition.github.io/sunflare/main/_static/switcher.json",
         "version_match": version,
     },
-    "navbar_end": ["version-switcher"],
+    "navbar_start": ["navbar-logo", "version-switcher"],
 }
 
 mermaid_version = "11.4.0"
