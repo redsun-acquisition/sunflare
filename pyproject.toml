@@ -132,7 +132,8 @@ docstring-code-format = true
 extend-select = [
     "D", # enable docstring checks
     "I", # enable imports checks
-    "TC" # enable type check imports
+    "TC", # enable type check imports
+    "FA102", # force __future__ imports
 ] 
 ignore = ["D100", "D104"] # https://docs.astral.sh/ruff/rules/undocumented-public-package/
 exclude = ["tests/**"]
