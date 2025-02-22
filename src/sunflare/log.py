@@ -1,11 +1,3 @@
-"""
-Redsun logging module.
-
-In each Redsun application, only one logger is created.
-
-All classes inheriting the :class:`~sunflare.log.Loggable` class can log messages via the core logger.
-"""
-
 from __future__ import annotations
 
 import logging

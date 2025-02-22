@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from abc import abstractmethod
 from typing import (
+    TYPE_CHECKING,
     Callable,
     Generic,
     Iterable,
@@ -13,8 +16,10 @@ from typing import (
 from typing_extensions import Protocol
 
 from sunflare.config import ControllerInfo
-from sunflare.model import ModelProtocol
-from sunflare.virtual import VirtualBus
+
+if TYPE_CHECKING:
+    from sunflare.model import ModelProtocol
+    from sunflare.virtual import VirtualBus
 
 
 @runtime_checkable
