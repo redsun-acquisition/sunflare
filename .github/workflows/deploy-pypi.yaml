@@ -22,7 +22,8 @@ jobs:
           python-version: "3.x"
       - name: Install dependencies
         run: |
-          pip install -U pip hatchling
+          pipx install hatch
+          pip install -U pip hatchling hatch-vcs
       - name: Build a binary wheel and a source tarball
         run: hatch build
       - name: Store the distribution packages
