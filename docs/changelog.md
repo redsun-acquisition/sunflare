@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.4.1] - 23-02-2025
+
+### Added
+
+- Added support for `Mapping` types (i.e. `dict`) in `ModelInfo` methods (`read/describe_configuration`)
+- Added optional parameters for `read/describe_configuration`
+  - `read_configuration`: `timestamp` (i.e. use `time.time()` for a timestamp of the last reading time)
+  - `describe_configuration`: `source`, to specify the source of the configuration parameter
+
 ## [0.4.0] - 22-02-2025
 
 ### Added
@@ -160,6 +169,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.4.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.3...v0.3.4

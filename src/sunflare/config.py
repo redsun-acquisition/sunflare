@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Protocol, Sized, TypeVar, Union, runtime_checkable
+from typing import Any, Mapping, Protocol, Sized, TypeVar, Union, runtime_checkable
 
 import numpy as np
 import yaml
@@ -192,7 +192,9 @@ class ModelInfo:
         bool: "boolean",
         list: "array",
         tuple: "array",
+        dict: "array",
         np.ndarray: "array",
+        Mapping: "array",
     }
 
     def __get_shape(self, value: Any) -> list[int]:
@@ -203,8 +205,18 @@ class ModelInfo:
                 return [len(value)]
         return []
 
-    def read_configuration(self) -> dict[str, Any]:
+    def __get_type(self, value: T) -> str:
+        return self.__type_map[type(value)]
+
+    def read_configuration(self, timestamp: float = 0) -> dict[str, Any]:
         """Read the model information as a Bluesky configuration dictionary.
+
+        Parameters
+        ----------
+        timestamp : ``float``, optional
+            Timestamp of the configuration.
+            Use time.time() to get the current timestamp.
+            Defaults to 0.
 
         Returns
         -------
@@ -220,14 +232,20 @@ class ModelInfo:
         """
         return {
             **{
-                key: {"value": value, "timestamp": 0}
+                key: {"value": value, "timestamp": timestamp}
                 for key, value in asdict(self).items()
                 if key != "model_name"
             }
         }
 
-    def describe_configuration(self) -> dict[str, Any]:
+    def describe_configuration(self, source: str = "model_info") -> dict[str, Any]:
         """Describe the model information as a Bluesky configuration dictionary.
+
+        Parameters
+        ----------
+        source : ``str``, optional
+            Source of the configuration.
+            Defaults to ``model_info``.
 
         Returns
         -------
@@ -244,8 +262,8 @@ class ModelInfo:
         return {
             **{
                 key: {
-                    "source": "model_info",
-                    "dtype": self.__type_map[type(value)],
+                    "source": source,
+                    "dtype": self.__get_type(value),
                     "shape": self.__get_shape(value),
                 }
                 for key, value in asdict(self).items()
@@ -272,11 +290,11 @@ class ModelInfoProtocol(AttrsInstance, Protocol):
     plugin_name: str
     repository: str
 
-    def read_configuration(self) -> dict[str, Any]:
+    def read_configuration(self, timestamp: float) -> dict[str, Any]:
         """See :meth:`sunflare.config.ModelInfo.read_configuration`."""
         ...
 
-    def describe_configuration(self) -> dict[str, Any]:
+    def describe_configuration(self, source: str) -> dict[str, Any]:
         """See :meth:`sunflare.config.ModelInfo.describe_configuration`."""
         ...
 
