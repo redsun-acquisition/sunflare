@@ -12,7 +12,9 @@
 This project is currently under active development and it may (and most likely will) receive breaking changes. Use at your own risk.
 ```
 
-Sunflare is a separate package used to build both Redsun and its plugins.
+Sunflare is a Software Development Kit (SDK) which provides common, reusable components for building plugins which can interact with [Redsun].
+
+The aim is to provide reusable patterns in developing software applications for scientific device orchestration leveraging the [Bluesky] hardware interface and data model.
 
 ## Contents
 
@@ -32,3 +34,6 @@ changelog
 - {ref}`genindex`
 - {ref}`modindex`
 - {ref}`search`
+
+[redsun]: https://redsun-acquisition.github.io/redsun/
+[bluesky]: https://blueskyproject.io/bluesky/main/index.html

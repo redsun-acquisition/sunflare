@@ -11,11 +11,12 @@
 > [!WARNING]
 > This project is still in alpha stage and very unstable. Use at your own risk.
 
-Sunflare is an Software Development Kit (SDK) which provides common, reusable components for building plugins which can interact with [Redsun].
+Sunflare is a Software Development Kit (SDK) which provides common, reusable components for building plugins which can interact with [Redsun].
 
-The aim is to provide reusable patterns in developing software applications for scientific device orchestration leveraging Bluesky hardware interface and data model.
+The aim is to provide reusable patterns in developing software applications for scientific device orchestration leveraging the [Bluesky] hardware interface and data model.
 
 For more information, see the [documentation].
 
 [redsun]: https://redsun-acquisition.github.io/redsun/
 [documentation]: https://redsun-acquisition.github.io/sunflare/
+[bluesky]: https://blueskyproject.io/bluesky/main/index.html
