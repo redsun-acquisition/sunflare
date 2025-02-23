@@ -185,6 +185,18 @@ class ModelInfo:
         default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
     )
 
+    __type_map = {
+        str: "string",
+        float: "number",
+        int: "integer",
+        bool: "boolean",
+        list: "array",
+        tuple: "array",
+        dict: "array",
+        np.ndarray: "array",
+        Mapping: "array",
+    }
+
     def __get_shape(self, value: Any) -> list[int]:
         if isinstance(value, Sized) and not isinstance(value, str):
             if hasattr(value, "shape"):
@@ -194,18 +206,7 @@ class ModelInfo:
         return []
 
     def __get_type(self, value: T) -> str:
-        if isinstance(value, str):
-            return "string"
-        if isinstance(value, float):
-            return "number"
-        if isinstance(value, int):
-            return "integer"
-        if isinstance(value, bool):
-            return "boolean"
-        if isinstance(value, (list, tuple, Mapping, np.ndarray)):
-            return "array"
-        else:
-            raise ValueError(f"Unsupported type {type(value)}")
+        return self.__type_map[type(value)]
 
     def read_configuration(self, timestamp: float = 0) -> dict[str, Any]:
         """Read the model information as a Bluesky configuration dictionary.
