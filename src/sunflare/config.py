@@ -204,6 +204,8 @@ class ModelInfo:
             return "boolean"
         if isinstance(value, (list, tuple, Mapping, np.ndarray)):
             return "array"
+        else:
+            raise ValueError(f"Unsupported type {type(value)}")
 
     def read_configuration(self, timestamp: float = 0) -> dict[str, Any]:
         """Read the model information as a Bluesky configuration dictionary.
