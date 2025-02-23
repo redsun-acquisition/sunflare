@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Protocol, Sized, TypeVar, Union, runtime_checkable
+from typing import Any, Mapping, Protocol, Sized, TypeVar, Union, runtime_checkable
 
 import numpy as np
 import yaml
@@ -185,16 +185,6 @@ class ModelInfo:
         default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
     )
 
-    __type_map = {
-        str: "string",
-        float: "number",
-        int: "integer",
-        bool: "boolean",
-        list: "array",
-        tuple: "array",
-        np.ndarray: "array",
-    }
-
     def __get_shape(self, value: Any) -> list[int]:
         if isinstance(value, Sized) and not isinstance(value, str):
             if hasattr(value, "shape"):
@@ -202,6 +192,18 @@ class ModelInfo:
             else:
                 return [len(value)]
         return []
+
+    def __get_type(self, value: T) -> str:
+        if isinstance(value, str):
+            return "string"
+        if isinstance(value, float):
+            return "number"
+        if isinstance(value, int):
+            return "integer"
+        if isinstance(value, bool):
+            return "boolean"
+        if isinstance(value, (list, tuple, Mapping, np.ndarray)):
+            return "array"
 
     def read_configuration(self) -> dict[str, Any]:
         """Read the model information as a Bluesky configuration dictionary.
@@ -245,7 +247,7 @@ class ModelInfo:
             **{
                 key: {
                     "source": "model_info",
-                    "dtype": self.__type_map[type(value)],
+                    "dtype": self.__get_type(value),
                     "shape": self.__get_shape(value),
                 }
                 for key, value in asdict(self).items()

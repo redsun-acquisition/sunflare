@@ -289,6 +289,7 @@ def test_model_info_descriptor():
             default=np.array([1, 2, 3, 4]), converter=np.array
         )
         tuple_param: tuple[int, int] = (1, 2)
+        dict_param: dict[str, int] = {"a": 1, "b": 2}
 
     info = MyModelInfo(model_name="MyModel")
 
@@ -340,6 +341,11 @@ def test_model_info_descriptor():
             "shape": [4],
         },
         "tuple_param": {
+            "source": "model_info",
+            "dtype": "array",
+            "shape": [2],
+        },
+        "dict_param": {
             "source": "model_info",
             "dtype": "array",
             "shape": [2],
