@@ -34,19 +34,27 @@ class ModelProtocol(Protocol):
     def __init__(self, name: str, model_info: ModelInfo) -> None: ...
 
     @abstractmethod
-    def configure(self, name: str, value: Any, /, **kwargs: Any) -> None:
+    def configure(
+        self, *args: Any, **kwargs: Any
+    ) -> SyncOrAsync[tuple[Reading[Any], Reading[Any]]]:
         """Configure the model.
 
         The protocol allows to set new values for slow-changing parameters.
 
+        The method can be normal or `async`.
+
         Parameters
         ----------
-        name : ``str``
-            The name of the configuration parameter to set.
-        value : ``Any``
-            The value to set for the configuration parameter.
-        kwargs : ``Any``
-            Additional keyword arguments.
+        *args
+            Positional arguments.
+        **kwargs
+            Keyword arguments.
+
+        Returns
+        -------
+        tuple[:class:`~bluesky.protocols.Reading`, :class:`~bluesky.protocols.Reading`]
+            A two-element tuple: the first element is the old configuration value;
+            the second element is the new configuration value set by the model.
         """
         ...
 
@@ -55,6 +63,8 @@ class ModelProtocol(Protocol):
         """Read the model configuration.
 
         Provides a dictionary with the current values of the model configuration.
+
+        The method can be normal or `async`.
 
         Returns
         -------
@@ -68,6 +78,8 @@ class ModelProtocol(Protocol):
         """Describe the model configuration.
 
         Provides a description of each field of the model configuration.
+
+        The method can be normal or `async`.
 
         Returns
         -------

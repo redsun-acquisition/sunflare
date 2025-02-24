@@ -106,7 +106,7 @@ class MockDetector(ReadableModel):
     def describe_configuration(self) -> dict[str, DataKey]:
         raise NotImplementedError
 
-    def configure(self, name: str, value: Any, /, **kwargs: Any) -> None:
+    def configure(self, *args: Any, **kwargs: Any) -> None:
         raise NotImplementedError
 
     def shutdown(self) -> None: ...
@@ -140,7 +140,7 @@ class MockMotor(SettableModel):
     def describe_configuration(self) -> dict[str, DataKey]:
         raise NotImplementedError
 
-    def configure(self, name: str, value: Any, /, **kwargs: Any) -> None:
+    def configure(self, *args: Any, **kwargs: Any) -> None:
         raise NotImplementedError
 
     def shutdown(self) -> None: ...

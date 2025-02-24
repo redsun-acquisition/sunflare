@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.4.2] - 24-02-2025
+
+### Changed
+
+- Changed `ModelProtocol.configure` signature
+  - Previous signature was not consistent with the command issued by the `RunEngine`
+
 ## [0.4.1] - 23-02-2025
 
 ### Added
