@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from bluesky.protocols import Reading, SyncOrAsync
     from event_model.documents.event_descriptor import DataKey
 
-    from sunflare.config import ModelInfo
+    from sunflare.config import ModelInfoProtocol
 
 __all__ = ["ModelProtocol"]
 
@@ -31,7 +31,7 @@ class ModelProtocol(Protocol):
     """
 
     @abstractmethod
-    def __init__(self, name: str, model_info: ModelInfo) -> None: ...
+    def __init__(self, name: str, model_info: ModelInfoProtocol) -> None: ...
 
     @abstractmethod
     def configure(
@@ -101,7 +101,7 @@ class ModelProtocol(Protocol):
     def name(self) -> str:
         """Model identifier.
 
-        Used to populate object_keys in the Event :class:`~event_model.DataKey`.
+        Used to populate object_keys in :class:`~event_model.DataKey`.
 
         See the following link for more information:
         https://blueskyproject.io/event-model/main/explanations/event-descriptors.html
@@ -120,7 +120,7 @@ class ModelProtocol(Protocol):
 
     @property
     @abstractmethod
-    def model_info(self) -> ModelInfo:
+    def model_info(self) -> ModelInfoProtocol:
         """The associated model information.
 
         It can return a subclass of :class:`~sunflare.config.ModelInfo`.

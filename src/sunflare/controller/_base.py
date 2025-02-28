@@ -15,7 +15,7 @@ from typing import (
 
 from typing_extensions import Protocol
 
-from sunflare.config import ControllerInfo
+from sunflare.config import ControllerInfoProtocol
 
 if TYPE_CHECKING:
     from sunflare.model import ModelProtocol
@@ -46,13 +46,13 @@ class ControllerProtocol(Protocol):
         Reference to the virtual bus.
     """
 
-    ctrl_info: ControllerInfo
+    ctrl_info: ControllerInfoProtocol
     virtual_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
-        ctrl_info: ControllerInfo,
+        ctrl_info: ControllerInfoProtocol,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
     ) -> None: ...
@@ -133,7 +133,7 @@ class HasConnection(Protocol):
         ...
 
 
-CI = TypeVar("CI", bound=ControllerInfo)
+CI = TypeVar("CI", bound=ControllerInfoProtocol)
 
 
 class Connection(NamedTuple):
