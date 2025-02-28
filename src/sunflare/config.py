@@ -298,6 +298,39 @@ class ModelInfoProtocol(AttrsInstance, Protocol):
         ...
 
 
+@runtime_checkable
+class ControllerInfoProtocol(Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.ControllerInfo`.
+
+    .. note::
+
+        This protocol is currently used only for type checking purposes.
+        within the Redsun application. In the future
+        we might be able to expose this for usage in
+        external packages.
+    """
+
+    plugin_name: str
+    plugin_id: str
+
+
+@runtime_checkable
+class WidgetInfoProtocol(Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.WidgetInfo`.
+
+    .. note::
+
+        This protocol is currently used only for type checking purposes.
+        within the Redsun application. In the future
+        we might be able to expose this for usage in
+        external packages.
+    """
+
+    plugin_name: str
+    plugin_id: str
+    position: WidgetPositionTypes
+
+
 # helper private functions for type conversion
 def _convert_engine_type(
     x: Union[str, AcquisitionEngineTypes],
@@ -358,9 +391,9 @@ class RedSunSessionInfo:
         validator=validators.in_(FrontendTypes),
         on_setattr=setters.frozen,
     )
-    models: dict[str, ModelInfo] = field(factory=dict)
-    controllers: dict[str, ControllerInfo] = field(factory=dict)
-    widgets: dict[str, WidgetInfo] = field(factory=dict)
+    models: dict[str, ModelInfoProtocol] = field(factory=dict)
+    controllers: dict[str, ControllerInfoProtocol] = field(factory=dict)
+    widgets: dict[str, WidgetInfoProtocol] = field(factory=dict)
 
     @staticmethod
     def load_yaml(path: str) -> dict[str, Any]:
