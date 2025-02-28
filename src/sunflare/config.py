@@ -89,8 +89,65 @@ def _convert_widget_position_type(
     return x if isinstance(x, WidgetPositionTypes) else WidgetPositionTypes(x)
 
 
+@runtime_checkable
+class ModelInfoProtocol(AttrsInstance, Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.ModelInfo`.
+
+    This protocol allows to implement the ``ModelInfo`` class
+    in packages that do not depend on ``sunflare`` directly.
+
+    The only required dependency is `attrs`_.
+
+    _attrs: https://www.attrs.org/en/stable/
+    """
+
+    plugin_name: str
+    plugin_id: str
+
+    def read_configuration(self, timestamp: float) -> dict[str, Any]:
+        """See :meth:`sunflare.config.ModelInfo.read_configuration`."""
+        ...
+
+    def describe_configuration(self, source: str) -> dict[str, Any]:
+        """See :meth:`sunflare.config.ModelInfo.describe_configuration`."""
+        ...
+
+
+@runtime_checkable
+class ControllerInfoProtocol(Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.ControllerInfo`.
+
+    .. note::
+
+        This protocol is currently used only for type checking purposes.
+        within the Redsun application. In the future
+        we might be able to expose this for usage in
+        external packages.
+    """
+
+    plugin_name: str
+    plugin_id: str
+
+
+@runtime_checkable
+class WidgetInfoProtocol(Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.WidgetInfo`.
+
+    .. note::
+
+        This protocol is currently used only for type checking purposes.
+        within the Redsun application. In the future
+        we might be able to expose this for usage in
+        external packages.
+    """
+
+    plugin_name: str
+    plugin_id: str
+    position: WidgetPositionTypes
+
+
 @define(kw_only=True)
-class WidgetInfo:
+class WidgetInfo(WidgetInfoProtocol):
     """Widget information model.
 
     All widget information models inherit from this class.
@@ -124,7 +181,7 @@ class WidgetInfo:
 
 
 @define(kw_only=True)
-class ControllerInfo:
+class ControllerInfo(ControllerInfoProtocol):
     """Controller information model.
 
     All controller information models inherit from this class.
@@ -149,7 +206,7 @@ class ControllerInfo:
 
 
 @define(kw_only=True)
-class ModelInfo:
+class ModelInfo(ModelInfoProtocol):
     """Base model for device information.
 
     All device information models inherit from this class.
@@ -272,63 +329,6 @@ class ModelInfo:
                 if key not in ["plugin_name", "plugin_id"]
             }
         }
-
-
-@runtime_checkable
-class ModelInfoProtocol(AttrsInstance, Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.ModelInfo`.
-
-    This protocol allows to implement the ``ModelInfo`` class
-    in packages that do not depend on ``sunflare`` directly.
-
-    The only required dependency is `attrs`_.
-
-    _attrs: https://www.attrs.org/en/stable/
-    """
-
-    plugin_name: str
-    plugin_id: str
-
-    def read_configuration(self, timestamp: float) -> dict[str, Any]:
-        """See :meth:`sunflare.config.ModelInfo.read_configuration`."""
-        ...
-
-    def describe_configuration(self, source: str) -> dict[str, Any]:
-        """See :meth:`sunflare.config.ModelInfo.describe_configuration`."""
-        ...
-
-
-@runtime_checkable
-class ControllerInfoProtocol(Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.ControllerInfo`.
-
-    .. note::
-
-        This protocol is currently used only for type checking purposes.
-        within the Redsun application. In the future
-        we might be able to expose this for usage in
-        external packages.
-    """
-
-    plugin_name: str
-    plugin_id: str
-
-
-@runtime_checkable
-class WidgetInfoProtocol(Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.WidgetInfo`.
-
-    .. note::
-
-        This protocol is currently used only for type checking purposes.
-        within the Redsun application. In the future
-        we might be able to expose this for usage in
-        external packages.
-    """
-
-    plugin_name: str
-    plugin_id: str
-    position: WidgetPositionTypes
 
 
 # helper private functions for type conversion
