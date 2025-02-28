@@ -288,8 +288,6 @@ class ModelInfoProtocol(AttrsInstance, Protocol):
 
     plugin_name: str
     plugin_id: str
-    vendor: str
-    serial_number: str
 
     def read_configuration(self, timestamp: float) -> dict[str, Any]:
         """See :meth:`sunflare.config.ModelInfo.read_configuration`."""
