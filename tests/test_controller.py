@@ -33,29 +33,25 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
         controller = MockController(cast(MockControllerInfo, ctrl), bus)
         assert controller.info == ctrl
         assert len(controller.plans) == 2
-        assert controller.info.plugin_name == "N/A"
-        assert controller.info.repository == "N/A"
+        assert controller.info.plugin_name == "mocks"
+        assert controller.info.plugin_id == "mock_controller"
 
     bus.shutdown()
 
 
 def test_base_controller(bus: VirtualBus) -> None:
-    class TestInfo(ControllerInfo):
-        def __init__(self, **kwargs) -> None:
-            super().__init__(**kwargs)
-
-    class TestController(Controller[TestInfo]):
+    class TestController(Controller[Controller]):
         # changing the name of __init__ parameters does not
         # affect the protocol behavior
         def __init__(
             self,
-            info: TestInfo,
+            info: ControllerInfo,
             test_models: Mapping[str, ModelProtocol],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
 
-    ctrl_info = TestInfo()
+    ctrl_info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(ctrl_info, {}, bus)
 
     assert isinstance(ctrl, ControllerProtocol)
@@ -70,22 +66,18 @@ def test_sender_controller(bus: VirtualBus) -> None:
         nonlocal cnt
         cnt += 1
 
-    class TestInfo(ControllerInfo):
-        def __init__(self, **kwargs) -> None:
-            super().__init__(**kwargs)
-
-    class TestController(Sender[TestInfo]):
+    class TestController(Sender[ControllerInfo]):
         dummySignal = Signal()
 
         def __init__(
             self,
-            info: TestInfo,
+            info: ControllerInfo,
             test_models: Mapping[str, ModelProtocol],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
 
-    info = TestInfo()
+    info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(info, {}, bus)
 
     assert isinstance(ctrl, ControllerProtocol)
@@ -109,25 +101,21 @@ def test_sender_controller(bus: VirtualBus) -> None:
 def test_receiver_controller(bus: VirtualBus) -> None:
     cnt = 0
 
-    class TestInfo(ControllerInfo):
-        def __init__(self, **kwargs) -> None:
-            super().__init__(**kwargs)
-
-    class DummySender(Sender[TestInfo]):
+    class DummySender(Sender[ControllerInfo]):
         dummySignal = Signal()
 
         def __init__(
             self,
-            info: TestInfo,
+            info: ControllerInfo,
             test_models: Mapping[str, ModelProtocol],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
 
-    class TestController(Receiver[TestInfo]):
+    class TestController(Receiver[ControllerInfo]):
         def __init__(
             self,
-            info: TestInfo,
+            info: ControllerInfo,
             test_models: Mapping[str, ModelProtocol],
             bus: VirtualBus,
         ) -> None:
@@ -140,7 +128,7 @@ def test_receiver_controller(bus: VirtualBus) -> None:
             nonlocal cnt
             cnt += 1
 
-    info = TestInfo()
+    info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     sender = DummySender(info, {}, bus)
     ctrl = TestController(info, {}, bus)
 
@@ -164,16 +152,12 @@ def test_receiver_controller(bus: VirtualBus) -> None:
 def test_sender_receiver(bus: VirtualBus) -> None:
     cnt = 0
 
-    class TestInfo(ControllerInfo):
-        def __init__(self, **kwargs) -> None:
-            super().__init__(**kwargs)
-
-    class TestController(SenderReceiver[TestInfo]):
+    class TestController(SenderReceiver[ControllerInfo]):
         dummySignal = Signal()
 
         def __init__(
             self,
-            info: TestInfo,
+            info: ControllerInfo,
             test_models: Mapping[str, ModelProtocol],
             bus: VirtualBus,
         ) -> None:
@@ -190,7 +174,7 @@ def test_sender_receiver(bus: VirtualBus) -> None:
             nonlocal cnt
             cnt += 1
 
-    info = TestInfo()
+    info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(info, {}, bus)
 
     assert isinstance(ctrl, ControllerProtocol)

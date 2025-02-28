@@ -2,6 +2,8 @@ engine: bluesky
 frontend: pyqt
 widgets:
   MockWidget:
+    plugin_name: mocks
+    plugin_id: mock_widget
     gui_int_param: 100
     gui_choices:
       - 'a'

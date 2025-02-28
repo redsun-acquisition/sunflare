@@ -100,7 +100,10 @@ class WidgetInfo:
     plugin_name : ``str``, optional
         Widget plugin name.
         Equivalent to the name of the PyPI/Conda package.
-        Defaults to ``N/A``.
+    plugin_id : ``str``, optional
+        Widget plugin ID.
+        Associated with the exposed entry
+        point in the plugin manifest.
     repository : ``str``, optional
         Widget repository URL. Defaults to ``N/A``.
     position : ``WidgetPositionTypes``
@@ -108,10 +111,10 @@ class WidgetInfo:
     """
 
     plugin_name: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+        validator=validators.instance_of(str), on_setattr=setters.frozen
     )
-    repository: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    plugin_id: str = field(
+        validator=validators.instance_of(str), on_setattr=setters.frozen
     )
     position: WidgetPositionTypes = field(
         converter=_convert_widget_position_type,
@@ -131,16 +134,17 @@ class ControllerInfo:
     plugin_name : ``str``, optional
         Controller plugin name.
         Equivalent to the name of the PyPI/Conda package.
-        Defaults to ``N/A``.
-    repository : ``str``, optional
-        Controller repository URL. Defaults to ``N/A``.
+    plugin_id : ``str``, optional
+        Controller plugin ID.
+        Associated with the exposed entry point
+        in the plugin manifest.
     """
 
     plugin_name: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+        validator=validators.instance_of(str), on_setattr=setters.frozen
     )
-    repository: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    plugin_id: str = field(
+        validator=validators.instance_of(str), on_setattr=setters.frozen
     )
 
 
@@ -152,37 +156,35 @@ class ModelInfo:
 
     Attributes
     ----------
-    model_name : ``str``
-        Device model name.
-    vendor : ``str``, optional
-        Detector vendor.
-    serial_number : ``str``, optional
-        Detector serial number.
     plugin_name : ``str``, optional
         Model plugin name.
         Equivalent to the name of the PyPI/Conda package.
+    plugin_id : ``str``, optional
+        Model plugin ID.
+        Associated with the exposed entry point
+        in the plugin manifest.
+    vendor : ``str``, optional
+        Detector vendor.
         Defaults to ``N/A``.
-    repository : ``str``, optional
-        Model repository URL. Defaults to ``N/A``.
+    family : ``str``, optional
+        Detector family.
+        Defaults to ``N/A``.
     """
 
-    model_name: str = field(
+    plugin_name: str = field(
         validator=validators.instance_of(str), on_setattr=setters.frozen
     )
-    vendor: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+    plugin_id: str = field(
+        validator=validators.instance_of(str), on_setattr=setters.frozen
+    )
+    vendor: str = field(default="N/A", validator=validators.instance_of(str))
+    family: str = field(
+        default="N/A",
+        validator=validators.instance_of(str),
     )
     serial_number: str = field(
         default="N/A",
-        converter=str,
-        on_setattr=setters.frozen,
-    )
-
-    plugin_name: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
-    )
-    repository: str = field(
-        default="N/A", validator=validators.instance_of(str), on_setattr=setters.frozen
+        validator=validators.instance_of(str),
     )
 
     __type_map = {
@@ -234,7 +236,7 @@ class ModelInfo:
             **{
                 key: {"value": value, "timestamp": timestamp}
                 for key, value in asdict(self).items()
-                if key != "model_name"
+                if key not in ["plugin_name", "plugin_id"]
             }
         }
 
@@ -267,7 +269,7 @@ class ModelInfo:
                     "shape": self.__get_shape(value),
                 }
                 for key, value in asdict(self).items()
-                if key != "model_name"
+                if key not in ["plugin_name", "plugin_id"]
             }
         }
 
@@ -284,11 +286,10 @@ class ModelInfoProtocol(AttrsInstance, Protocol):
     _attrs: https://www.attrs.org/en/stable/
     """
 
-    model_name: str
+    plugin_name: str
+    plugin_id: str
     vendor: str
     serial_number: str
-    plugin_name: str
-    repository: str
 
     def read_configuration(self, timestamp: float) -> dict[str, Any]:
         """See :meth:`sunflare.config.ModelInfo.read_configuration`."""

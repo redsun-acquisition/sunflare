@@ -14,11 +14,13 @@ def test_detector_model(config_path: str) -> None:
     """Test the detector model info."""
     truth_dict: dict[str, Any] = {
         "First mock detector": {
-            "model_name": "MockDetectorModel",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_detector",
             "sensor_size": [10, 10],
         },
         "Second mock detector": {
-            "model_name": "MockDetectorModel",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_detector",
             "sensor_size": [10, 10],
             "exposure_egu": "s",
         },
@@ -51,7 +53,8 @@ def test_detector_model(config_path: str) -> None:
 def test_broken_detector_model() -> None:
     """Test the detector model info."""
     test_config: dict[str, Any] = {
-        "model_name": "MockDetectorModel",
+        "plugin_name": "mocks",
+        "plugin_id": "mock_detector",
         "sensor_size": [10, 10, 100],
         "pixel_size": [1, 1, 1],
     }
@@ -60,7 +63,8 @@ def test_broken_detector_model() -> None:
         MockDetectorInfo(**test_config)
 
     test_config = {
-        "model_name": "MockDetectorModel",
+        "plugin_name": "mocks",
+        "plugin_id": "mock_detector",
         "sensor_size": [0, 10],
         "pixel_size": [1, 1, 1],
     }
@@ -69,7 +73,8 @@ def test_broken_detector_model() -> None:
         MockDetectorInfo(**test_config)
 
     test_config = {
-        "model_name": "MockDetectorModel",
+        "plugin_name": "mocks",
+        "plugin_id": "mock_detector",
         "sensor_size": [10, 10],
         "pixel_size": [1, 1],
     }
@@ -78,7 +83,8 @@ def test_broken_detector_model() -> None:
         MockDetectorInfo(**test_config)
 
     test_config = {
-        "model_name": "MockDetectorModel",
+        "plugin_name": "mocks",
+        "plugin_id": "mock_detector",
         "sensor_size": [10, 10],
         "pixel_size": [0, 1, 1],
     }
@@ -91,11 +97,13 @@ def test_motor_model(config_path: str) -> None:
     """Test the motor model info."""
     truth_dict: dict[str, Any] = {
         "Single axis motor": {
-            "model_name": "MockMotorModel",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_motor",
             "axes": ["X"],
         },
         "Double axis motor": {
-            "model_name": "MockMotorModel",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_motor",
             "axes": ["X", "Y"],
             "step_egu": "mm",
         },
@@ -124,17 +132,25 @@ def test_motor_model(config_path: str) -> None:
 
 
 def test_broken_motor_model() -> None:
-    test_config: dict[str, Any] = {"model_name": "MockMotor", "axes": [1, 2]}
+    test_config: dict[str, Any] = {
+        "plugin_name": "mocks",
+        "plugin_id": "mock_motor",
+        "axes": [1, 2],
+    }
 
     with pytest.raises(ValueError):
         MockMotorInfo(**test_config)
 
-    test_config = {"model_name": "MockMotor", "axes": ["x", "a", "b"]}
+    test_config = {
+        "plugin_name": "mocks",
+        "plugin_id": "mock_motor",
+        "axes": ["x", "a", "b"],
+    }
 
     with pytest.raises(ValueError):
         MockMotorInfo(**test_config)
 
-    test_config = {"model_name": "MockMotor", "axes": []}
+    test_config = {"plugin_name": "mocks", "plugin_id": "mock_motor", "axes": []}
 
     with pytest.raises(ValueError):
         MockMotorInfo(**test_config)
@@ -144,20 +160,24 @@ def test_multi_model(config_path: str) -> None:
     """Test the multi model info."""
     truth_dict: dict[str, Any] = {
         "First mock detector": {
-            "model_name": "MockDetector",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_detector",
             "sensor_size": [10, 10],
         },
         "Second mock detector": {
-            "model_name": "MockDetector",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_detector",
             "sensor_size": [10, 10],
             "exposure_egu": "s",
         },
         "Single axis motor": {
-            "model_name": "MockMotor",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_motor",
             "axes": ["X"],
         },
         "Double axis motor": {
-            "model_name": "MockMotor",
+            "plugin_name": "mocks",
+            "plugin_id": "mock_motor",
             "axes": ["X", "Y"],
             "step_egu": "mm",
         },
@@ -166,19 +186,19 @@ def test_multi_model(config_path: str) -> None:
     truth_config_detectors: dict[str, MockDetectorInfo] = {
         name: MockDetectorInfo(**cfg_info)
         for name, cfg_info in truth_dict.items()
-        if "Detector" in cfg_info["model_name"]
+        if "mock_detector" in cfg_info["plugin_id"]
     }
 
     truth_configs_motors: dict[str, MockMotorInfo] = {
         name: MockMotorInfo(**cfg_info)
         for name, cfg_info in truth_dict.items()
-        if "Motor" in cfg_info["model_name"]
+        if "mock_motor" in cfg_info["plugin_id"]
     }
 
     config_file = os.path.join(config_path, "multi_model_instance.yaml")
     config_dict = RedSunSessionInfo.load_yaml(config_file)
     for name, cfg_info in config_dict["models"].items():
-        if "Detector" in cfg_info["model_name"]:
+        if "mock_detector" in cfg_info["plugin_id"]:
             config_dict["models"][name] = MockDetectorInfo(**cfg_info)
         else:
             config_dict["models"][name] = MockMotorInfo(**cfg_info)
@@ -198,7 +218,8 @@ def test_multi_model(config_path: str) -> None:
             doc = detector.model_info.read_configuration()
             bs_config = {key: doc[key]["value"] for key in doc}
             truth = asdict(det_cfg_info)
-            del truth["model_name"]
+            truth.pop("plugin_name")
+            truth.pop("plugin_id")
             assert bs_config == truth
 
     for (name, mot_info), (truth_name, mot_cfg_info) in zip(
@@ -212,5 +233,6 @@ def test_multi_model(config_path: str) -> None:
             doc = motor.model_info.read_configuration()
             bs_config = {key: doc[key]["value"] for key in doc}
             truth = asdict(det_cfg_info)
-            del truth["model_name"]
+            truth.pop("plugin_name")
+            truth.pop("plugin_id")
             assert bs_config == truth

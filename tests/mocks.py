@@ -159,14 +159,15 @@ class MockMotor(SettableModel):
 
 
 mock_detector_info = MockDetectorInfo(
-    model_name="MockDetectorModel",
+    plugin_name="mocks",
+    plugin_id="mock_detector",
     sensor_size=(1024, 1024),
     exposure_egu="ms",
     pixel_size=(1, 1, 1),
 )
 
 mock_motor_info = MockMotorInfo(
-    model_name="MockMotorModel", step_egu="μm", axes=["X", "Y", "Z"]
+    plugin_name="mocks", plugin_id="mock_motor", step_egu="μm", axes=["X", "Y", "Z"]
 )
 
 mock_motor = MockMotor("motor", mock_motor_info)
