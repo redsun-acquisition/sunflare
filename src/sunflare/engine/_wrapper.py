@@ -58,21 +58,24 @@ class RunEngine(BlueskyRunEngine):
 
     - ``socket``: A ZMQ socket to send messages to a remote endpoint;
     - ``socket_prefix``: A prefix to be used in the ZMQ topic when sending messages.
-    - When launching a plan, the ``RunEngine``, the ``__call__`` method returns a ``Future`` object.
-        - This allows to set a callback on the future to retrieve the result of the execution.
-        - Alternatively, the result can be accessed directly from the ``result`` attribute
-          when the future is done.
+
+    When launching a plan, the ``RunEngine``, the ``__call__`` method returns a ``Future`` object.
+    This allows to set a callback on the future to retrieve the result of the execution.
+    Alternatively, the result can be accessed directly from the ``result`` attribute
+    when the future is done.
 
     Suppressed features:
 
     - ``context_managers``: The context managers are forced to be an empty list to
-        avoid the use of the built-in ``SignalHandler`` context manager.
-        - The rationale is that the original implementation is meant for
-          interactive usage (e.g., Jupyter notebooks, scripts) and not
-          for applications relying on an event loop.
+      avoid the use of the built-in ``SignalHandler`` context manager.
+
+    The rationale is that the original implementation is meant for
+    interactive usage (e.g., Jupyter notebooks, scripts) and not
+    for applications relying on an event loop.
+
     - ``pause_msg``: Overridden to be an empty string.
     - ``during_task``: Overridden to ``DuringTask``, so the ``RunEngine``
-        does not interact with any possible event loop in the main thread.
+      does not interact with any possible event loop in the main thread.
 
     For the original class initializer signature, refer to the :class:`~bluesky.run_engine.RunEngine` documentation.
 
@@ -111,6 +114,18 @@ class RunEngine(BlueskyRunEngine):
             self._run_in_executor = self.__run_in_executor
 
     def emit_sync(self, name: DocumentNames, doc: dict[str, Any]) -> None:
+        """Emit a document synchronously.
+
+        Reimplemented to send documents also through a ZMQ socket.
+
+        .. warning::
+
+            This method is not meant to be used directly.
+            The ``RunEngine`` will emit documents automatically
+            during the execution of a plan. Any
+            subscriber will receive the documents.
+
+        """
         if self.socket is not None:
             topic = f"{self.socket_prefix}:{str(DocumentNames[name])}"
             self.socket.send_multipart([topic.encode(), encode(doc)])

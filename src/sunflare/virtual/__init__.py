@@ -5,11 +5,11 @@ __all__ = [
     "VirtualBus",
     "slot",
     "Signal",
-    "Publisher",
-    "Subscriber",
     "HasConnection",
     "HasRegistration",
     "HasShutdown",
+    "Publisher",
+    "Subscriber",
     "encode",
     "decode",
 ]

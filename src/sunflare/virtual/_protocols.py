@@ -4,16 +4,21 @@ from typing_extensions import Protocol, runtime_checkable
 
 
 class HasShutdown(Protocol):
-    """Shutdown protocol class.
+    """Protocol marking your class as capable of shutting down.
 
-    Provides the ``shutdown`` method.
+    .. tip::
+
+        This protocol is optional and only available for
+        ``Controllers``. ``Widgets`` and ``Models`` will not
+        be affected by this protocol.
+
     """
 
     @abstractmethod
     def shutdown(self) -> None:
-        """Shutdown the controller. Performs cleanup operations.
+        """Shutdown an object. Performs cleanup operations.
 
-        If the controller holds any kind of resources,
+        If the object holds any kind of resources,
         this method should invoke any equivalent shutdown method for each resource.
         """
         ...
@@ -21,17 +26,25 @@ class HasShutdown(Protocol):
 
 @runtime_checkable
 class HasRegistration(Protocol):
-    """Protocol marking your class as capable of emitting signals."""
+    """Protocol marking your class as capable of emitting signals.
+
+    .. tip::
+
+        This protocol is optional and only available for
+        ``Controllers`` and ``Widgets``. ``Models``
+        will not be affected by this protocol.
+
+    """
 
     @abstractmethod
     def registration_phase(self) -> None:
-        r"""Register the controller signals listed in this method to expose them to the virtual bus.
+        r"""Register the signals listed in this method to expose them to the virtual bus.
 
         At application start-up, controllers can't know what signals are available from other controllers. \
         This method is called after all controllers are initialized to allow them to register their signals. \
         Controllers may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
         
-        Only signals defined in your controller can be registered.
+        Only signals defined in your object can be registered.
         
         An implementation example:
 
@@ -49,16 +62,24 @@ class HasRegistration(Protocol):
 
 @runtime_checkable
 class HasConnection(Protocol):
-    """Protocol marking your class as requesting connection to other signals."""
+    """Protocol marking your class as requesting connection to other signals.
+
+    .. tip::
+
+        This protocol is optional and only usable with
+        ``Controllers`` and ``Widgets``. ``Models``
+        will not be affected by this protocol.
+
+    """
 
     @abstractmethod
     def connection_phase(self) -> None:
-        """Connect to other controllers or widgets.
+        """Connect to other objects via the virtual bus.
 
-        At application start-up, controllers can't know what signals are available from other parts of Redsun.
-        This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
-        connect to all available registered signals in both virtual buses.
-        Controllers may be able to connect to other signals even after this phase (provided those signals
+        At application start-up, objects within Redsun can't know what signals are available from other parts of the session.
+        This method is invoked after the object's construction and after `registration_phase` as well, allowing to
+        connect to all available registered signals in the virtual bus.
+        Objects may be able to connect to other signals even after this phase (provided those signals
         were registered before).
 
         An implementation example:

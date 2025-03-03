@@ -371,8 +371,14 @@ class Status:
 
         Parameters
         ----------
-        callback: callable
-            Expected signature: ``callback(status)``.
+        callback: ``Callable[[Status], None]``
+            The callback to be called when the status is marked as finished.
+
+            .. code-block:: python
+
+                def callback(status: Status) -> None:
+                    # Do something with the status object
+                    ...
         """
         with self._lock:
             if self.done:
