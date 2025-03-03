@@ -8,8 +8,7 @@ from typing_extensions import Protocol
 if TYPE_CHECKING:
     from typing import Any, Optional
 
-    from bluesky.protocols import Reading, SyncOrAsync
-    from event_model.documents.event_descriptor import DataKey
+    from bluesky.protocols import Descriptor, Reading, SyncOrAsync
 
     from sunflare.config import ModelInfoProtocol
 
@@ -53,7 +52,7 @@ class ModelProtocol(Protocol):
         ...
 
     @abstractmethod
-    def describe_configuration(self) -> SyncOrAsync[dict[str, DataKey]]:
+    def describe_configuration(self) -> SyncOrAsync[dict[str, Descriptor]]:
         """Describe the model configuration.
 
         Provides a description of each field of the model configuration.
@@ -62,7 +61,7 @@ class ModelProtocol(Protocol):
 
         Returns
         -------
-        dict[``str``, :class:`~event_model.DataKey`]
+        dict[``str``, :class:`~bluesky.protocols.Descriptor`]
             A dictionary with the description of each field of the model configuration.
         """
         ...
