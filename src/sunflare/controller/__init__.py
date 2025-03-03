@@ -2,9 +2,6 @@ from ._base import (
     Connection,
     Controller,
     ControllerProtocol,
-    HasConnection,
-    HasRegistration,
-    HasShutdown,
     Receiver,
     Sender,
     SenderReceiver,
@@ -13,9 +10,6 @@ from ._base import (
 __all__ = [
     # protocols
     "ControllerProtocol",
-    "HasShutdown",
-    "HasRegistration",
-    "HasConnection",
     # boilerplate
     "Controller",
     "Sender",

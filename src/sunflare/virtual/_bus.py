@@ -25,7 +25,15 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
-__all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
+__all__ = [
+    "Signal",
+    "VirtualBus",
+    "slot",
+    "encode",
+    "decode",
+    "Publisher",
+    "Subscriber",
+]
 
 
 F = TypeVar("F", bound=Callable[..., object])

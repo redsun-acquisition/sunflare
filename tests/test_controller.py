@@ -4,12 +4,11 @@ from typing import Mapping, cast
 from mocks import MockController, MockControllerInfo
 
 from sunflare.config import ControllerInfo, RedSunSessionInfo
+from sunflare.virtual import HasConnection, HasRegistration
 from sunflare.controller import (
     Connection,
     Controller,
     ControllerProtocol,
-    HasConnection,
-    HasRegistration,
     Receiver,
     Sender,
     SenderReceiver,
