@@ -29,8 +29,7 @@ class ModelProtocol(Protocol):
     Parameters
     ----------
     name : ``str``
-        Name of the model.
-        - Serves as a unique identifier for the object created from it.
+        Name of the model. Serves as a unique identifier for the object created from it.
     model_info : :class:`~sunflare.config.ModelInfoProtocol`
         Object implementing :class:`~sunflare.config.ModelInfoProtocol`.
     """

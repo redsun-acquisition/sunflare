@@ -39,8 +39,7 @@ class Model(ModelProtocol, Generic[MI]):
     Parameters
     ----------
     name : ``str``
-        Name of the model.
-        - Serves as a unique identifier for the object created from it.
+        Name of the model. Serves as a unique identifier for the object created from it.
     model_info : ``MI``
         Instance of :class:`~sunflare.config.ModelInfo`. subclass.
     """
