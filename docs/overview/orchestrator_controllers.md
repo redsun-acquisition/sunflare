@@ -64,7 +64,7 @@ class PluginController:
             current_location = yield from bps.locate(self._motors[motor])
 ```
 
-Each controller is unique in the experiment it is expected to orchestrate, and the devices involved in such experiments. Redsun relies on using type hints to filter out the models we want to control. There are two ways to achieve this:
+Each controller is unique in the experiment it is expected to orchestrate, and the devices involved in such experiments. Redsun relies on [PEP 544](https://peps.python.org/pep-0544/) (a.k.a. structural subtyping) to filter out the models we want to control. There are two ways to achieve this:
 
 - by using the built-in `hasattr` function to determine if a `Model` has the required methods to execute an operation;
 - by defining a local `Protocol` with the expected methods and using `isinstance` to check if our `ModelProtocol` respects our custom interface.
