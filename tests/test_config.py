@@ -75,11 +75,10 @@ def test_detectors_info(config_path: Path):
     assert session.models != {}
 
     for _, mock in session.models.items():
-        assert mock.model_name == "MockDetectorModel"
+        assert mock.plugin_name == "mocks"
+        assert mock.plugin_id == "mock_detector"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
-        assert mock.plugin_name == "N/A"
-        assert mock.repository == "N/A"
         assert mock.sensor_size == (10, 10)
         assert mock.pixel_size == (1, 1, 1)
 
@@ -102,7 +101,8 @@ def test_motors_info(config_path: Path):
 
     # inspect the motors
     for _, mock in session.models.items():
-        assert mock.model_name == "MockMotorModel"
+        assert mock.plugin_name == "mocks"
+        assert mock.plugin_id == "mock_motor"
         assert mock.vendor == "N/A"
         assert mock.serial_number == "N/A"
 
@@ -128,12 +128,12 @@ def test_controller_info(config_path: Path, tmp_path: Path):
     assert session.controllers != {}
 
     for _, controller in session.controllers.items():
+        assert controller.plugin_name == "mocks"
+        assert controller.plugin_id == "mock_controller"
         assert controller.integer == 42
         assert controller.floating == 3.14
         assert controller.string == "hello"
         assert controller.boolean == True
-        assert controller.plugin_name == "N/A"
-        assert controller.repository == "N/A"
 
 
 def test_widget_info(config_path: Path):
@@ -164,8 +164,8 @@ def test_full_config(config_path: Path, tmp_path: Path):
     check if the content is the same as the original configuration.
     """
     config_map: dict[str, Any] = {
-        "MockDetectorModel": MockDetectorInfo,
-        "MockMotorModel": MockMotorInfo,
+        "mock_detector": MockDetectorInfo,
+        "mock_motor": MockMotorInfo,
     }
 
     config = RedSunSessionInfo.load_yaml(config_path / "full_instance.yaml")
@@ -176,7 +176,7 @@ def test_full_config(config_path: Path, tmp_path: Path):
         name: MockWidgetInfo(**info) for name, info in config["widgets"].items()
     }
     for name, info in config["models"].items():
-        model_type = config_map[info["model_name"]]
+        model_type = config_map[info["plugin_id"]]
         config["models"][name] = model_type(**info)
 
     session = RedSunSessionInfo(**config)
@@ -189,59 +189,58 @@ def test_full_config(config_path: Path, tmp_path: Path):
 
     # inspect the detectors
     detectors = [
-        det for det in session.models.values() if det.model_name == "MockDetectorModel"
+        det for det in session.models.values() if det.plugin_id == "mock_detector"
     ]
     assert len(detectors) == 2
 
-    detectors[0].vendor == "Greenheart GmbH"
-    detectors[0].serial_number == "1234"
-    detectors[0].plugin_name == "redsun-greenheart"
-    detectors[0].repository == "greenheart@github"
-    detectors[0].model_name == "MockDetectorModel"
-    detectors[0].sensor_size == (10, 10)
-    detectors[0].pixel_size == (1, 1, 1)
-    detectors[0].exposure_egu == "ms"
+    assert detectors[0].plugin_name == "redsun-greenheart"
+    assert detectors[0].plugin_id == "mock_detector"
+    assert detectors[0].vendor == "Greenheart GmbH"
+    assert detectors[0].serial_number == "1234"
+    assert detectors[0].sensor_size == (10, 10)
+    assert detectors[0].pixel_size == (1, 1, 1)
+    assert detectors[0].exposure_egu == "ms"
 
-    detectors[1].vendor == "Bluesapphire GmbH"
-    detectors[1].serial_number == "5678"
-    detectors[1].plugin_name == "redsun-bluesapphire"
-    detectors[1].repository == "bluesapphire@github"
-    detectors[1].model_name == "MockDetectorModel"
-    detectors[1].sensor_size == (20, 20)
-    detectors[1].pixel_size == (2, 2, 2)
-    detectors[1].exposure_egu == "s"
+    assert detectors[1].plugin_name == "redsun-bluesapphire"
+    assert detectors[1].plugin_id == "mock_detector"
+    assert detectors[1].serial_number == "5678"
+    assert detectors[1].sensor_size == (20, 20)
+    assert detectors[1].pixel_size == (2, 2, 2)
+    assert detectors[1].exposure_egu == "s"
 
     # inspect the motors
-    motors = [
-        mot for mot in session.models.values() if mot.model_name == "MockMotorModel"
-    ]
+    motors = [mot for mot in session.models.values() if mot.plugin_id == "mock_motor"]
     assert len(motors) == 2
 
-    motors[0].vendor == "N/A"
-    motors[0].serial_number == "N/A"
-    motors[0].model_name == "MockMotorModel"
-    motors[0].step_egu == "μm"
-    motors[0].axes == ["X"]
+    assert motors[0].plugin_name == "mocks"
+    assert motors[0].plugin_id == "mock_motor"
+    assert motors[0].vendor == "N/A"
+    assert motors[0].serial_number == "N/A"
+    assert motors[0].step_egu == "μm"
+    assert motors[0].axes == ["X"]
 
-    motors[1].vendor == "N/A"
-    motors[1].serial_number == "N/A"
-    motors[1].model_name == "MockMotorModel"
-    motors[1].axes == ["X", "Y"]
-    motors[1].step_egu == "mm"
+    assert motors[0].plugin_name == "mocks"
+    assert motors[0].plugin_id == "mock_motor"
+    assert motors[1].vendor == "N/A"
+    assert motors[1].serial_number == "N/A"
+    assert motors[1].axes == ["X", "Y"]
+    assert motors[1].step_egu == "mm"
 
     # inspect the controllers
     assert len(session.controllers) == 1
     for _, controller in session.controllers.items():
+        assert controller.plugin_name == "mocks"
+        assert controller.plugin_id == "mock_controller"
         assert controller.integer == 42
         assert controller.floating == 3.14
         assert controller.string == "hello"
         assert controller.boolean == True
-        assert controller.plugin_name == "N/A"
-        assert controller.repository == "N/A"
 
     # inspect the widgets
     assert len(session.widgets) == 1
     for _, widget in session.widgets.items():
+        assert widget.plugin_name == "mocks"
+        assert widget.plugin_id == "mock_widget"
         assert widget.gui_int_param == 100
         assert widget.gui_choices == ["a", "b", "c"]
         assert widget.position == WidgetPositionTypes.CENTER
@@ -291,26 +290,21 @@ def test_model_info_descriptor():
         tuple_param: tuple[int, int] = (1, 2)
         dict_param: dict[str, int] = {"a": 1, "b": 2}
 
-    info = MyModelInfo(model_name="MyModel")
+    info = MyModelInfo(plugin_name="mocks", plugin_id="mock_model")
 
     descriptor = info.describe_configuration()
     assert descriptor == {
-        "plugin_name": {
-            "source": "model_info",
-            "dtype": "string",
-            "shape": [],
-        },
-        "repository": {
-            "source": "model_info",
-            "dtype": "string",
-            "shape": [],
-        },
         "vendor": {
             "source": "model_info",
             "dtype": "string",
             "shape": [],
         },
         "serial_number": {
+            "source": "model_info",
+            "dtype": "string",
+            "shape": [],
+        },
+        "family": {
             "source": "model_info",
             "dtype": "string",
             "shape": [],

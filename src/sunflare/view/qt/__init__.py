@@ -48,13 +48,8 @@ class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self._config = config
-        self._virtual_bus = virtual_bus
+        self.config = config
+        self.virtual_bus = virtual_bus
 
-    @abstractmethod
-    def registration_phase(self) -> None:  # noqa: D102
-        ...
 
-    @abstractmethod
-    def connection_phase(self) -> None:  # noqa: D102
-        ...
+__all__ = ["BaseQtWidget"]

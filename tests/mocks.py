@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any
+from typing import Any, Mapping
 
 from attrs import define, field, validators
 from bluesky.plan_stubs import close_run, open_run, read, rel_set
@@ -10,12 +10,8 @@ from event_model.documents.event_descriptor import DataKey
 
 from sunflare.config import ControllerInfo, ModelInfo, WidgetInfo
 from sunflare.controller import ControllerProtocol
-from sunflare.model import ModelProtocol
+from sunflare.model import ModelProtocol, Model
 from sunflare.virtual import Signal, VirtualBus
-
-
-class MockVirtualBus(VirtualBus):
-    sigFoo = Signal()
 
 
 class ReadableModel(ModelProtocol):
@@ -90,41 +86,17 @@ class MockWidgetInfo(WidgetInfo):
     gui_choices: list[str] = field(factory=list, validator=validators.instance_of(list))
 
 
-class MockDetector(ReadableModel):
+class MockDetector(ReadableModel, Model[MockDetectorInfo]):
     """Mock detector model."""
 
     def __init__(self, name: str, cfg_info: MockDetectorInfo) -> None:
-        self._name = name
-        self._cfg_info = cfg_info
+        super().__init__(name=name, model_info=cfg_info)
 
     def read(self) -> dict[str, Any]:
         raise NotImplementedError
 
-    def read_configuration(self) -> dict[str, Reading[Any]]:
-        raise NotImplementedError
 
-    def describe_configuration(self) -> dict[str, DataKey]:
-        raise NotImplementedError
-
-    def configure(self, *args: Any, **kwargs: Any) -> None:
-        raise NotImplementedError
-
-    def shutdown(self) -> None: ...
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def parent(self) -> None:
-        return None
-
-    @property
-    def model_info(self) -> MockDetectorInfo:
-        return self._cfg_info
-
-
-class MockMotor(SettableModel):
+class MockMotor(SettableModel, Model[MockMotorInfo]):
     """Mock motor model."""
 
     def __init__(self, name: str, cfg_info: MockMotorInfo) -> None:
@@ -133,17 +105,6 @@ class MockMotor(SettableModel):
 
     def set(value: Any) -> None:
         raise NotImplementedError
-
-    def read_configuration(self) -> dict[str, Reading[Any]]:
-        raise NotImplementedError
-
-    def describe_configuration(self) -> dict[str, DataKey]:
-        raise NotImplementedError
-
-    def configure(self, *args: Any, **kwargs: Any) -> None:
-        raise NotImplementedError
-
-    def shutdown(self) -> None: ...
 
     @property
     def name(self) -> str:
@@ -159,14 +120,15 @@ class MockMotor(SettableModel):
 
 
 mock_detector_info = MockDetectorInfo(
-    model_name="MockDetectorModel",
+    plugin_name="mocks",
+    plugin_id="mock_detector",
     sensor_size=(1024, 1024),
     exposure_egu="ms",
     pixel_size=(1, 1, 1),
 )
 
 mock_motor_info = MockMotorInfo(
-    model_name="MockMotorModel", step_egu="μm", axes=["X", "Y", "Z"]
+    plugin_name="mocks", plugin_id="mock_motor", step_egu="μm", axes=["X", "Y", "Z"]
 )
 
 mock_motor = MockMotor("motor", mock_motor_info)
@@ -177,7 +139,13 @@ class MockController(ControllerProtocol):
     sigBar = Signal()
     sigNewPlan = Signal(object)
 
-    def __init__(self, info: MockControllerInfo, virtual_bus: MockVirtualBus) -> None:
+    def __init__(
+        self,
+        info: MockControllerInfo,
+        models: Mapping[str, ModelProtocol],
+        virtual_bus: VirtualBus,
+    ) -> None:
+        self.models = models
         self.info = info
         self.engine = RunEngine({})
         self.virtual_bus = virtual_bus

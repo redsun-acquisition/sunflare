@@ -47,14 +47,12 @@ config = {
     "handlers": {
         "stdout": {
             "class": "logging.StreamHandler",
-            "level": "DEBUG",
+            "level": "INFO",
             "formatter": "simple",
             "stream": "ext://sys.stdout",
         }
     },
-    "loggers": {
-        "redsun": {"level": "DEBUG", "propagate": True, "handlers": ["stdout"]}
-    },
+    "loggers": {"redsun": {"level": "INFO", "propagate": True, "handlers": ["stdout"]}},
 }
 
 # Set configuration

@@ -25,7 +25,15 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
-__all__ = ["Signal", "VirtualBus", "slot", "encode", "decode"]
+__all__ = [
+    "Signal",
+    "VirtualBus",
+    "slot",
+    "encode",
+    "decode",
+    "Publisher",
+    "Subscriber",
+]
 
 
 F = TypeVar("F", bound=Callable[..., object])
@@ -192,12 +200,8 @@ class VirtualBus(Loggable):
         self.debug("Closing publisher sockets.")
         for socket in self._pub_sockets:
             socket.close()
-        try:
-            self._context.term()
-        except zmq.error.ZMQError:
-            self.debug("ZMQ context already terminated.")
-        finally:
-            self._forwarder.join()
+        self._context.term()
+        self._forwarder.join()
 
     def register_signals(
         self, owner: object, only: Optional[Iterable[str]] = None

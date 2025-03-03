@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.5.0] - 03-03-2025
+
+### Changed
+
+- Rearranged the structure of virtual-related classes
+  - Everything related to creating connections with the virtual bus have been brought to the `sunflare.virtual` module
+- Set the default log level to `INFO` (was `DEBUG` before)
+- Reworked `sunflare.config` to accomodate for new plugin system
+
+### Added
+
+- Added a `Model` base class for quicker development.
+
+### Removed
+
+- `configure` protocol is not part of the `ModelProtocol` anymore; see [this PR](https://github.com/bluesky/bluesky/pull/1888)
+
 ## [0.4.2] - 24-02-2025
 
 ### Changed
@@ -176,6 +193,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.5.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.3.5...v0.4.0

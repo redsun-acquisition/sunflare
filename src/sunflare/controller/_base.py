@@ -10,12 +10,11 @@ from typing import (
     NamedTuple,
     Optional,
     TypeVar,
-    runtime_checkable,
 )
 
-from typing_extensions import Protocol
+from typing_extensions import Protocol, runtime_checkable
 
-from sunflare.config import ControllerInfo
+from sunflare.config import ControllerInfoProtocol
 
 if TYPE_CHECKING:
     from sunflare.model import ModelProtocol
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
 
 
 @runtime_checkable
-class ControllerProtocol(Protocol):
+class ControllerProtocol(Protocol):  # pragma: no cover
     """Controller protocol class.
 
     Provides the interface for a class
@@ -37,103 +36,18 @@ class ControllerProtocol(Protocol):
         Models currently loaded in the active Redsun session.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-
-    Attributes
-    ----------
-    ctrl_info : :class:`~sunflare.config.ControllerInfo`
-        Controller information.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
-        Reference to the virtual bus.
     """
-
-    ctrl_info: ControllerInfo
-    virtual_bus: VirtualBus
 
     @abstractmethod
     def __init__(
         self,
-        ctrl_info: ControllerInfo,
+        ctrl_info: ControllerInfoProtocol,
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
     ) -> None: ...
 
 
-class HasShutdown(Protocol):
-    """Shutdown protocol class.
-
-    Provides the ``shutdown`` method.
-    """
-
-    @abstractmethod
-    def shutdown(self) -> None:
-        """Shutdown the controller. Performs cleanup operations.
-
-        If the controller holds any kind of resources,
-        this method should invoke any equivalent shutdown method for each resource.
-        """
-        ...
-
-
-@runtime_checkable
-class HasRegistration(Protocol):
-    """Protocol marking your class as capable of emitting signals."""
-
-    @abstractmethod
-    def registration_phase(self) -> None:
-        r"""Register the controller signals listed in this method to expose them to the virtual bus.
-
-        At application start-up, controllers can't know what signals are available from other controllers. \
-        This method is called after all controllers are initialized to allow them to register their signals. \
-        Controllers may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
-        
-        Only signals defined in your controller can be registered.
-        
-        An implementation example:
-
-        .. code-block:: python
-
-            def registration_phase(self) -> None:
-                # you can register all signals...
-                self.virtual_bus.register_signals(self)
-                
-                # ... or only a selection of them
-                self.virtual_bus.register_signals(self, only=["signal"])
-        """
-        ...
-
-
-@runtime_checkable
-class HasConnection(Protocol):
-    """Protocol marking your class as requesting connection to other signals."""
-
-    @abstractmethod
-    def connection_phase(self) -> None:
-        """Connect to other controllers or widgets.
-
-        At application start-up, controllers can't know what signals are available from other parts of Redsun.
-        This method is invoked after the controller's construction and after `registration_phase` as well, allowing to
-        connect to all available registered signals in both virtual buses.
-        Controllers may be able to connect to other signals even after this phase (provided those signals
-        were registered before).
-
-        An implementation example:
-
-        .. code-block:: python
-
-            def connection_phase(self) -> None:
-                # you can connect signals from another controller to your local slots...
-                self.virtual_bus["OtherController"]["signal"].connect(self._my_slot)
-
-                # ... or to other signals ...
-                self.virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
-
-                # ... or connect to widgets
-                self.virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
-        """
-        ...
-
-
-CI = TypeVar("CI", bound=ControllerInfo)
+CI = TypeVar("CI", bound=ControllerInfoProtocol)
 
 
 class Connection(NamedTuple):
@@ -194,7 +108,7 @@ class Controller(ControllerProtocol, Generic[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of :class:`~sunflare.config.ControllerInfo`.
+        Instance of :class:`~sunflare.config.ControllerInfo` subclass.
     models : ``Mapping[str, ModelProtocol]``
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`

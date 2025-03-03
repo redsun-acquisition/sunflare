@@ -2,9 +2,11 @@ engine: bluesky
 frontend: pyqt
 models:
   First mock detector:
-    model_name: MockDetectorModel
+    plugin_name: mocks
+    plugin_id: mock_detector
     sensor_size: [10, 10]
   Second mock detector:
-    model_name: MockDetectorModel
+    plugin_name: mocks
+    plugin_id: mock_detector
     sensor_size: [10, 10]
     exposure_egu: s
