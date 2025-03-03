@@ -13,6 +13,8 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 - Rearranged the structure of virtual-related classes
   - Everything related to creating connections with the virtual bus have been brought to the `sunflare.virtual` module
+- Set the default log level to `INFO` (was `DEBUG` before)
+- Reworked `sunflare.config` to accomodate for new plugin system
 
 ### Added
 
