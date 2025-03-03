@@ -48,12 +48,17 @@ def test_detector_model(config_path: str) -> None:
         assert detector.parent is None
         assert detector.model_info == truth_cfg_info
 
-        descriptor = detector.read_configuration()
+        reading = detector.read_configuration()
         truth = {"sensor_size": {"value": (10, 10), "timestamp": 0}}
-        assert descriptor["sensor_size"]["value"] == truth["sensor_size"]["value"]
-        assert (
-            descriptor["sensor_size"]["timestamp"] == truth["sensor_size"]["timestamp"]
-        )
+        assert reading["sensor_size"]["value"] == truth["sensor_size"]["value"]
+        assert reading["sensor_size"]["timestamp"] == truth["sensor_size"]["timestamp"]
+        descriptor = detector.describe_configuration()
+        truth = {
+            "sensor_size": {"dtype": "array", "shape": [2], "source": "model_info"}
+        }
+        assert descriptor["sensor_size"]["dtype"] == truth["sensor_size"]["dtype"]
+        assert descriptor["sensor_size"]["shape"] == truth["sensor_size"]["shape"]
+        assert descriptor["sensor_size"]["source"] == truth["sensor_size"]["source"]
 
 
 def test_broken_detector_model() -> None:
