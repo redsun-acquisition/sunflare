@@ -90,23 +90,10 @@ class MockDetector(ReadableModel, Model[MockDetectorInfo]):
     """Mock detector model."""
 
     def __init__(self, name: str, cfg_info: MockDetectorInfo) -> None:
-        self._name = name
-        self._cfg_info = cfg_info
+        super().__init__(name=name, model_info=cfg_info)
 
     def read(self) -> dict[str, Any]:
         raise NotImplementedError
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def parent(self) -> None:
-        return None
-
-    @property
-    def model_info(self) -> MockDetectorInfo:
-        return self._cfg_info
 
 
 class MockMotor(SettableModel, Model[MockMotorInfo]):

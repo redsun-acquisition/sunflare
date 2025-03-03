@@ -48,6 +48,13 @@ def test_detector_model(config_path: str) -> None:
         assert detector.parent is None
         assert detector.model_info == truth_cfg_info
 
+        descriptor = detector.read_configuration()
+        truth = {"sensor_size": {"value": (10, 10), "timestamp": 0}}
+        assert descriptor["sensor_size"]["value"] == truth["sensor_size"]["value"]
+        assert (
+            descriptor["sensor_size"]["timestamp"] == truth["sensor_size"]["timestamp"]
+        )
+
 
 def test_broken_detector_model() -> None:
     """Test the detector model info."""
