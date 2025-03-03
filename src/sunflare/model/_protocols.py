@@ -25,9 +25,6 @@ class ModelProtocol(Protocol):
     - :class:`~bluesky.protocols.HasName`
     - :class:`~bluesky.protocols.HasParent`
     - :class:`~bluesky.protocols.Configurable`
-
-    Additionally provides a `shutdown` method
-    to (optionally) perform cleanup operations.
     """
 
     @abstractmethod
@@ -60,14 +57,6 @@ class ModelProtocol(Protocol):
         -------
         dict[``str``, :class:`~event_model.DataKey`]
             A dictionary with the description of each field of the model configuration.
-        """
-        ...
-
-    @abstractmethod
-    def shutdown(self) -> None:
-        """Perform cleanup operation of the model.
-
-        If not necessary, it can be left as a no-op.
         """
         ...
 
