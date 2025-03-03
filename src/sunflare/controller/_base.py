@@ -109,7 +109,7 @@ class Controller(ControllerProtocol, Generic[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of :class:`~sunflare.config.ControllerInfo`.
+        Instance of :class:`~sunflare.config.ControllerInfo` subclass.
     models : ``Mapping[str, ModelProtocol]``
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
