@@ -37,17 +37,7 @@ class ControllerProtocol(Protocol):
         Models currently loaded in the active Redsun session.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Virtual bus.
-
-    Attributes
-    ----------
-    ctrl_info : :class:`~sunflare.config.ControllerInfo`
-        Controller information.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
-        Reference to the virtual bus.
     """
-
-    ctrl_info: ControllerInfoProtocol
-    virtual_bus: VirtualBus
 
     @abstractmethod
     def __init__(
