@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Mapping, cast
+from typing import Mapping
 
 from mocks import MockController, MockControllerInfo
 
@@ -29,7 +29,8 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
     assert len(config_ctrl) == 1
 
     for _, ctrl in config_ctrl.items():
-        controller = MockController(cast(MockControllerInfo, ctrl), bus)
+        controller = MockController(ctrl, {}, bus)
+        assert isinstance(controller, ControllerProtocol)
         assert controller.info == ctrl
         assert len(controller.plans) == 2
         assert controller.info.plugin_name == "mocks"

@@ -42,8 +42,7 @@ def test_detector_model(config_path: str) -> None:
     for (name, cfg_info), (truth_name, truth_cfg_info) in zip(
         session.models.items(), truth_configs.items()
     ):
-        cfg = cast(MockDetectorInfo, cfg_info)
-        detector = MockDetector(name=name, cfg_info=cfg)
+        detector = MockDetector(name=name, cfg_info=cfg_info)
         assert isinstance(detector, ModelProtocol)
         assert detector.name == truth_name
         assert detector.parent is None

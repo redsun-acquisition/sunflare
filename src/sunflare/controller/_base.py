@@ -10,10 +10,9 @@ from typing import (
     NamedTuple,
     Optional,
     TypeVar,
-    runtime_checkable,
 )
 
-from typing_extensions import Protocol
+from typing_extensions import Protocol, runtime_checkable
 
 from sunflare.config import ControllerInfoProtocol
 
