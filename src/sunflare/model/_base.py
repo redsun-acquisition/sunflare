@@ -10,10 +10,10 @@ MI = TypeVar("MI", bound=ModelInfo)
 
 
 class Model(ModelProtocol, Generic[MI]):
-    """A boilerplate base class for quick development.
+    """A boilerplate base class for quick model development.
 
-    Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.ControllerInfo` implementation.
+    Users may subclass from this model and provide their custom
+    :class:`~sunflare.config.ModelInfo` implementation.
 
     Example usage:
 

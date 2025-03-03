@@ -25,6 +25,14 @@ class ModelProtocol(Protocol):
     - :class:`~bluesky.protocols.HasName`
     - :class:`~bluesky.protocols.HasParent`
     - :class:`~bluesky.protocols.Configurable`
+
+    Parameters
+    ----------
+    name : ``str``
+        Name of the model.
+        - Serves as a unique identifier for the object created from it.
+    model_info : :class:`~sunflare.config.ModelInfoProtocol`
+        Object implementing :class:`~sunflare.config.ModelInfoProtocol`.
     """
 
     @abstractmethod
