@@ -16,7 +16,7 @@ __all__ = ["ModelProtocol"]
 
 
 @runtime_checkable
-class ModelProtocol(Protocol):
+class ModelProtocol(Protocol):  # pragma: no cover
     """Minimal required protocol for a recognizable device in Redsun.
 
     Exposes the following Bluesky protocols:

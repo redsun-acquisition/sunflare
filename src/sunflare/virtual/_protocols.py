@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing_extensions import Protocol, runtime_checkable
 
 
-class HasShutdown(Protocol):
+class HasShutdown(Protocol):  # pragma: no cover
     """Protocol marking your class as capable of shutting down.
 
     .. tip::
@@ -25,7 +25,7 @@ class HasShutdown(Protocol):
 
 
 @runtime_checkable
-class HasRegistration(Protocol):
+class HasRegistration(Protocol):  # pragma: no cover
     """Protocol marking your class as capable of emitting signals.
 
     .. tip::
@@ -61,7 +61,7 @@ class HasRegistration(Protocol):
 
 
 @runtime_checkable
-class HasConnection(Protocol):
+class HasConnection(Protocol):  # pragma: no cover
     """Protocol marking your class as requesting connection to other signals.
 
     .. tip::

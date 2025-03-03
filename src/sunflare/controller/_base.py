@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 
 @runtime_checkable
-class ControllerProtocol(Protocol):
+class ControllerProtocol(Protocol):  # pragma: no cover
     """Controller protocol class.
 
     Provides the interface for a class
