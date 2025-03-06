@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.5.1] - 06-03-2025
+
+### Changed
+
+- Dropped upper bound limit for `numpy` dependency
+
 ## [0.5.0] - 03-03-2025
 
 ### Changed
@@ -193,6 +199,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.5.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.0...v0.4.1
