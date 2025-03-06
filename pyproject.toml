@@ -35,7 +35,7 @@ dependencies = [
     "bluesky",
     "attrs",
     "psygnal",
-    "numpy>=1.24, <1.27",
+    "numpy>=1.26",
     "typing_extensions>=4.10.0",
     "zmq",
     "msgspec",
