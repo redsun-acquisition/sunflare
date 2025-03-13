@@ -32,27 +32,57 @@ class ClassFormatter(logging.Formatter):
                 fmt += " -> %(uid)s"
             fmt += "]"
         fmt += " %(message)s"
-        if record.levelno >= logging.INFO:
+        if record.levelno != logging.INFO:
             fmt += " (%(filename)s:%(lineno)d)"
         formatted = fmt % record.__dict__
         return formatted
+
+
+class InfoFilter(logging.Filter):
+    def __init__(self, name: str = "") -> None:
+        super().__init__(name)
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.levelno >= logging.INFO
+
+
+class DebugFilter(logging.Filter):
+    def __init__(self, name: str = "") -> None:
+        super().__init__(name)
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.levelno < logging.INFO
 
 
 config = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {"()": lambda: ClassFormatter(datefmt="%d-%m-%y | %H:%M:%S")}
+        "default": {"()": lambda: ClassFormatter(datefmt="%d-%m-%y|%H:%M:%S")}
+    },
+    "filters": {
+        "info_filter": {"()": InfoFilter},  # Allows only INFO
+        "debug_filter": {"()": DebugFilter},  # Excludes INFO
     },
     "handlers": {
-        "stdout": {
+        "info": {
             "class": "logging.StreamHandler",
             "level": "INFO",
-            "formatter": "simple",
+            "formatter": "default",
             "stream": "ext://sys.stdout",
-        }
+            "filters": ["info_filter"],
+        },
+        "debug": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "default",
+            "stream": "ext://sys.stdout",
+            "filters": ["debug_filter"],
+        },
     },
-    "loggers": {"redsun": {"level": "INFO", "propagate": True, "handlers": ["stdout"]}},
+    "loggers": {
+        "redsun": {"level": "DEBUG", "propagate": True, "handlers": ["info", "debug"]}
+    },
 }
 
 # Set configuration
