@@ -2,40 +2,66 @@ from __future__ import annotations
 
 import logging
 import logging.config
-from typing import ClassVar
+from functools import cached_property
 
 __all__ = ["Loggable"]
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import MutableMapping
 
 
-class ClassFormatter(logging.Formatter):
-    """Custom formatter for logging messages with class name and user-defined ID."""
+class GlobalFormatter(logging.Formatter):
+    """Custom formatter for log messages."""
 
-    STD_FORMAT = "[%(asctime)s][%(levelname)s]"
+    _format = "[%(asctime)s][%(levelname)s]"
 
     def __init__(self, datefmt: str) -> None:
         super().__init__(datefmt=datefmt)
 
     def format(self, record: logging.LogRecord) -> str:
-        fmt = self.STD_FORMAT
+        fmt = self._format
         message = []
         message.append(record.getMessage())
         record.message = " ".join(message)
         record.asctime = self.formatTime(record, self.datefmt)
-        if "clsname" in record.__dict__:
-            fmt += "[%(clsname)s"
-            if "uid" in record.__dict__ and len(record.__dict__["uid"]) > 0:
-                fmt += " -> %(uid)s"
-            fmt += "]"
         fmt += " %(message)s"
         if record.levelno != logging.INFO:
             fmt += " (%(filename)s:%(lineno)d)"
         formatted = fmt % record.__dict__
         return formatted
+
+
+class ContextualAdapter(logging.LoggerAdapter[Any]):
+    """Adapter that adds class and object context to log messages.
+
+    Parameters
+    ----------
+    logger: ``logging.Logger``
+        Logger instance to wrap.
+    obj: ``Any``
+        The object to add context to.
+    """
+
+    logger: logging.Logger
+
+    def __init__(self, logger: logging.Logger, obj: Any) -> None:
+        super().__init__(logger, {"obj": obj})
+        self.obj = obj
+
+    def process(
+        self, msg: str, kwargs: MutableMapping[str, Any]
+    ) -> tuple[str, MutableMapping[str, Any]]:
+        """Add object context to the log message."""
+        clsname = self.obj.__class__.__name__
+        prefix = f"[{clsname}"
+        if self.logger.isEnabledFor(kwargs.get("level", logging.INFO)):
+            if hasattr(self.obj, "name"):
+                obj_name: str = getattr(self.obj, "name")
+                prefix += f" -> {obj_name}"
+        prefix += "]"
+        return f"{prefix}: {msg}", kwargs
 
 
 class InfoFilter(logging.Filter):
@@ -58,11 +84,11 @@ config = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "default": {"()": lambda: ClassFormatter(datefmt="%d-%m-%y|%H:%M:%S")}
+        "default": {"()": lambda: GlobalFormatter(datefmt="%d-%m-%y|%H:%M:%S")}
     },
     "filters": {
-        "info_filter": {"()": InfoFilter},  # Allows only INFO
-        "debug_filter": {"()": DebugFilter},  # Excludes INFO
+        "info_filter": {"()": InfoFilter},
+        "debug_filter": {"()": DebugFilter},
     },
     "handlers": {
         "info": {
@@ -93,143 +119,9 @@ logger = logging.getLogger("redsun")
 
 
 class Loggable:
-    """
-    Mixin class to extend log records with the class name and the user defined ID.
+    """Mixin class that adds a logger to a class instance with extra contextual information."""
 
-    Models and controllers can inherit from this class to have a consistent log format.
-
-    All methods allow to forward extra arguments to the logger calls as documented in the `logging` module.
-    """
-
-    logger: ClassVar[logging.Logger] = logging.getLogger("redsun")
-
-    def _extend(self, kwargs: dict[str, Any]) -> dict[str, Any]:
-        """
-        Enrich kwargs with class name and user-defined ID.
-
-        :meta-private:
-        """
-        kwargs["extra"] = {
-            **kwargs.get("extra", {}),
-            "clsname": self.__clsname__,
-            "uid": self.name,
-        }
-        return kwargs
-
-    def info(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        """
-        Log an info message in the core logger.
-
-        Parameters
-        ----------
-        msg : ``str``
-            String to log.
-        *args : ``Any``
-            Additional positional arguments for ``logging.Logger.info``.
-        **kwargs : ``Any``
-            Additional keyword arguments for ``logging.Logger.info``.
-        """
-        self._extend(kwargs)
-        logger.info(msg, *args, **kwargs)
-
-    def debug(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        """
-        Log a debug message in the core logger.
-
-        Parameters
-        ----------
-        msg : ``str``
-            String to log.
-        *args : ``Any``
-            Additional positional arguments for ``logging.Logger.debug``.
-        **kwargs : ``Any``
-            Additional keyword arguments for ``logging.Logger.debug``.
-        """
-        self._extend(kwargs)
-        logger.debug(msg, *args, **kwargs)
-
-    def warning(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        """
-        Log a warning message in the core logger.
-
-        Parameters
-        ----------
-        msg : ``str``
-            String to log.
-        *args : ``Any``
-            Additional positional arguments for ``logging.Logger.warning``.
-        **kwargs : ``Any``
-            Additional keyword arguments for ``logging.Logger.warning``.
-        """
-        self._extend(kwargs)
-        logger.warning(msg, *args, **kwargs)
-
-    def error(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        """
-        Log an error. message in the core logger.
-
-        Parameters
-        ----------
-        msg : ``str``
-            String to log.
-        *args : ``Any``
-            Additional positional arguments for ``logging.Logger.error``.
-        **kwargs : ``Any``
-            Additional keyword arguments for ``logging.Logger.error``.
-        """
-        self._extend(kwargs)
-        logger.error(msg, *args, **kwargs)
-
-    def critical(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        """
-        Log a critical message in the core logger.
-
-        Parameters
-        ----------
-        msg : ``str``
-            String to log.
-        *args : ``Any``
-            Additional positional arguments for ``logging.Logger.critical``.
-        **kwargs : ``Any``
-            Additional keyword arguments for ``logging.Logger.critical``.
-        """
-        self._extend(kwargs)
-        logger.critical(msg, *args, **kwargs)
-
-    def exception(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        """
-        Log an exception message in the core logger.
-
-        Parameters
-        ----------
-        msg : ``str``
-            String to log.
-        *args : ``Any``
-            Additional positional arguments for ``logging.Logger.exception``.
-        **kwargs : ``Any``
-            Additional keyword arguments for ``logging.Logger.exception``.
-        """
-        self._extend(kwargs)
-        logger.exception(msg, *args, **kwargs)
-
-    @property
-    def __clsname__(self) -> str:
-        """
-        Class name.
-
-        :meta-private:
-        """
-        # Private property, should not be
-        # accessed by the user
-        return self.__class__.__name__
-
-    @property
-    def name(self) -> str:
-        """Class instance unique identifier.
-
-        This property should be implemented by
-        model classes by default.
-
-        :meta-private:
-        """
-        return str()
+    @cached_property
+    def logger(self) -> logging.LoggerAdapter[Any]:
+        """Logger instance with contextual information."""
+        return ContextualAdapter(logging.getLogger("redsun"), self)

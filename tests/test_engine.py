@@ -294,7 +294,7 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
             self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
             for topic in topics:
                 self.socket.subscribe(topic)
-            self.debug(f"Subscribed to: {topics}")
+            self.logger.debug(f"Subscribed to: {topics}")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
@@ -314,7 +314,7 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
             finally:
                 self.poller.unregister(self.socket)
                 self.socket.close()
-                self.debug("Subscriber socket closed.")
+                self.logger.debug("Subscriber socket closed.")
 
     all_sub = Subscriber(bus, topics=["RE0"])
     start_sub = Subscriber(bus, topics=["RE0/start"])
@@ -347,7 +347,7 @@ def test_engine_prefix(bus: VirtualBus) -> None:
             self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
             for topic in topics:
                 self.socket.subscribe(topic)
-            self.debug(f"Subscribed to: {topics}")
+            self.logger.debug(f"Subscribed to: {topics}")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
@@ -367,7 +367,7 @@ def test_engine_prefix(bus: VirtualBus) -> None:
             finally:
                 self.poller.unregister(self.socket)
                 self.socket.close()
-                self.debug("Subscriber socket closed.")
+                self.logger.debug("Subscriber socket closed.")
 
     all_sub = Subscriber(bus, topics=["MyEngine"])
     start_sub = Subscriber(bus, topics=["MyEngine/start"])

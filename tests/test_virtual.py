@@ -37,7 +37,7 @@ class MockSubscriber(Subscriber, Loggable):
 
     def consume(self, content: list[bytes]) -> None:
         msg = tuple(c.decode() for c in content)
-        self.debug(f"Received message: {msg}")
+        self.logger.debug(f"Received message: {msg}")
         self.msg_queue.put(msg)
         with self.cond:
             self.monitorer.append(object())
@@ -114,7 +114,10 @@ def test_virtual_bus_no_object(
 
     assert len(signals) == 0
     assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "Class MockOwner not found in the registry."
+    assert (
+        caplog.records[0].message
+        == "[VirtualBus]: Class MockOwner not found in the registry."
+    )
 
     bus.shutdown()
 
@@ -228,7 +231,7 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
             self.socket = self.bus.connect_publisher()
 
         def send(self, msg: str) -> None:
-            self.debug(f"Sending message: {msg}")
+            self.logger.debug(f"Sending message: {msg}")
             self.socket.send_string(msg)
 
     class Subscriber(Loggable):
@@ -253,7 +256,7 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
                         socks = dict(self.poller.poll())
                         if self.socket in socks:
                             self.msg = self.socket.recv_string()
-                            self.debug(f"Received message: {self.msg}")
+                            self.logger.debug(f"Received message: {self.msg}")
                             with self.cond:
                                 self.sentinel.append(object)
                                 self.cond.notify()
@@ -262,7 +265,7 @@ def test_virtual_bus_zmq(bus: VirtualBus) -> None:
             finally:
                 self.poller.unregister(self.socket)
                 self.socket.close()
-                self.debug("Subscriber socket closed.")
+                self.logger.debug("Subscriber socket closed.")
 
     pub = Publisher(bus)
     sub = Subscriber(bus, cond, sentinel)
@@ -302,7 +305,7 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
 
         def send(self, topic: str, value: float) -> None:
             msg = f"{topic} {value}"
-            self.debug(f"Sending message: {msg}")
+            self.logger.debug(f"Sending message: {msg}")
             self.socket.send_string(msg)
 
     class Subscriber(Loggable):
@@ -318,7 +321,7 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
             self.condition = cond
             self.monitorer = monitorer
             self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
-            self.debug(f"Subscribed to: {topics}")
+            self.logger.debug(f"Subscribed to: {topics}")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)
             self.thread.start()
@@ -330,7 +333,7 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
                         socks = dict(self.poller.poll())
                         if self.socket in socks:
                             msg = self.socket.recv_string()
-                            self.debug(f"Received message: {msg}")
+                            self.logger.debug(f"Received message: {msg}")
                             self.received_messages.append(msg)
                             with self.condition:
                                 self.monitorer.append(None)
@@ -340,7 +343,7 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
             finally:
                 self.poller.unregister(self.socket)
                 self.socket.close()
-                self.debug("Subscriber socket closed.")
+                self.logger.debug("Subscriber socket closed.")
 
     # Create publisher and subscribers
     pub = Publisher(bus)

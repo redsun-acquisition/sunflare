@@ -13,12 +13,13 @@ if TYPE_CHECKING:
 
 
 class MockLoggable(Loggable):
-    def __init__(self, name: str = "Test instance") -> None:
-        self.__name = name
-
     @property
     def name(self) -> str:
-        return self.__name
+        return "Test instance"
+
+
+class LoggableNoName(Loggable):
+    pass
 
 
 @pytest.mark.skipif(
@@ -29,12 +30,12 @@ def test_loggable(caplog: LogCaptureFixture) -> None:
     obj = MockLoggable()
     assert obj.name == "Test instance"
 
-    obj.info("Test info")
-    obj.debug("Test debug")
-    obj.warning("Test warning")
-    obj.error("Test error")
-    obj.critical("Test critical")
-    obj.exception("Test exception")
+    obj.logger.info("Test info")
+    obj.logger.debug("Test debug")
+    obj.logger.warning("Test warning")
+    obj.logger.error("Test error")
+    obj.logger.critical("Test critical")
+    obj.logger.exception("Test exception")
 
     assert len(caplog.handler.records) == 6
     assert "Test info" in caplog.handler.records[0].msg
@@ -44,8 +45,10 @@ def test_loggable(caplog: LogCaptureFixture) -> None:
     assert "Test critical" in caplog.handler.records[4].msg
     assert "Test exception" in caplog.handler.records[5].msg
 
-    assert caplog.handler.records[0].clsname == "MockLoggable"
-    assert caplog.handler.records[0].uid == "Test instance"
+    for _, record in enumerate(caplog.handler.records):
+        assert "MockLoggable" in record.msg
+        assert "Test instance" in record.msg
+        assert "[MockLoggable -> Test instance]" in record.msg
 
     assert caplog.handler.records[0].levelname == "INFO"
     assert caplog.handler.records[1].levelname == "DEBUG"
@@ -53,3 +56,25 @@ def test_loggable(caplog: LogCaptureFixture) -> None:
     assert caplog.handler.records[3].levelname == "ERROR"
     assert caplog.handler.records[4].levelname == "CRITICAL"
     assert caplog.handler.records[5].levelname == "ERROR"
+
+
+def test_loggable_no_name(caplog: LogCaptureFixture) -> None:
+    obj = LoggableNoName()
+
+    obj.logger.info("Test info")
+    obj.logger.debug("Test debug")
+    obj.logger.warning("Test warning")
+    obj.logger.error("Test error")
+    obj.logger.critical("Test critical")
+    obj.logger.exception("Test exception")
+
+    assert len(caplog.handler.records) == 6
+    assert "Test info" in caplog.handler.records[0].msg
+    assert "Test debug" in caplog.handler.records[1].msg
+    assert "Test warning" in caplog.handler.records[2].msg
+    assert "Test error" in caplog.handler.records[3].msg
+    assert "Test critical" in caplog.handler.records[4].msg
+    assert "Test exception" in caplog.handler.records[5].msg
+
+    for _, record in enumerate(caplog.handler.records):
+        assert "[LoggableNoName]" in record.msg

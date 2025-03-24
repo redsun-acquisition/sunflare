@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import threading
 from abc import abstractmethod
 from types import MappingProxyType
@@ -197,7 +196,7 @@ class VirtualBus(Loggable):
 
         Closes the ZMQ context and terminates the streamer queue.
         """
-        self.debug("Closing publisher sockets.")
+        self.logger.debug("Closing publisher sockets.")
         for socket in self._pub_sockets:
             socket.close()
         self._context.term()
@@ -266,7 +265,7 @@ class VirtualBus(Loggable):
         try:
             return MappingProxyType(self._cache[class_name])
         except KeyError:
-            self.error(f"Class {class_name} not found in the registry.")
+            self.logger.error(f"Class {class_name} not found in the registry.")
             return MappingProxyType({})
 
     def __contains__(self, class_name: str) -> bool:
@@ -384,14 +383,14 @@ class VirtualBus(Loggable):
         return socket
 
 
-class Publisher:
+class Publisher(Loggable):
     """Publisher mixin class.
 
     Creates a publisher socket for the virtual bus,
     which can be used to send messages to subscribers
     over the virtual bus.
 
-    Provides a built-in reference to the application logger.
+    Combined with the :class:`~sunflare.log.Loggable` mixin.
 
     Parameters
     ----------
@@ -412,17 +411,16 @@ class Publisher:
         self,
         virtual_bus: VirtualBus,
     ) -> None:
-        self.logger = logging.getLogger("redsun")
         self.pub_socket = virtual_bus.connect_publisher()
 
 
-class Subscriber:
+class Subscriber(Loggable):
     """Subscriber mixin class.
 
     The synchronous subscriber deploys a background thread
     which will poll the virtual bus for incoming messages.
 
-    Provides a built-in reference to the application logger.
+    Combined with the :class:`~sunflare.log.Loggable` mixin.
 
     Parameters
     ----------
@@ -442,8 +440,6 @@ class Subscriber:
         Subscriber thread.
     sub_topics : ``str | Iterable[str]``
         Subscriber topics.
-    logger: ``logging.Logger``
-        Reference to application logger.
     """
 
     sub_socket: zmq.Socket[bytes]
@@ -456,7 +452,6 @@ class Subscriber:
         virtual_bus: VirtualBus,
         topics: Union[str, Iterable[str]] = "",
     ) -> None:
-        self.logger = logging.getLogger("redsun")
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
         self.logger.debug(f"Registered to topics {topics}")
         self.sub_topics = topics
