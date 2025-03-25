@@ -30,7 +30,15 @@ class GlobalFormatter(logging.Formatter):
         message.append(record.getMessage())
         record.message = " ".join(message)
         record.asctime = self.formatTime(record, self.datefmt)
-        fmt += " %(message)s"
+        clsname = getattr(record, "clsname", None)
+        if clsname:
+            fmt += "[%(clsname)s"
+        uid = getattr(record, "uid", None)
+        if uid:
+            fmt += " -> %(uid)s"
+        if clsname:
+            fmt += "]"
+        fmt += ": %(message)s"
         if record.levelno != logging.INFO:
             fmt += " (%(filename)s:%(lineno)d)"
         formatted = fmt % record.__dict__
@@ -64,6 +72,7 @@ class ContextualAdapter(_LoggerAdapter):
         extra: dict[str, Any] = kwargs.get("extra", {})
         extra["clsname"] = clsname
         extra["uid"] = getattr(self.obj, "name", None)
+        kwargs["extra"] = extra
         return msg, kwargs
 
 

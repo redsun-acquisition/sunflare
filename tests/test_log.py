@@ -46,9 +46,8 @@ def test_loggable(caplog: LogCaptureFixture) -> None:
     assert "Test exception" in caplog.handler.records[5].msg
 
     for _, record in enumerate(caplog.handler.records):
-        assert "MockLoggable" in record.msg
-        assert "Test instance" in record.msg
-        assert "[MockLoggable -> Test instance]" in record.msg
+        assert "MockLoggable" in record.clsname
+        assert "Test instance" in record.uid
 
     assert caplog.handler.records[0].levelname == "INFO"
     assert caplog.handler.records[1].levelname == "DEBUG"
@@ -77,4 +76,4 @@ def test_loggable_no_name(caplog: LogCaptureFixture) -> None:
     assert "Test exception" in caplog.handler.records[5].msg
 
     for _, record in enumerate(caplog.handler.records):
-        assert "[LoggableNoName]" in record.msg
+        assert "LoggableNoName" in record.clsname
