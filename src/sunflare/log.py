@@ -6,10 +6,14 @@ from functools import cached_property
 
 __all__ = ["Loggable"]
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import MutableMapping
+    from typing import Any, MutableMapping
+
+    _LoggerAdapter = logging.LoggerAdapter[logging.Logger]
+else:
+    _LoggerAdapter = logging.LoggerAdapter
 
 
 class GlobalFormatter(logging.Formatter):
@@ -33,8 +37,10 @@ class GlobalFormatter(logging.Formatter):
         return formatted
 
 
-class ContextualAdapter(logging.LoggerAdapter[Any]):
+class ContextualAdapter(_LoggerAdapter):
     """Adapter that adds class and object context to log messages.
+
+    It expands the ``kwargs`` to inject the object's class name and name into the log record.
 
     Parameters
     ----------
@@ -55,13 +61,10 @@ class ContextualAdapter(logging.LoggerAdapter[Any]):
     ) -> tuple[str, MutableMapping[str, Any]]:
         """Add object context to the log message."""
         clsname = self.obj.__class__.__name__
-        prefix = f"[{clsname}"
-        if self.logger.isEnabledFor(kwargs.get("level", logging.INFO)):
-            if hasattr(self.obj, "name"):
-                obj_name: str = getattr(self.obj, "name")
-                prefix += f" -> {obj_name}"
-        prefix += "]"
-        return f"{prefix}: {msg}", kwargs
+        extra: dict[str, Any] = kwargs.get("extra", {})
+        extra["clsname"] = clsname
+        extra["uid"] = getattr(self.obj, "name", None)
+        return msg, kwargs
 
 
 class InfoFilter(logging.Filter):
@@ -122,6 +125,6 @@ class Loggable:
     """Mixin class that adds a logger to a class instance with extra contextual information."""
 
     @cached_property
-    def logger(self) -> logging.LoggerAdapter[Any]:
+    def logger(self) -> _LoggerAdapter:
         """Logger instance with contextual information."""
         return ContextualAdapter(logging.getLogger("redsun"), self)
