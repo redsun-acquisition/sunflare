@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.5.3] - 25-03-2025
+
+### Changed
+
+- Reworked `log.py`
+  - When calling `obj.debug`, the line where the call was emitted redirected to `Loggable`
+  - using a `logging.LoggerAdapter` prevents this
+  - it also make the usage of `Loggable` more consistent by simply returning a `cached_property`, which now enforces usage of `obj.logger.debug` which is less confusing
+
 ## [0.5.2] - 13-03-2025
 
 ### Changed
@@ -205,6 +214,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.5.3]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.4.2...v0.5.0
