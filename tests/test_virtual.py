@@ -114,10 +114,7 @@ def test_virtual_bus_no_object(
 
     assert len(signals) == 0
     assert caplog.records[0].levelname == "ERROR"
-    assert (
-        caplog.records[0].message
-        == "[VirtualBus]: Class MockOwner not found in the registry."
-    )
+    assert caplog.records[0].message == "Class MockOwner not found in the registry."
 
     bus.shutdown()
 
