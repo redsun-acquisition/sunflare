@@ -31,7 +31,6 @@ classifiers = [
 license = {text = "Apache-2.0"}
 dependencies = [
     "pyyaml",
-    "types-PyYAML",
     "bluesky",
     "attrs",
     "psygnal",
@@ -52,12 +51,13 @@ docs = [
     "myst-parser"
 ]
 dev = [
-  "ruff",
-  "pytest",
-  "pytest-cov",
-  "pre-commit",
-  "ophyd",
-  "mypy"
+    "types-PyYAML",
+    "ruff",
+    "pytest",
+    "pytest-cov",
+    "pre-commit",
+    "ophyd",
+    "mypy"
 ]
 
 [project.urls]
