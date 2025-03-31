@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from sunflare.virtual import encode, decode
 from sunflare.virtual._bus import _msgpack_dec_hook, _msgpack_enc_hook
@@ -16,7 +15,7 @@ def test_hooks():
     array = np.array([1, 2, 3])
     ret = _msgpack_enc_hook(array)
     assert isinstance(ret, tuple)
-    assert isinstance(ret[0], bytes)
+    assert isinstance(ret[0], memoryview)
     assert isinstance(ret[1], str)
     assert isinstance(ret[2], tuple)
 
