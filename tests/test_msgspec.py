@@ -23,9 +23,6 @@ def test_hooks():
     original = _msgpack_dec_hook(np.ndarray, ret)
     assert np.array_equal(original, array)
 
-    with pytest.raises(NotImplementedError):
-        _msgpack_enc_hook([1, 2, 3])
-
     non_array = encode([1, 2, 3])
     non_array_ret = _msgpack_dec_hook(list, non_array)
     assert non_array_ret == non_array

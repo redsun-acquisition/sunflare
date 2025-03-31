@@ -44,11 +44,10 @@ _INPROC_XSUB = "inproc://virtual_xsub"
 
 def _msgpack_enc_hook(obj: object) -> object:
     if isinstance(obj, np.ndarray):
-        # TODO: this can be done more efficiently
-        return (obj.tobytes(), str(obj.dtype), obj.shape)
-    raise NotImplementedError(
-        f"Object of type {type(obj)} is not a supported type for encoding"
-    )
+        # TODO: this can be done more efficiently;
+        # consider using msgpack extension
+        return (obj.data, str(obj.dtype), obj.shape)
+    return obj
 
 
 def _msgpack_dec_hook(expected_type: type, obj: object) -> object:
