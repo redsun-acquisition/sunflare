@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.5.4] - 31-03-2025
+
+### Fixed
+
+- fixed `msgspec` decoding hook
+  - now returns the object when it's not of type `np.ndarray`
+- fixed `RunEngine` document emission
+  - `emit` was failing to parse the document name
+
 ## [0.5.3] - 25-03-2025
 
 ### Changed
@@ -214,6 +223,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.5.4]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.0...v0.5.1

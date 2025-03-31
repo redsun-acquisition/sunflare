@@ -1,12 +1,16 @@
 [   
-
     {
         "name": "latest",
-        "version": "0.5.4",
+        "version": "0.5.5",
         "url": "https://redsun-acquisition.github.io/sunflare/main/"
     },
     {
-        "name": "0.5.3 (stable)",
+        "name": "0.5.4 (stable)",
+        "version": "0.5.4",
+        "url": "https://redsun-acquisition.github.io/sunflare/v0.5.4/"
+    },
+    {
+        "name": "0.5.3",
         "version": "0.5.3",
         "url": "https://redsun-acquisition.github.io/sunflare/v0.5.3/"
     },
