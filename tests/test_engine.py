@@ -358,10 +358,13 @@ def test_engine_prefix(bus: VirtualBus) -> None:
                     try:
                         socks = dict(self.poller.poll())
                         if self.socket in socks:
-                            name, doc = self.socket.recv_multipart()
-                            name = name.decode()
-                            doc = decode(doc)
-                            assert name in self.topics
+                            content = self.socket.recv_multipart()
+                            name = content[0].decode()
+                            tpc_cnt = 0
+                            for topic in self.topics:
+                                if name.startswith(topic):
+                                    tpc_cnt += 1
+                            assert tpc_cnt == len(self.topics)
                     except zmq.error.ContextTerminated:
                         break
             finally:

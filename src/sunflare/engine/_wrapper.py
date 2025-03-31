@@ -127,7 +127,7 @@ class RunEngine(BlueskyRunEngine):
 
         """
         if self.socket is not None:
-            topic = f"{self.socket_prefix}:{str(DocumentNames[name])}"
+            topic = f"{self.socket_prefix}/{str(name).split('.')[-1]}"
             self.socket.send_multipart([topic.encode(), encode(doc)])
         super().emit_sync(name, doc)
 
