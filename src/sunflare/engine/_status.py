@@ -37,9 +37,12 @@ from __future__ import annotations
 import logging
 import threading
 from collections import deque
-from typing import Callable, Optional
+from typing import TYPE_CHECKING
 
 from ._exceptions import InvalidState, StatusTimeoutError, WaitTimeoutError
+
+if TYPE_CHECKING:
+    from typing import Callable, Optional
 
 __all__ = ["Status"]
 
