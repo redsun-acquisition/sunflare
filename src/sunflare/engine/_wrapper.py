@@ -13,7 +13,7 @@ from bluesky.run_engine import (
     RunEngine as BlueskyRunEngine,
 )
 from bluesky.run_engine import RunEngineResult
-from bluesky.utils import DuringTask
+from bluesky.utils import DuringTask, RunEngineInterrupted
 from event_model import (
     Datum,
     DatumPage,
@@ -30,7 +30,7 @@ from event_model import (
 
 from sunflare.virtual import encode
 
-__all__ = ["RunEngine", "RunEngineResult"]
+__all__ = ["RunEngine", "RunEngineResult", "RunEngineInterrupted"]
 
 DocumentType = Union[
     RunStart,
@@ -45,7 +45,7 @@ DocumentType = Union[
     StreamDatum,
 ]
 
-REResultType = Union[RunEngineResult, tuple[str, ...]]
+REResultType = Union[RunEngineResult, tuple[str, ...], Exception]
 FuncSocket = Union[Callable[[str, dict[str, Any]], None], zmq.Socket[bytes]]
 
 _prefix_counter = count()
@@ -146,8 +146,11 @@ class RunEngine(BlueskyRunEngine):
         return self._fut
 
     def _set_result(self, fut: Future[REResultType]) -> None:
-        self._result = fut.result()
+        try:
+            self._result = fut.result()
+        except Exception as exc:
+            self._result = exc
 
     @property
-    def result(self) -> Union[REResultType]:
+    def result(self) -> REResultType:
         return self._result
