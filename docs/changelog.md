@@ -14,6 +14,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Dropped support for 3.9
 - Removed usage of `Optional` and `Union`
   - Replaced with built-in `|` instead
+- Added `uv.lock`
 
 ## [0.5.5] - 02-04-2025
 
