@@ -26,28 +26,6 @@ T = TypeVar("T")
 
 
 @unique
-class AcquisitionEngineTypes(str, Enum):
-    """ 
-    Supported acquisition engines.
-
-    Acquisition engines are objects created within Redsun and operate
-    as Bluesky plan managers for the acquisition process. 
-    They are responsible for the orchestration of the different hardware 
-    components currently loaded in Redsun.
-
-    It is expected that new acquisition engines implement Bluesky's ``RunEngine`` public API.
-
-    Attributes
-    ----------
-    BLUESKY
-        Python-based data acquisition framework for scientific experiments. \
-        For more informations, refer to the `Bluesky documentation page <https://blueskyproject.io/bluesky/index.html>`_.
-    """
-
-    BLUESKY = "bluesky"
-
-
-@unique
 class FrontendTypes(str, Enum):
     """Supported frontend types.
 
@@ -350,12 +328,6 @@ class ModelInfo(ModelInfoProtocol):
 
 
 # helper private functions for type conversion
-def _convert_engine_type(
-    x: str | AcquisitionEngineTypes,
-) -> AcquisitionEngineTypes:
-    return x if isinstance(x, AcquisitionEngineTypes) else AcquisitionEngineTypes(x)
-
-
 def _convert_frontend_type(x: str | FrontendTypes) -> FrontendTypes:
     return x if isinstance(x, FrontendTypes) else FrontendTypes(x)
 
@@ -377,9 +349,6 @@ class RedSunSessionInfo:
     session: ``str``
         The name of the current session. Defaults to ``Redsun``.
         It will be shown as the main window title.
-    engine : ``AcquisitionEngineTypes``
-        Acquisition engine selected for the current session.
-        Defaults to ``AcquisitionEngineTypes.BLUESKY``.
     frontend : ``FrontendTypes``
         Frontend selected for the current session.
         Defaults to ``FrontendTypes.PYQT``.
@@ -397,11 +366,6 @@ class RedSunSessionInfo:
     session: str = field(
         default="Redsun",
         validator=validators.instance_of(str),
-        on_setattr=setters.frozen,
-    )
-    engine: AcquisitionEngineTypes = field(
-        converter=_convert_engine_type,
-        validator=validators.in_(AcquisitionEngineTypes),
         on_setattr=setters.frozen,
     )
     frontend: FrontendTypes = field(

@@ -47,7 +47,7 @@ def test_not_absolute_path() -> None:
 
     config = RedSunSessionInfo.load_yaml(str(path_to_test))
 
-    assert config["engine"] == "bluesky"
+    assert config["frontend"] == "pyqt"
 
 
 def test_empty_info(config_path: Path) -> None:
@@ -55,7 +55,6 @@ def test_empty_info(config_path: Path) -> None:
     config = RedSunSessionInfo.load_yaml(config_path / "empty_instance.yaml")
     session = RedSunSessionInfo(**config)
 
-    assert session.engine == "bluesky"
     assert session.controllers == {}
     assert session.models == {}
 
@@ -71,7 +70,6 @@ def test_detectors_info(config_path: Path):
 
     session = RedSunSessionInfo(**config)
 
-    assert session.engine == "bluesky"
     assert session.models != {}
 
     for _, mock in session.models.items():
@@ -96,7 +94,6 @@ def test_motors_info(config_path: Path):
 
     session = RedSunSessionInfo(**config)
 
-    assert session.engine == "bluesky"
     assert session.models != {}
 
     # inspect the motors
@@ -122,7 +119,6 @@ def test_controller_info(config_path: Path, tmp_path: Path):
     }
     session = RedSunSessionInfo(**config)
 
-    assert session.engine == "bluesky"
     assert session.models == {}
     assert session.widgets == {}
     assert session.controllers != {}
@@ -144,7 +140,6 @@ def test_widget_info(config_path: Path):
     }
     session = RedSunSessionInfo(**config)
 
-    assert session.engine == "bluesky"
     assert session.frontend == "pyqt"
     assert session.controllers == {}
     assert session.models == {}
@@ -181,7 +176,6 @@ def test_full_config(config_path: Path, tmp_path: Path):
 
     session = RedSunSessionInfo(**config)
 
-    assert session.engine == "bluesky"
     assert session.frontend == "pyqt"
     assert session.controllers != {}
     assert session.models != {}
@@ -271,7 +265,6 @@ def test_session_name(config_path: Path):
     session = RedSunSessionInfo(**config)
 
     assert session.session == "My test session"
-    assert session.engine == "bluesky"
     assert session.frontend == "pyqt"
     assert session.controllers == {}
     assert session.models == {}
