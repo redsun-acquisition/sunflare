@@ -15,6 +15,8 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Removed usage of `Optional` and `Union`
   - Replaced with built-in `|` instead
 - Added `uv.lock`
+- Removed `engine` field from `RedsunSessionInfo`
+  - Not really meaningful, was part of old concept
 
 ## [0.5.5] - 02-04-2025
 
