@@ -1,4 +1,3 @@
-engine: bluesky
 frontend: pyqt
 models:
   First mock detector:

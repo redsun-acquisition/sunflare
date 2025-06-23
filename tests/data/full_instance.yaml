@@ -1,5 +1,4 @@
 session: "My test session"
-engine: bluesky
 frontend: pyqt
 controllers:
   MyController:

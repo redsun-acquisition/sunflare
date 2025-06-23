@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, runtime_checkable
 from typing_extensions import Protocol
 
 if TYPE_CHECKING:
-    from typing import Any, Optional
+    from typing import Any
 
     from bluesky.protocols import Descriptor, Reading, SyncOrAsync
 
@@ -80,7 +80,7 @@ class ModelProtocol(Protocol):  # pragma: no cover
 
     @property
     @abstractmethod
-    def parent(self) -> Optional[Any]:
+    def parent(self) -> Any | None:
         """``None``, or a reference to a parent device.
 
         Used by the RE to stop duplicate stages.

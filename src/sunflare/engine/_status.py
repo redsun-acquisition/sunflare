@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING
 from ._exceptions import InvalidState, StatusTimeoutError, WaitTimeoutError
 
 if TYPE_CHECKING:
-    from typing import Callable, Optional
+    from typing import Callable
 
 __all__ = ["Status"]
 
@@ -101,9 +101,7 @@ class Status:
     program has moved on.
     """
 
-    def __init__(
-        self, *, timeout: Optional[float] = None, settle_time: Optional[float] = 0
-    ):
+    def __init__(self, *, timeout: float | None = None, settle_time: float | None = 0):
         super().__init__()
         self._logger = logging.getLogger("redsun")
         self._tname = None
@@ -115,7 +113,7 @@ class Status:
         self._externally_initiated_completion_lock = threading.Lock()
         self._externally_initiated_completion = False
         self._callbacks: deque[Callable[[Status], None]] = deque()
-        self._exception: Optional[Exception] = None
+        self._exception: Exception | None = None
 
         if settle_time is None:
             settle_time = 0.0
@@ -132,7 +130,7 @@ class Status:
         self._callback_thread.start()
 
     @property
-    def timeout(self) -> Optional[float]:
+    def timeout(self) -> float | None:
         """The timeout for this action.
 
         This is set when the Status is created, and it cannot be changed.
@@ -300,7 +298,7 @@ class Status:
         else:
             self._settled_event.set()
 
-    def exception(self, timeout: Optional[float] = None) -> Optional[Exception]:
+    def exception(self, timeout: float | None = None) -> Exception | None:
         """Return the exception raised by the action.
 
         If the action has completed successfully, return ``None``. If it has
@@ -308,7 +306,7 @@ class Status:
 
         Parameters
         ----------
-        timeout: Union[Number, None], optional
+        timeout: float | None, optional
             If None (default) wait indefinitely until the status finishes.
 
         Returns
@@ -327,7 +325,7 @@ class Status:
             raise WaitTimeoutError("Status has not completed yet.")
         return self._exception
 
-    def wait(self, timeout: Optional[float] = None) -> None:
+    def wait(self, timeout: float | None = None) -> None:
         """Block until the action completes.
 
         When the action has finished succesfully, return ``None``. If the

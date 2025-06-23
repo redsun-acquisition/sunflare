@@ -2,36 +2,27 @@ from __future__ import annotations
 
 import logging
 from enum import Enum, unique
+from functools import cached_property
 from pathlib import Path
-from typing import Any, Mapping, Protocol, Sized, TypeVar, Union, runtime_checkable
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Mapping,
+    Protocol,
+    Sized,
+    TypeVar,
+    runtime_checkable,
+)
 
 import numpy as np
 import yaml
 from attrs import AttrsInstance, asdict, define, field, setters, validators
 
+if TYPE_CHECKING:
+    from bluesky.protocols import Descriptor, Reading
+    from event_model.documents import Dtype
+
 T = TypeVar("T")
-
-
-@unique
-class AcquisitionEngineTypes(str, Enum):
-    """ 
-    Supported acquisition engines.
-
-    Acquisition engines are objects created within Redsun and operate
-    as Bluesky plan managers for the acquisition process. 
-    They are responsible for the orchestration of the different hardware 
-    components currently loaded in Redsun.
-
-    It is expected that new acquisition engines implement Bluesky's ``RunEngine`` public API.
-
-    Attributes
-    ----------
-    BLUESKY
-        Python-based data acquisition framework for scientific experiments. \
-        For more informations, refer to the `Bluesky documentation page <https://blueskyproject.io/bluesky/index.html>`_.
-    """
-
-    BLUESKY = "bluesky"
 
 
 @unique
@@ -84,7 +75,7 @@ class WidgetPositionTypes(str, Enum):
 
 
 def _convert_widget_position_type(
-    x: Union[str, WidgetPositionTypes],
+    x: str | WidgetPositionTypes,
 ) -> WidgetPositionTypes:
     return x if isinstance(x, WidgetPositionTypes) else WidgetPositionTypes(x)
 
@@ -244,17 +235,20 @@ class ModelInfo(ModelInfoProtocol):
         validator=validators.instance_of(str),
     )
 
-    __type_map = {
-        str: "string",
-        float: "number",
-        int: "integer",
-        bool: "boolean",
-        list: "array",
-        tuple: "array",
-        dict: "array",
-        np.ndarray: "array",
-        Mapping: "array",
-    }
+    @cached_property
+    def _type_map(self) -> dict[type, Dtype]:
+        """Return the type map for the model information."""
+        return {
+            str: "string",
+            float: "number",
+            int: "integer",
+            bool: "boolean",
+            list: "array",
+            tuple: "array",
+            dict: "array",
+            np.ndarray: "array",
+            Mapping: "array",
+        }
 
     def __get_shape(self, value: Any) -> list[int]:
         if isinstance(value, Sized) and not isinstance(value, str):
@@ -264,10 +258,10 @@ class ModelInfo(ModelInfoProtocol):
                 return [len(value)]
         return []
 
-    def __get_type(self, value: T) -> str:
-        return self.__type_map[type(value)]
+    def __get_type(self, value: T) -> Dtype:
+        return self._type_map[type(value)]
 
-    def read_configuration(self, timestamp: float = 0) -> dict[str, Any]:
+    def read_configuration(self, timestamp: float = 0) -> dict[str, Reading[Any]]:
         """Read the model information as a Bluesky configuration dictionary.
 
         Parameters
@@ -279,7 +273,7 @@ class ModelInfo(ModelInfoProtocol):
 
         Returns
         -------
-        ``dict[str, Any]``
+        ``dict[str, Reading[Any]]``
             A dictionary containing the model information,
             compatible with Bluesky configuration representation.
 
@@ -297,7 +291,9 @@ class ModelInfo(ModelInfoProtocol):
             }
         }
 
-    def describe_configuration(self, source: str = "model_info") -> dict[str, Any]:
+    def describe_configuration(
+        self, source: str = "model_info"
+    ) -> dict[str, Descriptor]:
         """Describe the model information as a Bluesky configuration dictionary.
 
         Parameters
@@ -308,7 +304,7 @@ class ModelInfo(ModelInfoProtocol):
 
         Returns
         -------
-        ``dict[str, Any]``
+        ``dict[str, Descriptor]``
             A dictionary containing the model information description,
             compatible with Bluesky configuration representation.
 
@@ -323,7 +319,7 @@ class ModelInfo(ModelInfoProtocol):
                 key: {
                     "source": source,
                     "dtype": self.__get_type(value),
-                    "shape": self.__get_shape(value),
+                    "shape": self.__get_shape(value),  # type: ignore[typeddict-item]
                 }
                 for key, value in asdict(self).items()
                 if key not in ["plugin_name", "plugin_id"]
@@ -332,13 +328,7 @@ class ModelInfo(ModelInfoProtocol):
 
 
 # helper private functions for type conversion
-def _convert_engine_type(
-    x: Union[str, AcquisitionEngineTypes],
-) -> AcquisitionEngineTypes:
-    return x if isinstance(x, AcquisitionEngineTypes) else AcquisitionEngineTypes(x)
-
-
-def _convert_frontend_type(x: Union[str, FrontendTypes]) -> FrontendTypes:
+def _convert_frontend_type(x: str | FrontendTypes) -> FrontendTypes:
     return x if isinstance(x, FrontendTypes) else FrontendTypes(x)
 
 
@@ -359,9 +349,6 @@ class RedSunSessionInfo:
     session: ``str``
         The name of the current session. Defaults to ``Redsun``.
         It will be shown as the main window title.
-    engine : ``AcquisitionEngineTypes``
-        Acquisition engine selected for the current session.
-        Defaults to ``AcquisitionEngineTypes.BLUESKY``.
     frontend : ``FrontendTypes``
         Frontend selected for the current session.
         Defaults to ``FrontendTypes.PYQT``.
@@ -379,11 +366,6 @@ class RedSunSessionInfo:
     session: str = field(
         default="Redsun",
         validator=validators.instance_of(str),
-        on_setattr=setters.frozen,
-    )
-    engine: AcquisitionEngineTypes = field(
-        converter=_convert_engine_type,
-        validator=validators.in_(AcquisitionEngineTypes),
         on_setattr=setters.frozen,
     )
     frontend: FrontendTypes = field(

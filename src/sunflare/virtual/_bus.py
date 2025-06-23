@@ -7,9 +7,7 @@ from typing import (
     Callable,
     Final,
     Iterable,
-    Optional,
     TypeVar,
-    Union,
     cast,
     overload,
 )
@@ -18,7 +16,6 @@ from weakref import WeakSet
 import msgspec
 import numpy as np
 import zmq
-import zmq.asyncio
 import zmq.devices
 from psygnal import Signal, SignalInstance
 
@@ -53,7 +50,7 @@ def _msgpack_enc_hook(obj: object) -> object:
 def _msgpack_dec_hook(expected_type: type, obj: object) -> object:
     if expected_type is np.ndarray:
         # TODO: this can be done more efficiently
-        data, dtype, shape = cast(tuple[bytes, str, tuple[int, ...]], obj)
+        data, dtype, shape = cast("tuple[bytes, str, tuple[int, ...]]", obj)
         return np.frombuffer(data, dtype=dtype).reshape(shape)
     return obj
 
@@ -110,9 +107,7 @@ def slot(func: F) -> F: ...
 def slot(*, private: bool) -> Callable[[F], F]: ...
 
 
-def slot(
-    func: Optional[F] = None, *, private: bool = False
-) -> Union[F, Callable[[F], F]]:
+def slot(func: F | None = None, *, private: bool = False) -> F | Callable[[F], F]:
     """Decorate a function (or class method) as a slot.
 
     Parameters
@@ -140,7 +135,7 @@ def slot(
 
 
 class ContextFactory:
-    ctx: Optional[zmq.Context[zmq.Socket[bytes]]] = None
+    ctx: zmq.Context[zmq.Socket[bytes]] | None = None
 
     def __call__(self) -> zmq.Context[zmq.Socket[bytes]]:
         if self.ctx is None:
@@ -202,7 +197,7 @@ class VirtualBus(Loggable):
         self._forwarder.join()
 
     def register_signals(
-        self, owner: object, only: Optional[Iterable[str]] = None
+        self, owner: object, only: Iterable[str] | None = None
     ) -> None:
         """
         Register the signals of an object in the virtual bus.
@@ -294,8 +289,7 @@ class VirtualBus(Loggable):
     ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
     def connect_subscriber(
-        self,
-        topic: Union[str, Iterable[str]] = "",
+        self, topic: str | Iterable[str] = ""
     ) -> tuple[zmq.Socket[bytes], zmq.Poller]:
         """
         Connect a subscriber to the virtual bus.
@@ -444,12 +438,12 @@ class Subscriber(Loggable):
     sub_socket: zmq.Socket[bytes]
     sub_poller: zmq.Poller
     sub_thread: threading.Thread
-    sub_topics: Optional[Union[str, Iterable[str]]]
+    sub_topics: str | Iterable[str] | None
 
     def __init__(
         self,
         virtual_bus: VirtualBus,
-        topics: Union[str, Iterable[str]] = "",
+        topics: str | Iterable[str] = "",
     ) -> None:
         self.sub_socket, self.sub_poller = virtual_bus.connect_subscriber(topics)
         self.logger.debug(f"Registered to topics {topics}")
