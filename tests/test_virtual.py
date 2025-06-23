@@ -317,7 +317,7 @@ def test_virtual_bus_subscriptions(bus: VirtualBus) -> None:
             self.bus = bus
             self.condition = cond
             self.monitorer = monitorer
-            self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
+            self.socket, self.poller = self.bus.connect_subscriber(topics)
             self.logger.debug(f"Subscribed to: {topics}")
 
             self.thread = threading.Thread(target=self._polling_thread, daemon=True)

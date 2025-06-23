@@ -291,7 +291,7 @@ def test_engine_over_virtual(RE: RunEngine, bus: VirtualBus):
             self.received_messages: list[str] = []
             self.bus = bus
             self.topics = topics
-            self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
+            self.socket, self.poller = self.bus.connect_subscriber(topics)
             for topic in topics:
                 self.socket.subscribe(topic)
             self.logger.debug(f"Subscribed to: {topics}")
@@ -344,7 +344,7 @@ def test_engine_prefix(bus: VirtualBus) -> None:
             self.received_messages: list[str] = []
             self.bus = bus
             self.topics = topics
-            self.socket, self.poller = self.bus.connect_subscriber(topic=topics)
+            self.socket, self.poller = self.bus.connect_subscriber(topics)
             for topic in topics:
                 self.socket.subscribe(topic)
             self.logger.debug(f"Subscribed to: {topics}")
