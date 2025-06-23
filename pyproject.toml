@@ -7,7 +7,7 @@ name = "sunflare"
 dynamic = ["version"]
 description = "Redsun plugin development toolkit"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
   {name = "Jacopo Abramo", email = "jacopo.abramo@gmail.com"}
 ]
