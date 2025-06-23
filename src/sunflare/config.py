@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from enum import Enum, unique
 from pathlib import Path
-from typing import Any, Mapping, Protocol, Sized, TypeVar, Union, runtime_checkable
+from typing import Any, Mapping, Protocol, Sized, TypeVar, runtime_checkable
 
 import numpy as np
 import yaml
@@ -84,7 +84,7 @@ class WidgetPositionTypes(str, Enum):
 
 
 def _convert_widget_position_type(
-    x: Union[str, WidgetPositionTypes],
+    x: str | WidgetPositionTypes,
 ) -> WidgetPositionTypes:
     return x if isinstance(x, WidgetPositionTypes) else WidgetPositionTypes(x)
 
@@ -333,12 +333,12 @@ class ModelInfo(ModelInfoProtocol):
 
 # helper private functions for type conversion
 def _convert_engine_type(
-    x: Union[str, AcquisitionEngineTypes],
+    x: str | AcquisitionEngineTypes,
 ) -> AcquisitionEngineTypes:
     return x if isinstance(x, AcquisitionEngineTypes) else AcquisitionEngineTypes(x)
 
 
-def _convert_frontend_type(x: Union[str, FrontendTypes]) -> FrontendTypes:
+def _convert_frontend_type(x: str | FrontendTypes) -> FrontendTypes:
     return x if isinstance(x, FrontendTypes) else FrontendTypes(x)
 
 
