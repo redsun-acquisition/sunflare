@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [Unreleased]
+
+### Changed
+
+- Dropped support for 3.9
+- Removed usage of `Optional` and `Union`
+  - Replaced with built-in `|` instead
+
 ## [0.5.5] - 02-04-2025
 
 ### Fixed
