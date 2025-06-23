@@ -129,7 +129,7 @@ class RunEngine(BlueskyRunEngine):
         self._fut = self._executor.submit(
             super().__call__,
             *args,
-            **metadata_kw,  # type: ignore[no-any-return]
+            **metadata_kw,
         )
         self._fut.add_done_callback(self._set_result)
         return self._fut

@@ -289,11 +289,8 @@ class VirtualBus(Loggable):
     ) -> tuple[zmq.Socket[bytes], zmq.Poller]: ...
 
     def connect_subscriber(
-        self,
-        topic: str | Iterable[str] = "",
-        /,
-        socket_type: int = zmq.SUB,
-    ) -> zmq.Socket[bytes]:
+        self, topic: str | Iterable[str] = ""
+    ) -> tuple[zmq.Socket[bytes], zmq.Poller]:
         """
         Connect a subscriber to the virtual bus.
 

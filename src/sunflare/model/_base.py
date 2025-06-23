@@ -48,9 +48,7 @@ class Model(ModelProtocol, Generic[MI]):
         self._name = name
         self._model_info = model_info
 
-    def describe_configuration(
-        self, *, source: str = "model_info"
-    ) -> SyncOrAsync[Descriptor]:
+    def describe_configuration(self) -> SyncOrAsync[dict[str, Descriptor]]:
         """Provide a description of the model configuration.
 
         Inspects the local ``model_info`` object and
@@ -67,11 +65,9 @@ class Model(ModelProtocol, Generic[MI]):
         dict[``str``, :class:`~event_model.DataKey`]
             A dictionary with the description of each field of the model configuration.
         """
-        return self._model_info.describe_configuration(source)
+        return self._model_info.describe_configuration()
 
-    def read_configuration(
-        self, *, timestamp: float = 0
-    ) -> SyncOrAsync[dict[str, Reading[Any]]]:
+    def read_configuration(self) -> SyncOrAsync[dict[str, Reading[Any]]]:
         """Provide a description of the model configuration.
 
         Inspects the local ``model_info`` object and
@@ -88,7 +84,7 @@ class Model(ModelProtocol, Generic[MI]):
         dict[``str``, :class:`~bluesky.protocols.Descriptor`]
             A dictionary with the description of each field of the model configuration.
         """
-        return self._model_info.read_configuration(timestamp)
+        return self._model_info.read_configuration()
 
     @property
     def name(self) -> str:
