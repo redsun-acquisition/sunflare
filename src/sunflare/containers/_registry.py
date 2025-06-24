@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from typing import Callable, Iterable, TypeGuard, overload
+import inspect
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    TypeGuard,
+    get_type_hints,
+    overload,
+)
 
 from bluesky.utils import MsgGenerator  # noqa: TC002
 
@@ -65,3 +73,30 @@ def register_protocols(
     if owner_name not in protocol_registry:
         protocol_registry[owner_name] = set()
     protocol_registry[owner_name].update(protos)
+
+
+def get_signature_info(obj: Callable) -> dict[str, Any]:
+    """Extract signature information from a callable object.
+
+    Parameters
+    ----------
+    obj : Callable
+        The callable object to inspect.
+        Callable objects can be functions, class methods,
+        or classes with a ``__call__`` method.
+
+    Returns
+    -------
+    dict[str, Any]
+        A dictionary containing the signature information,
+        including the function name, parameters, and return type.
+    """
+    if not callable(obj):
+        raise TypeError(f"{obj} is not callable")
+    signature = inspect.signature(obj)
+    return_type = get_type_hints(obj).get("return", None)
+    return {
+        "name": obj.__name__,
+        "parameters": {k: v.annotation for k, v in signature.parameters.items()},
+        "return_type": return_type,
+    }
