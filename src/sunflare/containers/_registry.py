@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import collections.abc
 import inspect
-from collections.abc import Iterable  # noqa: TC003
+from collections.abc import Generator, Iterable  # noqa: TC003
 from dataclasses import dataclass
 from functools import cached_property
 from types import MappingProxyType
@@ -10,36 +10,121 @@ from typing import (
     Any,
     Callable,
     TypeGuard,
+    cast,
     get_args,
     get_origin,
     get_type_hints,
     overload,
 )
 
-from bluesky.utils import MsgGenerator
+from bluesky.utils import Msg
+from typing_extensions import TypeIs
 
 from sunflare.controller import ControllerProtocol
 from sunflare.model import ModelProtocol
 
 
+@overload
+def ismethoddescriptor(
+    obj: type[Any] | object,
+    method_name: str,
+    descriptor_type: type[staticmethod[Any, Any]],
+) -> TypeIs[staticmethod[Any, Any]]: ...
+
+
+@overload
+def ismethoddescriptor(
+    obj: type[Any] | object,
+    method_name: str,
+    descriptor_type: type[classmethod[Any, Any, Any]],
+) -> TypeIs[classmethod[Any, Any, Any]]: ...
+
+
+def ismethoddescriptor(
+    obj: type[Any] | object,
+    method_name: str,
+    descriptor_type: type[staticmethod[Any, Any] | classmethod[Any, Any, Any]],
+) -> TypeIs[staticmethod[Any, Any] | classmethod[Any, Any, Any]]:
+    """Check if a method is of a specific descriptor type.
+
+    Parameters
+    ----------
+    obj : type[Any] | object
+        The object or class to check for the method.
+    method_name : str
+        The name of the method to check.
+    descriptor_type : type[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
+        The type of descriptor to check against, either `staticmethod` or `classmethod`.
+
+    Returns
+    -------
+    TypeIs[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
+        True if the method is a descriptor of the specified type, False otherwise.
+    """
+    if hasattr(obj, "__class__"):
+        cls: type[Any] = obj.__class__
+    elif inspect.isclass(obj):
+        cls = obj
+    else:
+        return False
+
+    return method_name in cls.__dict__ and isinstance(
+        cls.__dict__[method_name], descriptor_type
+    )
+
+
 def _get_callable_for_inspection(
-    func: Callable[..., MsgGenerator],
-) -> Callable[..., MsgGenerator]:
+    func: Callable[..., Generator[Msg, Any, Any]],
+) -> Callable[..., Generator[Msg, Any, Any]]:
     """Get the actual callable object for signature inspection."""
-    if isinstance(func, (staticmethod, classmethod)):
-        return func.__func__
-    elif (
+    # Check if func is a descriptor directly
+
+    if inspect.ismethod(func):
+        # For bound methods, check if the underlying method is static/class method
+        obj = func.__self__
+        method_name = func.__name__
+
+        if ismethoddescriptor(obj, method_name, staticmethod):
+            static_method = cast(
+                "staticmethod[Any, Any]", getattr(obj.__class__, method_name)
+            )
+            return cast(
+                "Callable[..., Generator[Msg, Any, Any]]", static_method.__func__
+            )
+        if ismethoddescriptor(obj, method_name, classmethod):
+            class_method = cast(
+                "classmethod[Any, Any, Any]", getattr(obj.__class__, method_name)
+            )
+            return cast(
+                "Callable[..., Generator[Msg, Any, Any]]", class_method.__func__
+            )
+        # Regular bound instance method
+        return func
+
+    if (
         hasattr(func, "__call__")
         and hasattr(func, "__class__")
         and not inspect.isfunction(func)
-        and not inspect.ismethod(func)
     ):
-        # For callable objects, inspect the __call__ method
-        return func.__call__
+        # For callable objects, check if __call__ is a static/class method
+        class_obj = func.__class__
+        if "__call__" in class_obj.__dict__:
+            call_descriptor = class_obj.__dict__["__call__"]
+            if isinstance(call_descriptor, staticmethod):
+                return cast(
+                    "Callable[..., Generator[Msg, Any, Any]]", call_descriptor.__func__
+                )
+            if isinstance(call_descriptor, classmethod):
+                return cast(
+                    "Callable[..., Generator[Msg, Any, Any]]", call_descriptor.__func__
+                )
+        # Regular callable object - inspect the __call__ method
+        return cast("Callable[..., Generator[Msg, Any, Any]]", func.__call__)
+
     return func
 
 
-def _get_plan_name_and_type(func: Callable[..., MsgGenerator]) -> str:
+def _get_plan_name_and_type(func: Callable[..., Generator[Msg, Any, Any]]) -> str:
     """
     Get the appropriate plan name for different callable objects.
 
@@ -51,38 +136,60 @@ def _get_plan_name_and_type(func: Callable[..., MsgGenerator]) -> str:
     """
     if inspect.isfunction(func):
         return func.__name__
-    elif inspect.ismethod(func):
-        # Bound instance method
-        return f"{func.__self__.__class__.__name__}.{func.__name__}"
-    elif isinstance(func, staticmethod):
-        # Static method - get the underlying function
-        underlying_func = func.__func__
-        # Get the class name from the qualified name if available
-        if (
-            hasattr(underlying_func, "__qualname__")
-            and "." in underlying_func.__qualname__
-        ):
-            class_name = underlying_func.__qualname__.split(".")[-2]
-            return f"{class_name}.{underlying_func.__name__}"
-        return underlying_func.__name__
-    elif isinstance(func, classmethod):
-        # Class method - get the underlying function
-        underlying_func = func.__func__
-        # Get the class name from the qualified name if available
-        if (
-            hasattr(underlying_func, "__qualname__")
-            and "." in underlying_func.__qualname__
-        ):
-            class_name = underlying_func.__qualname__.split(".")[-2]
-            return f"{class_name}.{underlying_func.__name__}"
-        return underlying_func.__name__
-    elif hasattr(func, "__call__") and hasattr(func, "__class__"):
-        # Callable object with __call__ method - use class name with __call__
-        class_name = func.__class__.__name__
-        return f"{class_name}"
-    else:
-        # Fallback for other callable objects
-        return getattr(func, "__name__", str(func))
+
+    if inspect.ismethod(func):
+        # Bound instance method - check if it's actually a static/class method
+        obj = func.__self__
+        method_name = func.__name__
+
+        if ismethoddescriptor(obj, method_name, staticmethod):
+            # It's a static method accessed through an instance
+            static_method = cast(
+                "staticmethod[Any, Any]", getattr(obj.__class__, method_name)
+            )
+            underlying_func = static_method.__func__
+            if (
+                hasattr(underlying_func, "__qualname__")
+                and "." in underlying_func.__qualname__
+            ):
+                class_name = underlying_func.__qualname__.split(".")[-2]
+                return f"{class_name}.{underlying_func.__name__}"
+            return str(underlying_func.__name__)
+
+        if ismethoddescriptor(obj, method_name, classmethod):
+            # It's a class method
+            class_method = cast(
+                "classmethod[Any, Any, Any]", getattr(obj.__class__, method_name)
+            )
+            underlying_func = class_method.__func__
+            if (
+                hasattr(underlying_func, "__qualname__")
+                and "." in underlying_func.__qualname__
+            ):
+                class_name = underlying_func.__qualname__.split(".")[-2]
+                return f"{class_name}.{underlying_func.__name__}"
+            return str(underlying_func.__name__)
+
+        # Regular bound instance method
+        return f"{obj.__class__.__name__}.{method_name}"
+
+    if hasattr(func, "__call__") and hasattr(func, "__class__"):
+        # Callable object with __call__ method - check if __call__ is static/class method
+        class_obj = func.__class__
+        if "__call__" in class_obj.__dict__:
+            call_descriptor = class_obj.__dict__["__call__"]
+            if isinstance(call_descriptor, staticmethod):
+                call_underlying_func = call_descriptor.__func__
+                return f"{class_obj.__name__}.{call_underlying_func.__name__}"
+            if isinstance(call_descriptor, classmethod):
+                call_underlying_func = call_descriptor.__func__
+                return f"{class_obj.__name__}.{call_underlying_func.__name__}"
+        # Regular callable object
+        return class_obj.__name__
+
+    # Fallback for other callable objects
+    name_attr = getattr(func, "__name__", None)
+    return str(name_attr) if name_attr is not None else str(func)
 
 
 @dataclass(frozen=True)
@@ -97,7 +204,7 @@ class ParameterInfo:
         The type annotation of the parameter.
     default : Any
         The default value of the parameter, if any.
-    kind : inspect.Parameter
+    kind : inspect._ParameterKind
         The kind of the parameter (e.g., positional, keyword, etc.).
     is_protocol : bool
         Whether the parameter is a protocol type.
@@ -111,7 +218,7 @@ class ParameterInfo:
     name: str
     annotation: Any
     default: Any
-    kind: inspect.Parameter
+    kind: inspect._ParameterKind
     is_protocol: bool
     is_generic_protocol: bool  # New field for generic protocol types
     generic_args: tuple[Any, ...] | None = None  # Type arguments for generics
@@ -143,7 +250,9 @@ class PlanSignature:
         return self._hash
 
     @classmethod
-    def from_function(cls, func: Callable[..., MsgGenerator]) -> "PlanSignature":
+    def from_function(
+        cls, func: Callable[..., Generator[Msg, Any, Any]]
+    ) -> "PlanSignature":
         """Create a PlanSignature from a function, method, or other callable."""
         # Get the appropriate name and the actual callable for inspection
         plan_name = _get_plan_name_and_type(func)
@@ -186,7 +295,9 @@ protocol_registry: dict[str, set[type[ModelProtocol]]] = {}
 
 #: Registry for storing plan generators with their detailed signatures
 #: The dictionary maps plan owners to PlanSignature objects to their callable functions
-plan_registry: dict[str, dict[PlanSignature, Callable[..., MsgGenerator]]] = {}
+plan_registry: dict[
+    str, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
+] = {}
 
 
 def _is_model_protocol(proto: type) -> TypeGuard[type[ModelProtocol]]:
@@ -242,10 +353,17 @@ def _check_protocol_in_generic(
 
 
 def _extract_protocol_types_from_generic(
-    annotation: Any, registered_protocols: set
+    annotation: Any, registered_protocols: set[type[ModelProtocol]]
 ) -> list[type]:
     """
     Extract all protocol types from a generic annotation and check if they're registered.
+
+    Parameters
+    ----------
+    annotation : Any
+        The type annotation to inspect.
+    registered_protocols : set
+        A set of registered protocol types to check against.
 
     Returns
     -------
@@ -282,10 +400,14 @@ def _extract_protocol_types_from_generic(
 def register_protocols(
     owner: ControllerProtocol, protocols: type[ModelProtocol]
 ) -> None: ...
+
+
 @overload
 def register_protocols(
     owner: ControllerProtocol, protocols: Iterable[type[ModelProtocol]]
 ) -> None: ...
+
+
 def register_protocols(
     owner: ControllerProtocol,
     protocols: type[ModelProtocol] | Iterable[type[ModelProtocol]],
@@ -327,16 +449,21 @@ def register_protocols(
 @overload
 def register_plans(
     owner: ControllerProtocol,
-    plans: Callable[..., MsgGenerator],
+    plans: Callable[..., Generator[Msg, Any, Any]],
 ) -> None: ...
+
+
 @overload
 def register_plans(
     owner: ControllerProtocol,
-    plans: Iterable[Callable[..., MsgGenerator]],
+    plans: Iterable[Callable[..., Generator[Msg, Any, Any]]],
 ) -> None: ...
+
+
 def register_plans(
     owner: ControllerProtocol,
-    plans: Callable[..., MsgGenerator] | Iterable[Callable[..., MsgGenerator]],
+    plans: Callable[..., Generator[Msg, Any, Any]]
+    | Iterable[Callable[..., Generator[Msg, Any, Any]]],
 ) -> None:
     """Register one or multiple plan generators.
 
@@ -349,33 +476,33 @@ def register_plans(
     ----------
     owner : ``ControllerProtocol``
         The owner of the plan.
-    plans : ``Callable[..., MsgGenerator] | Iterable[Callable[..., MsgGenerator]]``
+    plans : ``Callable[..., Generator[Msg, Any, Any]] | Iterable[Callable[..., Generator[Msg, Any, Any]]]``
         The plan generator or generators to register.
 
     Raises
     ------
     TypeError
         If the owner does not implement `ControllerProtocol`,
-        if the plans are not callable or if they do not return a `MsgGenerator`.
+        if the plans are not callable or if they do not return a `Generator[Msg, Any, Any]`.
     """
     if not isinstance(owner, ControllerProtocol):
         raise TypeError(f"Owner must implement ControllerProtocol, got {type(owner)}")
     owner_name = owner.__class__.__name__
 
     # Convert input to a set to ensure uniqueness
-    if isinstance(plans, Callable):
+    if callable(plans):
         obj_plans = {plans}
     else:
         obj_plans = set(plans)
 
     # Validate all plans before registering any
-    plan_signatures = {}
+    plan_signatures: dict[str, PlanSignature] = {}
     for plan in obj_plans:
         if not callable(plan):
             raise TypeError("Plans must be callable objects that return a MsgGenerator")
 
         # Get the actual function for inspection
-        inspectable_func = PlanSignature._get_callable_for_inspection(plan)
+        inspectable_func = _get_callable_for_inspection(plan)
 
         if not inspect.isgeneratorfunction(inspectable_func):
             raise TypeError(f"Plan {plan} must be a generator function")
@@ -385,8 +512,39 @@ def register_plans(
 
         # Validate return type using the inspectable function
         type_hints = get_type_hints(inspectable_func)
-        if "return" not in type_hints or type_hints["return"] is not MsgGenerator:
-            raise TypeError(f"Plan {plan} must return a MsgGenerator")
+        if "return" in type_hints:
+            return_type = type_hints["return"]
+            # Check if return type is a Generator that yields Msg
+            origin = get_origin(return_type)
+            if origin is not None:
+                # Handle generic types like Generator[Msg, Any, P]
+                if origin is not Generator:
+                    raise TypeError(
+                        f"Plan {plan} must return a Generator, got {return_type}"
+                    )
+                # Check that it yields Msg objects
+                args = get_args(return_type)
+                if args and len(args) >= 1:
+                    yield_type = args[0]  # First type arg is what the generator yields
+                    # Import Msg from bluesky.utils to check against
+                    if yield_type is not Msg:
+                        raise TypeError(
+                            f"Plan {plan} must return a Generator that yields Msg, got Generator[{yield_type}, ...]"
+                        )
+            else:
+                # Check if it's at least a Generator (fallback)
+                try:
+                    if not issubclass(return_type, Generator):
+                        raise TypeError(
+                            f"Plan {plan} must return a Generator, got {return_type}"
+                        )
+                except TypeError:
+                    # return_type is not a class, so can't use issubclass
+                    raise TypeError(
+                        f"Plan {plan} must return a Generator, got {return_type}"
+                    )
+        else:
+            raise TypeError(f"Plan {plan} must have a return type annotation")
 
         # Check if the plan requires any protocols (including in generics)
         for param_info in plan_sig.parameters.values():
@@ -413,5 +571,5 @@ def register_plans(
 
     # Use PlanSignature objects as keys and functions as values
     for plan in obj_plans:
-        plan_sig = plan_signatures[PlanSignature._get_plan_name_and_type(plan)]
+        plan_sig = plan_signatures[_get_plan_name_and_type(plan)]
         plan_registry[owner_name][plan_sig] = plan
