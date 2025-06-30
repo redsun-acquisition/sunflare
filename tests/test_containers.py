@@ -334,8 +334,8 @@ def test_containers() -> None:
 
     provider = PlanProvider("TestProvider")
     method_plans = [
-        provider.static_calibration_plan,
-        provider.class_setup_plan,
+        PlanProvider.static_calibration_plan,
+        PlanProvider.class_setup_plan,
         provider.instance_monitoring_plan,
         provider,
     ]
