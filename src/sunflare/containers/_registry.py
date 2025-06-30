@@ -16,6 +16,7 @@ from typing import (
     get_type_hints,
     overload,
 )
+from weakref import WeakKeyDictionary
 
 from bluesky.utils import Msg
 from typing_extensions import TypeIs
@@ -281,13 +282,15 @@ class PlanSignature:
 
 #: Registry for storing model protocols
 #: The dictionary maps the protocol owners to a set of `ModelProtocol` types.
-protocol_registry: dict[ControllerProtocol, set[type[ModelProtocol]]] = {}
+protocol_registry: WeakKeyDictionary[ControllerProtocol, set[type[ModelProtocol]]] = (
+    WeakKeyDictionary()
+)
 
 #: Registry for storing plan generators with their detailed signatures
 #: The dictionary maps plan owners to PlanSignature objects to their callable functions
-plan_registry: dict[
+plan_registry: WeakKeyDictionary[
     ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
-] = {}
+] = WeakKeyDictionary()
 
 
 def _is_model_protocol(proto: type) -> TypeGuard[type[ModelProtocol]]:
