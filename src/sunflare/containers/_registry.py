@@ -61,10 +61,9 @@ def ismethoddescriptor(
     TypeIs[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
         True if the method is a descriptor of the specified type, False otherwise.
     """
-    if hasattr(obj, "__class__"):
-        cls: type[Any] = obj.__class__
-    elif inspect.isclass(obj):
-        cls = obj
+    cls: type[Any]
+    if inspect.isclass(obj):
+        cls = obj.__class__
     else:
         return False
 
