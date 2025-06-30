@@ -1,10 +1,13 @@
-import pytest
 import collections.abc
 from collections.abc import Generator
 from bluesky.utils import Msg
 from typing import Generator, runtime_checkable, Protocol, Any
-from sunflare.containers import register_plans, register_protocols
-from sunflare.containers._registry import plan_registry, protocol_registry
+from sunflare.containers import (
+    register_plans,
+    register_protocols,
+    get_plans,
+    get_protocols,
+)
 from sunflare.virtual import VirtualBus
 from sunflare.model import ModelProtocol
 from sunflare.config import ControllerInfoProtocol, ControllerInfo
@@ -312,7 +315,7 @@ def test_containers() -> None:
         mock_controller, [DetectorProtocol, MotorProtocol, SampleProtocol]
     )
 
-    assert len(protocol_registry[mock_controller]) == 3, (
+    assert len(get_protocols()[mock_controller]) == 3, (
         "Protocol registry should not be empty"
     )
 
@@ -325,7 +328,7 @@ def test_containers() -> None:
 
     register_plans(mock_controller, regular_plans)
 
-    assert len(plan_registry[mock_controller]) == len(regular_plans), (
+    assert len(get_plans()[mock_controller]) == len(regular_plans), (
         "Plan registry should match number of registered plans"
     )
 
@@ -339,14 +342,12 @@ def test_containers() -> None:
 
     register_plans(mock_controller, method_plans)
 
-    assert len(plan_registry[mock_controller]) == len(regular_plans) + len(
+    assert len(get_plans()[mock_controller]) == len(regular_plans) + len(
         method_plans
     ), "Plan registry should include provider plans"
 
     # delete the owner to ensure weak references work
     del mock_controller
 
-    assert len(protocol_registry) == 0, (
-        "Protocol registry should be empty after deletion"
-    )
-    assert len(plan_registry) == 0, "Plan registry should be empty after deletion"
+    assert len(get_protocols()) == 0, "Protocol registry should be empty after deletion"
+    assert len(get_plans()) == 0, "Plan registry should be empty after deletion"

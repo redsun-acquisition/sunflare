@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import collections.abc
 import inspect
-from collections.abc import Generator, Iterable  # noqa: TC003
+from collections.abc import Generator, Iterable, Mapping, Sequence, Set  # noqa: TC003
 from dataclasses import dataclass
 from functools import cached_property
 from types import MappingProxyType
@@ -323,10 +322,10 @@ def _check_protocol_in_generic(
     if origin is not None and args:
         # Check if it's a supported generic type
         if origin in (
-            collections.abc.Sequence,
-            collections.abc.Iterable,
-            collections.abc.Mapping,
-            collections.abc.Set,
+            Sequence,
+            Iterable,
+            Mapping,
+            Set,
             list,
             tuple,
             set,
@@ -563,3 +562,29 @@ def register_plans(
     for plan in obj_plans:
         plan_sig = plan_signatures[_get_plan_name_and_type(plan)]
         plan_registry[owner][plan_sig] = plan
+
+
+def get_protocols() -> MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]:
+    """Get the available protocols.
+
+    Returns
+    -------
+    MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]
+        An immutable mapping of controller protocols to their registered model protocols.
+    """
+    return MappingProxyType(
+        protocol_registry
+    )  # Return an immutable view of the registry
+
+
+def get_plans() -> MappingProxyType[
+    ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
+]:
+    """Get the available plans.
+
+    Returns
+    -------
+    MappingProxyType[ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]]
+        An immutable mapping of controller protocols to their registered plan signatures and functions.
+    """
+    return MappingProxyType(plan_registry)  # Return an immutable view of the registry
