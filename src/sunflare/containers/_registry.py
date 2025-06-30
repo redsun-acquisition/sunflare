@@ -18,39 +18,22 @@ from typing import (
 from weakref import WeakKeyDictionary
 
 from bluesky.utils import Msg
-from typing_extensions import TypeIs
 
 from sunflare.controller import ControllerProtocol
 from sunflare.model import ModelProtocol
 
 
-@overload
 def ismethoddescriptor(
-    obj: type[Any] | object,
-    method_name: str,
-    descriptor_type: type[staticmethod[Any, Any]],
-) -> TypeIs[staticmethod[Any, Any]]: ...
-
-
-@overload
-def ismethoddescriptor(
-    obj: type[Any] | object,
-    method_name: str,
-    descriptor_type: type[classmethod[Any, Any, Any]],
-) -> TypeIs[classmethod[Any, Any, Any]]: ...
-
-
-def ismethoddescriptor(
-    obj: type[Any] | object,
+    cls: type[Any],
     method_name: str,
     descriptor_type: type[staticmethod[Any, Any] | classmethod[Any, Any, Any]],
-) -> TypeIs[staticmethod[Any, Any] | classmethod[Any, Any, Any]]:
+) -> bool:
     """Check if a method is of a specific descriptor type.
 
     Parameters
     ----------
-    obj : type[Any] | object
-        The object or class to check for the method.
+    obj : type[Any]
+        The class to check for the method.
     method_name : str
         The name of the method to check.
     descriptor_type : type[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
@@ -61,15 +44,10 @@ def ismethoddescriptor(
     TypeIs[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
         True if the method is a descriptor of the specified type, False otherwise.
     """
-    cls: type[Any]
-    if inspect.isclass(obj):
-        cls = obj.__class__
-    else:
-        return False
-
-    return method_name in cls.__dict__ and isinstance(
+    is_type = method_name in cls.__dict__ and isinstance(
         cls.__dict__[method_name], descriptor_type
     )
+    return is_type
 
 
 def _get_callable_for_inspection(
@@ -80,20 +58,16 @@ def _get_callable_for_inspection(
 
     if inspect.ismethod(func):
         # For bound methods, check if the underlying method is static/class method
-        obj = func.__self__
+        cls = func.__self__
         method_name = func.__name__
 
-        if ismethoddescriptor(obj, method_name, staticmethod):
-            static_method = cast(
-                "staticmethod[Any, Any]", getattr(obj.__class__, method_name)
-            )
+        if ismethoddescriptor(cls, method_name, staticmethod):
+            static_method = cast("staticmethod[Any, Any]", getattr(cls, method_name))
             return cast(
                 "Callable[..., Generator[Msg, Any, Any]]", static_method.__func__
             )
-        if ismethoddescriptor(obj, method_name, classmethod):
-            class_method = cast(
-                "classmethod[Any, Any, Any]", getattr(obj.__class__, method_name)
-            )
+        if ismethoddescriptor(cls, method_name, classmethod):
+            class_method = cast("classmethod[Any, Any, Any]", getattr(cls, method_name))
             return cast(
                 "Callable[..., Generator[Msg, Any, Any]]", class_method.__func__
             )
@@ -129,13 +103,12 @@ def _get_plan_name_and_type(func: Callable[..., Generator[Msg, Any, Any]]) -> st
     if inspect.ismethod(func):
         # Bound instance method - check if it's actually a static/class method
         obj = func.__self__
+        cls = func.__class__
         method_name = func.__name__
 
-        if ismethoddescriptor(obj, method_name, staticmethod):
+        if ismethoddescriptor(cls, method_name, staticmethod):
             # It's a static method accessed through an instance
-            static_method = cast(
-                "staticmethod[Any, Any]", getattr(obj.__class__, method_name)
-            )
+            static_method = cast("staticmethod[Any, Any]", getattr(cls, method_name))
             underlying_func = static_method.__func__
             if (
                 hasattr(underlying_func, "__qualname__")
@@ -145,11 +118,9 @@ def _get_plan_name_and_type(func: Callable[..., Generator[Msg, Any, Any]]) -> st
                 return f"{class_name}.{underlying_func.__name__}"
             return str(underlying_func.__name__)
 
-        if ismethoddescriptor(obj, method_name, classmethod):
+        if ismethoddescriptor(cls, method_name, classmethod):
             # It's a class method
-            class_method = cast(
-                "classmethod[Any, Any, Any]", getattr(obj.__class__, method_name)
-            )
+            class_method = cast("classmethod[Any, Any, Any]", getattr(cls, method_name))
             underlying_func = class_method.__func__
             if (
                 hasattr(underlying_func, "__qualname__")
