@@ -281,12 +281,12 @@ class PlanSignature:
 
 #: Registry for storing model protocols
 #: The dictionary maps the protocol owners to a set of `ModelProtocol` types.
-protocol_registry: dict[str, set[type[ModelProtocol]]] = {}
+protocol_registry: dict[ControllerProtocol, set[type[ModelProtocol]]] = {}
 
 #: Registry for storing plan generators with their detailed signatures
 #: The dictionary maps plan owners to PlanSignature objects to their callable functions
 plan_registry: dict[
-    str, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
+    ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
 ] = {}
 
 
@@ -430,10 +430,9 @@ def register_protocols(
     if not all(_is_model_protocol(proto) for proto in protos):
         raise TypeError("All protocols must be subclasses of ModelProtocol")
 
-    owner_name = owner.__class__.__name__
-    if owner_name not in protocol_registry:
-        protocol_registry[owner_name] = set()
-    protocol_registry[owner_name].update(protos)
+    if owner not in protocol_registry:
+        protocol_registry[owner] = set()
+    protocol_registry[owner].update(protos)
 
 
 @overload
@@ -477,7 +476,6 @@ def register_plans(
     """
     if not isinstance(owner, ControllerProtocol):
         raise TypeError(f"Owner must implement ControllerProtocol, got {type(owner)}")
-    owner_name = owner.__class__.__name__
 
     # Convert input to a set to ensure uniqueness
     if callable(plans):
@@ -540,7 +538,7 @@ def register_plans(
         for param_info in plan_sig.parameters.values():
             if param_info.is_protocol:
                 # Get registered protocols for this owner
-                registered_protocols = protocol_registry.get(owner_name, set())
+                registered_protocols = protocol_registry.get(owner, set())
 
                 # Extract all protocol types from the annotation (handles generics)
                 unregistered_protocols = _extract_protocol_types_from_generic(
@@ -550,16 +548,15 @@ def register_plans(
                 if unregistered_protocols:
                     protocol_names = [p.__name__ for p in unregistered_protocols]
                     raise TypeError(
-                        f"Protocols {protocol_names} used in plan {plan_sig.name} are not registered for owner {owner_name}"
+                        f"Protocols {protocol_names} used in plan {plan_sig.name} are not registered for owner {owner}"
                     )
 
         plan_signatures[plan_sig.name] = plan_sig
 
     # If all checks passed, register the plans with their complete signatures
-    if owner_name not in plan_registry:
-        plan_registry[owner_name] = {}
+    plan_registry.setdefault(owner, {})
 
     # Use PlanSignature objects as keys and functions as values
     for plan in obj_plans:
         plan_sig = plan_signatures[_get_plan_name_and_type(plan)]
-        plan_registry[owner_name][plan_sig] = plan
+        plan_registry[owner][plan_sig] = plan

@@ -315,7 +315,7 @@ def test_containers(mock_controller: ExperimentController) -> None:
         mock_controller, [DetectorProtocol, MotorProtocol, SampleProtocol]
     )
 
-    assert len(protocol_registry["ExperimentController"]) == 3, (
+    assert len(protocol_registry[mock_controller]) == 3, (
         "Protocol registry should not be empty"
     )
 
@@ -328,7 +328,7 @@ def test_containers(mock_controller: ExperimentController) -> None:
 
     register_plans(mock_controller, regular_plans)
 
-    assert len(plan_registry["ExperimentController"]) == len(regular_plans), (
+    assert len(plan_registry[mock_controller]) == len(regular_plans), (
         "Plan registry should match number of registered plans"
     )
 
@@ -342,6 +342,6 @@ def test_containers(mock_controller: ExperimentController) -> None:
 
     register_plans(mock_controller, method_plans)
 
-    assert len(plan_registry["ExperimentController"]) == len(regular_plans) + len(
+    assert len(plan_registry[mock_controller]) == len(regular_plans) + len(
         method_plans
     ), "Plan registry should include provider plans"
