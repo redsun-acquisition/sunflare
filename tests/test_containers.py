@@ -298,18 +298,15 @@ class PlanProvider:
         sample_handler.unload_sample()
 
 
-@pytest.fixture(scope="function")
-def mock_controller() -> Generator[ExperimentController, None, None]:
+def test_containers() -> None:
+    """Test the registration of plans and protocols."""
+
     bus = VirtualBus()
     models: dict[str, ModelProtocol] = {}
-    controller = ExperimentController(
+    mock_controller = ExperimentController(
         ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
     )
-    yield controller
 
-
-def test_containers(mock_controller: ExperimentController) -> None:
-    """Test the registration of plans and protocols."""
     # Register plans and protocols
     register_protocols(
         mock_controller, [DetectorProtocol, MotorProtocol, SampleProtocol]
@@ -345,3 +342,11 @@ def test_containers(mock_controller: ExperimentController) -> None:
     assert len(plan_registry[mock_controller]) == len(regular_plans) + len(
         method_plans
     ), "Plan registry should include provider plans"
+
+    # delete the owner to ensure weak references work
+    del mock_controller
+
+    assert len(protocol_registry) == 0, (
+        "Protocol registry should be empty after deletion"
+    )
+    assert len(plan_registry) == 0, "Plan registry should be empty after deletion"
