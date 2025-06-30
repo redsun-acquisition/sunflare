@@ -74,7 +74,7 @@ def ismethoddescriptor(
 
 
 def _get_callable_for_inspection(
-    func: Callable[..., Generator[Msg, Any, Any]],
+    func: type[Any] | Callable[..., Generator[Msg, Any, Any]],
 ) -> Callable[..., Generator[Msg, Any, Any]]:
     """Get the actual callable object for signature inspection."""
     # Check if func is a descriptor directly
@@ -109,17 +109,7 @@ def _get_callable_for_inspection(
         # For callable objects, check if __call__ is a static/class method
         class_obj = func.__class__
         if "__call__" in class_obj.__dict__:
-            call_descriptor = class_obj.__dict__["__call__"]
-            if isinstance(call_descriptor, staticmethod):
-                return cast(
-                    "Callable[..., Generator[Msg, Any, Any]]", call_descriptor.__func__
-                )
-            if isinstance(call_descriptor, classmethod):
-                return cast(
-                    "Callable[..., Generator[Msg, Any, Any]]", call_descriptor.__func__
-                )
-        # Regular callable object - inspect the __call__ method
-        return cast("Callable[..., Generator[Msg, Any, Any]]", func.__call__)
+            return cast("Callable[..., Generator[Msg, Any, Any]]", func.__call__)
 
     return func
 
