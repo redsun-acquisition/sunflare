@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Generator, Iterable, Mapping, Sequence, Set  # noqa: TC003
-from dataclasses import dataclass
-from functools import cached_property
-from types import MappingProxyType
 from typing import (
     Any,
     Callable,
@@ -41,7 +38,7 @@ def ismethoddescriptor(
 
     Returns
     -------
-    TypeIs[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
+    bool
         True if the method is a descriptor of the specified type, False otherwise.
     """
     is_type = method_name in cls.__dict__ and isinstance(
@@ -50,44 +47,7 @@ def ismethoddescriptor(
     return is_type
 
 
-def _get_callable_for_inspection(
-    func: type[Any] | Callable[..., Generator[Msg, Any, Any]],
-) -> Callable[..., Generator[Msg, Any, Any]]:
-    """Get the actual callable object for signature inspection."""
-    # Check if func is a descriptor directly
-
-    if inspect.ismethod(func):
-        # For bound methods, check if the underlying method is static/class method
-        cls = func.__self__
-        method_name = func.__name__
-
-        if ismethoddescriptor(cls, method_name, staticmethod):
-            static_method = cast("staticmethod[Any, Any]", getattr(cls, method_name))
-            return cast(
-                "Callable[..., Generator[Msg, Any, Any]]", static_method.__func__
-            )
-        if ismethoddescriptor(cls, method_name, classmethod):
-            class_method = cast("classmethod[Any, Any, Any]", getattr(cls, method_name))
-            return cast(
-                "Callable[..., Generator[Msg, Any, Any]]", class_method.__func__
-            )
-        # Regular bound instance method
-        return func
-
-    if (
-        hasattr(func, "__call__")
-        and hasattr(func, "__class__")
-        and not inspect.isfunction(func)
-    ):
-        # For callable objects, check if __call__ is a static/class method
-        class_obj = func.__class__
-        if "__call__" in class_obj.__dict__:
-            return cast("Callable[..., Generator[Msg, Any, Any]]", func.__call__)
-
-    return func
-
-
-def _get_plan_name_and_type(func: Callable[..., Generator[Msg, Any, Any]]) -> str:
+def _get_plan_name(func: Callable[..., Generator[Msg, Any, Any]]) -> str:
     """
     Get the appropriate plan name for different callable objects.
 
@@ -152,101 +112,37 @@ def _get_plan_name_and_type(func: Callable[..., Generator[Msg, Any, Any]]) -> st
     return str(name_attr) if name_attr is not None else str(func)
 
 
-@dataclass(frozen=True)
-class ParameterInfo:
-    """Information about a function parameter.
+def _get_callable_for_inspection(
+    func: type[Any] | Callable[..., Generator[Msg, Any, Any]],
+) -> Callable[..., Generator[Msg, Any, Any]]:
+    """Get the actual callable object for signature inspection."""
+    if inspect.ismethod(func):
+        # For bound methods, check if the underlying method is static/class method
+        cls = func.__self__
+        method_name = func.__name__
 
-    Parameters
-    ----------
-    name : str
-        The name of the parameter.
-    annotation : Any
-        The type annotation of the parameter.
-    default : Any
-        The default value of the parameter, if any.
-    kind : inspect._ParameterKind
-        The kind of the parameter (e.g., positional, keyword, etc.).
-    is_protocol : bool
-        Whether the parameter is a protocol type.
-    is_generic_protocol : bool
-        Whether the parameter is a generic protocol type.
-    generic_args : tuple[Any, ...], optional
-        Type arguments for generics, if applicable.
-        If the parameter is a generic protocol, this will contain the type arguments.
-    """
-
-    name: str
-    annotation: Any
-    default: Any
-    kind: inspect._ParameterKind
-    is_protocol: bool
-    is_generic_protocol: bool  # New field for generic protocol types
-    generic_args: tuple[Any, ...] | None = None  # Type arguments for generics
-
-
-@dataclass(frozen=True)
-class PlanSignature:
-    """A dataclass to hold the complete signature of a plan.
-
-    Parameters
-    ----------
-    name : str
-        The name of the plan function.
-    parameters : MappingProxyType[str, ParameterInfo]
-        An immutable mapping of parameter names to their information.
-    """
-
-    name: str
-    parameters: MappingProxyType[str, ParameterInfo]  # Immutable dict for hashability
-
-    @cached_property
-    def _hash(self) -> int:
-        """Cached hash computation for performance."""
-        params_tuple = tuple(sorted(self.parameters.items()))
-        return hash((self.name, params_tuple))
-
-    def __hash__(self) -> int:
-        """Hash implementation using cached property."""
-        return self._hash
-
-    @classmethod
-    def from_function(
-        cls, func: Callable[..., Generator[Msg, Any, Any]]
-    ) -> "PlanSignature":
-        """Create a PlanSignature from a function, method, or other callable."""
-        # Get the appropriate name and the actual callable for inspection
-        plan_name = _get_plan_name_and_type(func)
-        inspectable_func = _get_callable_for_inspection(func)
-
-        sig = inspect.signature(inspectable_func)
-        type_hints = get_type_hints(inspectable_func)
-
-        parameters = {}
-        for param_name, param in sig.parameters.items():
-            # Get the resolved type from type_hints, fallback to annotation
-            resolved_type = type_hints.get(param_name, param.annotation)
-
-            # Check if it's a protocol (including generics)
-            is_protocol, is_generic_protocol, generic_args = _check_protocol_in_generic(
-                resolved_type
+        if ismethoddescriptor(cls, method_name, staticmethod):
+            static_method = cast("staticmethod[Any, Any]", getattr(cls, method_name))
+            return cast(
+                "Callable[..., Generator[Msg, Any, Any]]", static_method.__func__
             )
-
-            parameters[param_name] = ParameterInfo(
-                name=param_name,
-                annotation=resolved_type,
-                default=param.default
-                if param.default != inspect.Parameter.empty
-                else None,
-                kind=param.kind,
-                is_protocol=is_protocol,
-                is_generic_protocol=is_generic_protocol,
-                generic_args=generic_args,
+        if ismethoddescriptor(cls, method_name, classmethod):
+            class_method = cast("classmethod[Any, Any, Any]", getattr(cls, method_name))
+            return cast(
+                "Callable[..., Generator[Msg, Any, Any]]", class_method.__func__
             )
+        # Regular bound instance method
+        return func
 
-        return cls(
-            name=plan_name,
-            parameters=MappingProxyType(parameters),  # Make it immutable
-        )
+    if (
+        hasattr(func, "__call__")
+        and hasattr(func, "__class__")
+        and not inspect.isfunction(func)
+    ):
+        # For callable objects, inspect the __call__ method
+        return cast("Callable[..., Generator[Msg, Any, Any]]", func.__call__)
+
+    return func
 
 
 #: Registry for storing model protocols
@@ -255,10 +151,10 @@ protocol_registry: WeakKeyDictionary[ControllerProtocol, set[type[ModelProtocol]
     WeakKeyDictionary()
 )
 
-#: Registry for storing plan generators with their detailed signatures
-#: The dictionary maps plan owners to PlanSignature objects to their callable functions
+#: Registry for storing plan generators
+#: The dictionary maps plan owners to plan names to their callable functions
 plan_registry: WeakKeyDictionary[
-    ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
+    ControllerProtocol, dict[str, Callable[..., Generator[Msg, Any, Any]]]
 ] = WeakKeyDictionary()
 
 
@@ -267,25 +163,20 @@ def _is_model_protocol(proto: type) -> TypeGuard[type[ModelProtocol]]:
     return ModelProtocol in proto.mro()
 
 
-def _check_protocol_in_generic(
-    annotation: Any,
-) -> tuple[bool, bool, tuple[Any, ...] | None]:
+def _check_protocol_in_generic(annotation: Any) -> bool:
     """
     Check if an annotation contains protocols, including in generic types.
 
     Returns
     -------
-        tuple[bool, bool, tuple[Any, ...] | None]
-        A tuple where:
-        - The first element is True if a protocol is found, False otherwise.
-        - The second element is True if the annotation is a generic type, False otherwise.
-        - The third element is the type arguments if the annotation is a generic type, None otherwise
+    bool
+        True if a protocol is found, False otherwise.
     """
     # Direct protocol check
     if isinstance(annotation, type) and ModelProtocol in annotation.mro():
-        return True, False, None
+        return True
 
-    # Check for generic types
+    # Check for generic types - use iterative approach instead of recursion
     origin = get_origin(annotation)
     args = get_args(annotation)
 
@@ -301,17 +192,22 @@ def _check_protocol_in_generic(
             set,
             dict,
         ):
-            # Check if any of the type arguments are protocols
-            for arg in args:
+            # Flatten all type arguments and check each one
+            types_to_check = list(args)
+            while types_to_check:
+                arg = types_to_check.pop()
+
+                # Direct protocol check
                 if isinstance(arg, type) and ModelProtocol in arg.mro():
-                    return True, True, args
+                    return True
 
-                # Recursively check nested generics
-                nested_is_protocol, _, _ = _check_protocol_in_generic(arg)
-                if nested_is_protocol:
-                    return True, True, args
+                # If it's a generic type, add its args to the list to check
+                nested_origin = get_origin(arg)
+                nested_args = get_args(arg)
+                if nested_origin is not None and nested_args:
+                    types_to_check.extend(nested_args)
 
-    return False, False, None
+    return False
 
 
 def _extract_protocol_types_from_generic(
@@ -339,23 +235,60 @@ def _extract_protocol_types_from_generic(
             unregistered.append(annotation)
         return unregistered
 
-    # Check for generic types
+    # Check for generic types - use iterative approach
     origin = get_origin(annotation)
     args = get_args(annotation)
 
     if origin is not None and args:
-        for arg in args:
+        # Flatten all type arguments and check each one
+        types_to_check = list(args)
+        while types_to_check:
+            arg = types_to_check.pop()
+
+            # Direct protocol check
             if isinstance(arg, type) and ModelProtocol in arg.mro():
                 if arg not in registered_protocols:
                     unregistered.append(arg)
             else:
-                # Recursively check nested generics
-                nested_unregistered = _extract_protocol_types_from_generic(
-                    arg, registered_protocols
-                )
-                unregistered.extend(nested_unregistered)
+                # If it's a generic type, add its args to the list to check
+                nested_origin = get_origin(arg)
+                nested_args = get_args(arg)
+                if nested_origin is not None and nested_args:
+                    types_to_check.extend(nested_args)
 
     return unregistered
+
+
+def _validate_plan_protocols(
+    plan: Callable[..., Generator[Msg, Any, Any]],
+    plan_name: str,
+    owner: ControllerProtocol,
+) -> None:
+    """Validate that all protocols used in plan parameters are registered."""
+    inspectable_func = _get_callable_for_inspection(plan)
+    sig = inspect.signature(inspectable_func)
+    type_hints = get_type_hints(inspectable_func)
+
+    registered_protocols = protocol_registry.get(owner, set())
+
+    for param_name, param in sig.parameters.items():
+        # Get the resolved type from type_hints, fallback to annotation
+        resolved_type = type_hints.get(param_name, param.annotation)
+
+        # Check if it's a protocol (including generics)
+        is_protocol = _check_protocol_in_generic(resolved_type)
+
+        if is_protocol:
+            # Extract all protocol types from the annotation (handles generics)
+            unregistered_protocols = _extract_protocol_types_from_generic(
+                resolved_type, registered_protocols
+            )
+
+            if unregistered_protocols:
+                protocol_names = [p.__name__ for p in unregistered_protocols]
+                raise TypeError(
+                    f"Protocols {protocol_names} used in plan {plan_name} are not registered for owner {owner}"
+                )
 
 
 @overload
@@ -430,7 +363,7 @@ def register_plans(
 
     Plans are expected to be callable objects that return a Bluesky message generator.
     Plan generators can require parameters, including protocols inherited from `ModelProtocol`;
-    the requirement for using procotols in a plan is that they have to be registered first via
+    the requirement for using protocols in a plan is that they have to be registered first via
     the `register_protocols` function.
 
     Parameters
@@ -456,10 +389,10 @@ def register_plans(
         obj_plans = set(plans)
 
     # Validate all plans before registering any
-    plan_signatures: dict[str, PlanSignature] = {}
+    plan_names: dict[Callable[..., Generator[Msg, Any, Any]], str] = {}
     for plan in obj_plans:
         if not callable(plan):
-            raise TypeError("Plans must be callable objects that return a MsgGenerator")
+            raise TypeError("Plans must be callable objects that return a Generator")
 
         # Get the actual function for inspection
         inspectable_func = _get_callable_for_inspection(plan)
@@ -467,8 +400,9 @@ def register_plans(
         if not inspect.isgeneratorfunction(inspectable_func):
             raise TypeError(f"Plan {plan} must be a generator function")
 
-        # Create the plan signature with all type information preserved
-        plan_sig = PlanSignature.from_function(plan)
+        # Get the plan name
+        plan_name = _get_plan_name(plan)
+        plan_names[plan] = plan_name
 
         # Validate return type using the inspectable function
         type_hints = get_type_hints(inspectable_func)
@@ -477,84 +411,66 @@ def register_plans(
             # Check if return type is a Generator that yields Msg
             origin = get_origin(return_type)
             if origin is not None:
-                # Handle generic types like Generator[Msg, Any, P]
+                # Handle generic types like Generator[Msg, Any, Any]
                 if origin is not Generator:
                     raise TypeError(
-                        f"Plan {plan} must return a Generator, got {return_type}"
+                        f"Plan {plan_name} must return a Generator, got {return_type}"
                     )
                 # Check that it yields Msg objects
                 args = get_args(return_type)
                 if args and len(args) >= 1:
                     yield_type = args[0]  # First type arg is what the generator yields
-                    # Import Msg from bluesky.utils to check against
                     if yield_type is not Msg:
                         raise TypeError(
-                            f"Plan {plan} must return a Generator that yields Msg, got Generator[{yield_type}, ...]"
+                            f"Plan {plan_name} must return a Generator that yields Msg, got Generator[{yield_type}, ...]"
                         )
             else:
                 # Check if it's at least a Generator (fallback)
                 try:
                     if not issubclass(return_type, Generator):
                         raise TypeError(
-                            f"Plan {plan} must return a Generator, got {return_type}"
+                            f"Plan {plan_name} must return a Generator, got {return_type}"
                         )
                 except TypeError:
                     # return_type is not a class, so can't use issubclass
                     raise TypeError(
-                        f"Plan {plan} must return a Generator, got {return_type}"
+                        f"Plan {plan_name} must return a Generator, got {return_type}"
                     )
         else:
-            raise TypeError(f"Plan {plan} must have a return type annotation")
+            raise TypeError(f"Plan {plan_name} must have a return type annotation")
 
-        # Check if the plan requires any protocols (including in generics)
-        for param_info in plan_sig.parameters.values():
-            if param_info.is_protocol:
-                # Get registered protocols for this owner
-                registered_protocols = protocol_registry.get(owner, set())
+        # Validate protocol usage
+        _validate_plan_protocols(plan, plan_name, owner)
 
-                # Extract all protocol types from the annotation (handles generics)
-                unregistered_protocols = _extract_protocol_types_from_generic(
-                    param_info.annotation, registered_protocols
-                )
+    # If all checks passed, register the plans
+    if owner not in plan_registry:
+        plan_registry[owner] = {}
 
-                if unregistered_protocols:
-                    protocol_names = [p.__name__ for p in unregistered_protocols]
-                    raise TypeError(
-                        f"Protocols {protocol_names} used in plan {plan_sig.name} are not registered for owner {owner}"
-                    )
-
-        plan_signatures[plan_sig.name] = plan_sig
-
-    # If all checks passed, register the plans with their complete signatures
-    plan_registry.setdefault(owner, {})
-
-    # Use PlanSignature objects as keys and functions as values
+    # Use string names as keys and functions as values
     for plan in obj_plans:
-        plan_sig = plan_signatures[_get_plan_name_and_type(plan)]
-        plan_registry[owner][plan_sig] = plan
+        plan_name = plan_names[plan]
+        plan_registry[owner][plan_name] = plan
 
 
-def get_protocols() -> MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]:
+def get_protocols() -> dict[ControllerProtocol, set[type[ModelProtocol]]]:
     """Get the available protocols.
 
     Returns
     -------
-    MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]
-        An immutable mapping of controller protocols to their registered model protocols.
+    dict[ControllerProtocol, set[type[ModelProtocol]]]
+        A mapping of controller protocols to their registered model protocols.
     """
-    return MappingProxyType(
-        protocol_registry
-    )  # Return an immutable view of the registry
+    return dict(protocol_registry)
 
 
-def get_plans() -> MappingProxyType[
-    ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]
+def get_plans() -> dict[
+    ControllerProtocol, dict[str, Callable[..., Generator[Msg, Any, Any]]]
 ]:
     """Get the available plans.
 
     Returns
     -------
-    MappingProxyType[ControllerProtocol, dict[PlanSignature, Callable[..., Generator[Msg, Any, Any]]]]
-        An immutable mapping of controller protocols to their registered plan signatures and functions.
+    dict[ControllerProtocol, dict[str, Callable[..., Generator[Msg, Any, Any]]]]
+        A mapping of controller protocols to their registered plan names and functions.
     """
-    return MappingProxyType(plan_registry)  # Return an immutable view of the registry
+    return dict(plan_registry)
