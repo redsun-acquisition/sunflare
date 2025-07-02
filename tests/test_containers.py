@@ -1,4 +1,5 @@
 import collections.abc
+import pytest
 from collections.abc import Generator
 from bluesky.utils import Msg
 from typing_extensions import Generator, runtime_checkable, Protocol, Any
@@ -215,7 +216,7 @@ class PlanProvider:
 
     def instance_monitoring_plan(
         self,
-        motors: collections.abc.Sequence[MotorProtocol],
+        motors: tuple[MotorProtocol],
         *,
         check_interval: float = 1.0,
     ) -> Generator[Msg, Any, Any]:
@@ -292,7 +293,7 @@ class PlanProvider:
 
     def instance_monitoring_plan(
         self,
-        motors: collections.abc.Sequence[MotorProtocol],
+        motors: list[MotorProtocol],
         *,
         check_interval: float = 1.0,
     ) -> Generator[Msg, Any, Any]:
@@ -372,3 +373,33 @@ def test_containers_function() -> None:
 
     assert len(get_protocols()) == 0, "Protocol registry should be empty after deletion"
     assert len(get_plans()) == 0, "Plan registry should be empty after deletion"
+
+
+def test_containers_wrong_return_type() -> None:
+    """Test that plans without return type raise TypeError."""
+    bus = VirtualBus()
+    models: dict[str, ModelProtocol] = {}
+    mock_controller = ExperimentController(
+        ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
+    )
+
+    def no_return_type_gen(detector: DetectorProtocol):
+        yield
+
+    def not_a_generator(
+        detector: DetectorProtocol,
+    ) -> None: ...
+
+    def wrong_yield_type_function(
+        detector: DetectorProtocol,
+    ) -> Generator[int, None, None]:
+        yield 42
+
+    with pytest.raises(TypeError):
+        register_plans(mock_controller, [no_return_type_gen])
+
+    with pytest.raises(TypeError):
+        register_plans(mock_controller, [not_a_generator])
+
+    with pytest.raises(TypeError):
+        register_plans(mock_controller, [wrong_yield_type_function])

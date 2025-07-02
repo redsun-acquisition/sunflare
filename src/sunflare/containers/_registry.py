@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Generator, Iterable, Mapping, Sequence, Set  # noqa: TC003
+from types import MappingProxyType
 from typing import (
     Any,
     Callable,
@@ -279,7 +280,7 @@ def register_plans(
             return_type = type_hints["return"]
             # Check if return type is a Generator that yields Msg
             origin = get_origin(return_type)
-            if origin is not None:
+            if origin:
                 # Handle generic types like Generator[Msg, Any, Any]
                 if origin is not Generator:
                     raise TypeError(
@@ -294,24 +295,20 @@ def register_plans(
                             f"Plan {plan_name} must return a Generator that yields Msg, got Generator[{yield_type}, ...]"
                         )
             else:
-                # Check if it's at least a Generator (fallback)
-                try:
-                    if not issubclass(return_type, Generator):
-                        raise TypeError(
-                            f"Plan {plan_name} must return a Generator, got {return_type}"
-                        )
-                except TypeError:
-                    # return_type is not a class, so can't use issubclass
-                    raise TypeError(
-                        f"Plan {plan_name} must return a Generator, got {return_type}"
-                    )
+                raise TypeError(
+                    f"Plan {plan_name} must have a return type annotation that is a Generator"
+                )
         else:
-            raise TypeError(f"Plan {plan_name} must have a return type annotation")
+            raise TypeError(
+                f"Plan {plan_name} must have a return type annotation that is a Generator"
+            )
 
-    try:
-        _validate_plan_protocols(inspect.signature(plan), type_hints, plan_name, owner)
-    except TypeError as e:
-        raise TypeError(f"Plan {plan_name} has invalid protocol usage: {e}") from e
+        try:
+            _validate_plan_protocols(
+                inspect.signature(plan), type_hints, plan_name, owner
+            )
+        except TypeError as e:
+            raise TypeError(f"Plan {plan_name} has invalid protocol usage: {e}") from e
 
     # If all checks passed, register the plans
     if owner not in plan_registry:
@@ -323,23 +320,23 @@ def register_plans(
         plan_registry[owner][plan_name] = plan
 
 
-def get_protocols() -> dict[ControllerProtocol, set[type[ModelProtocol]]]:
+def get_protocols() -> MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]:
     """Get the available protocols.
 
     Returns
     -------
-    dict[ControllerProtocol, set[type[ModelProtocol]]]
-        A mapping of controller protocols to their registered model protocols.
+    MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]
+        Read-only mapping of controller protocols to their registered model protocols.
     """
-    return dict(protocol_registry)
+    return MappingProxyType(protocol_registry)
 
 
-def get_plans() -> dict[ControllerProtocol, dict[str, PlanGenerator]]:
+def get_plans() -> MappingProxyType[ControllerProtocol, dict[str, PlanGenerator]]:
     """Get the available plans.
 
     Returns
     -------
-    dict[ControllerProtocol, dict[str, PlanGenerator]]
-        A mapping of controller protocols to their registered plan names and functions.
+    MappingProxyType[ControllerProtocol, dict[str, PlanGenerator]]
+        Read-only mapping of controller protocols to their registered plan names and functions.
     """
-    return dict(plan_registry)
+    return MappingProxyType(plan_registry)
