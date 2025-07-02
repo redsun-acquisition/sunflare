@@ -18,39 +18,7 @@ from bluesky.utils import Msg
 from sunflare.controller import ControllerProtocol
 from sunflare.model import ModelProtocol
 
-
-def _get_callable_for_inspection(
-    func: Callable[..., Generator[Msg, Any, Any]],
-) -> tuple[Callable[..., Generator[Msg, Any, Any]], str]:
-    """Get the actual callable object for signature inspection.
-
-    We check if the input is either a method or a function; in those cases,
-    simply return the function itself.
-
-    If the input is a callable object (like a class with a `__call__` method),
-    we return the `__call__` method for inspection.
-
-    Parameters
-    ----------
-    func : Callable[..., Generator[Msg, Any, Any]]
-        The function or callable object to inspect.
-
-    Returns
-    -------
-    tuple[Callable[..., Generator[Msg, Any, Any]], str]
-        The callable object for inspection and its name (extracted via `__qualname__`).
-    """
-    # check if the input is a bound method (either class or instance method)
-    name: str
-    if inspect.ismethod(func) or inspect.isfunction(func):
-        name = func.__qualname__
-    elif hasattr(func, "__call__"):
-        name = func.__call__.__qualname__.split(".")[-2]
-    else:
-        raise TypeError(f"{func} is not callable")
-
-    return func, name
-
+PlanGenerator = Callable[..., Generator[Msg, Any, Any]]
 
 #: Registry for storing model protocols
 #: The dictionary maps the protocol owners to a set of `ModelProtocol` types.
@@ -60,9 +28,9 @@ protocol_registry: WeakKeyDictionary[ControllerProtocol, set[type[ModelProtocol]
 
 #: Registry for storing plan generators
 #: The dictionary maps plan owners to plan names to their callable functions
-plan_registry: WeakKeyDictionary[
-    ControllerProtocol, dict[str, Callable[..., Generator[Msg, Any, Any]]]
-] = WeakKeyDictionary()
+plan_registry: WeakKeyDictionary[ControllerProtocol, dict[str, PlanGenerator]] = (
+    WeakKeyDictionary()
+)
 
 
 def _is_model_protocol(proto: type) -> TypeGuard[type[ModelProtocol]]:
@@ -167,18 +135,12 @@ def _extract_protocol_types_from_generic(
 
 
 def _validate_plan_protocols(
-    plan: Callable[..., Generator[Msg, Any, Any]],
+    sig: inspect.Signature,
+    type_hints: dict[str, Any],
     plan_name: str,
     owner: ControllerProtocol,
 ) -> None:
     """Validate that all protocols used in plan parameters are registered."""
-    sig = inspect.signature(plan)
-    try:
-        type_hints = get_type_hints(plan)
-    except TypeError:
-        # If the plan is a callable object, inspect its __call__ method
-        type_hints = get_type_hints(plan.__call__)
-
     registered_protocols = protocol_registry.get(owner, set())
 
     for param_name, param in sig.parameters.items():
@@ -253,21 +215,20 @@ def register_protocols(
 @overload
 def register_plans(
     owner: ControllerProtocol,
-    plans: Callable[..., Generator[Msg, Any, Any]],
+    plans: PlanGenerator,
 ) -> None: ...
 
 
 @overload
 def register_plans(
     owner: ControllerProtocol,
-    plans: Iterable[Callable[..., Generator[Msg, Any, Any]]],
+    plans: Iterable[PlanGenerator],
 ) -> None: ...
 
 
 def register_plans(
     owner: ControllerProtocol,
-    plans: Callable[..., Generator[Msg, Any, Any]]
-    | Iterable[Callable[..., Generator[Msg, Any, Any]]],
+    plans: PlanGenerator | Iterable[PlanGenerator],
 ) -> None:
     """Register one or multiple plan generators.
 
@@ -280,14 +241,16 @@ def register_plans(
     ----------
     owner : ``ControllerProtocol``
         The owner of the plan.
-    plans : ``Callable[..., Generator[Msg, Any, Any]] | Iterable[Callable[..., Generator[Msg, Any, Any]]]``
+    plans : ``PlanGenerator | Iterable[PlanGenerator]``
         The plan generator or generators to register.
 
     Raises
     ------
     TypeError
         If the owner does not implement `ControllerProtocol`,
-        if the plans are not callable or if they do not return a `Generator[Msg, Any, Any]`.
+        if the plans are not callable or if they do not return a `Generator[Msg, Any, Any]`,
+        if the yield type of the generator is not `Msg`
+        or a parameter using a protocol that is not registered is found.
     """
     if not isinstance(owner, ControllerProtocol):
         raise TypeError(f"Owner must implement ControllerProtocol, got {type(owner)}")
@@ -299,32 +262,31 @@ def register_plans(
         obj_plans = set(plans)
 
     # Validate all plans before registering any
-    plan_names: dict[Callable[..., Generator[Msg, Any, Any]], str] = {}
+    plan_names: dict[PlanGenerator, str] = {}
     for plan in obj_plans:
         if not callable(plan):
             raise TypeError("Plans must be callable objects that return a Generator")
 
-        # Get the actual function for inspection
-        inspectable_func, plan_name = _get_callable_for_inspection(plan)
+        try:
+            if inspect.ismethod(plan) or inspect.isfunction(plan):
+                if not inspect.isgeneratorfunction(plan):
+                    raise TypeError(f"Plan {plan} must be a generator function")
+                plan_name = plan.__qualname__
+                type_hints = get_type_hints(plan)
+            elif hasattr(plan, "__call__"):
+                if not inspect.isgeneratorfunction(plan.__call__):
+                    raise TypeError(
+                        f"Plan {plan.__call__.__qualname__} must be a generator function"
+                    )
+                plan_name = plan.__call__.__qualname__.split(".")[-2]
+                type_hints = get_type_hints(plan.__call__)
+            else:
+                raise TypeError(f"{plan} is not callable")
+        except TypeError:
+            raise
 
-        if not inspect.isgeneratorfunction(inspectable_func):
-            # check if it's an object with a __call__ method
-            if callable(inspectable_func) and not inspect.isgeneratorfunction(
-                inspectable_func.__call__
-            ):
-                raise TypeError(
-                    f"Plan {plan_name} must be a generator function, got {inspectable_func.__call__}"
-                )
-
-        # Get the plan name
         plan_names[plan] = plan_name
 
-        # Validate return type using the inspectable function
-        try:
-            type_hints = get_type_hints(inspectable_func)
-        except TypeError:
-            # found a callable object, so we inspect the __call__ method
-            type_hints = get_type_hints(inspectable_func.__call__)
         if "return" in type_hints:
             return_type = type_hints["return"]
             # Check if return type is a Generator that yields Msg
@@ -358,8 +320,10 @@ def register_plans(
         else:
             raise TypeError(f"Plan {plan_name} must have a return type annotation")
 
-        # Validate protocol usage
-        _validate_plan_protocols(plan, plan_name, owner)
+    try:
+        _validate_plan_protocols(inspect.signature(plan), type_hints, plan_name, owner)
+    except TypeError as e:
+        raise TypeError(f"Plan {plan_name} has invalid protocol usage: {e}") from e
 
     # If all checks passed, register the plans
     if owner not in plan_registry:
@@ -382,14 +346,12 @@ def get_protocols() -> dict[ControllerProtocol, set[type[ModelProtocol]]]:
     return dict(protocol_registry)
 
 
-def get_plans() -> dict[
-    ControllerProtocol, dict[str, Callable[..., Generator[Msg, Any, Any]]]
-]:
+def get_plans() -> dict[ControllerProtocol, dict[str, PlanGenerator]]:
     """Get the available plans.
 
     Returns
     -------
-    dict[ControllerProtocol, dict[str, Callable[..., Generator[Msg, Any, Any]]]]
+    dict[ControllerProtocol, dict[str, PlanGenerator]]
         A mapping of controller protocols to their registered plan names and functions.
     """
     return dict(plan_registry)
