@@ -6,7 +6,6 @@ from typing import (
     Any,
     Callable,
     TypeGuard,
-    cast,
     get_args,
     get_origin,
     get_type_hints,
@@ -20,129 +19,37 @@ from sunflare.controller import ControllerProtocol
 from sunflare.model import ModelProtocol
 
 
-def ismethoddescriptor(
-    cls: type[Any],
-    method_name: str,
-    descriptor_type: type[staticmethod[Any, Any] | classmethod[Any, Any, Any]],
-) -> bool:
-    """Check if a method is of a specific descriptor type.
+def _get_callable_for_inspection(
+    func: Callable[..., Generator[Msg, Any, Any]],
+) -> tuple[Callable[..., Generator[Msg, Any, Any]], str]:
+    """Get the actual callable object for signature inspection.
+
+    We check if the input is either a method or a function; in those cases,
+    simply return the function itself.
+
+    If the input is a callable object (like a class with a `__call__` method),
+    we return the `__call__` method for inspection.
 
     Parameters
     ----------
-    obj : type[Any]
-        The class to check for the method.
-    method_name : str
-        The name of the method to check.
-    descriptor_type : type[staticmethod[Any, Any] | classmethod[Any, Any, Any]]
-        The type of descriptor to check against, either `staticmethod` or `classmethod`.
+    func : Callable[..., Generator[Msg, Any, Any]]
+        The function or callable object to inspect.
 
     Returns
     -------
-    bool
-        True if the method is a descriptor of the specified type, False otherwise.
+    tuple[Callable[..., Generator[Msg, Any, Any]], str]
+        The callable object for inspection and its name (extracted via `__qualname__`).
     """
-    is_type = method_name in cls.__dict__ and isinstance(
-        cls.__dict__[method_name], descriptor_type
-    )
-    return is_type
+    # check if the input is a bound method (either class or instance method)
+    name: str
+    if inspect.ismethod(func) or inspect.isfunction(func):
+        name = func.__qualname__
+    elif hasattr(func, "__call__"):
+        name = func.__call__.__qualname__.split(".")[-2]
+    else:
+        raise TypeError(f"{func} is not callable")
 
-
-def _get_plan_name(func: Callable[..., Generator[Msg, Any, Any]]) -> str:
-    """
-    Get the appropriate plan name for different callable objects.
-
-    Returns
-    -------
-    str
-        The name of the plan function, including class name for methods.
-        If the function implements ``__call__``, it will return the class name.
-    """
-    if inspect.isfunction(func):
-        return func.__name__
-
-    if inspect.ismethod(func):
-        # Bound instance method - check if it's actually a static/class method
-        obj = func.__self__
-        cls = func.__class__
-        method_name = func.__name__
-
-        if ismethoddescriptor(cls, method_name, staticmethod):
-            # It's a static method accessed through an instance
-            static_method = cast("staticmethod[Any, Any]", getattr(cls, method_name))
-            underlying_func = static_method.__func__
-            if (
-                hasattr(underlying_func, "__qualname__")
-                and "." in underlying_func.__qualname__
-            ):
-                class_name = underlying_func.__qualname__.split(".")[-2]
-                return f"{class_name}.{underlying_func.__name__}"
-            return str(underlying_func.__name__)
-
-        if ismethoddescriptor(cls, method_name, classmethod):
-            # It's a class method
-            class_method = cast("classmethod[Any, Any, Any]", getattr(cls, method_name))
-            underlying_func = class_method.__func__
-            if (
-                hasattr(underlying_func, "__qualname__")
-                and "." in underlying_func.__qualname__
-            ):
-                class_name = underlying_func.__qualname__.split(".")[-2]
-                return f"{class_name}.{underlying_func.__name__}"
-            return str(underlying_func.__name__)
-
-        # Regular bound instance method
-        return f"{obj.__class__.__name__}.{method_name}"
-
-    if hasattr(func, "__call__") and hasattr(func, "__class__"):
-        # Callable object with __call__ method - check if __call__ is static/class method
-        class_obj = func.__class__
-        if "__call__" in class_obj.__dict__:
-            call_descriptor = class_obj.__dict__["__call__"]
-            if isinstance(call_descriptor, staticmethod):
-                call_underlying_func = call_descriptor.__func__
-                return f"{class_obj.__name__}.{call_underlying_func.__name__}"
-            if isinstance(call_descriptor, classmethod):
-                call_underlying_func = call_descriptor.__func__
-                return f"{class_obj.__name__}.{call_underlying_func.__name__}"
-        # Regular callable object
-        return class_obj.__name__
-
-    # Fallback for other callable objects
-    name_attr = getattr(func, "__name__", None)
-    return str(name_attr) if name_attr is not None else str(func)
-
-
-def _get_callable_for_inspection(
-    func: type[Any] | Callable[..., Generator[Msg, Any, Any]],
-) -> Callable[..., Generator[Msg, Any, Any]]:
-    """Get the actual callable object for signature inspection."""
-    if inspect.ismethod(func):
-        # For bound methods, check if the underlying method is static/class method
-        cls = func.__self__
-        method_name = func.__name__
-
-        if ismethoddescriptor(cls, method_name, staticmethod):
-            static_method = cast("staticmethod[Any, Any]", getattr(cls, method_name))
-            return cast(
-                "Callable[..., Generator[Msg, Any, Any]]", static_method.__func__
-            )
-        if ismethoddescriptor(cls, method_name, classmethod):
-            class_method = cast("classmethod[Any, Any, Any]", getattr(cls, method_name))
-            return cast(
-                "Callable[..., Generator[Msg, Any, Any]]", class_method.__func__
-            )
-        # Regular bound instance method
-        return func
-
-    if (
-        hasattr(func, "__call__")
-        and hasattr(func, "__class__")
-        and not inspect.isfunction(func)
-    ):
-        # For callable objects, inspect the __call__ method
-        return cast("Callable[..., Generator[Msg, Any, Any]]", func.__call__)
-
-    return func
+    return func, name
 
 
 #: Registry for storing model protocols
@@ -265,9 +172,12 @@ def _validate_plan_protocols(
     owner: ControllerProtocol,
 ) -> None:
     """Validate that all protocols used in plan parameters are registered."""
-    inspectable_func = _get_callable_for_inspection(plan)
-    sig = inspect.signature(inspectable_func)
-    type_hints = get_type_hints(inspectable_func)
+    sig = inspect.signature(plan)
+    try:
+        type_hints = get_type_hints(plan)
+    except TypeError:
+        # If the plan is a callable object, inspect its __call__ method
+        type_hints = get_type_hints(plan.__call__)
 
     registered_protocols = protocol_registry.get(owner, set())
 
@@ -395,17 +305,26 @@ def register_plans(
             raise TypeError("Plans must be callable objects that return a Generator")
 
         # Get the actual function for inspection
-        inspectable_func = _get_callable_for_inspection(plan)
+        inspectable_func, plan_name = _get_callable_for_inspection(plan)
 
         if not inspect.isgeneratorfunction(inspectable_func):
-            raise TypeError(f"Plan {plan} must be a generator function")
+            # check if it's an object with a __call__ method
+            if callable(inspectable_func) and not inspect.isgeneratorfunction(
+                inspectable_func.__call__
+            ):
+                raise TypeError(
+                    f"Plan {plan_name} must be a generator function, got {inspectable_func.__call__}"
+                )
 
         # Get the plan name
-        plan_name = _get_plan_name(plan)
         plan_names[plan] = plan_name
 
         # Validate return type using the inspectable function
-        type_hints = get_type_hints(inspectable_func)
+        try:
+            type_hints = get_type_hints(inspectable_func)
+        except TypeError:
+            # found a callable object, so we inspect the __call__ method
+            type_hints = get_type_hints(inspectable_func.__call__)
         if "return" in type_hints:
             return_type = type_hints["return"]
             # Check if return type is a Generator that yields Msg

@@ -301,7 +301,7 @@ class PlanProvider:
         sample_handler.unload_sample()
 
 
-def test_containers() -> None:
+def test_containers_function() -> None:
     """Test the registration of plans and protocols."""
 
     bus = VirtualBus()
