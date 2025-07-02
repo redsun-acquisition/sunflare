@@ -35,7 +35,7 @@ plan_registry: WeakKeyDictionary[ControllerProtocol, dict[str, PlanGenerator]] =
 
 def _is_model_protocol(proto: type) -> TypeGuard[type[ModelProtocol]]:
     """Type guard to check if a type implements ModelProtocol."""
-    return ModelProtocol in proto.mro()
+    return ModelProtocol in proto.mro() or isinstance(proto, ModelProtocol)
 
 
 def _check_protocol_in_generic(annotation: Any) -> bool:
@@ -47,33 +47,20 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
     bool
         True if a protocol is found, False otherwise.
     """
-    # Direct protocol check
-    if isinstance(annotation, type) and ModelProtocol in annotation.mro():
-        return True
-
     # Check for generic types - use iterative approach instead of recursion
     origin = get_origin(annotation)
     args = get_args(annotation)
 
     if origin is not None and args:
         # Check if it's a supported generic type
-        if origin in (
-            Sequence,
-            Iterable,
-            Mapping,
-            Set,
-            list,
-            tuple,
-            set,
-            dict,
-        ):
+        if origin in (Sequence, Iterable, Mapping, Set):
             # Flatten all type arguments and check each one
             types_to_check = list(args)
             while types_to_check:
                 arg = types_to_check.pop()
 
-                # Direct protocol check
-                if isinstance(arg, type) and ModelProtocol in arg.mro():
+                # Use improved protocol check
+                if isinstance(arg, type) and _is_model_protocol(arg):
                     return True
 
                 # If it's a generic type, add its args to the list to check
@@ -104,8 +91,8 @@ def _extract_protocol_types_from_generic(
     """
     unregistered = []
 
-    # Direct protocol check
-    if isinstance(annotation, type) and ModelProtocol in annotation.mro():
+    # Use improved protocol check for direct protocols
+    if isinstance(annotation, type) and _is_model_protocol(annotation):
         if annotation not in registered_protocols:
             unregistered.append(annotation)
         return unregistered
@@ -120,8 +107,8 @@ def _extract_protocol_types_from_generic(
         while types_to_check:
             arg = types_to_check.pop()
 
-            # Direct protocol check
-            if isinstance(arg, type) and ModelProtocol in arg.mro():
+            # Use improved protocol check
+            if isinstance(arg, type) and _is_model_protocol(arg):
                 if arg not in registered_protocols:
                     unregistered.append(arg)
             else:
@@ -204,8 +191,9 @@ def register_protocols(
         protos = set(protocols)
 
     # Use type guard for safe protocol checking
-    if not all(_is_model_protocol(proto) for proto in protos):
-        raise TypeError("All protocols must be subclasses of ModelProtocol")
+    for proto in protos:
+        if not _is_model_protocol(proto):
+            raise TypeError(f"Protocol {proto.__name__} must implement ModelProtocol")
 
     if owner not in protocol_registry:
         protocol_registry[owner] = set()

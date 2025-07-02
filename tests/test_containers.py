@@ -1,7 +1,7 @@
 import collections.abc
 from collections.abc import Generator
 from bluesky.utils import Msg
-from typing import Generator, runtime_checkable, Protocol, Any
+from typing_extensions import Generator, runtime_checkable, Protocol, Any
 from sunflare.containers import (
     register_plans,
     register_protocols,
@@ -10,7 +10,7 @@ from sunflare.containers import (
 )
 from sunflare.virtual import VirtualBus
 from sunflare.model import ModelProtocol
-from sunflare.config import ControllerInfoProtocol, ControllerInfo
+from sunflare.config import ControllerInfoProtocol, ControllerInfo, ModelInfoProtocol
 
 
 @runtime_checkable
@@ -69,6 +69,26 @@ class SampleProtocol(ModelProtocol, Protocol):
     def current_sample(self) -> str | None:
         """ID of currently loaded sample."""
         ...
+
+
+@runtime_checkable
+class StructuredProtocol(Protocol):
+    """A protocol that does not inherit from ModelProtocol."""
+
+    def __init__(self, name: str, model_info: ModelInfoProtocol) -> None: ...
+
+    def read_configuration(self) -> dict[str, Any]: ...
+
+    def describe_configuration(self) -> dict[str, Any]: ...
+
+    @property
+    def name(self) -> str: ...
+
+    @property
+    def model_info(self) -> ModelInfoProtocol: ...
+
+    @property
+    def parent(self) -> None: ...
 
 
 def simple_scan_plan(
@@ -310,12 +330,13 @@ def test_containers_function() -> None:
         ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
     )
 
-    # Register plans and protocols
+    # register plans and protocols
     register_protocols(
-        mock_controller, [DetectorProtocol, MotorProtocol, SampleProtocol]
+        mock_controller,
+        [DetectorProtocol, MotorProtocol, SampleProtocol, StructuredProtocol],
     )
 
-    assert len(get_protocols()[mock_controller]) == 3, (
+    assert len(get_protocols()[mock_controller]) == 4, (
         "Protocol registry should not be empty"
     )
 
