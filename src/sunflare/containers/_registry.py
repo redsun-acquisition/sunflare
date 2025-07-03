@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Generator, Iterable, Mapping, Sequence, Set  # noqa: TC003
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import (
     Any,
@@ -21,6 +22,100 @@ from sunflare.model import ModelProtocol
 
 PlanGenerator = Callable[..., Generator[Msg, Any, Any]]
 
+
+@dataclass(frozen=True)
+class ParameterInfo:
+    """Information about a single parameter in a plan signature."""
+
+    annotation: type[Any]
+    kind: inspect._ParameterKind
+    default: Any
+    origin: type[Any] | None
+
+    def __hash__(self) -> int:
+        return hash(
+            (str(self.annotation), self.kind, str(self.default), str(self.origin))
+        )
+
+    @classmethod
+    def from_parameter(
+        cls, param: inspect.Parameter, resolved_type: type[Any]
+    ) -> "ParameterInfo":
+        """Create a ParameterInfo from an inspect.Parameter and resolved type.
+
+        Parameters
+        ----------
+        param : inspect.Parameter
+            The parameter to extract information from.
+        resolved_type : type[Any]
+            The resolved type annotation.
+
+        Returns
+        -------
+        ParameterInfo
+            A new ParameterInfo instance with the extracted information.
+        """
+        origin = get_origin(resolved_type)
+
+        return cls(
+            annotation=resolved_type,
+            kind=param.kind,
+            default=param.default if param.default != inspect.Parameter.empty else None,
+            origin=origin,
+        )
+
+
+@dataclass(frozen=True)
+class PlanSignature:
+    """Holds information about a plan's signature."""
+
+    parameters: dict[str, ParameterInfo]
+
+    def __hash__(self) -> int:
+        return hash(tuple(sorted(self.parameters.items())))
+
+    @classmethod
+    def from_callable(cls, func: Callable[..., Any]) -> "PlanSignature":
+        """Create a PlanSignature from a callable.
+
+        Parameters
+        ----------
+        func : Callable[..., Any]
+            The callable to extract signature information from.
+
+        Returns
+        -------
+        PlanSignature
+            A new PlanSignature instance with the extracted information.
+        """
+        if inspect.ismethod(func) or inspect.isfunction(func):
+            # Use the function's signature directly
+            sig = inspect.signature(func)
+            type_hints = get_type_hints(func)
+        elif hasattr(func, "__call__"):
+            # Use the __call__ method's signature if it's a callable object
+            sig = inspect.signature(func.__call__)
+            type_hints = get_type_hints(func.__call__)
+        else:
+            raise TypeError(
+                f"{func} is not callable or does not have a valid signature"
+            )
+
+        # Extract parameter information
+        parameters = {}
+        for param_name, param in sig.parameters.items():
+            # Get the resolved type from type_hints, fallback to annotation
+            resolved_type = type_hints.get(param_name, param.annotation)
+
+            # Create ParameterInfo instance (no name field needed)
+            param_info = ParameterInfo.from_parameter(param, resolved_type)
+            parameters[param_name] = param_info
+
+        return cls(
+            parameters=parameters,
+        )
+
+
 #: Registry for storing model protocols
 #: The dictionary maps the protocol owners to a set of `ModelProtocol` types.
 protocol_registry: WeakKeyDictionary[ControllerProtocol, set[type[ModelProtocol]]] = (
@@ -30,6 +125,12 @@ protocol_registry: WeakKeyDictionary[ControllerProtocol, set[type[ModelProtocol]
 #: Registry for storing plan generators
 #: The dictionary maps plan owners to plan names to their callable functions
 plan_registry: WeakKeyDictionary[ControllerProtocol, dict[str, PlanGenerator]] = (
+    WeakKeyDictionary()
+)
+
+#: Registry for storing plan signatures
+#: The dictionary maps plan owners to plan names to their signatures
+signatures: WeakKeyDictionary[ControllerProtocol, dict[str, PlanSignature]] = (
     WeakKeyDictionary()
 )
 
@@ -253,28 +354,24 @@ def register_plans(
     # Validate all plans before registering any
     plan_names: dict[PlanGenerator, str] = {}
     for plan in obj_plans:
-        if not callable(plan):
+        # preemptively check if the plan is a callable object
+        func: Callable[..., Generator[Msg, Any, Any]]
+
+        if inspect.ismethod(plan) or inspect.isfunction(plan):
+            func = plan
+            func_name = func.__qualname__
+            type_hints = get_type_hints(func)
+        elif hasattr(plan, "__call__"):
+            func = plan.__call__
+            func_name = plan.__call__.__qualname__.split(".")[-2]
+            type_hints = get_type_hints(plan.__call__)
+        else:
             raise TypeError("Plans must be callable objects that return a Generator")
 
-        try:
-            if inspect.ismethod(plan) or inspect.isfunction(plan):
-                if not inspect.isgeneratorfunction(plan):
-                    raise TypeError(f"Plan {plan} must be a generator function")
-                plan_name = plan.__qualname__
-                type_hints = get_type_hints(plan)
-            elif hasattr(plan, "__call__"):
-                if not inspect.isgeneratorfunction(plan.__call__):
-                    raise TypeError(
-                        f"Plan {plan.__call__.__qualname__} must be a generator function"
-                    )
-                plan_name = plan.__call__.__qualname__.split(".")[-2]
-                type_hints = get_type_hints(plan.__call__)
-            else:
-                raise TypeError(f"{plan} is not callable")
-        except TypeError:
-            raise
+        if not inspect.isgeneratorfunction(func):
+            raise TypeError(f"Plan {func_name} must be a generator function")
 
-        plan_names[plan] = plan_name
+        plan_names[func] = func_name
 
         if "return" in type_hints:
             return_type = type_hints["return"]
@@ -284,7 +381,7 @@ def register_plans(
                 # Handle generic types like Generator[Msg, Any, Any]
                 if origin is not Generator:
                     raise TypeError(
-                        f"Plan {plan_name} must return a Generator, got {return_type}"
+                        f"Plan {func_name} must return a Generator, got {return_type}"
                     )
                 # Check that it yields Msg objects
                 args = get_args(return_type)
@@ -292,32 +389,29 @@ def register_plans(
                     yield_type = args[0]  # First type arg is what the generator yields
                     if yield_type is not Msg:
                         raise TypeError(
-                            f"Plan {plan_name} must return a Generator that yields Msg, got Generator[{yield_type}, ...]"
+                            f"Plan {func_name} must return a Generator that yields Msg, got Generator[{yield_type}, ...]"
                         )
             else:
                 raise TypeError(
-                    f"Plan {plan_name} must have a return type annotation that is a Generator"
+                    f"Plan {func_name} must have a return type annotation that is a Generator"
                 )
         else:
             raise TypeError(
-                f"Plan {plan_name} must have a return type annotation that is a Generator"
+                f"Plan {func_name} must have a return type annotation that is a Generator"
             )
 
         try:
             _validate_plan_protocols(
-                inspect.signature(plan), type_hints, plan_name, owner
+                inspect.signature(func), type_hints, func_name, owner
             )
         except TypeError as e:
-            raise TypeError(f"Plan {plan_name} has invalid protocol usage: {e}") from e
+            raise TypeError(f"Plan {func_name} has invalid protocol usage: {e}") from e
 
-    # If all checks passed, register the plans
-    if owner not in plan_registry:
-        plan_registry[owner] = {}
+        plan_registry.setdefault(owner, {})
+        plan_registry[owner][func_name] = func
 
-    # Use string names as keys and functions as values
-    for plan in obj_plans:
-        plan_name = plan_names[plan]
-        plan_registry[owner][plan_name] = plan
+        signatures.setdefault(owner, {})
+        signatures[owner][func_name] = PlanSignature.from_callable(func)
 
 
 def get_protocols() -> MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]:
@@ -334,9 +428,30 @@ def get_protocols() -> MappingProxyType[ControllerProtocol, set[type[ModelProtoc
 def get_plans() -> MappingProxyType[ControllerProtocol, dict[str, PlanGenerator]]:
     """Get the available plans.
 
+    Plans are mapped as:
+    - owner (``ControllerProtocol``): The owner of the plans.
+      - ``dict[str, PlanGenerator]``: A dictionary mapping plan names to their generator functions.
+
     Returns
     -------
     MappingProxyType[ControllerProtocol, dict[str, PlanGenerator]]
         Read-only mapping of controller protocols to their registered plan names and functions.
     """
     return MappingProxyType(plan_registry)
+
+
+def get_signatures() -> MappingProxyType[ControllerProtocol, dict[str, PlanSignature]]:
+    """Get the available plan signatures.
+
+    Signatures are mapped as:
+    - owner (``ControllerProtocol``): The owner of the plans.
+      - ``dict[str, PlanSignature]``: A dictionary mapping plan names to their signatures.
+
+
+
+    Returns
+    -------
+    MappingProxyType[ControllerProtocol, dict[str, PlanSignature]]
+        Read-only mapping of controller protocols to their registered plan signatures.
+    """
+    return MappingProxyType(signatures)
