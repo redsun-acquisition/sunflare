@@ -7,7 +7,6 @@ from types import MappingProxyType
 from typing import (
     Any,
     Callable,
-    TypeGuard,
     get_args,
     get_origin,
     get_type_hints,
@@ -135,11 +134,6 @@ signatures: WeakKeyDictionary[ControllerProtocol, dict[str, PlanSignature]] = (
 )
 
 
-def _is_model_protocol(proto: type) -> TypeGuard[type[ModelProtocol]]:
-    """Type guard to check if a type implements ModelProtocol."""
-    return ModelProtocol in proto.mro() or isinstance(proto, ModelProtocol)
-
-
 def _check_protocol_in_generic(annotation: Any) -> bool:
     """
     Check if an annotation contains protocols, including in generic types.
@@ -162,7 +156,7 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
                 arg = types_to_check.pop()
 
                 # Use improved protocol check
-                if isinstance(arg, type) and _is_model_protocol(arg):
+                if isinstance(arg, type) and isinstance(arg, ModelProtocol):
                     return True
 
                 # If it's a generic type, add its args to the list to check
@@ -194,7 +188,7 @@ def _extract_protocol_types_from_generic(
     unregistered = []
 
     # Use improved protocol check for direct protocols
-    if isinstance(annotation, type) and _is_model_protocol(annotation):
+    if isinstance(annotation, type) and isinstance(annotation, ModelProtocol):
         if annotation not in registered_protocols:
             unregistered.append(annotation)
         return unregistered
@@ -210,7 +204,7 @@ def _extract_protocol_types_from_generic(
             arg = types_to_check.pop()
 
             # Use improved protocol check
-            if isinstance(arg, type) and _is_model_protocol(arg):
+            if isinstance(arg, type) and isinstance(arg, ModelProtocol):
                 if arg not in registered_protocols:
                     unregistered.append(arg)
             else:
@@ -294,11 +288,10 @@ def register_protocols(
 
     # Use type guard for safe protocol checking
     for proto in protos:
-        if not _is_model_protocol(proto):
+        if not isinstance(proto, ModelProtocol):
             raise TypeError(f"Protocol {proto.__name__} must implement ModelProtocol")
 
-    if owner not in protocol_registry:
-        protocol_registry[owner] = set()
+    protocol_registry.setdefault(owner, set())
     protocol_registry[owner].update(protos)
 
 
