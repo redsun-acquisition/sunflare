@@ -10,7 +10,7 @@ from sunflare.view import ViewProtocol
 if TYPE_CHECKING:
     from typing import Any
 
-    from sunflare.config import ViewInfo
+    from sunflare.config import ViewInfoProtocol
     from sunflare.virtual import VirtualBus
 
 QWidgetMeta = type(QWidget)
@@ -38,7 +38,7 @@ class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
     @abstractmethod
     def __init__(
         self,
-        view_info: ViewInfo,
+        view_info: ViewInfoProtocol,
         virtual_bus: VirtualBus,
         *args: Any,
         **kwargs: Any,
