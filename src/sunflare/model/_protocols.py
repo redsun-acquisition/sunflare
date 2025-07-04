@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, runtime_checkable
+from typing import TYPE_CHECKING
 
-from typing_extensions import Protocol
+from typing_extensions import Protocol, runtime_checkable
 
 if TYPE_CHECKING:
     from typing import Any

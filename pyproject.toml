@@ -40,8 +40,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-pyqt = ["qtpy", "pyqt6"]
-pyside = ["qtpy", "pyside6"]
+pyqt = [
+    "magicgui>=0.10.1",
+    "pyqt6>=6.9.1",
+    "qtpy>=2.4.3",
+]
+pyside = [
+    "magicgui>=0.10.1",
+    "pyside6>=6.9.1",
+    "qtpy>=2.4.3",
+]
 docs = [
     "sphinx",
     "pydata-sphinx-theme",
@@ -50,6 +58,8 @@ docs = [
     "myst-parser"
 ]
 dev = [
+    "sunflare[pyqt]",
+    "sunflare[docs]",
     "types-PyYAML",
     "ruff",
     "pytest",
