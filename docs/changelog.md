@@ -15,6 +15,8 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Provided 4 functions
     - `register/get_plans`
     - `register/get_protocols`
+  - Plan signatures are unwrapped within `PlanSignature` dataclass object
+    - The signatures can be retrieved via `get_signatures`
   - Registered plans must be type annotated to be correctly registered and used by other plugins
 - Added initial testing
 
