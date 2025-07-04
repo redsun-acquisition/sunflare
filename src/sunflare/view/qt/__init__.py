@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 
 from qtpy.QtWidgets import QWidget
 
-from sunflare.view import WidgetProtocol
+from sunflare.view import ViewProtocol
 
 if TYPE_CHECKING:
     from typing import Any
 
-    from sunflare.config import RedSunSessionInfo
+    from sunflare.config import ViewInfo
     from sunflare.virtual import VirtualBus
 
 QWidgetMeta = type(QWidget)
@@ -20,35 +20,31 @@ QWidgetMeta = type(QWidget)
 # This apparently seem to work when launching redsun empty, but
 # it has not been tested yet; anyway we keep mypy happy by ignoring it
 # https://stackoverflow.com/a/76681565/4437552
-class _QWidgetBaseMeta(QWidgetMeta, WidgetProtocol):  # type: ignore[valid-type,misc]
-    """Common metaclass for QWidget and WidgetProtocol."""
+class _QWidgetBaseMeta(QWidgetMeta, ViewProtocol):  # type: ignore[valid-type,misc]
+    """Common metaclass for QWidget and ViewProtocol."""
 
 
 class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
-    """Qt base widget class that implemenents the WidgetProtocol.
+    """Qt base widget class that implemenents the ViewProtocol.
 
     Parameters
     ----------
-    config : RedSunSessionInfo
-        The session configuration.
+    view_info : ViewInfo
+        View information.
     virtual_bus : VirtualBus
         Virtual bus for the Redsun session.
-    *args : Any
-        Additional positional arguments for QWidget.
-    **kwargs : Any
-        Additional keyword arguments for QWidget.
     """
 
     @abstractmethod
     def __init__(
         self,
-        config: RedSunSessionInfo,
+        view_info: ViewInfo,
         virtual_bus: VirtualBus,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.config = config
+        self.view_info = view_info
         self.virtual_bus = virtual_bus
 
 

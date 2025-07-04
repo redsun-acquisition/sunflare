@@ -3,12 +3,10 @@ from typing import Any, Mapping
 
 from attrs import define, field, validators
 from bluesky.plan_stubs import close_run, open_run, read, rel_set
-from bluesky.protocols import Reading
 from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
-from event_model.documents.event_descriptor import DataKey
 
-from sunflare.config import ControllerInfo, ModelInfo, WidgetInfo
+from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
 from sunflare.controller import ControllerProtocol
 from sunflare.model import ModelProtocol, Model
 from sunflare.virtual import Signal, VirtualBus
@@ -81,7 +79,7 @@ class MockControllerInfo(ControllerInfo):
 
 
 @define
-class MockWidgetInfo(WidgetInfo):
+class MockWidgetInfo(ViewInfo):
     gui_int_param: int = field(validator=validators.instance_of(int))
     gui_choices: list[str] = field(factory=list, validator=validators.instance_of(list))
 

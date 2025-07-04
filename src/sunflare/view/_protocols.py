@@ -1,28 +1,26 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, runtime_checkable
+from typing import TYPE_CHECKING
 
-from typing_extensions import Protocol
+from typing_extensions import Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from typing import Any
-
-    from sunflare.config import RedSunSessionInfo
+    from sunflare.config import ViewInfo
     from sunflare.virtual import VirtualBus
 
 
 @runtime_checkable
-class WidgetProtocol(Protocol):
-    """Minimmal protocol a widget should implement.
+class ViewProtocol(Protocol):
+    """Minimmal protocol a view component should implement.
 
-    All widgets, regardless of the chosen front-end,
+    All views, regardless of the chosen front-end,
     must implement the methods defined in this protocol.
 
     Parameters
     ----------
-    config : RedSunSessionInfo
-        The Redsun instance configuration.
+    view_info : ViewInfo
+        View information model.
     virtual_bus : VirtualBus
         Main virtual bus for the Redsun instance.
     """
@@ -30,8 +28,6 @@ class WidgetProtocol(Protocol):
     @abstractmethod
     def __init__(
         self,
-        config: RedSunSessionInfo,
+        view_info: ViewInfo,
         virtual_bus: VirtualBus,
-        *args: Any,
-        **kwargs: Any,
     ) -> None: ...

@@ -23,14 +23,14 @@ venv\Scripts\Activate.ps1
 :::
 :::{tab-item} conda
 ```{code-block} shell
-conda create -n redsun-env python=3.9
-conda activate redsun-env
+conda create -n sunflare-env python=3.9
+conda activate sunflare-env
 ```
 :::
 :::{tab-item} mamba
 ```{code-block} shell
-mamba create -n redsun-env python=3.9
-mamba activate redsun-env
+mamba create -n sunflare-env python=3.9
+mamba activate sunflare-env
 ```
 :::
 ::::

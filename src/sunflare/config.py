@@ -121,8 +121,8 @@ class ControllerInfoProtocol(Protocol):
 
 
 @runtime_checkable
-class WidgetInfoProtocol(Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.WidgetInfo`.
+class ViewInfoProtocol(Protocol):
+    """Protocol equivalent to :class:`~sunflare.config.ViewInfo`.
 
     .. note::
 
@@ -138,10 +138,10 @@ class WidgetInfoProtocol(Protocol):
 
 
 @define(kw_only=True)
-class WidgetInfo(WidgetInfoProtocol):
-    """Widget information model.
+class ViewInfo(ViewInfoProtocol):
+    """View information model.
 
-    All widget information models inherit from this class.
+    All view information models inherit from this class.
 
     Parameters
     ----------
@@ -358,8 +358,8 @@ class RedSunSessionInfo:
     models : ``dict[str, ModelInfo]``
         Model informations dictionary.
         Defaults to an empty dictionary.
-    widgets : ``dict[str, WidgetInfo]``
-        Widget informations dictionary.
+    views : ``dict[str, ViewInfo]``
+        View informations dictionary.
         Defaults to an empty dictionary.
     """
 
@@ -375,7 +375,7 @@ class RedSunSessionInfo:
     )
     models: dict[str, ModelInfoProtocol] = field(factory=dict)
     controllers: dict[str, ControllerInfoProtocol] = field(factory=dict)
-    widgets: dict[str, WidgetInfoProtocol] = field(factory=dict)
+    views: dict[str, ViewInfoProtocol] = field(factory=dict)
 
     @staticmethod
     def load_yaml(path: str) -> dict[str, Any]:

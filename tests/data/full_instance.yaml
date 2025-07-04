@@ -35,7 +35,7 @@ models:
       - X
       - Y
     step_egu: mm
-widgets:
+views:
   MockWidget:
     plugin_name: mocks
     plugin_id: mock_widget

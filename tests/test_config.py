@@ -120,7 +120,7 @@ def test_controller_info(config_path: Path, tmp_path: Path):
     session = RedSunSessionInfo(**config)
 
     assert session.models == {}
-    assert session.widgets == {}
+    assert session.views == {}
     assert session.controllers != {}
 
     for _, controller in session.controllers.items():
@@ -133,10 +133,10 @@ def test_controller_info(config_path: Path, tmp_path: Path):
 
 
 def test_widget_info(config_path: Path):
-    """Test the redsun session info with widgets."""
+    """Test the redsun session info with views."""
     config = RedSunSessionInfo.load_yaml(config_path / "widget_instance.yaml")
-    config["widgets"] = {
-        name: MockWidgetInfo(**info) for name, info in config["widgets"].items()
+    config["views"] = {
+        name: MockWidgetInfo(**info) for name, info in config["views"].items()
     }
     session = RedSunSessionInfo(**config)
 
@@ -144,7 +144,7 @@ def test_widget_info(config_path: Path):
     assert session.controllers == {}
     assert session.models == {}
 
-    for _, widget in session.widgets.items():
+    for _, widget in session.views.items():
         assert widget.gui_int_param == 100
         assert widget.gui_choices == ["a", "b", "c"]
         assert widget.position == WidgetPositionTypes.CENTER
@@ -167,8 +167,8 @@ def test_full_config(config_path: Path, tmp_path: Path):
     config["controllers"] = {
         name: MockControllerInfo(**info) for name, info in config["controllers"].items()
     }
-    config["widgets"] = {
-        name: MockWidgetInfo(**info) for name, info in config["widgets"].items()
+    config["views"] = {
+        name: MockWidgetInfo(**info) for name, info in config["views"].items()
     }
     for name, info in config["models"].items():
         model_type = config_map[info["plugin_id"]]
@@ -179,7 +179,7 @@ def test_full_config(config_path: Path, tmp_path: Path):
     assert session.frontend == "pyqt"
     assert session.controllers != {}
     assert session.models != {}
-    assert session.widgets != {}
+    assert session.views != {}
 
     # inspect the detectors
     detectors = [
@@ -230,9 +230,9 @@ def test_full_config(config_path: Path, tmp_path: Path):
         assert controller.string == "hello"
         assert controller.boolean == True
 
-    # inspect the widgets
-    assert len(session.widgets) == 1
-    for _, widget in session.widgets.items():
+    # inspect the views
+    assert len(session.views) == 1
+    for _, widget in session.views.items():
         assert widget.plugin_name == "mocks"
         assert widget.plugin_id == "mock_widget"
         assert widget.gui_int_param == 100

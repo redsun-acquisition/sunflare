@@ -25,9 +25,12 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Dropped support for 3.9
 - Removed usage of `Optional` and `Union`
   - Replaced with built-in `|` instead
-- Added `uv.lock`
+- Switch to `uv` for dependency management
+  - Added `uv.lock` file
 - Removed `engine` field from `RedsunSessionInfo`
   - Not really meaningful, was part of old concept
+- Renamed `Widget` components to `View`
+- Ex-`Widget` classes are now injected with `ViewInfo` in initializer rather than `RedSunSessionInfo`
 
 ## [0.5.5] - 02-04-2025
 

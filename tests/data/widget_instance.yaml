@@ -1,5 +1,5 @@
 frontend: pyqt
-widgets:
+views:
   MockWidget:
     plugin_name: mocks
     plugin_id: mock_widget
