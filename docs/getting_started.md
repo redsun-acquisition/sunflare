@@ -23,13 +23,13 @@ venv\Scripts\Activate.ps1
 :::
 :::{tab-item} conda
 ```{code-block} shell
-conda create -n sunflare-env python=3.9
+conda create -n sunflare-env python=3.10
 conda activate sunflare-env
 ```
 :::
 :::{tab-item} mamba
 ```{code-block} shell
-mamba create -n sunflare-env python=3.9
+mamba create -n sunflare-env python=3.10
 mamba activate sunflare-env
 ```
 :::
