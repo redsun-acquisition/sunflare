@@ -67,7 +67,7 @@ class HasConnection(Protocol):  # pragma: no cover
     .. tip::
 
         This protocol is optional and only usable with
-        ``Controllers`` and ``Widgets``. ``Models``
+        ``Controllers`` and ``Views``. ``Models``
         will not be affected by this protocol.
 
     """
@@ -93,7 +93,7 @@ class HasConnection(Protocol):  # pragma: no cover
                 # ... or to other signals ...
                 self.virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
 
-                # ... or connect to widgets
+                # ... or connect to a view component
                 self.virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
         """
         ...

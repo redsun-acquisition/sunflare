@@ -8,7 +8,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 from event_model.documents.event_descriptor import DataKey
 
-from sunflare.config import ControllerInfo, ModelInfo, WidgetInfo
+from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
 from sunflare.controller import ControllerProtocol
 from sunflare.model import ModelProtocol, Model
 from sunflare.virtual import Signal, VirtualBus
@@ -81,7 +81,7 @@ class MockControllerInfo(ControllerInfo):
 
 
 @define
-class MockWidgetInfo(WidgetInfo):
+class MockWidgetInfo(ViewInfo):
     gui_int_param: int = field(validator=validators.instance_of(int))
     gui_choices: list[str] = field(factory=list, validator=validators.instance_of(list))
 
