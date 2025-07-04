@@ -3,10 +3,8 @@ from typing import Any, Mapping
 
 from attrs import define, field, validators
 from bluesky.plan_stubs import close_run, open_run, read, rel_set
-from bluesky.protocols import Reading
 from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
-from event_model.documents.event_descriptor import DataKey
 
 from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
 from sunflare.controller import ControllerProtocol
