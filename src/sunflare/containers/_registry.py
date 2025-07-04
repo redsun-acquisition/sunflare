@@ -7,6 +7,7 @@ from types import MappingProxyType
 from typing import (
     Any,
     Callable,
+    TypeGuard,
     get_args,
     get_origin,
     get_type_hints,
@@ -168,6 +169,10 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
     return False
 
 
+def _ismodel(arg: type[Any]) -> TypeGuard[type[ModelProtocol]]:
+    return isinstance(arg, ModelProtocol)
+
+
 def _extract_protocol_types_from_generic(
     annotation: Any, registered_protocols: set[type[ModelProtocol]]
 ) -> list[type]:
@@ -188,7 +193,7 @@ def _extract_protocol_types_from_generic(
     unregistered = []
 
     # Use improved protocol check for direct protocols
-    if isinstance(annotation, type) and isinstance(annotation, ModelProtocol):
+    if isinstance(annotation, type) and _ismodel(annotation):
         if annotation not in registered_protocols:
             unregistered.append(annotation)
         return unregistered
@@ -204,7 +209,7 @@ def _extract_protocol_types_from_generic(
             arg = types_to_check.pop()
 
             # Use improved protocol check
-            if isinstance(arg, type) and isinstance(arg, ModelProtocol):
+            if isinstance(arg, type) and _ismodel(arg):
                 if arg not in registered_protocols:
                     unregistered.append(arg)
             else:
