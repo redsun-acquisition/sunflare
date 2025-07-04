@@ -28,6 +28,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Added `uv.lock`
 - Removed `engine` field from `RedsunSessionInfo`
   - Not really meaningful, was part of old concept
+- Renamed `Widget` components to `View`
 
 ## [0.5.5] - 02-04-2025
 
