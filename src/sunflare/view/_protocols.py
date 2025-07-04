@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from typing_extensions import Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from sunflare.config import ViewInfo
+    from sunflare.config import ViewInfoProtocol
     from sunflare.virtual import VirtualBus
 
 
@@ -28,6 +28,6 @@ class ViewProtocol(Protocol):
     @abstractmethod
     def __init__(
         self,
-        view_info: ViewInfo,
+        view_info: ViewInfoProtocol,
         virtual_bus: VirtualBus,
     ) -> None: ...
