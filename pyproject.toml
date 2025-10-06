@@ -29,14 +29,13 @@ classifiers = [
 ]
 license = {text = "Apache-2.0"}
 dependencies = [
-    "pyyaml",
-    "bluesky",
-    "attrs",
-    "psygnal",
-    "numpy>=1.26",
-    "typing_extensions>=4.10.0",
-    "zmq",
-    "msgspec",
+    "pyyaml>=6.0.2",
+    "bluesky>=1.14.2",
+    "attrs>=25.3.0",
+    "psygnal>=0.13.0",
+    "msgspec>=0.19.0",
+    "pyzmq>=27.1.0",
+    "typing-extensions>=4.14.0",
 ]
 
 [project.optional-dependencies]
@@ -51,22 +50,22 @@ pyside = [
     "qtpy>=2.4.3",
 ]
 docs = [
-    "sphinx",
-    "pydata-sphinx-theme",
-    "sphinxcontrib-mermaid",
-    "sphinx-design",
-    "myst-parser"
+    "myst-parser>=4.0.1",
+    "pydata-sphinx-theme>=0.16.1",
+    "sphinx>=8.1.3",
+    "sphinx-design>=0.6.1",
+    "sphinxcontrib-mermaid>=1.0.0",
 ]
 dev = [
     "sunflare[pyqt]",
     "sunflare[docs]",
-    "types-PyYAML",
-    "ruff",
-    "pytest",
-    "pytest-cov",
-    "pre-commit",
-    "ophyd",
-    "mypy"
+    "types-pyyaml>=6.0.12.20250516",
+    "ruff>=0.13.3",
+    "ophyd>=1.11.0",
+    "mypy>=1.18.2",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
 ]
 
 [project.urls]
