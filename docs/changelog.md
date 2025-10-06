@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [Unreleased]
+
+### Changed
+
+- Synchronize all dependencies correctly via `uv`
+- Bump `bluesky` version to `1.14.5`
+  - Fix type hints accordingly 
+
 ## [0.6.1] - 04-07-2025
 
 ### Fixed
