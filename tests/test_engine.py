@@ -71,7 +71,7 @@ def test_status_wrong_external_finished() -> None:
 def test_status_false_exception() -> None:
     status = Status()
     with pytest.raises(Exception):
-        status.set_exception("This is not an exception")  # type: ignore
+        status.set_exception("This is not an exception")
     assert status.done is False
     assert status.success is False
 
@@ -87,7 +87,7 @@ def test_status_timeout() -> None:
 
     # what happens if we set StatusTimeoutError as the exception?
     with pytest.raises(ValueError):
-        status.set_exception(StatusTimeoutError)  # type: ignore
+        status.set_exception(StatusTimeoutError)
 
 
 def test_status_set_exception_after_timeout() -> None:

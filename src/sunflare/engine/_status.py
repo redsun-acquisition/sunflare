@@ -113,7 +113,7 @@ class Status:
         self._externally_initiated_completion_lock = threading.Lock()
         self._externally_initiated_completion = False
         self._callbacks: deque[Callable[[Status], None]] = deque()
-        self._exception: Exception | None = None
+        self._exception: Exception | type[Exception] | None = None
 
         if settle_time is None:
             settle_time = 0.0
@@ -231,7 +231,7 @@ class Status:
                 )
         self._callbacks.clear()
 
-    def set_exception(self, exc: Exception) -> None:
+    def set_exception(self, exc: Exception | type[Exception]) -> None:
         """Mark as finished but failed with the given Exception.
 
         This method should generally not be called by the *recipient* of this
@@ -239,13 +239,13 @@ class Status:
 
         Parameters
         ----------
-        exc: Exception
+        exc: Exception | type[Exception]
         """
         # Since we rely on this being raise-able later, check proactively to
         # avoid potentially very confusing failures.
         if not (
             isinstance(exc, Exception)
-            or (isinstance(exc, type) and issubclass(exc, Exception))  # type: ignore[unreachable]
+            or (isinstance(exc, type) and issubclass(exc, Exception))
         ):
             # Note that Python allows `raise Exception` or raise Exception()`
             # so we allow a class or an instance here too.
@@ -255,7 +255,9 @@ class Status:
         # would probably never come up except due to some rare user error, but
         # if it did it could be very confusing indeed!
         for exc_class in (StatusTimeoutError, WaitTimeoutError):
-            if isinstance(exc, exc_class) or (issubclass(type(exc), exc_class)):
+            if isinstance(exc, exc_class) or (
+                isinstance(exc, type) and issubclass(exc, exc_class)
+            ):
                 raise ValueError(
                     f"{exc_class} has special significance and cannot be set "
                     "as the exception. Use a plain TimeoutError or some other "
@@ -296,7 +298,9 @@ class Status:
         else:
             self._settled_event.set()
 
-    def exception(self, timeout: float | None = None) -> Exception | None:
+    def exception(
+        self, timeout: float | None = None
+    ) -> Exception | type[Exception] | None:
         """Return the exception raised by the action.
 
         If the action has completed successfully, return ``None``. If it has
