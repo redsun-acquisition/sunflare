@@ -116,6 +116,15 @@ You can also obtain a test coverage report by running the following command:
 pytest --cov=sunflare --cov-report=html
 ```
 
+`sunflare` provides a `noxfile.py` to run tests with `nox` on all the supported python versions; if you use `uv` you can run tests as follows:
+
+```bash
+# install nox globally...
+uv tool install nox
+# ... then run it in the project
+nox -s tests
+```
+
 This will generate a `htmlcov` directory with the test coverage report, which you can open in your browser by opening the `index.html` file.
 
 [conda]: https://docs.conda.io/en/latest/

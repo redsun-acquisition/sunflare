@@ -16,6 +16,8 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Fix type hints accordingly
 - Trigger CI for docs deployment and PyPI publishing from GitHub release page
   - Previously new tag had to be manually pushed from CLI
+- Add support for Python 3.13
+- Add `noxfile.py` to run tests via `nox` for multiple Python versions locally
 
 ## [0.6.1] - 04-07-2025
 
