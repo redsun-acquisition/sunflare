@@ -212,10 +212,13 @@ class ModelInfo(ModelInfoProtocol):
         Associated with the exposed entry point
         in the plugin manifest.
     vendor : ``str``, optional
-        Detector vendor.
+        Device vendor.
         Defaults to ``N/A``.
     family : ``str``, optional
-        Detector family.
+        Device family (if applicable).
+        Defaults to ``N/A``.
+    serial_number : ``str``, optional
+        Device serial number.
         Defaults to ``N/A``.
     """
 
