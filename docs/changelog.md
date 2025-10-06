@@ -13,7 +13,9 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 - Synchronize all dependencies correctly via `uv`
 - Bump `bluesky` version to `1.14.5`
-  - Fix type hints accordingly 
+  - Fix type hints accordingly
+- Trigger CI for docs deployment and PyPI publishing from GitHub release page
+  - Previously new tag had to be manually pushed from CLI
 
 ## [0.6.1] - 04-07-2025
 
