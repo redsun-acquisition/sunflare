@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from concurrent.futures import Future, ThreadPoolExecutor
 from itertools import count
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 import zmq
 from bluesky.run_engine import (
@@ -12,36 +12,17 @@ from bluesky.run_engine import (
 )
 from bluesky.run_engine import RunEngineResult
 from bluesky.utils import DuringTask, RunEngineInterrupted
-from event_model import (
-    Datum,
-    DatumPage,
-    DocumentNames,
-    Event,
-    EventDescriptor,
-    EventPage,
-    Resource,
-    RunStart,
-    RunStop,
-    StreamDatum,
-    StreamResource,
-)
+from event_model.documents import Document
 
 from sunflare.virtual import encode
 
-__all__ = ["RunEngine", "RunEngineResult", "RunEngineInterrupted"]
+if TYPE_CHECKING:
+    from typing import Iterable
 
-DocumentType = (
-    RunStart
-    | RunStop
-    | EventDescriptor
-    | Event
-    | EventPage
-    | Datum
-    | DatumPage
-    | Resource
-    | StreamResource
-    | StreamDatum
-)
+    from bluesky.utils import Msg, Subscribers
+    from event_model import DocumentNames
+
+__all__ = ["RunEngine", "RunEngineResult", "RunEngineInterrupted", "Document"]
 
 REResultType = RunEngineResult | tuple[str, ...] | Exception
 FuncSocket = Callable[[str, dict[str, Any]], None] | zmq.Socket[bytes]
@@ -122,19 +103,23 @@ class RunEngine(BlueskyRunEngine):
             self.socket.send_multipart([topic.encode(), encode(doc)])
         super().emit_sync(name, doc)
 
-    def __run_in_executor(self, *args: Any, **kwargs: Any) -> REResultType:
-        return super().__call__(*args, **kwargs)  # type: ignore[no-any-return]
-
-    def __call__(self, *args: Any, **metadata_kw: Any) -> Future[REResultType]:
+    def __call__(  # type: ignore[override]
+        self,
+        plan: Iterable[Msg],
+        subs: Subscribers | None = None,
+        /,
+        **metadata_kw: Any,
+    ) -> Future[RunEngineResult | tuple[str, ...]]:
         self._fut = self._executor.submit(
             super().__call__,
-            *args,
+            plan,
+            subs,
             **metadata_kw,
         )
         self._fut.add_done_callback(self._set_result)
         return self._fut
 
-    def _set_result(self, fut: Future[REResultType]) -> None:
+    def _set_result(self, fut: Future[RunEngineResult | tuple[str, ...]]) -> None:
         try:
             self._result = fut.result()
         except Exception as exc:
