@@ -30,7 +30,7 @@ classifiers = [
 license = {text = "Apache-2.0"}
 dependencies = [
     "pyyaml>=6.0.2",
-    "bluesky>=1.14.2",
+    "bluesky>=1.14.5",
     "attrs>=25.3.0",
     "psygnal>=0.13.0",
     "msgspec>=0.19.0",

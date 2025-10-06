@@ -60,7 +60,7 @@ wheels = [
 
 [[package]]
 name = "bluesky"
-version = "1.14.2"
+version = "1.14.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cycler" },
@@ -75,9 +75,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/32/aa/38e1cc6279c2eb574ff3c23c96dfd0cec4d3a5c6c45ff340870dc280c1fd/bluesky-1.14.2.tar.gz", hash = "sha256:a7aa2dfa9f718a7bbb9581238f6fc1f4a5962fc7059823a32b78ea986fedf16c", size = 497389, upload-time = "2025-06-10T18:41:12.876Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3b/91/4d695def6bbfa92a5ab7ed70be36c73b9b09baf7c8a32be8cc7afd7d04ac/bluesky-1.14.5.tar.gz", hash = "sha256:324eff12d29cf315759ee781aa577b5341e144c77000b013e3a343a7381b620a", size = 499510, upload-time = "2025-10-03T12:43:30.731Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/35/88bf3ab1e1a379ab25a91cc339fbb1d52842f3fed8fbebaa878b5850934e/bluesky-1.14.2-py3-none-any.whl", hash = "sha256:f7e844f9d191e11c363887fa99a1b417f11e5389ea647cb5d9a622606fa90cdc", size = 356825, upload-time = "2025-06-10T18:41:11.114Z" },
+    { url = "https://files.pythonhosted.org/packages/96/58/1561baa582337fd12d5886cda8189a54230f75319c289ed7b3dada920cfb/bluesky-1.14.5-py3-none-any.whl", hash = "sha256:480ca5bebb4f6c86b6a69292e1ab39fb227a058089077eb5547a1dc15aa0fa1e", size = 358278, upload-time = "2025-10-03T12:43:29.113Z" },
 ]
 
 [[package]]
@@ -392,7 +392,7 @@ wheels = [
 
 [[package]]
 name = "event-model"
-version = "1.23"
+version = "1.23.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-resources" },
@@ -401,9 +401,9 @@ dependencies = [
     { name = "numpy", version = "2.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b3/ec/c6e26b71980ae925a84c4b4da351d4a1f84fc6060c31d0a10ffc886c2633/event_model-1.23.tar.gz", hash = "sha256:7481cc97151b3ac77b5f5c6a11daf24c9c5d56bf58c88f4318f393e9a804f598", size = 184896, upload-time = "2025-06-11T15:25:36.96Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/5a/de03f05fdbc4377db89fa6daf243e89370f9bcf2d21ad96b54d4549a74ed/event_model-1.23.1.tar.gz", hash = "sha256:5bb70fd8c7f345aa32afe561aff5a306b2c8a19cbdc3066b736643c8092ddaab", size = 185271, upload-time = "2025-08-28T13:26:38.647Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/ee/97d558331ea905acad0b7c55a894e50884c02ccac87ebab583d50fac528b/event_model-1.23-py3-none-any.whl", hash = "sha256:223def5ab479db058243085a7860786013d21f58a22d607cbcb32e237e3a2f1f", size = 76805, upload-time = "2025-06-11T15:25:35.328Z" },
+    { url = "https://files.pythonhosted.org/packages/fb/32/e31e3363bf48ad2ba80b644b01ad9676ce154f1b755950de81eb4ed5b6bd/event_model-1.23.1-py3-none-any.whl", hash = "sha256:e0b951b829cebcf3879beff238bb370fd997d315856bc5d5ac2a66202b854958", size = 77057, upload-time = "2025-08-28T13:26:37.228Z" },
 ]
 
 [[package]]
@@ -1846,7 +1846,7 @@ pyside = [
 [package.metadata]
 requires-dist = [
     { name = "attrs", specifier = ">=25.3.0" },
-    { name = "bluesky", specifier = ">=1.14.2" },
+    { name = "bluesky", specifier = ">=1.14.5" },
     { name = "magicgui", marker = "extra == 'dev'", specifier = ">=0.10.1" },
     { name = "magicgui", marker = "extra == 'pyqt'", specifier = ">=0.10.1" },
     { name = "magicgui", marker = "extra == 'pyside'", specifier = ">=0.10.1" },
