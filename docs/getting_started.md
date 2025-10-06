@@ -4,7 +4,26 @@
 
 It is reccomended to install the package in a virtual environment.
 
+:::{tip}
+`sunflare` is supported between Python 3.10 and 3.12.
+:::
+
+
 ::::{tab-set}
+:::{tab-item} uv
+```{code-block} shell
+uv venv --python 3.10
+venv\Scripts\activate
+
+# for Windows...
+# ... command prompt
+venv\Scripts\activate.bat
+
+# ... powershell
+venv\Scripts\Activate.ps1
+```
+:::
+
 :::{tab-item} venv
 ```{code-block} shell
 # python version depends
@@ -41,6 +60,9 @@ You can install the package from [PyPI] or directly from the GitHub [repository]
 :::{tab-item} PyPI
 ```{code-block} shell
 pip install -U sunflare
+
+# ... or if you're using uv
+uv pip install sunflare
 ```
 :::
 :::{tab-item} GitHub
