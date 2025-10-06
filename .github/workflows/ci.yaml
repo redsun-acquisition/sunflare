@@ -1,95 +1,124 @@
 name: CI Pipeline
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "docs/**"
-      - ".github/workflows/**"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "docs/**"
+    push:
+        branches:
+            - main
+        paths:
+            - "src/**"
+            - "tests/**"
+            - "docs/**"
+            - ".github/workflows/**"
+    pull_request:
+        branches:
+            - main
+        paths:
+            - "src/**"
+            - "tests/**"
+            - "docs/**"
+    release:
+        types: [published]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  code_analysis:
-    name: Run Code Analysis
-    uses: ./.github/workflows/run-code-analysis.yaml
-    with:
-      ref: ${{ github.ref }}
-      event_name: ${{ github.event_name }}
-
-  tests:
-    name: Run Tests
-    uses: ./.github/workflows/run-tests.yaml
-    with:
-      ref: ${{ github.ref }}
-      event_name: ${{ github.event_name }}
-    secrets: inherit
-
-  docs:
-    name: Deploy Documentation
-    # Only run on main branch push or tag push
-    needs: [code_analysis, tests]
-    if: success() && (github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
-    uses: ./.github/workflows/deploy-docs.yaml
-    permissions:
-      contents: write
-    with:
-      ref: ${{ github.ref }}
-    secrets: inherit
-
-  build:
-    name: Build Package
-    needs: [tests, docs]
-    if: success() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Set up Python
-        uses: actions/setup-python@v6
+    code_analysis:
+        name: Run Code Analysis
+        uses: ./.github/workflows/run-code-analysis.yaml
         with:
-            python-version: "3.x"
-      - name: Install dependencies
-        run: |
-            pipx install hatch
-            pip install -U pip hatchling hatch-vcs
-      - name: Build a binary wheel and a source tarball
-        run: hatch build
-      - name: Store the distribution packages
-        uses: actions/upload-artifact@v4
-        with:
-            name: python-package-distributions
-            path: dist/
+            ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref }}
+            event_name: ${{ github.event_name }}
 
-  publish-to-pypi:
-    name: Publish to PyPI
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-        name: pypi
-        url: https://pypi.org/p/sunflare
-    permissions:
-        id-token: write  # IMPORTANT: mandatory for trusted publishing
-    steps:
-        - name: Download all the dists
-          uses: actions/download-artifact@v5
-          with:
-            name: python-package-distributions
-            path: dist/
-        - name: Publish distribution 📦 to PyPI
-          uses: pypa/gh-action-pypi-publish@release/v1
-          with:
-            verbose: true
+    tests:
+        name: Run Tests
+        uses: ./.github/workflows/run-tests.yaml
+        with:
+            ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref }}
+            event_name: ${{ github.event_name }}
+        secrets: inherit
+
+    docs:
+        name: Deploy Documentation
+        needs: [code_analysis, tests]
+        # Only deploy docs on release events
+        if: success() && github.event_name == 'release'
+        uses: ./.github/workflows/deploy-docs.yaml
+        permissions:
+            contents: write
+        with:
+            ref: ${{ github.event.release.tag_name }}
+        secrets: inherit
+
+    build:
+        name: Build Package
+        needs: [docs]
+        # Only build on release events (docs already checks for success)
+        if: success() && github.event_name == 'release'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.release.tag_name }}
+
+            - name: Set up Python
+              uses: actions/setup-python@v6
+              with:
+                  python-version: "3.x"
+
+            - name: Install dependencies
+              run: |
+                  pipx install hatch
+                  pip install -U pip hatchling hatch-vcs
+
+            - name: Build a binary wheel and a source tarball
+              run: |
+                  hatch build
+                  echo "Build completed. Contents of dist/:"
+                  ls -lah dist/
+
+            - name: Verify build artifacts
+              run: |
+                  if [ ! -f dist/*.whl ] || [ ! -f dist/*.tar.gz ]; then
+                    echo "Error: Expected build artifacts not found"
+                    exit 1
+                  fi
+                  echo "Build artifacts verified successfully"
+
+            - name: Store the distribution packages
+              uses: actions/upload-artifact@v4
+              with:
+                  name: python-package-distributions
+                  path: dist/
+
+    publish-to-pypi:
+        name: Publish to PyPI
+        needs: [build]
+        runs-on: ubuntu-latest
+        environment:
+            name: pypi
+            url: https://pypi.org/p/sunflare
+        permissions:
+            id-token: write # IMPORTANT: mandatory for trusted publishing
+        steps:
+            - name: Download all the dists
+              uses: actions/download-artifact@v5
+              with:
+                  name: python-package-distributions
+                  path: dist/
+
+            - name: Verify downloaded artifacts
+              run: |
+                  echo "Downloaded artifacts:"
+                  ls -lah dist/
+                  if [ -z "$(ls -A dist/)" ]; then
+                    echo "Error: No artifacts downloaded"
+                    exit 1
+                  fi
+
+            - name: Publish distribution 📦 to PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
+              with:
+                  verbose: true
