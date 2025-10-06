@@ -255,9 +255,7 @@ class Status:
         # would probably never come up except due to some rare user error, but
         # if it did it could be very confusing indeed!
         for exc_class in (StatusTimeoutError, WaitTimeoutError):
-            if isinstance(exc, exc_class) or (
-                isinstance(exc, type) and issubclass(exc, exc_class)
-            ):
+            if isinstance(exc, exc_class) or (issubclass(type(exc), exc_class)):
                 raise ValueError(
                     f"{exc_class} has special significance and cannot be set "
                     "as the exception. Use a plain TimeoutError or some other "
