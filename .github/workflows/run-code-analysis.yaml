@@ -15,7 +15,7 @@ jobs:
     name: ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: astral-sh/ruff-action@v3
         with:
           version: 0.9.3
@@ -32,7 +32,7 @@ jobs:
     name: mypy with Qt
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: "${{ matrix.python-version }}"
