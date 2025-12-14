@@ -9,7 +9,7 @@ class HasShutdown(Protocol):  # pragma: no cover
     .. tip::
 
         This protocol is optional and only available for
-        ``Controllers``. ``Widgets`` and ``Models`` will not
+        ``Presenters``. ``Widgets`` and ``Models`` will not
         be affected by this protocol.
 
     """
@@ -31,7 +31,7 @@ class HasRegistration(Protocol):  # pragma: no cover
     .. tip::
 
         This protocol is optional and only available for
-        ``Controllers`` and ``Widgets``. ``Models``
+        ``Presenters`` and ``Widgets``. ``Models``
         will not be affected by this protocol.
 
     """
@@ -42,7 +42,7 @@ class HasRegistration(Protocol):  # pragma: no cover
 
         At application start-up, controllers can't know what signals are available from other controllers. \
         This method is called after all controllers are initialized to allow them to register their signals. \
-        Controllers may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
+        Presenters may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
         
         Only signals defined in your object can be registered.
         
@@ -67,7 +67,7 @@ class HasConnection(Protocol):  # pragma: no cover
     .. tip::
 
         This protocol is optional and only usable with
-        ``Controllers`` and ``Views``. ``Models``
+        ``Presenters`` and ``Views``. ``Models``
         will not be affected by this protocol.
 
     """

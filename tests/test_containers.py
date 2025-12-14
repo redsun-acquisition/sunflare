@@ -19,12 +19,12 @@ from sunflare.containers import (
 )
 from sunflare.containers._registry import ParameterInfo, PlanSignature
 from sunflare.virtual import VirtualBus
-from sunflare.model import ModelProtocol
-from sunflare.config import ControllerInfoProtocol, ControllerInfo, ModelInfoProtocol
+from sunflare.model import PModel
+from sunflare.config import PPresenterInfo, ControllerInfo, PModelInfo
 
 
 @runtime_checkable
-class DetectorProtocol(ModelProtocol, Protocol):
+class DetectorProtocol(PModel, Protocol):
     """A protocol for detector devices."""
 
     @property
@@ -40,7 +40,7 @@ class DetectorProtocol(ModelProtocol, Protocol):
 
 
 @runtime_checkable
-class MotorProtocol(ModelProtocol, Protocol):
+class MotorProtocol(PModel, Protocol):
     """A protocol for motor devices."""
 
     @property
@@ -61,7 +61,7 @@ class MotorProtocol(ModelProtocol, Protocol):
 
 
 @runtime_checkable
-class SampleProtocol(ModelProtocol, Protocol):
+class SampleProtocol(PModel, Protocol):
     """A protocol for sample handling devices."""
 
     @property
@@ -83,9 +83,9 @@ class SampleProtocol(ModelProtocol, Protocol):
 
 @runtime_checkable
 class StructuredProtocol(Protocol):
-    """A protocol that does not inherit from ModelProtocol."""
+    """A protocol that does not inherit from PModel."""
 
-    def __init__(self, name: str, model_info: ModelInfoProtocol) -> None: ...
+    def __init__(self, name: str, model_info: PModelInfo) -> None: ...
 
     def read_configuration(self) -> dict[str, Any]: ...
 
@@ -95,7 +95,7 @@ class StructuredProtocol(Protocol):
     def name(self) -> str: ...
 
     @property
-    def model_info(self) -> ModelInfoProtocol: ...
+    def model_info(self) -> PModelInfo: ...
 
     @property
     def parent(self) -> None: ...
@@ -259,8 +259,8 @@ class ExperimentController:
 
     def __init__(
         self,
-        ctrl_info: ControllerInfoProtocol,
-        models: dict[str, ModelProtocol],
+        ctrl_info: PPresenterInfo,
+        models: dict[str, PModel],
         virtual_bus: VirtualBus,
     ) -> None:
         self.ctrl_info = ctrl_info
@@ -272,7 +272,7 @@ def test_containers_function() -> None:
     """Test the registration of plans and protocols."""
 
     bus = VirtualBus()
-    models: dict[str, ModelProtocol] = {}
+    models: dict[str, PModel] = {}
     mock_controller = ExperimentController(
         ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
     )
@@ -328,7 +328,7 @@ def test_containers_function() -> None:
 def test_containers_wrong_return_type() -> None:
     """Test that plans without return type raise TypeError."""
     bus = VirtualBus()
-    models: dict[str, ModelProtocol] = {}
+    models: dict[str, PModel] = {}
     mock_controller = ExperimentController(
         ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
     )

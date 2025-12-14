@@ -1,6 +1,6 @@
 # `sunflare.presenter`
 
-Controllers come in two forms:
+Presenters come in two forms:
 
 - ``typing.Protocol`` classes:
   - no inheritance required, allows full customization of the controller;
@@ -14,7 +14,7 @@ Controllers come in two forms:
   - minimal, reusable components to provide a specific functionality
   - inheritance is required
   - available mixins:
-    - {py:class}`~sunflare.presenter.Controller` (minimal base controller)
+    - {py:class}`~sunflare.presenter.Presenter` (minimal base controller)
     - {py:class}`~sunflare.presenter.Sender` (implements {py:class}`~sunflare.presenter.HasRegistration` protocol)
     - {py:class}`~sunflare.presenter.Receiver` (implements {py:class}`~sunflare.presenter.HasConnection` protocol)
     - {py:class}`~sunflare.presenter.SenderReceiver` (union of previous two mixins)

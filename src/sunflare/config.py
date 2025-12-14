@@ -81,7 +81,7 @@ def _convert_widget_position_type(
 
 
 @runtime_checkable
-class ModelInfoProtocol(AttrsInstance, Protocol):
+class PModelInfo(AttrsInstance, Protocol):
     """Protocol equivalent to :class:`~sunflare.config.ModelInfo`.
 
     This protocol allows to implement the ``ModelInfo`` class
@@ -105,7 +105,7 @@ class ModelInfoProtocol(AttrsInstance, Protocol):
 
 
 @runtime_checkable
-class ControllerInfoProtocol(Protocol):
+class PPresenterInfo(Protocol):
     """Protocol equivalent to :class:`~sunflare.config.ControllerInfo`.
 
     .. note::
@@ -121,7 +121,7 @@ class ControllerInfoProtocol(Protocol):
 
 
 @runtime_checkable
-class ViewInfoProtocol(Protocol):
+class PViewInfo(Protocol):
     """Protocol equivalent to :class:`~sunflare.config.ViewInfo`.
 
     .. note::
@@ -138,7 +138,7 @@ class ViewInfoProtocol(Protocol):
 
 
 @define(kw_only=True)
-class ViewInfo(ViewInfoProtocol):
+class ViewInfo(PViewInfo):
     """View information model.
 
     All view information models inherit from this class.
@@ -172,18 +172,18 @@ class ViewInfo(ViewInfoProtocol):
 
 
 @define(kw_only=True)
-class ControllerInfo(ControllerInfoProtocol):
-    """Controller information model.
+class ControllerInfo(PPresenterInfo):
+    """Presenter information model.
 
     All controller information models inherit from this class.
 
     Parameters
     ----------
     plugin_name : ``str``, optional
-        Controller plugin name.
+        Presenter plugin name.
         Equivalent to the name of the PyPI/Conda package.
     plugin_id : ``str``, optional
-        Controller plugin ID.
+        Presenter plugin ID.
         Associated with the exposed entry point
         in the plugin manifest.
     """
@@ -197,7 +197,7 @@ class ControllerInfo(ControllerInfoProtocol):
 
 
 @define(kw_only=True)
-class ModelInfo(ModelInfoProtocol):
+class ModelInfo(PModelInfo):
     """Base model for device information.
 
     All device information models inherit from this class.
@@ -356,7 +356,7 @@ class RedSunSessionInfo:
         Frontend selected for the current session.
         Defaults to ``FrontendTypes.PYQT``.
     controllers : ``dict[str, ControllerInfo]``
-        Controller informations dictionary.
+        Presenter informations dictionary.
         Defaults to an empty dictionary.
     models : ``dict[str, ModelInfo]``
         Model informations dictionary.
@@ -376,9 +376,9 @@ class RedSunSessionInfo:
         validator=validators.in_(FrontendTypes),
         on_setattr=setters.frozen,
     )
-    models: dict[str, ModelInfoProtocol] = field(factory=dict)
-    controllers: dict[str, ControllerInfoProtocol] = field(factory=dict)
-    views: dict[str, ViewInfoProtocol] = field(factory=dict)
+    models: dict[str, PModelInfo] = field(factory=dict)
+    controllers: dict[str, PPresenterInfo] = field(factory=dict)
+    views: dict[str, PViewInfo] = field(factory=dict)
 
     @staticmethod
     def load_yaml(path: str) -> dict[str, Any]:

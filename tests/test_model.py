@@ -6,7 +6,7 @@ import yaml
 from attrs import asdict
 from mocks import MockDetector, MockDetectorInfo, MockMotor, MockMotorInfo
 
-from sunflare.model import ModelProtocol
+from sunflare.model import PModel
 from sunflare.config import RedSunSessionInfo
 
 
@@ -43,7 +43,7 @@ def test_detector_model(config_path: str) -> None:
         session.models.items(), truth_configs.items()
     ):
         detector = MockDetector(name=name, cfg_info=cfg_info)
-        assert isinstance(detector, ModelProtocol)
+        assert isinstance(detector, PModel)
         assert detector.name == truth_name
         assert detector.parent is None
         assert detector.model_info == truth_cfg_info
@@ -136,7 +136,7 @@ def test_motor_model(config_path: str) -> None:
     ):
         cfg = cast(MockMotorInfo, cfg_info)
         motor = MockMotor(name=name, cfg_info=cfg)
-        assert isinstance(motor, ModelProtocol)
+        assert isinstance(motor, PModel)
         assert motor.name == truth_name
         assert motor.parent is None
         assert motor.model_info == truth_cfg_info

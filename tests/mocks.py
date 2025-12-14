@@ -8,16 +8,16 @@ from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
 from sunflare.presenter import PPresenter
-from sunflare.model import ModelProtocol, Model
+from sunflare.model import PModel, Model
 from sunflare.virtual import Signal, VirtualBus
 
 
-class ReadableModel(ModelProtocol):
+class ReadableModel(PModel):
     def read(self) -> dict[str, Any]:
         raise NotImplementedError
 
 
-class SettableModel(ModelProtocol):
+class SettableModel(PModel):
     def set(value: Any) -> None:
         raise NotImplementedError
 
@@ -140,7 +140,7 @@ class MockController(PPresenter):
     def __init__(
         self,
         info: MockControllerInfo,
-        models: Mapping[str, ModelProtocol],
+        models: Mapping[str, PModel],
         virtual_bus: VirtualBus,
     ) -> None:
         self.models = models

@@ -7,13 +7,13 @@ from sunflare.config import ControllerInfo, RedSunSessionInfo
 from sunflare.virtual import HasConnection, HasRegistration
 from sunflare.presenter import (
     Connection,
-    Controller,
+    Presenter,
     PPresenter,
     Receiver,
     Sender,
     SenderReceiver,
 )
-from sunflare.model import ModelProtocol
+from sunflare.model import PModel
 from sunflare.virtual import Signal, VirtualBus
 
 
@@ -40,13 +40,13 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
 
 
 def test_base_controller(bus: VirtualBus) -> None:
-    class TestController(Controller[Controller]):
+    class TestController(Presenter[Presenter]):
         # changing the name of __init__ parameters does not
         # affect the protocol behavior
         def __init__(
             self,
             info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
@@ -72,7 +72,7 @@ def test_sender_controller(bus: VirtualBus) -> None:
         def __init__(
             self,
             info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
@@ -107,7 +107,7 @@ def test_receiver_controller(bus: VirtualBus) -> None:
         def __init__(
             self,
             info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
@@ -116,7 +116,7 @@ def test_receiver_controller(bus: VirtualBus) -> None:
         def __init__(
             self,
             info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             connection_map = {
@@ -158,7 +158,7 @@ def test_sender_receiver(bus: VirtualBus) -> None:
         def __init__(
             self,
             info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             # connect to myself...

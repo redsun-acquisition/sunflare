@@ -26,7 +26,7 @@ from concurrent.futures import Future
 from my_plugin.config import PluginControllerInfo
 
 from sunflare.engine import RunEngine
-from sunflare.model import ModelProtocol
+from sunflare.model import PModel
 from sunflare.virtual import VirtualBus, Signal
 
 from bluesky.protocols import MsgGenerator
@@ -41,7 +41,7 @@ class PluginController:
     def __init__(
             self,
             ctrl_info: PluginControllerInfo,
-            models: Mapping[str, ModelProtocol],
+            models: Mapping[str, PModel],
             virtual_bus: VirtualBus
         ) -> None:
         self._ctrl_info = ctrl_info
@@ -67,7 +67,7 @@ class PluginController:
 Each controller is unique in the experiment it is expected to orchestrate, and the devices involved in such experiments. Redsun relies on [PEP 544](https://peps.python.org/pep-0544/) (a.k.a. structural subtyping) to filter out the models we want to control. There are two ways to achieve this:
 
 - by using the built-in `hasattr` function to determine if a `Model` has the required methods to execute an operation;
-- by defining a local `Protocol` with the expected methods and using `isinstance` to check if our `ModelProtocol` respects our custom interface.
+- by defining a local `Protocol` with the expected methods and using `isinstance` to check if our `PModel` respects our custom interface.
 
 In our example, to use the [stub plans] `bps.mv` and `bps.locate`, an interface requires, respectively:
 
