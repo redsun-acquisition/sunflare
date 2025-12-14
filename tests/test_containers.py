@@ -20,7 +20,7 @@ from sunflare.containers import (
 from sunflare.containers._registry import ParameterInfo, PlanSignature
 from sunflare.virtual import VirtualBus
 from sunflare.model import PModel
-from sunflare.config import PPresenterInfo, ControllerInfo, PModelInfo
+from sunflare.config import PPresenterInfo, PresenterInfo, PModelInfo
 
 
 @runtime_checkable
@@ -274,7 +274,7 @@ def test_containers_function() -> None:
     bus = VirtualBus()
     models: dict[str, PModel] = {}
     mock_controller = ExperimentController(
-        ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
+        PresenterInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
     )
 
     # register plans and protocols
@@ -330,7 +330,7 @@ def test_containers_wrong_return_type() -> None:
     bus = VirtualBus()
     models: dict[str, PModel] = {}
     mock_controller = ExperimentController(
-        ControllerInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
+        PresenterInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
     )
 
     def no_return_type_gen(detector: DetectorProtocol):

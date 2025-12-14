@@ -8,10 +8,10 @@ Orchestrator controllers deploy an instance of the {py:class}`~sunflare.engine._
 :caption: my_plugin/config.py
 
 from attrs import define
-from sunflare.config import ControllerInfo
+from sunflare.config import PresenterInfo
 
 @define
-class PluginControllerInfo(ControllerInfo):
+class PluginPresenterInfo(PresenterInfo):
     param1: int
     param2: int
 ```
@@ -23,7 +23,7 @@ import bluesky.plan_stubs as bps
 from typing import Mapping
 from concurrent.futures import Future
 
-from my_plugin.config import PluginControllerInfo
+from my_plugin.config import PluginPresenterInfo
 
 from sunflare.engine import RunEngine
 from sunflare.model import PModel
@@ -31,7 +31,7 @@ from sunflare.virtual import VirtualBus, Signal
 
 from bluesky.protocols import MsgGenerator
 
-class PluginController:
+class PluginPresenter:
 
     # a signal emitting
     # a tuple of UID strings
@@ -40,7 +40,7 @@ class PluginController:
 
     def __init__(
             self,
-            ctrl_info: PluginControllerInfo,
+            ctrl_info: PluginPresenterInfo,
             models: Mapping[str, PModel],
             virtual_bus: VirtualBus
         ) -> None:
@@ -104,7 +104,7 @@ self._my_models = {
 ```{code-block} python
 :caption: my_plugin/controller.py
 
-# before defining your "PluginController"
+# before defining your "PluginPresenter"
 from typing import Protocol
 from sunflare.engine import Status
 

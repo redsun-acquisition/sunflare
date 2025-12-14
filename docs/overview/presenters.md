@@ -17,7 +17,7 @@ All controllers must implement the {py:class}`~sunflare.presenter.PPresenter` in
 
 The {py:class}`~sunflare.presenter.PPresenter` requires three things in its initialization:
 
-- a reference to a subclass of {py:class}`~sunflare.config.ControllerInfo`, to provide additional parameters;
+- a reference to a subclass of {py:class}`~sunflare.config.PresenterInfo`, to provide additional parameters;
 - a `Mapping[str, PModel]` of the allocated models in the session;
 - a reference to the {py:class}`~sunflare.virtual.VirtualBus` in order to provide a communication point with other controllers and widgets.
 

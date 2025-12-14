@@ -6,7 +6,7 @@ from bluesky.plan_stubs import close_run, open_run, read, rel_set
 from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
-from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
+from sunflare.config import PresenterInfo, ModelInfo, ViewInfo
 from sunflare.presenter import PPresenter
 from sunflare.model import PModel, Model
 from sunflare.virtual import Signal, VirtualBus
@@ -71,7 +71,7 @@ class MockMotorInfo(ModelInfo):
 
 
 @define
-class MockControllerInfo(ControllerInfo):
+class MockControllerInfo(PresenterInfo):
     integer: int = field(validator=validators.instance_of(int))
     floating: float = field(validator=validators.instance_of(float))
     boolean: bool = field(validator=validators.instance_of(bool))

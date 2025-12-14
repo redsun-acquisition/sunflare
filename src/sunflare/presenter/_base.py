@@ -72,19 +72,19 @@ class Presenter(PPresenter, Generic[CI]):
     """A boilerplate base class for quick development.
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.ControllerInfo` implementation.
+    :class:`~sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
     .. code-block:: python
 
         from sunflare.presenter import Presenter
-        from sunflare.config import ControllerInfo
+        from sunflare.config import PresenterInfo
         from attrs import define
 
 
         @define
-        class MyControllerInfo(ControllerInfo):
+        class MyControllerInfo(PresenterInfo):
             str_param: str
             bool_param: bool
             # any other parameters...
@@ -103,7 +103,7 @@ class Presenter(PPresenter, Generic[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of :class:`~sunflare.config.ControllerInfo` subclass.
+        Instance of :class:`~sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
@@ -129,19 +129,19 @@ class Sender(Presenter[CI]):
     signals.
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.ControllerInfo` implementation.
+    :class:`~sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
     .. code-block:: python
 
         from sunflare.presenter import SignalerController
-        from sunflare.config import ControllerInfo
+        from sunflare.config import PresenterInfo
         from attrs import define
 
 
         @define
-        class MyControllerInfo(ControllerInfo):
+        class MyControllerInfo(PresenterInfo):
             str_param: str
             bool_param: bool
             # any other parameters...
@@ -172,7 +172,7 @@ class Sender(Presenter[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of a :class:`~sunflare.config.ControllerInfo` subclass.
+        Instance of a :class:`~sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
@@ -214,18 +214,18 @@ class Receiver(Presenter[CI]):
     to optionally connect a group of the controller's defined signals to local slots.
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.ControllerInfo` implementation.
+    :class:`~sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
     .. code-block:: python
 
         from sunflare.presenter import ReceiverController
-        from sunflare.config import ControllerInfo
+        from sunflare.config import PresenterInfo
         from attrs import define
 
         @define
-        class MyControllerInfo(ControllerInfo):
+        class MyControllerInfo(PresenterInfo):
             str_param: str
             bool_param: bool
             # any other parameters...
@@ -270,7 +270,7 @@ class Receiver(Presenter[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of a :class:`~sunflare.config.ControllerInfo` subclass.
+        Instance of a :class:`~sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
@@ -314,18 +314,18 @@ class SenderReceiver(Presenter[CI]):
     """Combines the functionality of :class:`~sunflare.presenter.Sender` and :class:`~sunflare.presenter.Receiver`.
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.ControllerInfo` implementation.
+    :class:`~sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
     .. code-block:: python
 
         from sunflare.presenter import SenderReceiverController
-        from sunflare.config import ControllerInfo
+        from sunflare.config import PresenterInfo
         from attrs import define
 
         @define
-        class MyControllerInfo(ControllerInfo):
+        class MyControllerInfo(PresenterInfo):
             str_param: str
             bool_param: bool
             # any other parameters...
@@ -373,7 +373,7 @@ class SenderReceiver(Presenter[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of a :class:`~sunflare.config.ControllerInfo` subclass.
+        Instance of a :class:`~sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`

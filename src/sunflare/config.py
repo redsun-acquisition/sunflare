@@ -106,7 +106,7 @@ class PModelInfo(AttrsInstance, Protocol):
 
 @runtime_checkable
 class PPresenterInfo(Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.ControllerInfo`.
+    """Protocol equivalent to :class:`~sunflare.config.PresenterInfo`.
 
     .. note::
 
@@ -172,7 +172,7 @@ class ViewInfo(PViewInfo):
 
 
 @define(kw_only=True)
-class ControllerInfo(PPresenterInfo):
+class PresenterInfo(PPresenterInfo):
     """Presenter information model.
 
     All controller information models inherit from this class.
@@ -355,7 +355,7 @@ class RedSunSessionInfo:
     frontend : ``FrontendTypes``
         Frontend selected for the current session.
         Defaults to ``FrontendTypes.PYQT``.
-    controllers : ``dict[str, ControllerInfo]``
+    controllers : ``dict[str, PresenterInfo]``
         Presenter informations dictionary.
         Defaults to an empty dictionary.
     models : ``dict[str, ModelInfo]``
