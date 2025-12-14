@@ -149,8 +149,8 @@ During initialization we provide the means to execute an experiment (a plan, a g
 
 During startup time, Redsun will call two methods of `PPresenter`:
 
-- {py:attr}`~sunflare.controller.PPresenter.registration_phase`;
-- {py:attr}`~sunflare.controller.PPresenter.connection_phase`.
+- {py:attr}`~sunflare.presenter.PPresenter.registration_phase`;
+- {py:attr}`~sunflare.presenter.PPresenter.connection_phase`.
 
 The first will *always* be called before the second. These two methods allow your controller to expose any {py:class}`~sunflare.virtual.Signal` object to the rest of the application, as well as connect
 to `Signal` objects provided by other controllers.

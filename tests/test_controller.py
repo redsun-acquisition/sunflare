@@ -5,7 +5,7 @@ from mocks import MockController, MockControllerInfo
 
 from sunflare.config import ControllerInfo, RedSunSessionInfo
 from sunflare.virtual import HasConnection, HasRegistration
-from sunflare.controller import (
+from sunflare.presenter import (
     Connection,
     Controller,
     PPresenter,

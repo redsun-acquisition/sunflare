@@ -52,8 +52,8 @@ class Connection(NamedTuple):
     for describing a connection between
     a virtual bus signal and a local slot.
 
-    Usable with :class:`~sunflare.controller.Receiver`
-    and :class:`~sunflare.controller.SenderReceiver`
+    Usable with :class:`~sunflare.presenter.Receiver`
+    and :class:`~sunflare.presenter.SenderReceiver`
     to set the `connection_map` parameter.
 
     Parameters
@@ -78,7 +78,7 @@ class Controller(PPresenter, Generic[CI]):
 
     .. code-block:: python
 
-        from sunflare.controller import Controller
+        from sunflare.presenter import Controller
         from sunflare.config import ControllerInfo
         from attrs import define
 
@@ -135,7 +135,7 @@ class Sender(Controller[CI]):
 
     .. code-block:: python
 
-        from sunflare.controller import SignalerController
+        from sunflare.presenter import SignalerController
         from sunflare.config import ControllerInfo
         from attrs import define
 
@@ -162,7 +162,7 @@ class Sender(Controller[CI]):
                 # any other initialization code...
 
 
-    See :class:`~sunflare.controller.Controller` for parent information.
+    See :class:`~sunflare.presenter.Controller` for parent information.
 
     .. note::
 
@@ -220,7 +220,7 @@ class Receiver(Controller[CI]):
 
     .. code-block:: python
 
-        from sunflare.controller import ReceiverController
+        from sunflare.presenter import ReceiverController
         from sunflare.config import ControllerInfo
         from attrs import define
 
@@ -265,7 +265,7 @@ class Receiver(Controller[CI]):
             Make sure to review any provided documentation
             about the nature of the signals being connected.
 
-    See :class:`~sunflare.controller.Controller` for parent information.
+    See :class:`~sunflare.presenter.Controller` for parent information.
 
     Parameters
     ----------
@@ -311,7 +311,7 @@ class Receiver(Controller[CI]):
 
 
 class SenderReceiver(Controller[CI]):
-    """Combines the functionality of :class:`~sunflare.controller.Sender` and :class:`~sunflare.controller.Receiver`.
+    """Combines the functionality of :class:`~sunflare.presenter.Sender` and :class:`~sunflare.presenter.Receiver`.
 
     Users may subclass from this controller and provide their custom
     :class:`~sunflare.config.ControllerInfo` implementation.
@@ -320,7 +320,7 @@ class SenderReceiver(Controller[CI]):
 
     .. code-block:: python
 
-        from sunflare.controller import SenderReceiverController
+        from sunflare.presenter import SenderReceiverController
         from sunflare.config import ControllerInfo
         from attrs import define
 

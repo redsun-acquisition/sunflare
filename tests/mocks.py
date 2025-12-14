@@ -7,7 +7,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
-from sunflare.controller import PPresenter
+from sunflare.presenter import PPresenter
 from sunflare.model import ModelProtocol, Model
 from sunflare.virtual import Signal, VirtualBus
 

@@ -13,9 +13,9 @@ We highlight "**can be**" because `Controllers` are not limited to that:
 
 `Controllers` are meant to communicate between each other via the {py:class}`~sunflare.virtual.VirtualBus`, which takes care of redirecting information (commands and/or documents) to the appropriate destination (whether it is another `Controller` or a `View`).
 
-All controllers must implement the {py:class}`~sunflare.controller.PPresenter` interface to be recognized by Redsun.
+All controllers must implement the {py:class}`~sunflare.presenter.PPresenter` interface to be recognized by Redsun.
 
-The {py:class}`~sunflare.controller.PPresenter` requires three things in its initialization:
+The {py:class}`~sunflare.presenter.PPresenter` requires three things in its initialization:
 
 - a reference to a subclass of {py:class}`~sunflare.config.ControllerInfo`, to provide additional parameters;
 - a `Mapping[str, ModelProtocol]` of the allocated models in the session;

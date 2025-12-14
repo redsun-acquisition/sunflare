@@ -17,8 +17,8 @@ from weakref import WeakKeyDictionary
 
 from bluesky.utils import Msg
 
-from sunflare.controller import PPresenter
 from sunflare.model import ModelProtocol
+from sunflare.presenter import PPresenter
 
 PlanGenerator = Callable[..., Generator[Msg, Any, Any]]
 
