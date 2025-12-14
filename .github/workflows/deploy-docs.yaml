@@ -23,7 +23,7 @@ jobs:
       - name: install dependencies
         run: |
           pip install --upgrade pip
-          pip install --editable .[docs]
+          pip install --editable .[dev]
       - name: build docs
         run: |
           cd docs
