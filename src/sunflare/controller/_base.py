@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import (
     TYPE_CHECKING,
     Callable,
     Generic,
-    Iterable,
-    Mapping,
     NamedTuple,
-    Optional,
     TypeVar,
 )
 
@@ -17,6 +13,8 @@ from typing_extensions import Protocol, runtime_checkable
 from sunflare.config import ControllerInfoProtocol
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from sunflare.model import ModelProtocol
     from sunflare.virtual import VirtualBus
 
@@ -26,25 +24,22 @@ class ControllerProtocol(Protocol):  # pragma: no cover
     """Controller protocol class.
 
     Provides the interface for a class
-    that Redsun can recognize as a controller.
+    that Redsun can recognize as a controller by
+    implementing the defined attributes.
 
-    Parameters
+    Attributes
     ----------
-    ctrl_info : :class:`~sunflare.config.ControllerInfo`
-        Controller information.
-    models : Mapping[str, :class:`~sunflare.model.ModelProtocol`]
-        Models currently loaded in the active Redsun session.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
-        Virtual bus.
+    ctrl_info : ControllerInfoProtocol
+        Controller configuration information.
+    models : Mapping[str, ModelProtocol]
+        Reference to the models used in the controller.
+    virtual_bus : VirtualBus
+        Reference to the virtual bus.
     """
 
-    @abstractmethod
-    def __init__(
-        self,
-        ctrl_info: ControllerInfoProtocol,
-        models: Mapping[str, ModelProtocol],
-        virtual_bus: VirtualBus,
-    ) -> None: ...
+    ctrl_info: ControllerInfoProtocol
+    virtual_bus: VirtualBus
+    models: Mapping[str, ModelProtocol]
 
 
 CI = TypeVar("CI", bound=ControllerInfoProtocol)
@@ -65,7 +60,7 @@ class Connection(NamedTuple):
     ----------
     signal : ``str``
         Signal name.
-    slot : ``Callable``
+    slot : ``Callable[..., None]``
         Slot to connect to.
     """
 
@@ -182,14 +177,14 @@ class Sender(Controller[CI]):
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
-    signals : ``Iterable[str]``, keyword-only, optional
-        Iterable of signals to register.
+    signals : ``Sequence[str]``, keyword-only, optional
+        Sequence of signals to register.
         Default is ``None`` (no signals registered).
 
     Attributes
     ----------
-    signals : ``Iterable[str]``, optional
-        Iterable of registered signals.
+    signals : ``Sequence[str]``, optional
+        Sequence of registered signals.
     """
 
     def __init__(
@@ -198,7 +193,7 @@ class Sender(Controller[CI]):
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
         *,
-        signals: Optional[Iterable[str]] = None,
+        signals: Sequence[str] | None = None,
     ) -> None:
         self.signals = signals
         super().__init__(ctrl_info, models, virtual_bus)
@@ -296,7 +291,7 @@ class Receiver(Controller[CI]):
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
         *,
-        connection_map: Optional[Mapping[str, list[Connection]]] = None,
+        connection_map: Mapping[str, list[Connection]] | None = None,
     ) -> None:
         self.connection_map = connection_map
         super().__init__(ctrl_info, models, virtual_bus)
@@ -383,8 +378,8 @@ class SenderReceiver(Controller[CI]):
         Reference to the models used in the controller.
     virtual_bus : :class:`~sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
-    signals : ``Iterable[str]``, optional
-        Iterable of signals to register.
+    signals : ``Sequence[str]``, optional
+        Sequence of signals to register.
         Default is ``None`` (no signals registered).
     connection_map : ``Mapping[str, list[Connection]]``, optional
         Mapping of emitters to a list of connections.
@@ -392,8 +387,8 @@ class SenderReceiver(Controller[CI]):
 
     Attributes
     ----------
-    signals : ``Iterable[str]``, optional
-        Iterable of registered signals.
+    signals : ``Sequence[str]``, optional
+        Sequence of registered signals.
     connection_map : ``Mapping[str, list[Connection]]``, optional
         Mapping of emitters to a list of connections.
     """
@@ -404,8 +399,8 @@ class SenderReceiver(Controller[CI]):
         models: Mapping[str, ModelProtocol],
         virtual_bus: VirtualBus,
         *,
-        signals: Optional[Iterable[str]] = None,
-        connection_map: Optional[Mapping[str, list[Connection]]] = None,
+        signals: Sequence[str] | None = None,
+        connection_map: Mapping[str, list[Connection]] | None = None,
     ) -> None:
         self.signals = signals
         self.connection_map = connection_map
