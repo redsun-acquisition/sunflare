@@ -119,6 +119,24 @@ class RunEngine(BlueskyRunEngine):
         self._fut.add_done_callback(self._set_result)
         return self._fut
 
+    def resume(self) -> Future[RunEngineResult | tuple[str, ...]]:
+        """Resume the paused plan in a separate thread.
+
+        If the plan has been paused, the initial
+        future returned by ``__call__`` will be set as completed.
+
+        With this method, the plan is resumed in a separate thread,
+        and a new future is returned.
+
+        Returns
+        -------
+        ``Future[RunEngineResult | tuple[str, ...]]``
+            Future object representing the result of the resumed plan.
+        """
+        self._fut = self._executor.submit(super().resume)
+        self._fut.add_done_callback(self._set_result)
+        return self._fut
+
     def _set_result(self, fut: Future[RunEngineResult | tuple[str, ...]]) -> None:
         try:
             self._result = fut.result()
