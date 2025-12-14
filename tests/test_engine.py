@@ -423,4 +423,6 @@ def test_pausable_engine(RE: RunEngine) -> None:
 
     RE.stop()
 
+    wait(future_set)
+
     assert len(future_set) == 0
