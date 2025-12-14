@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## Unreleased
+
+### Changed
+
+- Remove `__init__` from common protocols
+- Make parameters of `__init__` as read-write protocol attributes
+
+## [0.6.3] - 14-12-2025
+
+### Added
+
+- Add appropriate `resume` method to the `RunEngine` wrapper
+  - Ensure that it does not block the main thread
+  - Requires better documentation
+
 ## [0.6.2] - 06-10-2025
 
 ### Changed
@@ -272,6 +287,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.6.3]: https://github.com/redsun-acquisition/sunflare/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/redsun-acquisition/sunflare/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.5.5...v0.6.0
