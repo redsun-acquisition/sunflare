@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import TYPE_CHECKING
 
 from typing_extensions import Protocol, runtime_checkable
@@ -17,7 +16,7 @@ class ViewProtocol(Protocol):
     All views, regardless of the chosen front-end,
     must implement the methods defined in this protocol.
 
-    Parameters
+    Attributes
     ----------
     view_info : ViewInfo
         View information model.
@@ -25,9 +24,5 @@ class ViewProtocol(Protocol):
         Main virtual bus for the Redsun instance.
     """
 
-    @abstractmethod
-    def __init__(
-        self,
-        view_info: ViewInfoProtocol,
-        virtual_bus: VirtualBus,
-    ) -> None: ...
+    view_info: ViewInfoProtocol
+    virtual_bus: VirtualBus
