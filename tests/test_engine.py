@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 import zmq
+import bluesky.plan_stubs as bps
 from bluesky.plans import count
 from ophyd.sim import det1
 
@@ -392,3 +393,36 @@ def test_engine_prefix(bus: VirtualBus) -> None:
     desc_sub.thread.join()
     event_sub.thread.join()
     stop_sub.thread.join()
+
+
+def test_pausable_engine(RE: RunEngine) -> None:
+    future_set = set()
+
+    def pausable_plan():
+        yield from bps.checkpoint()
+
+        yield from count([det1], num=None)
+
+    fut = RE(pausable_plan())
+    future_set.add(fut)
+    fut.add_done_callback(future_set.discard)
+
+    sleep(0.5)
+
+    RE.request_pause(defer=True)
+
+    wait(future_set)
+
+    assert len(future_set) == 0
+
+    fut = RE.resume()
+    future_set.add(fut)
+    fut.add_done_callback(future_set.discard)
+
+    assert len(future_set) == 1
+
+    RE.stop()
+
+    wait(future_set)
+
+    assert len(future_set) == 0
