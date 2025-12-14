@@ -7,7 +7,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
 from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
-from sunflare.controller import ControllerProtocol
+from sunflare.controller import PPresenter
 from sunflare.model import ModelProtocol, Model
 from sunflare.virtual import Signal, VirtualBus
 
@@ -133,7 +133,7 @@ mock_motor = MockMotor("motor", mock_motor_info)
 mock_detector = MockDetector("detector", mock_detector_info)
 
 
-class MockController(ControllerProtocol):
+class MockController(PPresenter):
     sigBar = Signal()
     sigNewPlan = Signal(object)
 

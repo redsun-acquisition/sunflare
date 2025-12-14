@@ -147,10 +147,10 @@ The reccomended approach is to use `Protocols` in order to have better type hint
 
 During initialization we provide the means to execute an experiment (a plan, a group of devices, and a `RunEngine` to perform the plan), but we still don't have ways to control this behavior from the rest of the application.
 
-During startup time, Redsun will call two methods of `ControllerProtocol`:
+During startup time, Redsun will call two methods of `PPresenter`:
 
-- {py:attr}`~sunflare.controller.ControllerProtocol.registration_phase`;
-- {py:attr}`~sunflare.controller.ControllerProtocol.connection_phase`.
+- {py:attr}`~sunflare.controller.PPresenter.registration_phase`;
+- {py:attr}`~sunflare.controller.PPresenter.connection_phase`.
 
 The first will *always* be called before the second. These two methods allow your controller to expose any {py:class}`~sunflare.virtual.Signal` object to the rest of the application, as well as connect
 to `Signal` objects provided by other controllers.

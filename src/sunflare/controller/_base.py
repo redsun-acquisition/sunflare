@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 
 @runtime_checkable
-class ControllerProtocol(Protocol):  # pragma: no cover
+class PPresenter(Protocol):  # pragma: no cover
     """Controller protocol class.
 
     Provides the interface for a class
@@ -68,7 +68,7 @@ class Connection(NamedTuple):
     slot: Callable[..., None]
 
 
-class Controller(ControllerProtocol, Generic[CI]):
+class Controller(PPresenter, Generic[CI]):
     """A boilerplate base class for quick development.
 
     Users may subclass from this controller and provide their custom

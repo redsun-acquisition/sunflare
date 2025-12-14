@@ -6,7 +6,7 @@ Controllers come in two forms:
   - no inheritance required, allows full customization of the controller;
   - users will have to implement each interface on their own in a controller class;
   - available protocols:
-    - {py:class}`~sunflare.controller.ControllerProtocol` (for class initialization)
+    - {py:class}`~sunflare.controller.PPresenter` (for class initialization)
     - {py:class}`~sunflare.controller.HasShutdown` (for clearing held resources)
     - {py:class}`~sunflare.controller.HasRegistration` (for registering signals)
     - {py:class}`~sunflare.controller.HasConnection` (for connecting signals to local methods)

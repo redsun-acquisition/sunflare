@@ -8,7 +8,7 @@ from sunflare.virtual import HasConnection, HasRegistration
 from sunflare.controller import (
     Connection,
     Controller,
-    ControllerProtocol,
+    PPresenter,
     Receiver,
     Sender,
     SenderReceiver,
@@ -30,7 +30,7 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
 
     for _, ctrl in config_ctrl.items():
         controller = MockController(ctrl, {}, bus)
-        assert isinstance(controller, ControllerProtocol)
+        assert isinstance(controller, PPresenter)
         assert controller.info == ctrl
         assert len(controller.plans) == 2
         assert controller.info.plugin_name == "mocks"
@@ -54,7 +54,7 @@ def test_base_controller(bus: VirtualBus) -> None:
     ctrl_info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(ctrl_info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
 
     bus.shutdown()
 
@@ -80,7 +80,7 @@ def test_sender_controller(bus: VirtualBus) -> None:
     info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
     assert isinstance(ctrl, HasRegistration)
 
     ctrl.registration_phase()
@@ -132,7 +132,7 @@ def test_receiver_controller(bus: VirtualBus) -> None:
     sender = DummySender(info, {}, bus)
     ctrl = TestController(info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
     assert isinstance(ctrl, HasConnection)
 
     sender.registration_phase()
@@ -177,7 +177,7 @@ def test_sender_receiver(bus: VirtualBus) -> None:
     info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
     assert isinstance(ctrl, HasRegistration)
     assert isinstance(ctrl, HasConnection)
 
