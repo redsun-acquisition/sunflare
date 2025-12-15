@@ -39,6 +39,8 @@ import threading
 from collections import deque
 from typing import TYPE_CHECKING
 
+from bluesky.protocols import Status as PStatus
+
 from ._exceptions import InvalidState, StatusTimeoutError, WaitTimeoutError
 
 if TYPE_CHECKING:
@@ -47,7 +49,7 @@ if TYPE_CHECKING:
 __all__ = ["Status"]
 
 
-class Status:
+class Status(PStatus):
     """
     Track the status of a potentially-lengthy action like moving or triggering.
 
@@ -113,7 +115,7 @@ class Status:
         self._externally_initiated_completion_lock = threading.Lock()
         self._externally_initiated_completion = False
         self._callbacks: deque[Callable[[Status], None]] = deque()
-        self._exception: Exception | type[Exception] | None = None
+        self._exception: BaseException | None = None
 
         if settle_time is None:
             settle_time = 0.0
@@ -274,7 +276,7 @@ class Status:
             if isinstance(self._exception, StatusTimeoutError):
                 # We have already timed out.
                 return
-            self._exception = exc
+            self._exception = exc  # type: ignore[assignment]
             self._settled_event.set()
 
     def set_finished(self) -> None:
@@ -298,9 +300,7 @@ class Status:
         else:
             self._settled_event.set()
 
-    def exception(
-        self, timeout: float | None = None
-    ) -> Exception | type[Exception] | None:
+    def exception(self, timeout: float | None = None) -> BaseException | None:
         """Return the exception raised by the action.
 
         If the action has completed successfully, return ``None``. If it has
