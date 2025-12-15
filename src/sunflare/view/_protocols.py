@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from typing_extensions import Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from sunflare.config import ViewInfoProtocol
+    from sunflare.config import PViewInfo
     from sunflare.virtual import VirtualBus
 
 
@@ -24,5 +24,5 @@ class ViewProtocol(Protocol):
         Main virtual bus for the Redsun instance.
     """
 
-    view_info: ViewInfoProtocol
+    view_info: PViewInfo
     virtual_bus: VirtualBus

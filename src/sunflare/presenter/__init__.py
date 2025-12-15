@@ -1,7 +1,7 @@
 from ._base import (
     Connection,
-    Controller,
-    ControllerProtocol,
+    PPresenter,
+    Presenter,
     Receiver,
     Sender,
     SenderReceiver,
@@ -9,9 +9,9 @@ from ._base import (
 
 __all__ = [
     # protocols
-    "ControllerProtocol",
+    "PPresenter",
     # boilerplate
-    "Controller",
+    "Presenter",
     "Sender",
     "Receiver",
     "SenderReceiver",

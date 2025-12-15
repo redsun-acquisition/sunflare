@@ -6,18 +6,18 @@ from bluesky.plan_stubs import close_run, open_run, read, rel_set
 from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
-from sunflare.config import ControllerInfo, ModelInfo, ViewInfo
-from sunflare.controller import ControllerProtocol
-from sunflare.model import ModelProtocol, Model
+from sunflare.config import PresenterInfo, ModelInfo, ViewInfo
+from sunflare.presenter import PPresenter
+from sunflare.model import PModel, Model
 from sunflare.virtual import Signal, VirtualBus
 
 
-class ReadableModel(ModelProtocol):
+class ReadableModel(PModel):
     def read(self) -> dict[str, Any]:
         raise NotImplementedError
 
 
-class SettableModel(ModelProtocol):
+class SettableModel(PModel):
     def set(value: Any) -> None:
         raise NotImplementedError
 
@@ -71,7 +71,7 @@ class MockMotorInfo(ModelInfo):
 
 
 @define
-class MockControllerInfo(ControllerInfo):
+class MockControllerInfo(PresenterInfo):
     integer: int = field(validator=validators.instance_of(int))
     floating: float = field(validator=validators.instance_of(float))
     boolean: bool = field(validator=validators.instance_of(bool))
@@ -133,14 +133,14 @@ mock_motor = MockMotor("motor", mock_motor_info)
 mock_detector = MockDetector("detector", mock_detector_info)
 
 
-class MockController(ControllerProtocol):
+class MockController(PPresenter):
     sigBar = Signal()
     sigNewPlan = Signal(object)
 
     def __init__(
         self,
         info: MockControllerInfo,
-        models: Mapping[str, ModelProtocol],
+        models: Mapping[str, PModel],
         virtual_bus: VirtualBus,
     ) -> None:
         self.models = models

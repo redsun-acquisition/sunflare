@@ -8,10 +8,10 @@ Orchestrator controllers deploy an instance of the {py:class}`~sunflare.engine._
 :caption: my_plugin/config.py
 
 from attrs import define
-from sunflare.config import ControllerInfo
+from sunflare.config import PresenterInfo
 
 @define
-class PluginControllerInfo(ControllerInfo):
+class PluginPresenterInfo(PresenterInfo):
     param1: int
     param2: int
 ```
@@ -23,15 +23,15 @@ import bluesky.plan_stubs as bps
 from typing import Mapping
 from concurrent.futures import Future
 
-from my_plugin.config import PluginControllerInfo
+from my_plugin.config import PluginPresenterInfo
 
 from sunflare.engine import RunEngine
-from sunflare.model import ModelProtocol
+from sunflare.model import PModel
 from sunflare.virtual import VirtualBus, Signal
 
 from bluesky.protocols import MsgGenerator
 
-class PluginController:
+class PluginPresenter:
 
     # a signal emitting
     # a tuple of UID strings
@@ -40,8 +40,8 @@ class PluginController:
 
     def __init__(
             self,
-            ctrl_info: PluginControllerInfo,
-            models: Mapping[str, ModelProtocol],
+            ctrl_info: PluginPresenterInfo,
+            models: Mapping[str, PModel],
             virtual_bus: VirtualBus
         ) -> None:
         self._ctrl_info = ctrl_info
@@ -67,7 +67,7 @@ class PluginController:
 Each controller is unique in the experiment it is expected to orchestrate, and the devices involved in such experiments. Redsun relies on [PEP 544](https://peps.python.org/pep-0544/) (a.k.a. structural subtyping) to filter out the models we want to control. There are two ways to achieve this:
 
 - by using the built-in `hasattr` function to determine if a `Model` has the required methods to execute an operation;
-- by defining a local `Protocol` with the expected methods and using `isinstance` to check if our `ModelProtocol` respects our custom interface.
+- by defining a local `Protocol` with the expected methods and using `isinstance` to check if our `PModel` respects our custom interface.
 
 In our example, to use the [stub plans] `bps.mv` and `bps.locate`, an interface requires, respectively:
 
@@ -104,7 +104,7 @@ self._my_models = {
 ```{code-block} python
 :caption: my_plugin/controller.py
 
-# before defining your "PluginController"
+# before defining your "PluginPresenter"
 from typing import Protocol
 from sunflare.engine import Status
 
@@ -147,10 +147,10 @@ The reccomended approach is to use `Protocols` in order to have better type hint
 
 During initialization we provide the means to execute an experiment (a plan, a group of devices, and a `RunEngine` to perform the plan), but we still don't have ways to control this behavior from the rest of the application.
 
-During startup time, Redsun will call two methods of `ControllerProtocol`:
+During startup time, Redsun will call two methods of `PPresenter`:
 
-- {py:attr}`~sunflare.controller.ControllerProtocol.registration_phase`;
-- {py:attr}`~sunflare.controller.ControllerProtocol.connection_phase`.
+- {py:attr}`~sunflare.presenter.PPresenter.registration_phase`;
+- {py:attr}`~sunflare.presenter.PPresenter.connection_phase`.
 
 The first will *always* be called before the second. These two methods allow your controller to expose any {py:class}`~sunflare.virtual.Signal` object to the rest of the application, as well as connect
 to `Signal` objects provided by other controllers.

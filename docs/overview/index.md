@@ -6,7 +6,7 @@ This section illustrates the contents of the package, how to use the provided co
 :maxdepth: 1
 
 models
-controllers
+presenters
 virtual
 ```
 

@@ -3,17 +3,17 @@ from typing import Mapping
 
 from mocks import MockController, MockControllerInfo
 
-from sunflare.config import ControllerInfo, RedSunSessionInfo
+from sunflare.config import PresenterInfo, RedSunSessionInfo
 from sunflare.virtual import HasConnection, HasRegistration
-from sunflare.controller import (
+from sunflare.presenter import (
     Connection,
-    Controller,
-    ControllerProtocol,
+    Presenter,
+    PPresenter,
     Receiver,
     Sender,
     SenderReceiver,
 )
-from sunflare.model import ModelProtocol
+from sunflare.model import PModel
 from sunflare.virtual import Signal, VirtualBus
 
 
@@ -21,7 +21,7 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
     config_file = config_path / "controller_instance.yaml"
 
     config = RedSunSessionInfo.load_yaml(str(config_file))
-    config_ctrl: dict[str, ControllerInfo] = {
+    config_ctrl: dict[str, PresenterInfo] = {
         name: MockControllerInfo(**input)
         for name, input in config["controllers"].items()
     }
@@ -30,7 +30,7 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
 
     for _, ctrl in config_ctrl.items():
         controller = MockController(ctrl, {}, bus)
-        assert isinstance(controller, ControllerProtocol)
+        assert isinstance(controller, PPresenter)
         assert controller.info == ctrl
         assert len(controller.plans) == 2
         assert controller.info.plugin_name == "mocks"
@@ -40,21 +40,21 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
 
 
 def test_base_controller(bus: VirtualBus) -> None:
-    class TestController(Controller[Controller]):
+    class TestController(Presenter[PresenterInfo]):
         # changing the name of __init__ parameters does not
         # affect the protocol behavior
         def __init__(
             self,
-            info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            info: PresenterInfo,
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
 
-    ctrl_info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
+    ctrl_info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(ctrl_info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
 
     bus.shutdown()
 
@@ -66,21 +66,21 @@ def test_sender_controller(bus: VirtualBus) -> None:
         nonlocal cnt
         cnt += 1
 
-    class TestController(Sender[ControllerInfo]):
+    class TestController(Sender[PresenterInfo]):
         dummySignal = Signal()
 
         def __init__(
             self,
-            info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            info: PresenterInfo,
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
 
-    info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
+    info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
     assert isinstance(ctrl, HasRegistration)
 
     ctrl.registration_phase()
@@ -101,22 +101,22 @@ def test_sender_controller(bus: VirtualBus) -> None:
 def test_receiver_controller(bus: VirtualBus) -> None:
     cnt = 0
 
-    class DummySender(Sender[ControllerInfo]):
+    class DummySender(Sender[PresenterInfo]):
         dummySignal = Signal()
 
         def __init__(
             self,
-            info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            info: PresenterInfo,
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             super().__init__(info, test_models, bus)
 
-    class TestController(Receiver[ControllerInfo]):
+    class TestController(Receiver[PresenterInfo]):
         def __init__(
             self,
-            info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            info: PresenterInfo,
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             connection_map = {
@@ -128,11 +128,11 @@ def test_receiver_controller(bus: VirtualBus) -> None:
             nonlocal cnt
             cnt += 1
 
-    info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
+    info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
     sender = DummySender(info, {}, bus)
     ctrl = TestController(info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
     assert isinstance(ctrl, HasConnection)
 
     sender.registration_phase()
@@ -152,13 +152,13 @@ def test_receiver_controller(bus: VirtualBus) -> None:
 def test_sender_receiver(bus: VirtualBus) -> None:
     cnt = 0
 
-    class TestController(SenderReceiver[ControllerInfo]):
+    class TestController(SenderReceiver[PresenterInfo]):
         dummySignal = Signal()
 
         def __init__(
             self,
-            info: ControllerInfo,
-            test_models: Mapping[str, ModelProtocol],
+            info: PresenterInfo,
+            test_models: Mapping[str, PModel],
             bus: VirtualBus,
         ) -> None:
             # connect to myself...
@@ -174,10 +174,10 @@ def test_sender_receiver(bus: VirtualBus) -> None:
             nonlocal cnt
             cnt += 1
 
-    info = ControllerInfo(plugin_name="mocks", plugin_id="mock_controller")
+    info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
     ctrl = TestController(info, {}, bus)
 
-    assert isinstance(ctrl, ControllerProtocol)
+    assert isinstance(ctrl, PPresenter)
     assert isinstance(ctrl, HasRegistration)
     assert isinstance(ctrl, HasConnection)
 

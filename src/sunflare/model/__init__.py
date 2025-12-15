@@ -1,10 +1,10 @@
 from bluesky.protocols import check_supports
 
 from ._base import Model
-from ._protocols import ModelProtocol
+from ._protocols import PModel
 
 __all__ = [
-    "ModelProtocol",
+    "PModel",
     "Model",
     "check_supports",
 ]

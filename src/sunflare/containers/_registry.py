@@ -17,8 +17,8 @@ from weakref import WeakKeyDictionary
 
 from bluesky.utils import Msg
 
-from sunflare.controller import ControllerProtocol
-from sunflare.model import ModelProtocol
+from sunflare.model import PModel
+from sunflare.presenter import PPresenter
 
 PlanGenerator = Callable[..., Generator[Msg, Any, Any]]
 
@@ -117,20 +117,20 @@ class PlanSignature:
 
 
 #: Registry for storing model protocols
-#: The dictionary maps the protocol owners to a set of `ModelProtocol` types.
-protocol_registry: WeakKeyDictionary[ControllerProtocol, set[type[ModelProtocol]]] = (
+#: The dictionary maps the protocol owners to a set of `PModel` types.
+protocol_registry: WeakKeyDictionary[PPresenter, set[type[PModel]]] = (
     WeakKeyDictionary()
 )
 
 #: Registry for storing plan generators
 #: The dictionary maps plan owners to plan names to their callable functions
-plan_registry: WeakKeyDictionary[ControllerProtocol, dict[str, PlanGenerator]] = (
+plan_registry: WeakKeyDictionary[PPresenter, dict[str, PlanGenerator]] = (
     WeakKeyDictionary()
 )
 
 #: Registry for storing plan signatures
 #: The dictionary maps plan owners to plan names to their signatures
-signatures: WeakKeyDictionary[ControllerProtocol, dict[str, PlanSignature]] = (
+signatures: WeakKeyDictionary[PPresenter, dict[str, PlanSignature]] = (
     WeakKeyDictionary()
 )
 
@@ -157,7 +157,7 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
                 arg = types_to_check.pop()
 
                 # Use improved protocol check
-                if isinstance(arg, type) and isinstance(arg, ModelProtocol):
+                if isinstance(arg, type) and isinstance(arg, PModel):
                     return True
 
                 # If it's a generic type, add its args to the list to check
@@ -169,12 +169,12 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
     return False
 
 
-def _ismodel(arg: type[Any]) -> TypeGuard[type[ModelProtocol]]:
-    return isinstance(arg, ModelProtocol)
+def _ismodel(arg: type[Any]) -> TypeGuard[type[PModel]]:
+    return isinstance(arg, PModel)
 
 
 def _extract_protocol_types_from_generic(
-    annotation: Any, registered_protocols: set[type[ModelProtocol]]
+    annotation: Any, registered_protocols: set[type[PModel]]
 ) -> list[type]:
     """
     Extract all protocol types from a generic annotation and check if they're registered.
@@ -226,7 +226,7 @@ def _validate_plan_protocols(
     sig: inspect.Signature,
     type_hints: dict[str, Any],
     plan_name: str,
-    owner: ControllerProtocol,
+    owner: PPresenter,
 ) -> None:
     """Validate that all protocols used in plan parameters are registered."""
     registered_protocols = protocol_registry.get(owner, set())
@@ -252,38 +252,36 @@ def _validate_plan_protocols(
 
 
 @overload
-def register_protocols(
-    owner: ControllerProtocol, protocols: type[ModelProtocol]
-) -> None: ...
+def register_protocols(owner: PPresenter, protocols: type[PModel]) -> None: ...
 
 
 @overload
 def register_protocols(
-    owner: ControllerProtocol, protocols: Iterable[type[ModelProtocol]]
+    owner: PPresenter, protocols: Iterable[type[PModel]]
 ) -> None: ...
 
 
 def register_protocols(
-    owner: ControllerProtocol,
-    protocols: type[ModelProtocol] | Iterable[type[ModelProtocol]],
+    owner: PPresenter,
+    protocols: type[PModel] | Iterable[type[PModel]],
 ) -> None:
     """Register one or multiple protocols.
 
     Parameters
     ----------
-    owner : ``ControllerProtocol``
+    owner : ``PPresenter``
         The owner of the protocol.
-    protocols : ``type[ModelProtocol] | Iterable[type[ModelProtocol]]``
-        The protocol or protocols to register. They must be subclasses of `ModelProtocol`.
+    protocols : ``type[PModel] | Iterable[type[PModel]]``
+        The protocol or protocols to register. They must be subclasses of `PModel`.
 
     Raises
     ------
     TypeError
-        If the owner does not implement `ControllerProtocol`
-        or if the protocols are not subclasses of `ModelProtocol`.
+        If the owner does not implement `PPresenter`
+        or if the protocols are not subclasses of `PModel`.
     """
-    if not isinstance(owner, ControllerProtocol):
-        raise TypeError(f"Owner must implement ControllerProtocol, got {type(owner)}")
+    if not isinstance(owner, PPresenter):
+        raise TypeError(f"Owner must implement PPresenter, got {type(owner)}")
 
     # Handle both single protocol and iterable of protocols
     if isinstance(protocols, type):
@@ -293,8 +291,8 @@ def register_protocols(
 
     # Use type guard for safe protocol checking
     for proto in protos:
-        if not isinstance(proto, ModelProtocol):
-            raise TypeError(f"Protocol {proto.__name__} must implement ModelProtocol")
+        if not isinstance(proto, PModel):
+            raise TypeError(f"Protocol {proto.__name__} must implement PModel")
 
     protocol_registry.setdefault(owner, set())
     protocol_registry[owner].update(protos)
@@ -302,32 +300,32 @@ def register_protocols(
 
 @overload
 def register_plans(
-    owner: ControllerProtocol,
+    owner: PPresenter,
     plans: PlanGenerator,
 ) -> None: ...
 
 
 @overload
 def register_plans(
-    owner: ControllerProtocol,
+    owner: PPresenter,
     plans: Iterable[PlanGenerator],
 ) -> None: ...
 
 
 def register_plans(
-    owner: ControllerProtocol,
+    owner: PPresenter,
     plans: PlanGenerator | Iterable[PlanGenerator],
 ) -> None:
     """Register one or multiple plan generators.
 
     Plans are expected to be callable objects that return a Bluesky message generator.
-    Plan generators can require parameters, including protocols inherited from `ModelProtocol`;
+    Plan generators can require parameters, including protocols inherited from `PModel`;
     the requirement for using protocols in a plan is that they have to be registered first via
     the `register_protocols` function.
 
     Parameters
     ----------
-    owner : ``ControllerProtocol``
+    owner : ``PPresenter``
         The owner of the plan.
     plans : ``PlanGenerator | Iterable[PlanGenerator]``
         The plan generator or generators to register.
@@ -335,13 +333,13 @@ def register_plans(
     Raises
     ------
     TypeError
-        If the owner does not implement `ControllerProtocol`,
+        If the owner does not implement `PPresenter`,
         if the plans are not callable or if they do not return a `Generator[Msg, Any, Any]`,
         if the yield type of the generator is not `Msg`
         or a parameter using a protocol that is not registered is found.
     """
-    if not isinstance(owner, ControllerProtocol):
-        raise TypeError(f"Owner must implement ControllerProtocol, got {type(owner)}")
+    if not isinstance(owner, PPresenter):
+        raise TypeError(f"Owner must implement PPresenter, got {type(owner)}")
 
     # Convert input to a set to ensure uniqueness
     if callable(plans):
@@ -412,44 +410,44 @@ def register_plans(
         signatures[owner][func_name] = PlanSignature.from_callable(func)
 
 
-def get_protocols() -> MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]:
+def get_protocols() -> MappingProxyType[PPresenter, set[type[PModel]]]:
     """Get the available protocols.
 
     Returns
     -------
-    MappingProxyType[ControllerProtocol, set[type[ModelProtocol]]]
+    MappingProxyType[PPresenter, set[type[PModel]]]
         Read-only mapping of controller protocols to their registered model protocols.
     """
     return MappingProxyType(protocol_registry)
 
 
-def get_plans() -> MappingProxyType[ControllerProtocol, dict[str, PlanGenerator]]:
+def get_plans() -> MappingProxyType[PPresenter, dict[str, PlanGenerator]]:
     """Get the available plans.
 
     Plans are mapped as:
-    - owner (``ControllerProtocol``): The owner of the plans.
+    - owner (``PPresenter``): The owner of the plans.
       - ``dict[str, PlanGenerator]``: A dictionary mapping plan names to their generator functions.
 
     Returns
     -------
-    MappingProxyType[ControllerProtocol, dict[str, PlanGenerator]]
+    MappingProxyType[PPresenter, dict[str, PlanGenerator]]
         Read-only mapping of controller protocols to their registered plan names and functions.
     """
     return MappingProxyType(plan_registry)
 
 
-def get_signatures() -> MappingProxyType[ControllerProtocol, dict[str, PlanSignature]]:
+def get_signatures() -> MappingProxyType[PPresenter, dict[str, PlanSignature]]:
     """Get the available plan signatures.
 
     Signatures are mapped as:
-    - owner (``ControllerProtocol``): The owner of the plans.
+    - owner (``PPresenter``): The owner of the plans.
       - ``dict[str, PlanSignature]``: A dictionary mapping plan names to their signatures.
 
 
 
     Returns
     -------
-    MappingProxyType[ControllerProtocol, dict[str, PlanSignature]]
+    MappingProxyType[PPresenter, dict[str, PlanSignature]]
         Read-only mapping of controller protocols to their registered plan signatures.
     """
     return MappingProxyType(signatures)

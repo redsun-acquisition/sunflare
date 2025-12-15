@@ -39,6 +39,8 @@ import threading
 from collections import deque
 from typing import TYPE_CHECKING
 
+from bluesky.protocols import Status as PStatus
+
 from ._exceptions import InvalidState, StatusTimeoutError, WaitTimeoutError
 
 if TYPE_CHECKING:
@@ -47,7 +49,7 @@ if TYPE_CHECKING:
 __all__ = ["Status"]
 
 
-class Status:
+class Status(PStatus):
     """
     Track the status of a potentially-lengthy action like moving or triggering.
 
@@ -113,7 +115,7 @@ class Status:
         self._externally_initiated_completion_lock = threading.Lock()
         self._externally_initiated_completion = False
         self._callbacks: deque[Callable[[Status], None]] = deque()
-        self._exception: Exception | type[Exception] | None = None
+        self._exception: BaseException | None = None
 
         if settle_time is None:
             settle_time = 0.0
@@ -231,7 +233,7 @@ class Status:
                 )
         self._callbacks.clear()
 
-    def set_exception(self, exc: Exception | type[Exception]) -> None:
+    def set_exception(self, exc: BaseException) -> None:
         """Mark as finished but failed with the given Exception.
 
         This method should generally not be called by the *recipient* of this
@@ -239,14 +241,12 @@ class Status:
 
         Parameters
         ----------
-        exc: Exception | type[Exception]
+        exc: BaseException
+            The exception that caused the failure.
         """
         # Since we rely on this being raise-able later, check proactively to
         # avoid potentially very confusing failures.
-        if not (
-            isinstance(exc, Exception)
-            or (isinstance(exc, type) and issubclass(exc, Exception))
-        ):
+        if not (isinstance(exc, BaseException)):
             # Note that Python allows `raise Exception` or raise Exception()`
             # so we allow a class or an instance here too.
             raise ValueError(f"Expected an Exception, got {exc!r}")
@@ -255,9 +255,7 @@ class Status:
         # would probably never come up except due to some rare user error, but
         # if it did it could be very confusing indeed!
         for exc_class in (StatusTimeoutError, WaitTimeoutError):
-            if isinstance(exc, exc_class) or (
-                isinstance(exc, type) and issubclass(exc, exc_class)
-            ):
+            if isinstance(exc, exc_class):
                 raise ValueError(
                     f"{exc_class} has special significance and cannot be set "
                     "as the exception. Use a plain TimeoutError or some other "
@@ -298,9 +296,7 @@ class Status:
         else:
             self._settled_event.set()
 
-    def exception(
-        self, timeout: float | None = None
-    ) -> Exception | type[Exception] | None:
+    def exception(self, timeout: float | None = None) -> BaseException | None:
         """Return the exception raised by the action.
 
         If the action has completed successfully, return ``None``. If it has

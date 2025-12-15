@@ -4,12 +4,12 @@ from bluesky.protocols import Descriptor, Reading, SyncOrAsync
 
 from sunflare.config import ModelInfo
 
-from ._protocols import ModelProtocol
+from ._protocols import PModel
 
 MI = TypeVar("MI", bound=ModelInfo)
 
 
-class Model(ModelProtocol, Generic[MI]):
+class Model(PModel, Generic[MI]):
     """A boilerplate base class for quick model development.
 
     Users may subclass from this model and provide their custom
