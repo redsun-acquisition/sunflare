@@ -233,7 +233,7 @@ class Status(PStatus):
                 )
         self._callbacks.clear()
 
-    def set_exception(self, exc: Exception | type[Exception]) -> None:
+    def set_exception(self, exc: BaseException) -> None:
         """Mark as finished but failed with the given Exception.
 
         This method should generally not be called by the *recipient* of this
@@ -241,14 +241,12 @@ class Status(PStatus):
 
         Parameters
         ----------
-        exc: Exception | type[Exception]
+        exc: BaseException
+            The exception that caused the failure.
         """
         # Since we rely on this being raise-able later, check proactively to
         # avoid potentially very confusing failures.
-        if not (
-            isinstance(exc, Exception)
-            or (isinstance(exc, type) and issubclass(exc, Exception))
-        ):
+        if not (isinstance(exc, BaseException)):
             # Note that Python allows `raise Exception` or raise Exception()`
             # so we allow a class or an instance here too.
             raise ValueError(f"Expected an Exception, got {exc!r}")
@@ -257,9 +255,7 @@ class Status(PStatus):
         # would probably never come up except due to some rare user error, but
         # if it did it could be very confusing indeed!
         for exc_class in (StatusTimeoutError, WaitTimeoutError):
-            if isinstance(exc, exc_class) or (
-                isinstance(exc, type) and issubclass(exc, exc_class)
-            ):
+            if isinstance(exc, exc_class):
                 raise ValueError(
                     f"{exc_class} has special significance and cannot be set "
                     "as the exception. Use a plain TimeoutError or some other "
@@ -276,7 +272,7 @@ class Status(PStatus):
             if isinstance(self._exception, StatusTimeoutError):
                 # We have already timed out.
                 return
-            self._exception = exc  # type: ignore[assignment]
+            self._exception = exc
             self._settled_event.set()
 
     def set_finished(self) -> None:
