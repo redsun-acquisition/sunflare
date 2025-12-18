@@ -4,18 +4,9 @@ on:
     push:
         branches:
             - main
-        paths:
-            - "src/**"
-            - "tests/**"
-            - "docs/**"
-            - ".github/workflows/**"
     pull_request:
         branches:
             - main
-        paths:
-            - "src/**"
-            - "tests/**"
-            - "docs/**"
     release:
         types: [published]
 
