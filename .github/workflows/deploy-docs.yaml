@@ -26,8 +26,7 @@ jobs:
           uv sync --locked
       - name: build docs
         run: |
-          cd docs
-          make dirhtml
+          uv run --directory docs make dirhtml
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
