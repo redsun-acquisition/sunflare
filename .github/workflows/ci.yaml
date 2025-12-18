@@ -63,19 +63,14 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.event.release.tag_name }}
 
-            - name: Set up Python
-              uses: actions/setup-python@v6
+            - name: Install uv and setup python
+              uses: astral-sh/setup-uv@v7
               with:
-                  python-version: "3.x"
-
-            - name: Install dependencies
-              run: |
-                  pipx install hatch
-                  pip install -U pip hatchling hatch-vcs
+                  python-version: "3.13"
 
             - name: Build a binary wheel and a source tarball
               run: |
-                  hatch build
+                  uv build
                   echo "Build completed. Contents of dist/:"
                   ls -lah dist/
 
