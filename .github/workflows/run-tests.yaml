@@ -36,13 +36,13 @@ jobs:
           uv sync --locked
       - name: Run tests
         run: |
-          coverage run -p -m pytest --color=yes --log-cli-level=DEBUG
+          uv run coverage run -p -m pytest --color=yes --log-cli-level=DEBUG
       
       - name: Generate coverage report
         run: |
-          python -m coverage combine --append
-          python -m coverage xml -o coverage.xml
-          python -m coverage report
+          uv run python -m coverage combine --append
+          uv run python -m coverage xml -o coverage.xml
+          uv run python -m coverage report
       
       - name: Generate UUID
         shell: bash
@@ -99,7 +99,7 @@ jobs:
           fi
           echo "    */site-packages/" >> ci_coveragerc
           cat ci_coveragerc
-          python -Im coverage combine --rcfile=ci_coveragerc covreports
+          python -Im coverage combine --rcfile=ci_coveragerc .
           python -Im coverage xml -o coverage.xml
           python -Im coverage report
           python -Im coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
