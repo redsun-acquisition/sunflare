@@ -43,4 +43,4 @@ jobs:
           uv sync --locked --extra ${{ matrix.frontend }}
       - name: Run mypy
         run: |
-          mypy src/sunflare --ignore-missing-imports
+          uv run mypy src/sunflare --ignore-missing-imports
