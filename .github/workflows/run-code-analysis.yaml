@@ -19,7 +19,6 @@ jobs:
       - uses: astral-sh/ruff-action@v3
         with:
           args: "check --fix"
-          src: "src/sunflare"
 
   mypy-pyqt:
     strategy:
