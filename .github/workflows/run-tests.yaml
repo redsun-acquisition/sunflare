@@ -37,7 +37,6 @@ jobs:
       - name: Run tests
         run: |
           uv run coverage run -m pytest --color=yes --log-cli-level=DEBUG
-      
       - name: Generate coverage report
         run: |
           uv run python -m coverage combine --append
