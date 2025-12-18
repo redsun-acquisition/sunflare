@@ -36,7 +36,7 @@ jobs:
           uv sync --locked
       - name: Run tests
         run: |
-          uv run coverage run -p -m pytest --color=yes --log-cli-level=DEBUG
+          uv run coverage run -m pytest --color=yes --log-cli-level=DEBUG
       
       - name: Generate coverage report
         run: |
