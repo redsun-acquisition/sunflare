@@ -9,6 +9,10 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 ## Unreleased
 
+### Changed
+
+- Update CI/CD to use `uv` for faster and consistent development
+
 ## [0.7.0] - 15-12-2025
 
 ### Changed
