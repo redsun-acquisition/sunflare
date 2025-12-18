@@ -78,7 +78,7 @@ jobs:
       - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
-          name: covreport-*
+          pattern: covreport-*
       
       - name: Combine coverage data
         run: |
