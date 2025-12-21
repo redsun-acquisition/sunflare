@@ -1,10 +1,15 @@
 from __future__ import annotations
 
-from types import MappingProxyType
+import inspect
+from collections.abc import Callable
 from typing import (
     Iterable,
+    TypeAlias,
+    TypeVar,
 )
 
+from event_model import DocumentRouter
+from event_model.documents import Document
 from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
@@ -14,11 +19,15 @@ __all__ = [
     "VirtualBus",
 ]
 
+K = TypeVar("K")
+V = TypeVar("V")
+
+CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
+SignalCache: TypeAlias = dict[str, SignalInstance]
+
 
 class VirtualBus(Loggable):
-    """``VirtualBus``: signal router for data exchange.
-
-    Supports logging via :class:`~sunflare.log.Loggable`.
+    """``VirtualBus``: router object for data exchange.
 
     The ``VirtualBus`` is a mechanism to exchange
     data between different parts of the system. Communication
@@ -26,11 +35,13 @@ class VirtualBus(Loggable):
     well as between different layers of the system.
 
     It can be used to emit notifications and carry information
-    to other plugins.
+    to other plugins, or to register document callbacks
+    that process documents generated during data acquisition.
     """
 
     def __init__(self) -> None:
-        self._cache: dict[str, dict[str, SignalInstance]] = {}
+        self._signals: dict[str, SignalCache] = {}
+        self._callbacks: dict[str, CallbackType] = {}
 
     def register_signals(
         self, owner: object, only: Iterable[str] | None = None
@@ -66,8 +77,8 @@ class VirtualBus(Loggable):
             ]
 
         # Initialize the registry for this class if not already present
-        if class_name not in self._cache:
-            self._cache[class_name] = {}
+        if class_name not in self._signals:
+            self._signals[class_name] = SignalCache()
 
         # Iterate over the specified signal names and cache their instances
         for name in only:
@@ -75,41 +86,40 @@ class VirtualBus(Loggable):
             if isinstance(signal_descriptor, Signal):
                 # Retrieve the SignalInstance using the descriptor protocol
                 signal_instance = getattr(owner, name)
-                self._cache[class_name][name] = signal_instance
+                self._signals[class_name][name] = signal_instance
 
-    def __getitem__(self, class_name: str) -> MappingProxyType[str, SignalInstance]:
-        """
-        Access the registry for a specific class.
+    def register_callbacks(self, callback: CallbackType) -> None:
+        """Register a document callback in the virtual bus.
 
-        Parameters
-        ----------
-        class_name: str
-            The name of the class whose signals are to be accessed.
-
-        Returns
-        -------
-        MappingProxyType[str, SignalInstance]
-            A read-only dictionary mapping signal names to their `SignalInstance` objects.
-            If the class is not found in the registry, an empty dictionary is returned.
-        """
-        try:
-            return MappingProxyType(self._cache[class_name])
-        except KeyError:
-            self.logger.error(f"Class {class_name} not found in the registry.")
-            return MappingProxyType({})
-
-    def __contains__(self, class_name: str) -> bool:
-        """
-        Check if a class is in the registry.
+        Allows other components of the system access to
+        specific document routers through the `callbacks` property.
 
         Parameters
         ----------
-        class_name : str
-            The name of the class to check.
-
-        Returns
-        -------
-        bool
-            True if the class is in the registry, False otherwise.
+        callback : ``CallbackType``
+            The document callback to register.
         """
-        return class_name in self._cache
+        if isinstance(callback, DocumentRouter):
+            self._callbacks[callback.__class__.__name__] = callback
+        else:
+            if not callable(callback):
+                raise ValueError(f"{callback.__name__} is not callable.")
+            # validate that the callback accepts only two parameters
+            try:
+                inspect.signature(callback).bind(None, None)
+            except TypeError as e:
+                raise ValueError(
+                    "The callback function must accept exactly two parameters: "
+                    "'name' (str) and 'document' (Document)."
+                ) from e
+            self._callbacks[callback.__name__] = callback
+
+    @property
+    def callbacks(self) -> dict[str, CallbackType]:
+        """The currently registered document callbacks in the virtual bus."""
+        return self._callbacks
+
+    @property
+    def signals(self) -> dict[str, SignalCache]:
+        """The currently registered signals in the virtual bus."""
+        return self._signals

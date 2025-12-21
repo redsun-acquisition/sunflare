@@ -138,7 +138,7 @@ self._my_models: dict[str, MotorProtocol] = {
 Key differences in both approaches:
 
 - using `hasattr` is more performant than `isinstance`, as reported in the [`mypy`] documentation;
-  - in our use case though, performance will only marginally impact startup time, and it may be considered negligeble;
+  - in our use case though, performance will only marginally impact startup time, and it may be considered negligible;
 - using `isinstance` provides type hints for the models you're storing, while `hasattr` does not; in the example above, your IDE will not provide information on whether `set`/`locate` are methods or object attributes, while `isinstance` will allow your IDE to provide more complete information about them.
 
 The reccomended approach is to use `Protocols` in order to have better type hinting of your code. You should use this approach **only** to allocate the models you need at Redsun initialization, as that will only impact performance when starting the application (and only by a minimal amount) and not impact run-time performance.

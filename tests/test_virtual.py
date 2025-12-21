@@ -7,22 +7,16 @@ from itertools import count
 import pytest
 
 from sunflare.virtual import Signal, VirtualBus
-from sunflare.log import Loggable
 
 
-def test_virtual_bus_no_object(
-    caplog: pytest.LogCaptureFixture, bus: VirtualBus
-) -> None:
+def test_virtual_bus_no_object(bus: VirtualBus) -> None:
     """Test that trying to access a non-existent signal raises an error."""
 
     logger = logging.getLogger("redsun")
     logger.setLevel(logging.DEBUG)
 
-    signals = bus["MockOwner"]
-
-    assert len(signals) == 0
-    assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "Class MockOwner not found in the registry."
+    with pytest.raises(KeyError):
+        bus.signals["MockOwner"]
 
 
 def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
@@ -38,7 +32,9 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
             self.bus.register_signals(self)
 
         def connection_phase(self) -> None:
-            self.bus["SecondMockOwner"]["sigSecondSignal"].connect(self.second_to_first)
+            self.bus.signals["SecondMockOwner"]["sigSecondSignal"].connect(
+                self.second_to_first
+            )
 
         def second_to_first(self, x: int) -> None:
             assert x == 5
@@ -53,7 +49,9 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
             self.bus.register_signals(self)
 
         def connection_phase(self) -> None:
-            self.bus["FirstMockOwner"]["sigFirstSignal"].connect(self.first_to_second)
+            self.bus.signals["FirstMockOwner"]["sigFirstSignal"].connect(
+                self.first_to_second
+            )
 
         def first_to_second(self, x: int) -> None:
             assert x == 5
@@ -67,8 +65,8 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     first_owner.connection_phase()
     second_owner.connection_phase()
 
-    assert "FirstMockOwner" in bus
-    assert "SecondMockOwner" in bus
+    assert "FirstMockOwner" in bus.signals
+    assert "SecondMockOwner" in bus.signals
 
     first_owner.sigFirstSignal.emit(5)
     second_owner.sigSecondSignal.emit(5)
@@ -88,10 +86,10 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
 
     bus.register_signals(owner, only=["sigSignalOne"])
 
-    assert "MockOwner" in bus
-    assert len(bus["MockOwner"]) == 1
-    assert "sigSignalOne" in bus["MockOwner"]
-    assert "sigSignalTwo" not in bus["MockOwner"]
+    assert "MockOwner" in bus.signals
+    assert len(bus.signals["MockOwner"]) == 1
+    assert "sigSignalOne" in bus.signals["MockOwner"]
+    assert "sigSignalTwo" not in bus.signals["MockOwner"]
 
-    bus["MockOwner"]["sigSignalOne"].connect(callback)
+    bus.signals["MockOwner"]["sigSignalOne"].connect(callback)
     owner.sigSignalOne.emit(5)

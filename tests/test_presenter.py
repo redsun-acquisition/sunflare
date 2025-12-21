@@ -81,11 +81,11 @@ def test_sender_controller(bus: VirtualBus) -> None:
 
     ctrl.registration_phase()
 
-    assert len(bus._cache) == 1
-    assert len(bus._cache[ctrl.__class__.__name__]) == 1
-    assert bus._cache[ctrl.__class__.__name__]["dummySignal"] == ctrl.dummySignal
+    assert len(bus.signals) == 1
+    assert len(bus.signals[ctrl.__class__.__name__]) == 1
+    assert bus.signals[ctrl.__class__.__name__]["dummySignal"] == ctrl.dummySignal
 
-    bus[ctrl.__class__.__name__]["dummySignal"].connect(mock_slot)
+    bus.signals[ctrl.__class__.__name__]["dummySignal"].connect(mock_slot)
 
     ctrl.dummySignal.emit()
 
@@ -132,9 +132,9 @@ def test_receiver_controller(bus: VirtualBus) -> None:
     sender.registration_phase()
     ctrl.connection_phase()
 
-    assert len(bus._cache) == 1
-    assert len(bus._cache["DummySender"]) == 1
-    assert bus._cache["DummySender"]["dummySignal"] == sender.dummySignal
+    assert len(bus.signals) == 1
+    assert len(bus.signals["DummySender"]) == 1
+    assert bus.signals["DummySender"]["dummySignal"] == sender.dummySignal
 
     sender.dummySignal.emit()
 
@@ -176,6 +176,6 @@ def test_sender_receiver(bus: VirtualBus) -> None:
     ctrl.registration_phase()
     ctrl.connection_phase()
 
-    assert len(bus._cache) == 1
-    assert len(bus._cache["TestController"]) == 1
-    assert bus._cache["TestController"]["dummySignal"] == ctrl.dummySignal
+    assert len(bus.signals) == 1
+    assert len(bus.signals["TestController"]) == 1
+    assert bus.signals["TestController"]["dummySignal"] == ctrl.dummySignal

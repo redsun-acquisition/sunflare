@@ -19,4 +19,6 @@ def RE() -> RunEngine:
 
 @pytest.fixture(scope="function")
 def bus() -> Generator[VirtualBus, None, None]:
-    yield VirtualBus()
+    bus = VirtualBus()
+
+    yield bus

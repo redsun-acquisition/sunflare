@@ -1,15 +1,6 @@
 # Virtual bus
 
-The {py:class}`~sunflare.virtual.VirtualBus` is a class encapsulating different communication mechanism to allow different controllers and widget to exchange controls and/or data streams. It provides the following features:
-
-- a "Qt-like" mechanism of signal connection through the [`psygnal`] package, where objects can dinamically register signals and connect to remote slots for communication in the main thread;
-- a ZMQ publisher/subscriber device which provides a common data exchange channel for multiple endpoints via the [`pyzmq`] package;
-  - data can be encoded/decoded via [`msgspec`];
-- a {py:obj}`~sunflare.virtual.slot` decorator which can mark your class method as a function connected to a signal;
-
-```{tip}
-{py:obj}`~sunflare.virtual.slot` is pure syntactic sugar; it does not provide any advantage at runtime, but renders your code more easy to read for other developers. `psygnal.Signal` can be connected to any function or class method.
-```
+The {py:class}`~sunflare.virtual.VirtualBus` is a class encapsulating different communication mechanism to allow different controllers and widget to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the [`psygnal`] package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.
 
 ## Signal connection
 
@@ -110,85 +101,7 @@ emitter = Emitter(bus)
 receiver = Receiver(bus)
 
 # ... run your application
-# before ending the application,
-# call the following:
-bus.shutdown()
 ```
 ````
 
-## Socket connection
-
-The `VirtualBus` uses a [`pyzmq`] queue (called a "forwarder") for sharing a serialized byte stream between different endpoints using the publisher/subscriber pattern.
-
-This pattern can be used in different configurations.
-
-- one-to-one: a single publisher forwards data to a single subscriber;
-```mermaid
-:config: { "theme": "neutral" }
-:align: center
-
-graph LR
-    q[["zmq.XSUB | -> | zmq.XPUB"]]
-    pub["zmq.PUB"] --> q
-    q --> sub["zmq.SUB"]
-```
-
-- one-to-many: a single publisher forwards data to a multiple subscribers;
-```mermaid
-:config: { "theme": "neutral" }
-:align: center
-
-graph LR
-    q[["zmq.XSUB | -> | zmq.XPUB"]]
-    pubA["zmq.PUB"] --> q
-    q --> subA["zmq.SUB"]
-    q --> subB["zmq.SUB"]
-    q --> subC["zmq.SUB"]
-```
-
-- many-to-many: multiple publishers forward data to a multiple subscribers;
-```mermaid
-:config: { "theme": "neutral" }
-:align: center
-
-graph LR
-    pubA["zmq.PUB"] --> q
-    pubB["zmq.PUB"] --> q
-    pubC["zmq.PUB"] --> q
-    q[["zmq.XSUB | -> | zmq.XPUB"]]
-    q --> subA["zmq.SUB"]
-    q --> subB["zmq.SUB"]
-    q --> subC["zmq.SUB"]
-```
-- many-to-one: multiple publishers forward data to a single subscriber.
-```mermaid
-:config: { "theme": "neutral" }
-:align: center
-
-graph LR
-    pubA["zmq.PUB"] --> q
-    pubB["zmq.PUB"] --> q
-    pubC["zmq.PUB"] --> q
-    q[["zmq.XSUB | -> | zmq.XPUB"]]
-    q --> subA["zmq.SUB"]
-```
-
-This is transparent to the plugins: they're not aware of how many agents are currently connected to the forwarder; whenever a new message is sent from a publisher, any subscriber who is actively listening (either to a broadcasted message or to a specific topic) will be able to receive the information.
-
-The `sunflare.virtual` module provides a series of pre-shipped classes which allow for easy integration with the `zmq` forwarder:
-
-- {py:class}`~sunflare.virtual.Publisher` (message dispatching);
-- {py:class}`~sunflare.virtual.Subscriber` (message reception).
-
-### Serialization with `msgspec`
-
-[`msgspec`] is a *fast* serialization library (according to the author, and backed up by some [benchmarks](https://jcristharif.com/msgspec/benchmarks.html)); combined with the performance of [`pyzmq`], transmission from one point to another becomes easy and fast. Sunflare provides two methods:
-
-- {py:obj}`~sunflare.virtual.encode`;
-- {py:obj}`~sunflare.virtual.decode`;
-
-using a common, reusable `msgspec` encoder/decoder for data transmission and reception.
-
 [`psygnal`]: https://psygnal.readthedocs.io/en/stable/
-[`pyzmq`]: https://pyzmq.readthedocs.io/en/latest/
-[`msgspec`]: https://jcristharif.com/msgspec/

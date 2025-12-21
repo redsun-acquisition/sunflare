@@ -305,7 +305,7 @@ class Receiver(Presenter[CI]):
         if self.connection_map is not None:
             for emitter, connections in self.connection_map.items():
                 for connection in connections:
-                    self.virtual_bus[emitter][connection.signal].connect(
+                    self.virtual_bus.signals[emitter][connection.signal].connect(
                         connection.slot
                     )
 
@@ -423,6 +423,6 @@ class SenderReceiver(Presenter[CI]):
         if self.connection_map is not None:
             for emitter, connections in self.connection_map.items():
                 for connection in connections:
-                    self.virtual_bus[emitter][connection.signal].connect(
+                    self.virtual_bus.signals[emitter][connection.signal].connect(
                         connection.slot
                     )

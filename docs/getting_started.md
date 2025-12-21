@@ -4,13 +4,9 @@
 
 It is reccomended to install the package in a virtual environment.
 
-:::{tip}
-`sunflare` is supported between Python 3.10 and 3.12.
-:::
-
 
 ::::{tab-set}
-:::{tab-item} uv
+:::{tab-item} uv (reccomended)
 ```{code-block} shell
 uv venv --python 3.10
 venv\Scripts\activate
@@ -76,13 +72,27 @@ pip install -e .
 
 ## Usage from source
 
-### Building the documentation
+### Installing development dependencies
 
-If you want to build the documentation locally, you'll need to install the dependencies first:
+You can install the required development dependencies via [PEP-735](https://peps.python.org/pep-0735/) dependency groups.
 
-```bash
-pip install -e .[doc]
+::::{tab-set}
+:::{tab-item} uv (reccomended)
+```{code-block} shell
+# dev dependencies 
+# are automatically
+# synchronized
+uv sync
 ```
+:::
+:::{tab-item} pip
+```{code-block} shell
+pip install -e . --group dev
+```
+:::
+::::
+
+### Building the documentation
 
 You can build the documentation by running the following command:
 
@@ -98,13 +108,7 @@ And then open the `_build/html/index.html` file in your browser.
 
 ### Running tests
 
-To run the tests, you'll need to install the dependencies first:
-
-```bash
-pip install -e .[dev]
-```
-
-Then, you can run the tests by running the following command:
+You can run the tests by running the following command:
 
 ```bash
 pytest

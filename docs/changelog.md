@@ -9,6 +9,23 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 ## Unreleased
 
+### Removed
+
+- Removed the overall dependency on `pyzmq` and `msgspec`:
+  - The original idea was to create a local network of document dispatch via the `inproc` protocol.
+  - This idea is now discarded and will be reworked in favor of a more consistent approach using multiple processes
+    controlled centrally by the application.
+
+### Changed
+
+- Expose signals registered to the `VirtualBus` through the `signals` property.
+
+### Added
+
+- Add the ability to register callbacks in the `VirtualBus` for other components to retrieve (primarely other run engines).
+- Expose callbacks via the `callbacks` property.
+
+
 ## [0.7.0] - 15-12-2025
 
 ### Changed
