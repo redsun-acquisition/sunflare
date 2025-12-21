@@ -132,6 +132,17 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
 def test_virtual_bus_callback_registration(bus: VirtualBus) -> None:
     """Test registering callbacks to the virtual bus."""
 
+    with pytest.raises(TypeError):
+
+        def wrong_callback(name: str) -> None:
+            pass
+
+        bus.register_callbacks(wrong_callback)
+
+    with pytest.raises(TypeError):
+        non_callable = 42
+        bus.register_callbacks(non_callable)
+
     # Regular function - key should be function name
     bus.register_callbacks(simple_callback)
     assert len(bus.callbacks) == 1
