@@ -112,7 +112,25 @@ class VirtualBus(Loggable):
                     "The callback function must accept exactly two parameters: "
                     "'name' (str) and 'document' (Document)."
                 ) from e
-            self._callbacks[callback.__name__] = callback
+
+            # determine the key based on the type of callback
+            if inspect.ismethod(callback):
+                # bound method: if it's __call__, use the class name; otherwise use the method name
+                if callback.__name__ == "__call__":
+                    key = callback.__self__.__class__.__name__
+                else:
+                    key = callback.__name__
+            elif inspect.isfunction(callback):
+                # regular function: use the function name
+                key = callback.__name__
+            elif hasattr(callback, "__call__"):
+                # callable object (instance with __call__ method): use the class name
+                key = callback.__class__.__name__
+            else:
+                # fallback (should not reach here due to earlier callable check)
+                key = callback.__name__
+
+            self._callbacks[key] = callback
 
     @property
     def callbacks(self) -> dict[str, CallbackType]:
