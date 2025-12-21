@@ -46,7 +46,6 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --extra ${{ matrix.frontend }}
-          uv pip install --system mypy
 
       - name: Run mypy
         run: uv run mypy src/sunflare --ignore-missing-imports
