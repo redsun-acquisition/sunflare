@@ -14,26 +14,34 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.10"
-      - name: install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install --editable .[dev]
-      - name: build docs
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Set up Python
+        run: uv python install 3.10
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Build docs
         run: |
           cd docs
-          make dirhtml
-      - name: upload artifacts
-        uses: actions/upload-artifact@v5
+          uv run make dirhtml
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: docs
           path: docs/_build/dirhtml
-      - name: deploy on gh-pages
+
+      - name: Deploy on gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           publish_branch: gh-pages
