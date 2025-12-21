@@ -58,24 +58,20 @@ jobs:
         if: success() && github.event_name == 'release'
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
                   ref: ${{ github.event.release.tag_name }}
 
-            - name: Set up Python
-              uses: actions/setup-python@v6
-              with:
-                  python-version: "3.x"
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
 
-            - name: Install dependencies
-              run: |
-                  pipx install hatch
-                  pip install -U pip hatchling hatch-vcs
+            - name: Set up Python
+              run: uv python install 3.x
 
             - name: Build a binary wheel and a source tarball
               run: |
-                  hatch build
+                  uv build
                   echo "Build completed. Contents of dist/:"
                   ls -lah dist/
 
@@ -88,7 +84,7 @@ jobs:
                   echo "Build artifacts verified successfully"
 
             - name: Store the distribution packages
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               with:
                   name: python-package-distributions
                   path: dist/
