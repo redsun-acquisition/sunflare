@@ -1,12 +1,46 @@
 import logging
-import threading
-import time
-import queue
-from itertools import count
 
 import pytest
 
 from sunflare.virtual import Signal, VirtualBus
+from event_model import DocumentRouter
+
+logger = logging.getLogger("redsun")
+logger.setLevel(logging.DEBUG)
+
+
+def simple_callback(name: str, doc: dict) -> None:
+    logger.debug(f"received {name} document")
+
+
+class MockRouter(DocumentRouter):
+    def __init__(self) -> None:
+        super().__init__()
+        self.received_docs: list[tuple[str, dict]] = []
+
+    def event(self, doc: dict) -> None:
+        logger.debug("MockRouter received event document")
+
+    def start(self, doc: dict) -> None:
+        logger.debug("MockRouter received start document")
+
+    def stop(self, doc: dict) -> None:
+        logger.debug("MockRouter received stop document")
+
+    def descriptor(self, doc: dict) -> None:
+        logger.debug("MockRouter received descriptor document")
+
+
+class MockCallback:
+    def __call__(self, name: str, doc: dict) -> None:
+        logger.debug(f"MockCallback received {name} document")
+
+
+class MockMethodCallback:
+    """Mock class with a regular method callback for testing bound methods."""
+
+    def process_document(self, name: str, doc: dict) -> None:
+        logger.debug(f"MockMethodCallback.process_document received {name} document")
 
 
 def test_virtual_bus_no_object(bus: VirtualBus) -> None:
@@ -93,3 +127,36 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
 
     bus.signals["MockOwner"]["sigSignalOne"].connect(callback)
     owner.sigSignalOne.emit(5)
+
+
+def test_virtual_bus_callback_registration(bus: VirtualBus) -> None:
+    """Test registering callbacks to the virtual bus."""
+
+    # Regular function - key should be function name
+    bus.register_callbacks(simple_callback)
+    assert len(bus.callbacks) == 1
+    assert "simple_callback" in bus.callbacks
+
+    # DocumentRouter subclass - key should be class name
+    router = MockRouter()
+    bus.register_callbacks(router)
+    assert len(bus.callbacks) == 2
+    assert "MockRouter" in bus.callbacks
+
+    # Callable object (instance with __call__) - key should be class name
+    mock_callback = MockCallback()
+    bus.register_callbacks(mock_callback)
+    assert len(bus.callbacks) == 3
+    assert "MockCallback" in bus.callbacks
+
+    # Bound method - key should be method name
+    method_callback = MockMethodCallback()
+    bus.register_callbacks(method_callback.process_document)
+    assert len(bus.callbacks) == 4
+    assert "process_document" in bus.callbacks
+
+    # Bound __call__ method - key should be class name
+    another_callable = MockCallback()
+    bus.register_callbacks(another_callable.__call__)
+    assert len(bus.callbacks) == 4  # same key as Test 3, so count stays the same
+    assert "MockCallback" in bus.callbacks
