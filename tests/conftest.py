@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Generator
 
 import pytest
-import zmq
 
 from sunflare.engine import RunEngine
 from sunflare.virtual import VirtualBus
@@ -20,4 +19,6 @@ def RE() -> RunEngine:
 
 @pytest.fixture(scope="function")
 def bus() -> Generator[VirtualBus, None, None]:
-    yield VirtualBus()
+    bus = VirtualBus()
+
+    yield bus

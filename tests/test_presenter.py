@@ -36,8 +36,6 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
         assert controller.info.plugin_name == "mocks"
         assert controller.info.plugin_id == "mock_controller"
 
-    bus.shutdown()
-
 
 def test_base_controller(bus: VirtualBus) -> None:
     class TestController(Presenter[PresenterInfo]):
@@ -55,8 +53,6 @@ def test_base_controller(bus: VirtualBus) -> None:
     ctrl = TestController(ctrl_info, {}, bus)
 
     assert isinstance(ctrl, PPresenter)
-
-    bus.shutdown()
 
 
 def test_sender_controller(bus: VirtualBus) -> None:
@@ -85,17 +81,15 @@ def test_sender_controller(bus: VirtualBus) -> None:
 
     ctrl.registration_phase()
 
-    assert len(bus._cache) == 1
-    assert len(bus._cache[ctrl.__class__.__name__]) == 1
-    assert bus._cache[ctrl.__class__.__name__]["dummySignal"] == ctrl.dummySignal
+    assert len(bus.signals) == 1
+    assert len(bus.signals[ctrl.__class__.__name__]) == 1
+    assert bus.signals[ctrl.__class__.__name__]["dummySignal"] == ctrl.dummySignal
 
-    bus[ctrl.__class__.__name__]["dummySignal"].connect(mock_slot)
+    bus.signals[ctrl.__class__.__name__]["dummySignal"].connect(mock_slot)
 
     ctrl.dummySignal.emit()
 
     assert cnt == 1
-
-    bus.shutdown()
 
 
 def test_receiver_controller(bus: VirtualBus) -> None:
@@ -138,15 +132,13 @@ def test_receiver_controller(bus: VirtualBus) -> None:
     sender.registration_phase()
     ctrl.connection_phase()
 
-    assert len(bus._cache) == 1
-    assert len(bus._cache["DummySender"]) == 1
-    assert bus._cache["DummySender"]["dummySignal"] == sender.dummySignal
+    assert len(bus.signals) == 1
+    assert len(bus.signals["DummySender"]) == 1
+    assert bus.signals["DummySender"]["dummySignal"] == sender.dummySignal
 
     sender.dummySignal.emit()
 
     assert cnt == 1
-
-    bus.shutdown()
 
 
 def test_sender_receiver(bus: VirtualBus) -> None:
@@ -184,8 +176,6 @@ def test_sender_receiver(bus: VirtualBus) -> None:
     ctrl.registration_phase()
     ctrl.connection_phase()
 
-    assert len(bus._cache) == 1
-    assert len(bus._cache["TestController"]) == 1
-    assert bus._cache["TestController"]["dummySignal"] == ctrl.dummySignal
-
-    bus.shutdown()
+    assert len(bus.signals) == 1
+    assert len(bus.signals["TestController"]) == 1
+    assert bus.signals["TestController"]["dummySignal"] == ctrl.dummySignal
