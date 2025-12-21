@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Generator
 
 import pytest
-import zmq
 
 from sunflare.engine import RunEngine
 from sunflare.virtual import VirtualBus

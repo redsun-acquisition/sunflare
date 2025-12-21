@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 from concurrent.futures import Future, ThreadPoolExecutor
-from itertools import count
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
-import zmq
 from bluesky.run_engine import (
     RunEngine as BlueskyRunEngine,
 )
@@ -22,9 +20,6 @@ if TYPE_CHECKING:
 __all__ = ["RunEngine", "RunEngineResult", "RunEngineInterrupted", "Document"]
 
 REResultType = RunEngineResult | tuple[str, ...] | Exception
-FuncSocket = Callable[[str, dict[str, Any]], None] | zmq.Socket[bytes]
-
-_prefix_counter = count()
 
 
 class RunEngine(BlueskyRunEngine):

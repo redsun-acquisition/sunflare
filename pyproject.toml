@@ -34,8 +34,6 @@ dependencies = [
     "bluesky>=1.14.5",
     "attrs>=25.3.0",
     "psygnal>=0.15.0",
-    "msgspec>=0.20.0",
-    "pyzmq>=27.1.0",
     "typing-extensions>=4.14.0",
 ]
 

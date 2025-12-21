@@ -36,8 +36,6 @@ def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
         assert controller.info.plugin_name == "mocks"
         assert controller.info.plugin_id == "mock_controller"
 
-    bus.shutdown()
-
 
 def test_base_controller(bus: VirtualBus) -> None:
     class TestController(Presenter[PresenterInfo]):
@@ -55,8 +53,6 @@ def test_base_controller(bus: VirtualBus) -> None:
     ctrl = TestController(ctrl_info, {}, bus)
 
     assert isinstance(ctrl, PPresenter)
-
-    bus.shutdown()
 
 
 def test_sender_controller(bus: VirtualBus) -> None:
@@ -94,8 +90,6 @@ def test_sender_controller(bus: VirtualBus) -> None:
     ctrl.dummySignal.emit()
 
     assert cnt == 1
-
-    bus.shutdown()
 
 
 def test_receiver_controller(bus: VirtualBus) -> None:
@@ -146,8 +140,6 @@ def test_receiver_controller(bus: VirtualBus) -> None:
 
     assert cnt == 1
 
-    bus.shutdown()
-
 
 def test_sender_receiver(bus: VirtualBus) -> None:
     cnt = 0
@@ -187,5 +179,3 @@ def test_sender_receiver(bus: VirtualBus) -> None:
     assert len(bus._cache) == 1
     assert len(bus._cache["TestController"]) == 1
     assert bus._cache["TestController"]["dummySignal"] == ctrl.dummySignal
-
-    bus.shutdown()
