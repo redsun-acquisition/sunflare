@@ -98,17 +98,23 @@ class VirtualBus(Loggable):
         ----------
         callback : ``CallbackType``
             The document callback to register.
+
+        Raises
+        ------
+        TypeError
+            If the provided callback is not callable or does not
+            accept the correct parameters.
         """
         if isinstance(callback, DocumentRouter):
             self._callbacks[callback.__class__.__name__] = callback
         else:
             if not callable(callback):
-                raise ValueError(f"{callback.__name__} is not callable.")
+                raise TypeError(f"{callback} is not callable.")
             # validate that the callback accepts only two parameters
             try:
                 inspect.signature(callback).bind(None, None)
             except TypeError as e:
-                raise ValueError(
+                raise TypeError(
                     "The callback function must accept exactly two parameters: "
                     "'name' (str) and 'document' (Document)."
                 ) from e
