@@ -1,4 +1,4 @@
-"""Wrapper for the :class:`~bluesky.run_engine.RunEngine` class to allow execution without blocking the main thread."""
+"""Wrapper for the [`bluesky.run_engine.RunEngine`]() class to allow execution without blocking the main thread."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class RunEngine(BlueskyRunEngine):
     - ``during_task``: Overridden to ``DuringTask``, so the ``RunEngine``
       does not interact with any possible event loop in the main thread.
 
-    For the original class initializer signature, refer to the :class:`~bluesky.run_engine.RunEngine` documentation.
+    For the original class initializer signature, refer to the [`bluesky.run_engine.RunEngine`]() documentation.
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

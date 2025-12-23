@@ -52,8 +52,8 @@ class Connection(NamedTuple):
     for describing a connection between
     a virtual bus signal and a local slot.
 
-    Usable with :class:`~sunflare.presenter.Receiver`
-    and :class:`~sunflare.presenter.SenderReceiver`
+    Usable with [`sunflare.presenter.Receiver`]()
+    and [`sunflare.presenter.SenderReceiver`]()
     to set the `connection_map` parameter.
 
     Attributes
@@ -72,41 +72,41 @@ class Presenter(PPresenter, Generic[CI]):
     """A boilerplate base class for quick development.
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.PresenterInfo` implementation.
+    `sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
-    .. code-block:: python
-
-        from sunflare.presenter import Presenter
-        from sunflare.config import PresenterInfo
-        from attrs import define
-
-
-        @define
-        class MyControllerInfo(PresenterInfo):
-            str_param: str
-            bool_param: bool
-            # any other parameters...
+    ```python
+    from sunflare.presenter import Presenter
+    from sunflare.config import PresenterInfo
+    from attrs import define
 
 
-        class MyController(Presenter[MyControllerInfo]):
-            def __init__(
-                self,
-                ctrl_info: MyControllerInfo,
-                models: Mapping[str, PModel],
-                virtual_bus: VirtualBus,
-            ) -> None:
-                super().__init__(ctrl_info, models, virtual_bus)
-                # any other initialization code...
+    @define
+    class MyControllerInfo(PresenterInfo):
+        str_param: str
+        bool_param: bool
+        # any other parameters...
+
+
+    class MyController(Presenter[MyControllerInfo]):
+        def __init__(
+            self,
+            ctrl_info: MyControllerInfo,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
+        ) -> None:
+            super().__init__(ctrl_info, models, virtual_bus)
+            # any other initialization code...
+    ```
 
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of :class:`~sunflare.config.PresenterInfo` subclass.
+        Instance of `sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+    virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     """
 
@@ -129,53 +129,51 @@ class Sender(Presenter[CI]):
     signals.
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.PresenterInfo` implementation.
+    `sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
-    .. code-block:: python
-
-        from sunflare.presenter import SignalerController
-        from sunflare.config import PresenterInfo
-        from attrs import define
-
-
-        @define
-        class MyControllerInfo(PresenterInfo):
-            str_param: str
-            bool_param: bool
-            # any other parameters...
+    ```python
+    from sunflare.presenter import SignalerController
+    from sunflare.config import PresenterInfo
+    from attrs import define
 
 
-        class MyController(SignalerController[MyControllerInfo]):
-            sigRegisteredSignal = Signal(str)
-            sigUnregisteredSignal = Signal(int)
-
-            def __init__(
-                self,
-                ctrl_info: MyControllerInfo,
-                models: Mapping[str, PModel],
-                virtual_bus: VirtualBus,
-            ) -> None:
-                signals = ["sigRegisteredSignal"]
-                super().__init__(ctrl_info, models, virtual_bus, signals)
-                # any other initialization code...
+    @define
+    class MyControllerInfo(PresenterInfo):
+        str_param: str
+        bool_param: bool
+        # any other parameters...
 
 
-    See :class:`~sunflare.presenter.Presenter` for parent information.
+    class MyController(SignalerController[MyControllerInfo]):
+        sigRegisteredSignal = Signal(str)
+        sigUnregisteredSignal = Signal(int)
 
-    .. note::
+        def __init__(
+            self,
+            ctrl_info: MyControllerInfo,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
+        ) -> None:
+            signals = ["sigRegisteredSignal"]
+            super().__init__(ctrl_info, models, virtual_bus, signals)
+            # any other initialization code...
+    ```
 
+    See [`sunflare.presenter.Presenter`]() for parent information.
+
+    !!! note
         Users should carefully document the data transmitted by the signals
         to ensure other endpoints can easily connect to them.
 
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of a :class:`~sunflare.config.PresenterInfo` subclass.
+        Instance of a `sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+    virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     signals : ``Sequence[str]``, keyword-only, optional
         Sequence of signals to register.
@@ -218,62 +216,61 @@ class Receiver(Presenter[CI]):
 
     Example usage:
 
-    .. code-block:: python
+    ```python
+    from sunflare.presenter import ReceiverController
+    from sunflare.config import PresenterInfo
+    from attrs import define
 
-        from sunflare.presenter import ReceiverController
-        from sunflare.config import PresenterInfo
-        from attrs import define
+    @define
+    class MyControllerInfo(PresenterInfo):
+        str_param: str
+        bool_param: bool
+        # any other parameters...
 
-        @define
-        class MyControllerInfo(PresenterInfo):
-            str_param: str
-            bool_param: bool
-            # any other parameters...
+    class MyController(ReceiverController[MyControllerInfo]):
+        def __init__(
+            self,
+            ctrl_info: MyControllerInfo,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
+        ) -> None:
+            connection_map = {
+                "WidgetEmitter": [
+                    Connection("sigWidgetSignal1", self.widget_slot),
+                    Connection("sigWidgetSignal2", self.other_widget_slot)
+                ],
+                "ControllerEmitter": [
+                    Connection("sigControllerSignal", self.controller_slot),
+                ],
+            }
+            super().__init__(ctrl_info, models, virtual_bus, connection_map)
+            # any other initialization code...
 
-        class MyController(ReceiverController[MyControllerInfo]):
-            def __init__(
-                self,
-                ctrl_info: MyControllerInfo,
-                models: Mapping[str, PModel],
-                virtual_bus: VirtualBus,
-            ) -> None:
-                connection_map = {
-                    "WidgetEmitter": [
-                        Connection("sigWidgetSignal1", self.widget_slot),
-                        Connection("sigWidgetSignal2", self.other_widget_slot)
-                    ],
-                    "ControllerEmitter": [
-                        Connection("sigControllerSignal", self.controller_slot),
-                    ],
-                }
-                super().__init__(ctrl_info, models, virtual_bus, connection_map)
-                # any other initialization code...
+        def widget_slot(self, *args, **kwargs) -> None:
+            # your logic here...
 
-            def widget_slot(self, *args, **kwargs) -> None:
-                # your logic here...
+        def other_widget_slot(self, *args, **kwargs) -> None:
+            # your logic here...
 
-            def other_widget_slot(self, *args, **kwargs) -> None:
-                # your logic here...
+        def controller_slot(self, *args, **kwargs) -> None:
+            # your logic here...
+    ```
 
-            def controller_slot(self, *args, **kwargs) -> None:
-                # your logic here...
+    !!! note
+        The controller slots should respect the signals' signatures
+        in order to correctly receive the emitted signals.
+        Make sure to review any provided documentation
+        about the nature of the signals being connected.
 
-        .. note::
-
-            The controller slots should respect the signals' signatures
-            in order to correctly receive the emitted signals.
-            Make sure to review any provided documentation
-            about the nature of the signals being connected.
-
-    See :class:`~sunflare.presenter.Presenter` for parent information.
+    See [`sunflare.presenter.Presenter`]() for parent information.
 
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of a :class:`~sunflare.config.PresenterInfo` subclass.
+        Instance of a `sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+    virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     connection_map : ``Mapping[str, list[Connection]]``, optional
         Mapping of emitters to a list of connections.
@@ -311,10 +308,10 @@ class Receiver(Presenter[CI]):
 
 
 class SenderReceiver(Presenter[CI]):
-    """Combines the functionality of :class:`~sunflare.presenter.Sender` and :class:`~sunflare.presenter.Receiver`.
+    """Combines the functionality of [`sunflare.presenter.Sender`]() and [`sunflare.presenter.Receiver`]().
 
     Users may subclass from this controller and provide their custom
-    :class:`~sunflare.config.PresenterInfo` implementation.
+    `sunflare.config.PresenterInfo` implementation.
 
     Example usage:
 
@@ -373,10 +370,10 @@ class SenderReceiver(Presenter[CI]):
     Parameters
     ----------
     ctrl_info : ``CI``
-        Instance of a :class:`~sunflare.config.PresenterInfo` subclass.
+        Instance of a `sunflare.config.PresenterInfo` subclass.
     models : ``Mapping[str, PModel]``
         Reference to the models used in the controller.
-    virtual_bus : :class:`~sunflare.virtual.VirtualBus`
+    virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     signals : ``Sequence[str]``, optional
         Sequence of signals to register.

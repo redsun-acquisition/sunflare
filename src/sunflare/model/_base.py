@@ -13,35 +13,35 @@ class Model(PModel, Generic[MI]):
     """A boilerplate base class for quick model development.
 
     Users may subclass from this model and provide their custom
-    :class:`~sunflare.config.ModelInfo` implementation.
+    `sunflare.config.ModelInfo` implementation.
 
     Example usage:
 
-    .. code-block:: python
-
-        from sunflare.model import Model
-        from sunflare.config import ModelInfo
-        from attrs import define
-
-
-        @define
-        class MyModelInfo(ModelInfo):
-            str_param: str
-            bool_param: bool
-            # any other parameters...
+    ```python
+    from sunflare.model import Model
+    from sunflare.config import ModelInfo
+    from attrs import define
 
 
-        class MyModel(Model[MyModelInfo]):
-            def __init__(self, name: str, model_info: MyModelInfo) -> None:
-                super().__init__(name, model_info)
-                # any other initialization code...
+    @define
+    class MyModelInfo(ModelInfo):
+        str_param: str
+        bool_param: bool
+        # any other parameters...
+
+
+    class MyModel(Model[MyModelInfo]):
+        def __init__(self, name: str, model_info: MyModelInfo) -> None:
+            super().__init__(name, model_info)
+            # any other initialization code...
+    ```
 
     Parameters
     ----------
     name : ``str``
         Name of the model. Serves as a unique identifier for the object created from it.
     model_info : ``MI``
-        Instance of :class:`~sunflare.config.ModelInfo`. subclass.
+        Instance of `sunflare.config.ModelInfo` subclass.
     """
 
     def __init__(self, name: str, model_info: MI) -> None:
@@ -57,7 +57,7 @@ class Model(PModel, Generic[MI]):
 
         Returns
         -------
-        dict[``str``, :class:`~event_model.DataKey`]
+        dict[``str``, `event_model.DataKey`]
             A dictionary with the description of each field of the model configuration.
         """
         return self._model_info.describe_configuration()
@@ -71,7 +71,7 @@ class Model(PModel, Generic[MI]):
 
         Returns
         -------
-        dict[``str``, :class:`~bluesky.protocols.Descriptor`]
+        dict[``str``, `bluesky.protocols.Descriptor`]
             A dictionary with the description of each field of the model configuration.
         """
         return self._model_info.read_configuration()

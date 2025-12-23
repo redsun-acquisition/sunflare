@@ -6,12 +6,10 @@ from typing_extensions import Protocol, runtime_checkable
 class HasShutdown(Protocol):  # pragma: no cover
     """Protocol marking your class as capable of shutting down.
 
-    .. tip::
-
+    !!! tip
         This protocol is optional and only available for
         ``Presenters``. ``Widgets`` and ``Models`` will not
         be affected by this protocol.
-
     """
 
     @abstractmethod
@@ -28,12 +26,10 @@ class HasShutdown(Protocol):  # pragma: no cover
 class HasRegistration(Protocol):  # pragma: no cover
     """Protocol marking your class as capable of emitting signals.
 
-    .. tip::
-
+    !!! tip
         This protocol is optional and only available for
         ``Presenters`` and ``Widgets``. ``Models``
         will not be affected by this protocol.
-
     """
 
     @abstractmethod
@@ -48,14 +44,14 @@ class HasRegistration(Protocol):  # pragma: no cover
         
         An implementation example:
 
-        .. code-block:: python
-
-            def registration_phase(self) -> None:
-                # you can register all signals...
-                self.virtual_bus.register_signals(self)
-                
-                # ... or only a selection of them
-                self.virtual_bus.register_signals(self, only=["signal"])
+        ```python
+        def registration_phase(self) -> None:
+            # you can register all signals...
+            self.virtual_bus.register_signals(self)
+            
+            # ... or only a selection of them
+            self.virtual_bus.register_signals(self, only=["signal"])
+        ```
         """
         ...
 
@@ -64,12 +60,10 @@ class HasRegistration(Protocol):  # pragma: no cover
 class HasConnection(Protocol):  # pragma: no cover
     """Protocol marking your class as requesting connection to other signals.
 
-    .. tip::
-
+    !!! tip
         This protocol is optional and only usable with
         ``Presenters`` and ``Views``. ``Models``
         will not be affected by this protocol.
-
     """
 
     @abstractmethod
@@ -84,16 +78,16 @@ class HasConnection(Protocol):  # pragma: no cover
 
         An implementation example:
 
-        .. code-block:: python
+        ```python
+        def connection_phase(self) -> None:
+            # you can connect signals from another controller to your local slots...
+            self.virtual_bus["OtherController"]["signal"].connect(self._my_slot)
 
-            def connection_phase(self) -> None:
-                # you can connect signals from another controller to your local slots...
-                self.virtual_bus["OtherController"]["signal"].connect(self._my_slot)
+            # ... or to other signals ...
+            self.virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
 
-                # ... or to other signals ...
-                self.virtual_bus["OtherController"]["signal"].connect(self.sigMySignal)
-
-                # ... or connect to a view component
-                self.virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
+            # ... or connect to a view component
+            self.virtual_bus["OtherWidget"]["sigWidget"].connect(self._my_slot)
+        ```
         """
         ...

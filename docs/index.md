@@ -61,7 +61,7 @@ New to Sunflare? Start here:
 
 - **[Installation Guide](how-to/installation.md)** - Get Sunflare up and running
 - **[Statement of Need](explanation/statement.md)** - Learn why Sunflare exists
-- **[API Reference](reference/api/index.md)** - Explore the complete API
+- **[API Reference](reference/api/config.md)** - Explore the complete API
 - **[Changelog](reference/changelog.md)** - See what's new
 
 ## About the Documentation

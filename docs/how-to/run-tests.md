@@ -75,4 +75,4 @@ pytest -x
 
 - Learn how to [build the documentation](build-docs.md)
 - Understand [Sunflare's architecture](../explanation/architecture/index.md)
-- Check the [API reference](../reference/api/index.md)
+- Check the [API reference](../reference/api/config.md)

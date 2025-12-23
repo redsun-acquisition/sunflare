@@ -74,7 +74,7 @@ class Status(PStatus):
 
     At __init__ time, a *timeout* and *settle_time* are specified. A thread
     is started, on which user callbacks, registered after __init__ time via
-    :meth:`add_callback`, will eventually be run. The thread waits on an
+    [`add_callback`](), will eventually be run. The thread waits on an
     Event be set or (timeout + settle_time) seconds to pass, whichever
     happens first.
 
@@ -91,8 +91,8 @@ class Status(PStatus):
     the Status as done and successful. The callbacks are run.
 
     There are two methods that directly set the first Event. One,
-    :meth:set_exception, sets it directly after setting the internal
-    Exception.  The other, :meth:`set_finished`, starts a
+    [`set_exception`](), sets it directly after setting the internal
+    Exception.  The other, [`set_finished`](), starts a
     ``threading.Timer`` that will set it after a delay (the settle_time).
     One of these methods may be called, and at most once. If one is called
     twice or if both are called, ``InvalidState`` is raised. If they are
@@ -141,7 +141,7 @@ class Status(PStatus):
 
     @property
     def settle_time(self) -> float:
-        """A delay between when :meth:`set_finished` is when the Status is done.
+        """A delay between when [`set_finished`]() is when the Status is done.
 
         This is set when the Status is created, and it cannot be changed.
         """
@@ -152,7 +152,7 @@ class Status(PStatus):
         """Boolean indicating whether associated operation has completed.
 
         This is set to True at __init__ time or by calling
-        :meth:`set_finished`, :meth:`set_exception`.
+        [`set_finished`](), [`set_exception`]().
         Once True, it can never become False.
         """
         return self._event.is_set()
@@ -162,7 +162,7 @@ class Status(PStatus):
         """Boolean indicating whether associated operation has completed.
 
         This is set to True at __init__ time or by calling
-        :meth:`set_finished`, :meth:`set_exception`
+        [`set_finished`](), [`set_exception`]()
         . Once True, it can never become False.
         """
         return self.done and self._exception is None
@@ -373,11 +373,11 @@ class Status(PStatus):
         callback: ``Callable[[Status], None]``
             The callback to be called when the status is marked as finished.
 
-            .. code-block:: python
-
-                def callback(status: Status) -> None:
-                    # Do something with the status object
-                    ...
+            ```python
+            def callback(status: Status) -> None:
+                # Do something with the status object
+                ...
+            ```
         """
         with self._lock:
             if self.done:

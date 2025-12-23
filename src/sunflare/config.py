@@ -82,7 +82,7 @@ def _convert_widget_position_type(
 
 @runtime_checkable
 class PModelInfo(AttrsInstance, Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.ModelInfo`.
+    """Protocol equivalent to `sunflare.config.ModelInfo`.
 
     This protocol allows to implement the ``ModelInfo`` class
     in packages that do not depend on ``sunflare`` directly.
@@ -96,21 +96,20 @@ class PModelInfo(AttrsInstance, Protocol):
     plugin_id: str
 
     def read_configuration(self, timestamp: float) -> dict[str, Any]:
-        """See :meth:`sunflare.config.ModelInfo.read_configuration`."""
+        """See [`sunflare.config.ModelInfo.read_configuration`]()."""
         ...
 
     def describe_configuration(self, source: str) -> dict[str, Any]:
-        """See :meth:`sunflare.config.ModelInfo.describe_configuration`."""
+        """See [`sunflare.config.ModelInfo.describe_configuration`]()."""
         ...
 
 
 @runtime_checkable
 class PPresenterInfo(Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.PresenterInfo`.
+    """Protocol equivalent to `sunflare.config.PresenterInfo`.
 
-    .. note::
-
-        This protocol is currently used only for type checking purposes.
+    !!! note
+        This protocol is currently used only for type checking purposes
         within the Redsun application. In the future
         we might be able to expose this for usage in
         external packages.
@@ -122,11 +121,10 @@ class PPresenterInfo(Protocol):
 
 @runtime_checkable
 class PViewInfo(Protocol):
-    """Protocol equivalent to :class:`~sunflare.config.ViewInfo`.
+    """Protocol equivalent to `sunflare.config.ViewInfo`.
 
-    .. note::
-
-        This protocol is currently used only for type checking purposes.
+    !!! note
+        This protocol is currently used only for type checking purposes
         within the Redsun application. In the future
         we might be able to expose this for usage in
         external packages.

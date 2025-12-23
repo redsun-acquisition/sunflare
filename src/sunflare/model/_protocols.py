@@ -18,9 +18,9 @@ class PModel(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cov
 
     Exposes the following Bluesky protocols:
 
-    - :class:`~bluesky.protocols.HasName`
-    - :class:`~bluesky.protocols.HasParent`
-    - :class:`~bluesky.protocols.Configurable`
+    - [`bluesky.protocols.HasName`]()
+    - [`bluesky.protocols.HasParent`]()
+    - [`bluesky.protocols.Configurable`]()
     """
 
     @property
@@ -28,6 +28,6 @@ class PModel(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cov
     def model_info(self) -> PModelInfo:
         """The associated model information.
 
-        It can return a subclass of :class:`~sunflare.config.ModelInfo`.
+        It can return a subclass of `sunflare.config.ModelInfo`.
         """
         ...

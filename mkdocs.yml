@@ -67,14 +67,12 @@ nav:
 
   - Reference:
     - reference/index.md
-    - API Reference:
-      - reference/api/index.md
-      - Configuration: reference/api/config.md
-      - Engine: reference/api/engine.md
-      - Model: reference/api/model.md
-      - Controller: reference/api/controller.md
-      - Virtual Bus: reference/api/virtual.md
-      - Logging: reference/api/log.md
+    - Configuration: reference/api/config.md
+    - Engine: reference/api/engine.md
+    - Model: reference/api/model.md
+    - Controller: reference/api/controller.md
+    - Virtual Bus: reference/api/virtual.md
+    - Logging: reference/api/log.md
     - Changelog: reference/changelog.md
 
   - Explanation:
