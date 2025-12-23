@@ -13,16 +13,12 @@ In this usage, a standard model is simply a wrapper around the actual device int
 The wrapped interface is often referred to as `handler`, although it varies depending on implementation details.
 The external application should not interact directly with the `handler` object; instead, the Model wrapping it should take care of calling the appropriate methods of the `handler` to perform the required tasks.
 
-```{tip}
-It is good practice to mark your handler object via a double underscore `__`, i.e. `__handler`, symbolizing that this is a *private* attribute (meaning that only your Model object can use it internally and it is not accessible from the outside). In truth, Python **does not really** enforce private attributes - meaning that there are ways to circumvent the privacy - but it is considered standard practice to annotate them in this manner.
-```
+!!! tip
+    It is good practice to mark your handler object via a double underscore `__`, i.e. `__handler`, symbolizing that this is a *private* attribute (meaning that only your Model object can use it internally and it is not accessible from the outside). In truth, Python **does not really** enforce private attributes - meaning that there are ways to circumvent the privacy - but it is considered standard practice to annotate them in this manner.
 
-::::{tab-set}
-:::{tab-item} UML
-```mermaid
-:config: { "theme": "neutral", "fontFamily": "Courier New" }
-:align: center
+=== "UML"
 
+    ```mermaid
     classDiagram
         class DeviceModel {
             -DeviceHandler __handler
@@ -48,72 +44,66 @@ It is good practice to mark your handler object via a double underscore `__`, i.
         DeviceModel *-- DeviceHandler
         ModelInfo <|-- DeviceInfo : inherits from
         DeviceModel o-- DeviceInfo : is aggregated in
-```
-:::
-:::{tab-item} Python
-```{code-block} python
-:caption: my_plugin/config.py
+    ```
 
-from attrs import define
-from sunflare.config import ModelInfo
+=== "Python"
 
-@define
-class DeviceInfo(ModelInfo):
-    param1: int
-    param2: float
-```
+    ```python title="my_plugin/config.py"
+    from attrs import define
+    from sunflare.config import ModelInfo
 
-```{code-block} python
-:caption: my_plugin/model.py
+    @define
+    class DeviceInfo(ModelInfo):
+        param1: int
+        param2: float
+    ```
 
-from my_plugin.config import DeviceInfo
-from device_package import DeviceHandler
-from bluesky.protocols import Reading
-from event_model import DataKey
+    ```python title="my_plugin/model.py"
+    from my_plugin.config import DeviceInfo
+    from device_package import DeviceHandler
+    from bluesky.protocols import Reading
+    from event_model import DataKey
 
-class DeviceModel:
-    def __init__(self, name: str, model_info: DeviceInfo) -> None:
-        self._name = name
-        self._model_info = model_info
+    class DeviceModel:
+        def __init__(self, name: str, model_info: DeviceInfo) -> None:
+            self._name = name
+            self._model_info = model_info
 
-        # unpack the parameters you need
-        # to initialize DeviceHandler,
-        # or provide them hard-coded
-        param1 = model_info.param1
-        param2 = model_info.param2
-        self.__handler = DeviceHandler(int_param=param1, float_param=param2, bool_param=True)
-    
-    def configure(self) -> None:
-        # here goes your implementation;
-        self.__handler.configure()
+            # unpack the parameters you need
+            # to initialize DeviceHandler,
+            # or provide them hard-coded
+            param1 = model_info.param1
+            param2 = model_info.param2
+            self.__handler = DeviceHandler(int_param=param1, float_param=param2, bool_param=True)
 
-    def read_configuration(self) -> dict[str, Reading]:
-        # here goes your implementation;
-        return self.__handler.read_configuration()
-    
-    def describe_configuration(self) -> dict[str, DataKey]:
-        # here goes your implementation;
-        return self.__handler.describe_configuration()
+        def configure(self) -> None:
+            # here goes your implementation;
+            self.__handler.configure()
 
-    @property
-    def name(self) -> str:
-        return self._name
+        def read_configuration(self) -> dict[str, Reading]:
+            # here goes your implementation;
+            return self.__handler.read_configuration()
 
-    @property
-    def parent(self) -> None:
-        return None
-    
-    @property
-    def model_info(self) -> DeviceInfo:
-       return self._model_info
-```
-:::
-::::
+        def describe_configuration(self) -> dict[str, DataKey]:
+            # here goes your implementation;
+            return self.__handler.describe_configuration()
+
+        @property
+        def name(self) -> str:
+            return self._name
+
+        @property
+        def parent(self) -> None:
+            return None
+
+        @property
+        def model_info(self) -> DeviceInfo:
+           return self._model_info
+    ```
 
 Furthermore, a single Model can encapsulate multiple handlers, each of them with different functionalities. Keep in mind that it is your responsability (as developer) to associate the execution of Bluesky messages with the appropriate device handler.
 
-```{code-block} python
-:caption: my_plugin/config.py
+```python title= my_plugin/config.py
 from attrs import define
 from sunflare.config import ModelInfo
 from typing import Any
@@ -124,8 +114,7 @@ class MyModelInfo(ModelInfo):
     motor_parameters: dict[str, Any]
 ```
 
-```{code-block} python
-:caption: my_plugin/model.py
+```python title= my_plugin/model.py
 
 # a dummy representation of a plugin package that encapsulates
 # a Model wrapping controls for a camera and a motor
@@ -146,8 +135,7 @@ class MyModel:
 
 Using aggregation to control your device interface may be impractical if `DeviceHandler` already leverages a lot of internal code. Inheriting your Model from a pre-existing class gives the benefit of reusing it without having to rewrite any of the internals.
 
-::::{tab-set}
-:::{tab-item} UML
+=== "UML"
 ```mermaid
 :config: { "theme": "neutral", "fontFamily": "Courier New" }
 :align: center
@@ -174,22 +162,21 @@ Using aggregation to control your device interface may be impractical if `Device
         DeviceModel <|-- DeviceHandler
         ModelInfo <|-- DeviceInfo : inherits from
         DeviceModel o-- DeviceInfo : is aggregated in
-```
-:::
-:::{tab-item} Python
-```{code-block} python
-:caption: my_plugin/config.py
+    ```
 
-from attrs import define
+=== "Python"
+
+    ```python title="my_plugin/config.py"
+    from attrs import define
 from sunflare.config import ModelInfo
 
 @define
 class DeviceInfo(ModelInfo):
     param1: int
     param2: float
-```
+    ```
 
-```{code-block} python
+    ```python title="my_plugin/model.py"
 from my_plugin.config import DeviceInfo
 from device_package import DeviceHandler
 from bluesky.protocols import Reading
@@ -228,14 +215,11 @@ class DeviceModel(DeviceHandler):
     @property
     def model_info(self) -> DeviceInfo:
        return self._model_info
-```
-:::
-::::
+    ```
 
 Just like in the aggregated API, your model can also inherit from multiple classes. Again, it is your responsibility (as developer) to ensure that the appropriate Bluesky protocols are invoked on the correct device.
 
-```{code-block} python
-:caption: my_plugin/config.py
+```python title= my_plugin/config.py
 from attrs import define
 from sunflare.config import ModelInfo
 from typing import Any
@@ -246,8 +230,7 @@ class MyModelInfo(ModelInfo):
     motor_parameters: dict[str, Any]
 ```
 
-```{code-block} python
-:caption: my_plugin/model.py
+```python title= my_plugin/model.py
 
 # a dummy representation of a plugin package that encapsulates
 # a Model wrapping controls for a camera and a motor

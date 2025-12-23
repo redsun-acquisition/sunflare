@@ -56,7 +56,7 @@ class Connection(NamedTuple):
     and :class:`~sunflare.presenter.SenderReceiver`
     to set the `connection_map` parameter.
 
-    Parameters
+    Attributes
     ----------
     signal : ``str``
         Signal name.

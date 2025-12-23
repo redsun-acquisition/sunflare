@@ -1,6 +1,6 @@
 # Virtual bus
 
-The {py:class}`~sunflare.virtual.VirtualBus` is a class encapsulating different communication mechanism to allow different controllers and widget to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the [`psygnal`] package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.
+The [`VirtualBus`][sunflare.virtual.VirtualBus] is a class encapsulating different communication mechanism to allow different controllers and widget to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the [`psygnal`](https://psygnal.readthedocs.io/en/stable/) package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.
 
 ## Signal connection
 
@@ -8,26 +8,21 @@ The `VirtualBus` allows to create a connection between objects living in differe
 
 Suppose you have the following example:
 
-```{code-block} python
-:caption: emitter_plugin.py
-
+```python title="emitter_plugin.py"
 class Emitter:
     sigSender = Signal(int)
 ```
 
-```{code-block} python
-:caption: receiver_plugin.py
-
+```python title="receiver_plugin.py"
 class Receiver:
-    
+
     def receiver_slot(param: int) -> None:
         print("I received", param)
 ```
 
 In a normal scenario where you have access to the codebase of both `Emitter` and `Receiver`, you would simply do the following:
 
-```{code-block} python
-
+```python
 emitter = Emitter()
 receiver = Receiver()
 
@@ -41,9 +36,7 @@ Redsun operates by dinamically loading plugins, which means that `Emitter` and `
 
 The `VirtualBus` takes care of giving a common exposure and retrieval point between different plugins. The catch is that to be able to share a connection, `Emitter` and `Receiver` must be adapted to talk to the bus:
 
-```{code-block} python
-:caption: emitter_plugin.py
-
+```python title="emitter_plugin.py"
 from sunflare.virtual import VirtualBus
 
 class Emitter:
@@ -56,16 +49,14 @@ class Emitter:
         self.virtual_bus.register_signals(self)
 ```
 
-```{code-block} python
-:caption: receiver_plugin.py
-
+```python title="receiver_plugin.py"
 from sunflare.virtual import VirtualBus
 
 class Receiver:
 
     def __init__(self, virtual_bus: VirtualBus):
         self.virtual_bus = virtual_bus
-    
+
     def receiver_slot(param: int) -> None:
         print("I received", param)
 
@@ -77,31 +68,30 @@ With this modifications, `Emitter` has informed the `VirtualBus` of the existenc
 
 This enforces a specific call order: all `Emitter`-like object must call the `registration_phase` method before any `Receiver`-like´object can call the `connection_phase` method, otherwise there will be a mismatch.
 
-```{note}
-If a `Receiver`-like object tries to connect to a non-defined signal, your application will not crash, but there will be simply no connection enstablished with your slots.
-```
+!!! note
+    If a `Receiver`-like object tries to connect to a non-defined signal, your application will not crash, but there will be simply no connection enstablished with your slots.
 
 As a user, you only need to provide these two methods to ensure a safe connection. When Redsun is launched, it takes care of calling `registration_phase` and `connection_phase` in the correct order to ensure a safe connection.
 
-````{warning}
-If you're using Sunflare in a non-Redsun application, you'll have to:
+!!! warning "Using Sunflare without Redsun"
+    If you're using Sunflare in a non-Redsun application, you'll have to:
 
-- create an instance of `VirtualBus`;
-- connect any `Emitter` and `Receiver` objects manually;
-- call {py:obj}`~sunflare.virtual.VirtualBus.shutdown` before ending your application;
-  - the rationale is that the bus deploys a ZMQ context which has to be gracefully terminated; the `shutdown` method takes care of that.
+    - create an instance of `VirtualBus`;
+    - ensure `Emitter` objects call their `registration_phase` method before `Receiver` objects call their `connection_phase` method.
 
-```{code-block} python
+    ```python
+    from sunflare.virtual import VirtualBus
 
-from sunflare.virtual import VirtualBus
+    bus = VirtualBus()
 
-bus = VirtualBus()
+    emitter = Emitter(bus)
+    receiver = Receiver(bus)
 
-emitter = Emitter(bus)
-receiver = Receiver(bus)
+    # Register signals first
+    emitter.registration_phase()
 
-# ... run your application
-```
-````
+    # Then connect to them
+    receiver.connection_phase()
 
-[`psygnal`]: https://psygnal.readthedocs.io/en/stable/
+    # ... run your application
+    ```

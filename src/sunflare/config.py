@@ -143,7 +143,7 @@ class ViewInfo(PViewInfo):
 
     All view information models inherit from this class.
 
-    Parameters
+    Attributes
     ----------
     plugin_name : ``str``, optional
         Widget plugin name.
@@ -177,7 +177,7 @@ class PresenterInfo(PPresenterInfo):
 
     All controller information models inherit from this class.
 
-    Parameters
+    Attributes
     ----------
     plugin_name : ``str``, optional
         Presenter plugin name.

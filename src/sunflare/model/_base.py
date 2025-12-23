@@ -55,11 +55,6 @@ class Model(PModel, Generic[MI]):
         returns a descriptor dictionary compatible
         with the Bluesky event model.
 
-        Parameters
-        ----------
-        source : ``str``, optional
-            Source of the configuration description. Default is ``model_info``.
-
         Returns
         -------
         dict[``str``, :class:`~event_model.DataKey`]
@@ -73,11 +68,6 @@ class Model(PModel, Generic[MI]):
         Inspects the local ``model_info`` object and
         returns a reading dictionary compatible
         with the Bluesky event model.
-
-        Parameters
-        ----------
-        timestamp : ``float``, optional
-            Timestamp of the reading (i.e. ``time.time()``). Default is ``0``.
 
         Returns
         -------

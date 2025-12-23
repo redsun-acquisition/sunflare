@@ -1,0 +1,160 @@
+site_name: Sunflare
+site_url: https://redsun-acquisition.github.io/sunflare/
+site_description: Toolkit for Redsun development - SDK for building Bluesky-compatible plugins
+docs_dir: docs
+
+repo_url: https://github.com/redsun-acquisition/sunflare
+repo_name: redsun-acquisition/sunflare
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode (default)
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+
+  - Tutorials:
+    - tutorials/index.md
+    - OOP Crash Course:
+      - tutorials/oop-crash-course/index.md
+      - Inheritance: tutorials/oop-crash-course/inheritance.md
+
+  - How-to Guides:
+    - how-to/index.md
+    - Installation: how-to/installation.md
+    - Build Documentation: how-to/build-docs.md
+    - Run Tests: how-to/run-tests.md
+
+  - Reference:
+    - reference/index.md
+    - API Reference:
+      - reference/api/index.md
+      - Configuration: reference/api/config.md
+      - Engine: reference/api/engine.md
+      - Model: reference/api/model.md
+      - Controller: reference/api/controller.md
+      - Virtual Bus: reference/api/virtual.md
+      - Logging: reference/api/log.md
+    - Changelog: reference/changelog.md
+
+  - Explanation:
+    - explanation/index.md
+    - Statement of Need: explanation/statement.md
+    - Architecture Overview:
+      - explanation/architecture/index.md
+      - Models: explanation/architecture/models.md
+      - Presenters & Controllers: explanation/architecture/presenters.md
+      - Virtual Bus: explanation/architecture/virtual.md
+      - In-Process Model: explanation/architecture/in-process-model.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+            group_by_category: true
+            extensions:
+              - griffe_fieldz:
+                  add_fields_to: docstring-attributes
+                  include_inherited: false
+                  include_private: false
+                  remove_fields_from_members: true
+                  strip_annotated: true
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/redsun-acquisition/sunflare
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/sunflare/
+
+extra_css:
+  - stylesheets/custom.css

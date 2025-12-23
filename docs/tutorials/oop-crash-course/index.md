@@ -6,11 +6,7 @@ Python is a multi-paradigm language (meaning that it leverages OOP but also othe
 
 We will use _Unified Modeling Language_ ([UML]) diagrams made with [mermaid] for visual representation of these patterns.
 
-```{toctree}
-:maxdepth: 1
-
-inheritance
-```
+<!-- Navigation handled by mkdocs.yml -->
 
 [object-oriented programming]: https://en.wikipedia.org/wiki/Object-oriented_programming
 [uml]: https://en.wikipedia.org/wiki/Unified_Modeling_Language
