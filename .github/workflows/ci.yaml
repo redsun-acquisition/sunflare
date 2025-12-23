@@ -33,8 +33,7 @@ jobs:
     docs:
         name: Deploy Documentation
         needs: [code_analysis, tests]
-        # Only deploy docs on release events
-        if: success() && github.event_name == 'release'
+        if: success()
         uses: ./.github/workflows/deploy-docs.yaml
         permissions:
             contents: write
