@@ -33,9 +33,9 @@ class FrontendTypes(str, Enum):
 
     Attributes
     ----------
-    PYQT
+    PYQT: str
         PyQt6 frontend.
-    PYSIDE
+    PYSIDE: str
         PySide6 frontend.
     """
 
@@ -50,20 +50,20 @@ class WidgetPositionTypes(str, Enum):
     This enum is used to to define the
     position of a widget in the main view of the GUI.
 
-    .. warning::
+    !!! warning
 
         This enumerator refers to the usage of `QtWidget.DockWidget`;
         it may be changed in the future to support other GUI frameworks.
 
     Attributes
     ----------
-    LEFT
+    LEFT: str
         Left widget position.
-    RIGHT
+    RIGHT: str
         Right widget position.
-    TOP
+    TOP: str
         Top widget position.
-    BOTTOM
+    BOTTOM: str
         Bottom widget position.
     """
 
@@ -82,25 +82,21 @@ def _convert_widget_position_type(
 
 @runtime_checkable
 class PModelInfo(AttrsInstance, Protocol):
-    """Protocol equivalent to `sunflare.config.ModelInfo`.
+    """Protocol equivalent to [`ModelInfo`]().
 
     This protocol allows to implement the ``ModelInfo`` class
     in packages that do not depend on ``sunflare`` directly.
 
-    The only required dependency is `attrs`_.
-
-    _attrs: https://www.attrs.org/en/stable/
+    The only required dependency is [`attrs`](https://www.attrs.org/en/stable/).
     """
 
     plugin_name: str
     plugin_id: str
 
-    def read_configuration(self, timestamp: float) -> dict[str, Any]:
-        """See [`sunflare.config.ModelInfo.read_configuration`]()."""
+    def read_configuration(self, timestamp: float) -> dict[str, Any]:  # noqa: D102
         ...
 
-    def describe_configuration(self, source: str) -> dict[str, Any]:
-        """See [`sunflare.config.ModelInfo.describe_configuration`]()."""
+    def describe_configuration(self, source: str) -> dict[str, Any]:  # noqa: D102
         ...
 
 
@@ -143,16 +139,14 @@ class ViewInfo(PViewInfo):
 
     Attributes
     ----------
-    plugin_name : ``str``, optional
+    plugin_name : `str`, optional
         Widget plugin name.
         Equivalent to the name of the PyPI/Conda package.
-    plugin_id : ``str``, optional
+    plugin_id : `str`, optional
         Widget plugin ID.
         Associated with the exposed entry
         point in the plugin manifest.
-    repository : ``str``, optional
-        Widget repository URL. Defaults to ``N/A``.
-    position : ``WidgetPositionTypes``
+    position : `WidgetPositionTypes`
         Widget position in the main view of the GUI.
     """
 

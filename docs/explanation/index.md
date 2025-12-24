@@ -6,17 +6,14 @@ Welcome to the Sunflare explanation section! Here you'll find background informa
 
 Explanations are **understanding-oriented** discussions that clarify and illuminate a topic. They provide context, discuss alternatives, and explain the "why" behind design decisions.
 
-## Available Explanations
-
-### Project Context
 - **[Statement of Need](statement.md)** - Why Sunflare exists and its role in the Redsun ecosystem
 
 ### Architecture & Design
-- **[Architecture Overview](architecture/index.md)** - Understanding Sunflare's architectural patterns
-  - [Models](architecture/models.md) - The model layer and data abstractions
-  - [Presenters & Controllers](architecture/presenters.md) - Business logic components
-  - [Virtual Bus](architecture/virtual.md) - Event-driven communication system
-  - [In-Process Model](architecture/in-process-model.md) - In-process communication patterns
+
+- [Models](architecture/models.md) - The model layer and data abstractions
+- [Presenters & Controllers](architecture/presenters.md) - Business logic components
+- [Virtual Bus](architecture/virtual.md) - Event-driven communication system
+- [In-Process Model](architecture/in-process-model.md) - In-process communication patterns
 
 ## Deepen Your Understanding
 

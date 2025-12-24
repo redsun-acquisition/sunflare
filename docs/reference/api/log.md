@@ -1,6 +1,6 @@
-# sunflare.log
+# `sunflare.log` module
 
 ::: sunflare.log
     options:
-      show_root_heading: true
-      show_source: true
+      members:
+        - Loggable

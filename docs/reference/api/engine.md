@@ -1,4 +1,4 @@
-# sunflare.engine
+# `sunflare.engine` module
 
 ::: sunflare.engine
     options:
@@ -6,5 +6,3 @@
         - Status
         - RunEngine
         - RunEngineResult
-      show_root_heading: true
-      show_source: true

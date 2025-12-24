@@ -23,11 +23,14 @@ K = TypeVar("K")
 V = TypeVar("V")
 
 CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
+"""Type alias for document callback functions."""
+
 SignalCache: TypeAlias = dict[str, SignalInstance]
+"""Cache type for signals of a specific class."""
 
 
 class VirtualBus(Loggable):
-    """``VirtualBus``: router object for data exchange.
+    """Data exchange layer.
 
     The ``VirtualBus`` is a mechanism to exchange
     data between different parts of the system. Communication
@@ -51,9 +54,9 @@ class VirtualBus(Loggable):
 
         Parameters
         ----------
-        owner : ``object``
+        owner : object
             The instance whose class's signals are to be cached.
-        only : ``Iterable[str]``, optional
+        only : Iterable[str], optional
             A list of signal names to cache. If not provided, all
             signals in the class will be cached automatically by inspecting
             the class attributes.
@@ -61,8 +64,8 @@ class VirtualBus(Loggable):
         Notes
         -----
         This method inspects the attributes of the owner's class to find
-        ``psygnal.Signal`` descriptors. For each such descriptor, it retrieves
-        the ``SignalInstance`` from the owner using the descriptor protocol and
+        [`psygnal.Signal`][] descriptors. For each such descriptor, it retrieves
+        the [`psygnal.SignalInstance`][] from the owner using the descriptor protocol and
         stores it in the registry.
         """
         owner_class = type(owner)  # Get the class of the object

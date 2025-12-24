@@ -18,8 +18,8 @@ theme:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: indigo
+      primary: red
+      accent: red
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
@@ -27,8 +27,8 @@ theme:
     # Palette toggle for dark mode (default)
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: red
+      accent: red
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
@@ -70,8 +70,8 @@ nav:
     - Configuration: reference/api/config.md
     - Engine: reference/api/engine.md
     - Model: reference/api/model.md
-    - Controller: reference/api/controller.md
-    - Virtual Bus: reference/api/virtual.md
+    - Presenter: reference/api/presenter.md
+    - Virtual bus: reference/api/virtual.md
     - Logging: reference/api/log.md
     - Changelog: reference/changelog.md
 
@@ -81,8 +81,8 @@ nav:
     - Architecture Overview:
       - explanation/architecture/index.md
       - Models: explanation/architecture/models.md
-      - Presenters & Controllers: explanation/architecture/presenters.md
-      - Virtual Bus: explanation/architecture/virtual.md
+      - Presenters: explanation/architecture/presenters.md
+      - Virtual bus: explanation/architecture/virtual.md
       - In-Process Model: explanation/architecture/in-process-model.md
 
 plugins:
@@ -93,10 +93,17 @@ plugins:
           options:
             docstring_style: numpy
             show_source: true
-            show_root_heading: true
+            show_root_heading: false
             show_root_full_path: false
+            show_signature_annotations: true
+            separate_signature: true
             members_order: source
             group_by_category: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            filters:
+              - "!^_"
+              - "!^__"
             extensions:
               - griffe_fieldz:
                   add_fields_to: docstring-attributes
@@ -104,6 +111,10 @@ plugins:
                   include_private: false
                   remove_fields_from_members: true
                   strip_annotated: true
+          inventories:
+            - https://psygnal.readthedocs.io/en/latest/objects.inv
+            - https://docs.python.org/3/objects.inv
+          paths: [src]
 
 markdown_extensions:
   # Python Markdown

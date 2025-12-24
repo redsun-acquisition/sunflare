@@ -8,12 +8,12 @@ Reference guides are **information-oriented** technical descriptions. They provi
 
 ### API Documentation
 
-  - [Configuration](api/config.md) - Configuration classes and options
-  - [Engine](api/engine.md) - Core engine components
-  - [Model](api/model.md) - Model layer abstractions
-  - [Controller](api/controller.md) - Controller/presenter components
-  - [Virtual Bus](api/virtual.md) - Event bus system
-  - [Logging](api/log.md) - Logging utilities
+  - [`sunflare.config`](api/config.md) - configuration components
+  - [`sunflare.engine`](api/engine.md) - Bluesky run engine components
+  - [`sunflare.model`](api/model.md) - model layer abstractions
+  - [`sunflare.presenter`](api/presenter.md) - presenter layer components
+  - [`sunflare.virtual`](api/virtual.md) - virtual layer components
+  - [`sunflare.log`](api/log.md) - logging utilities
 
 ### Version History
 
