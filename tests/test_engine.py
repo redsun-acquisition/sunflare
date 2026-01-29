@@ -162,8 +162,10 @@ def test_engine_wrapper_run(RE: RunEngine) -> None:
 
     wait([fut])
 
-    assert type(RE.result) == tuple
-    assert len(RE.result) == 1
+    result = fut.result()
+
+    assert type(result) == tuple
+    assert len(result) == 1
 
 
 def test_engine_wrapper_run_with_result(RE: RunEngine) -> None:
@@ -172,8 +174,10 @@ def test_engine_wrapper_run_with_result(RE: RunEngine) -> None:
 
     wait([fut])
 
-    assert type(RE.result) == RunEngineResult
-    assert RE.result.exit_status == "success"
+    result = fut.result()
+
+    assert type(result) == RunEngineResult
+    assert result.exit_status == "success"
 
     RE._call_returns_result = False
 

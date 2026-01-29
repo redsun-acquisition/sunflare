@@ -48,7 +48,6 @@ class RunEngine(BlueskyRunEngine):
         kwargs["context_managers"] = []
         kwargs["during_task"] = DuringTask()
         self._executor = ThreadPoolExecutor(max_workers=1)
-        self._result: REResultType
         super().__init__(*args, **kwargs)
 
         # override pause message to be an empty string
@@ -61,14 +60,46 @@ class RunEngine(BlueskyRunEngine):
         /,
         **metadata_kw: Any,
     ) -> Future[RunEngineResult | tuple[str, ...]]:
-        self._fut = self._executor.submit(
+        """Execute a plan.
+
+        Any keyword arguments will be interpreted as metadata and recorded with
+        any run(s) created by executing the plan. Notice that the plan
+        (required) and extra subscriptions (optional) must be given as
+        positional arguments.
+
+        Parameters
+        ----------
+        plan : typing.Iterable[`bluesky.utils.Msg`]
+            A generator or that yields ``Msg`` objects (or an iterable that
+            returns such a generator).
+        subs : `bluesky.utils.Subscribers`, optional (positional only)
+            Temporary subscriptions (a.k.a. callbacks) to be used on this run.
+            For convenience, any of the following are accepted:
+
+            * a callable, which will be subscribed to 'all'
+            * a list of callables, which again will be subscribed to 'all'
+            * a dictionary, mapping specific subscriptions to callables or
+              lists of callables; valid keys are {'all', 'start', 'stop',
+              'event', 'descriptor'}
+
+        Returns
+        -------
+        Future[RunEngineResult | tuple[str, ...]]
+            Future object representing the result of the plan execution.
+
+        The result contained in the future is either:
+        uids : tuple
+            list of uids (i.e. RunStart Document uids) of run(s)
+            if :attr:`RunEngine._call_returns_result` is ``False``
+        result : :class:`RunEngineResult`
+            if :attr:`RunEngine._call_returns_result` is ``True``
+        """
+        return self._executor.submit(
             super().__call__,
             plan,
             subs,
             **metadata_kw,
         )
-        self._fut.add_done_callback(self._set_result)
-        return self._fut
 
     def resume(self) -> Future[RunEngineResult | tuple[str, ...]]:
         """Resume the paused plan in a separate thread.
@@ -84,16 +115,4 @@ class RunEngine(BlueskyRunEngine):
         ``Future[RunEngineResult | tuple[str, ...]]``
             Future object representing the result of the resumed plan.
         """
-        self._fut = self._executor.submit(super().resume)
-        self._fut.add_done_callback(self._set_result)
-        return self._fut
-
-    def _set_result(self, fut: Future[RunEngineResult | tuple[str, ...]]) -> None:
-        try:
-            self._result = fut.result()
-        except Exception as exc:
-            self._result = exc
-
-    @property
-    def result(self) -> REResultType:
-        return self._result
+        return self._executor.submit(super().resume)
