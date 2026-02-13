@@ -23,23 +23,30 @@ class _QWidgetBaseMeta(QWidgetMeta, ViewProtocol):  # type: ignore[valid-type,mi
     """Common metaclass for QWidget and ViewProtocol."""
 
 
-class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
+class QtView(QWidget, metaclass=_QWidgetBaseMeta):
     """Qt base widget class that implemenents the ViewProtocol.
 
     Parameters
     ----------
     virtual_bus : VirtualBus
         Virtual bus for the Redsun session.
+    parent : QWidget | None, optional
+        Parent widget for the Qt widget hierarchy.
+        Defaults to `None`.
+    kwargs : Any, optional
+        Additional keyword arguments for view subclasses.
+        These are parsed from the session configuration file.
     """
 
     @abstractmethod
     def __init__(
         self,
         virtual_bus: VirtualBus,
-        *args: Any,
+        /,
+        parent: QWidget | None = None,
         **kwargs: Any,
     ) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(parent=parent)
         self.virtual_bus = virtual_bus
 
 
