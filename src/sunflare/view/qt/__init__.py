@@ -8,8 +8,6 @@ from qtpy.QtWidgets import QWidget
 from sunflare.view import PView
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from sunflare.virtual import VirtualBus
 
 QWidgetMeta = type(QWidget)
@@ -31,11 +29,7 @@ class QtView(QWidget, metaclass=_QWidgetBaseMeta):
     virtual_bus : VirtualBus
         Virtual bus for the Redsun session.
     parent : QWidget | None, optional
-        Parent widget for the Qt widget hierarchy.
-        Defaults to `None`.
-    kwargs : Any, optional
-        Additional keyword arguments for view subclasses.
-        These are parsed from the session configuration file.
+        Parent widget. Default is `None`.
     """
 
     @abstractmethod
@@ -44,10 +38,9 @@ class QtView(QWidget, metaclass=_QWidgetBaseMeta):
         virtual_bus: VirtualBus,
         /,
         parent: QWidget | None = None,
-        **kwargs: Any,
     ) -> None:
         super().__init__(parent=parent)
         self.virtual_bus = virtual_bus
 
 
-__all__ = ["BaseQtWidget"]
+__all__ = ["QtView"]
