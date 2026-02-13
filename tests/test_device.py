@@ -83,7 +83,7 @@ def test_simple_device() -> None:
 
     # Test describe_configuration
     descriptor = device.describe_configuration()
-    assert "value" in descriptor
+    assert "value" in descriptor.keys()
     assert descriptor["value"]["source"] == "test_device"
     assert descriptor["value"]["dtype"] == "integer"
     assert descriptor["value"]["shape"] == []
