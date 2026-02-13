@@ -5,11 +5,11 @@ from typing import Any
 from bluesky.protocols import Configurable, HasName, HasParent
 from typing_extensions import Protocol, runtime_checkable
 
-__all__ = ["PModel"]
+__all__ = ["PDevice"]
 
 
 @runtime_checkable
-class PModel(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cover
+class PDevice(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cover
     """Minimal required protocol for a recognizable device in Redsun.
 
     Exposes the following Bluesky protocols:
@@ -18,7 +18,7 @@ class PModel(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cov
     - [`bluesky.protocols.HasParent`]()
     - [`bluesky.protocols.Configurable`]()
 
-    Models should implement their configuration properties directly
+    Devices should implement their configuration properties directly
     and provide implementations of `describe_configuration()` and
     `read_configuration()` methods as required by the Configurable protocol.
     """

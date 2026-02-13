@@ -1,6 +1,6 @@
 import pytest
 from collections.abc import Mapping
-from sunflare.model import PModel
+from sunflare.device import PDevice
 from sunflare.presenter import Presenter, Receiver, Sender, SenderReceiver, Connection
 from sunflare.virtual import Signal, VirtualBus
 
@@ -11,29 +11,31 @@ def virtual_bus() -> VirtualBus:
 
 
 @pytest.fixture
-def models() -> dict[str, PModel]:
+def devices() -> dict[str, PDevice]:
     return {}
 
 
-def test_base_presenter(models: Mapping[str, PModel], virtual_bus: VirtualBus) -> None:
+def test_base_presenter(
+    devices: Mapping[str, PDevice], virtual_bus: VirtualBus
+) -> None:
     """Test basic Presenter functionality."""
 
     class TestController(Presenter):
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(models, virtual_bus)
+            super().__init__(devices, virtual_bus)
 
-    controller = TestController(models, virtual_bus)
+    controller = TestController(devices, virtual_bus)
 
-    assert controller.models == models
+    assert controller.devices == devices
     assert controller.virtual_bus == virtual_bus
 
 
 def test_sender_presenter(
-    models: Mapping[str, PModel], virtual_bus: VirtualBus
+    devices: Mapping[str, PDevice], virtual_bus: VirtualBus
 ) -> None:
     """Test Sender functionality."""
 
@@ -43,12 +45,12 @@ def test_sender_presenter(
 
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(models, virtual_bus, signals=["sigTestSignal"])
+            super().__init__(devices, virtual_bus, signals=["sigTestSignal"])
 
-    controller = TestController(models, virtual_bus)
+    controller = TestController(devices, virtual_bus)
     controller.registration_phase()
 
     assert "TestController" in virtual_bus.signals
@@ -57,7 +59,7 @@ def test_sender_presenter(
 
 
 def test_receiver_presenter(
-    models: Mapping[str, PModel], virtual_bus: VirtualBus
+    devices: Mapping[str, PDevice], virtual_bus: VirtualBus
 ) -> None:
     """Test Receiver functionality."""
 
@@ -66,31 +68,31 @@ def test_receiver_presenter(
 
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(models, virtual_bus, signals=["sigDummySignal"])
+            super().__init__(devices, virtual_bus, signals=["sigDummySignal"])
 
     class TestController(Receiver):
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
             connection_map = {
                 "DummySender": [Connection("sigDummySignal", self.dummy_slot)]
             }
-            super().__init__(models, virtual_bus, connection_map=connection_map)
+            super().__init__(devices, virtual_bus, connection_map=connection_map)
             self.received_value = None
 
         def dummy_slot(self, value: str) -> None:
             self.received_value = value
 
-    sender = DummySender(models, virtual_bus)
+    sender = DummySender(devices, virtual_bus)
     sender.registration_phase()
 
-    receiver = TestController(models, virtual_bus)
-    receiver.connection_phase()
+    receiver = TestController(devices, virtual_bus)
+    receiver.connect_to_virtual()
 
     # Emit signal and check reception
     sender.sigDummySignal.emit("test_value")
@@ -98,7 +100,7 @@ def test_receiver_presenter(
 
 
 def test_sender_receiver_presenter(
-    models: Mapping[str, PModel], virtual_bus: VirtualBus
+    devices: Mapping[str, PDevice], virtual_bus: VirtualBus
 ) -> None:
     """Test SenderReceiver functionality."""
 
@@ -108,14 +110,14 @@ def test_sender_receiver_presenter(
 
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
             connection_map = {
                 "TestController": [Connection("sigOutgoing", self.incoming_slot)]
             }
             super().__init__(
-                models,
+                devices,
                 virtual_bus,
                 signals=["sigOutgoing", "sigOtherOutgoing"],
                 connection_map=connection_map,
@@ -125,9 +127,8 @@ def test_sender_receiver_presenter(
         def incoming_slot(self, value: int) -> None:
             self.received_value = value
 
-    controller = TestController(models, virtual_bus)
-    controller.registration_phase()
-    controller.connection_phase()
+    controller = TestController(devices, virtual_bus)
+    controller.connect_to_virtual()
 
     # Check signals are registered
     assert "TestController" in virtual_bus.signals

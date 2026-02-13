@@ -17,7 +17,7 @@ from weakref import WeakKeyDictionary
 
 from bluesky.utils import Msg
 
-from sunflare.model import PModel
+from sunflare.device import PDevice
 from sunflare.presenter import PPresenter
 
 PlanGenerator = Callable[..., Generator[Msg, Any, Any]]
@@ -116,9 +116,9 @@ class PlanSignature:
         )
 
 
-#: Registry for storing model protocols
-#: The dictionary maps the protocol owners to a set of `PModel` types.
-protocol_registry: WeakKeyDictionary[PPresenter, set[type[PModel]]] = (
+#: Registry for storing device protocols
+#: The dictionary maps the protocol owners to a set of `PDevice` types.
+protocol_registry: WeakKeyDictionary[PPresenter, set[type[PDevice]]] = (
     WeakKeyDictionary()
 )
 
@@ -157,7 +157,7 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
                 arg = types_to_check.pop()
 
                 # Use improved protocol check
-                if isinstance(arg, type) and isinstance(arg, PModel):
+                if isinstance(arg, type) and isinstance(arg, PDevice):
                     return True
 
                 # If it's a generic type, add its args to the list to check
@@ -169,12 +169,12 @@ def _check_protocol_in_generic(annotation: Any) -> bool:
     return False
 
 
-def _ismodel(arg: type[Any]) -> TypeGuard[type[PModel]]:
-    return isinstance(arg, PModel)
+def _isdevice(arg: type[Any]) -> TypeGuard[type[PDevice]]:
+    return isinstance(arg, PDevice)
 
 
 def _extract_protocol_types_from_generic(
-    annotation: Any, registered_protocols: set[type[PModel]]
+    annotation: Any, registered_protocols: set[type[PDevice]]
 ) -> list[type]:
     """
     Extract all protocol types from a generic annotation and check if they're registered.
@@ -193,7 +193,7 @@ def _extract_protocol_types_from_generic(
     unregistered = []
 
     # Use improved protocol check for direct protocols
-    if isinstance(annotation, type) and _ismodel(annotation):
+    if isinstance(annotation, type) and _isdevice(annotation):
         if annotation not in registered_protocols:
             unregistered.append(annotation)
         return unregistered
@@ -209,7 +209,7 @@ def _extract_protocol_types_from_generic(
             arg = types_to_check.pop()
 
             # Use improved protocol check
-            if isinstance(arg, type) and _ismodel(arg):
+            if isinstance(arg, type) and _isdevice(arg):
                 if arg not in registered_protocols:
                     unregistered.append(arg)
             else:
@@ -252,18 +252,18 @@ def _validate_plan_protocols(
 
 
 @overload
-def register_protocols(owner: PPresenter, protocols: type[PModel]) -> None: ...
+def register_protocols(owner: PPresenter, protocols: type[PDevice]) -> None: ...
 
 
 @overload
 def register_protocols(
-    owner: PPresenter, protocols: Iterable[type[PModel]]
+    owner: PPresenter, protocols: Iterable[type[PDevice]]
 ) -> None: ...
 
 
 def register_protocols(
     owner: PPresenter,
-    protocols: type[PModel] | Iterable[type[PModel]],
+    protocols: type[PDevice] | Iterable[type[PDevice]],
 ) -> None:
     """Register one or multiple protocols.
 
@@ -271,14 +271,14 @@ def register_protocols(
     ----------
     owner : ``PPresenter``
         The owner of the protocol.
-    protocols : ``type[PModel] | Iterable[type[PModel]]``
-        The protocol or protocols to register. They must be subclasses of `PModel`.
+    protocols : ``type[PDevice] | Iterable[type[PDevice]]``
+        The protocol or protocols to register. They must be subclasses of `PDevice`.
 
     Raises
     ------
     TypeError
         If the owner does not implement `PPresenter`
-        or if the protocols are not subclasses of `PModel`.
+        or if the protocols are not subclasses of `PDevice`.
     """
     if not isinstance(owner, PPresenter):
         raise TypeError(f"Owner must implement PPresenter, got {type(owner)}")
@@ -291,8 +291,8 @@ def register_protocols(
 
     # Use type guard for safe protocol checking
     for proto in protos:
-        if not isinstance(proto, PModel):
-            raise TypeError(f"Protocol {proto.__name__} must implement PModel")
+        if not isinstance(proto, PDevice):
+            raise TypeError(f"Protocol {proto.__name__} must implement PDevice")
 
     protocol_registry.setdefault(owner, set())
     protocol_registry[owner].update(protos)
@@ -319,7 +319,7 @@ def register_plans(
     """Register one or multiple plan generators.
 
     Plans are expected to be callable objects that return a Bluesky message generator.
-    Plan generators can require parameters, including protocols inherited from `PModel`;
+    Plan generators can require parameters, including protocols inherited from `PDevice`;
     the requirement for using protocols in a plan is that they have to be registered first via
     the `register_protocols` function.
 
@@ -410,13 +410,13 @@ def register_plans(
         signatures[owner][func_name] = PlanSignature.from_callable(func)
 
 
-def get_protocols() -> MappingProxyType[PPresenter, set[type[PModel]]]:
+def get_protocols() -> MappingProxyType[PPresenter, set[type[PDevice]]]:
     """Get the available protocols.
 
     Returns
     -------
-    MappingProxyType[PPresenter, set[type[PModel]]]
-        Read-only mapping of controller protocols to their registered model protocols.
+    MappingProxyType[PPresenter, set[type[PDevice]]]
+        Read-only mapping of controller protocols to their registered device protocols.
     """
     return MappingProxyType(protocol_registry)
 

@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    NamedTuple,
-)
-
-from typing_extensions import Protocol, runtime_checkable
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Callable, NamedTuple, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
+    from typing import Any
 
-    from sunflare.model import PModel
+    from sunflare.device import PDevice
     from sunflare.virtual import VirtualBus
 
 
@@ -25,14 +21,14 @@ class PPresenter(Protocol):  # pragma: no cover
 
     Attributes
     ----------
-    models : Mapping[str, PModel]
-        Reference to the models used in the presenter.
+    devices : Mapping[str, PDevice]
+        Reference to the devices used in the presenter.
     virtual_bus : VirtualBus
         Reference to the virtual bus.
     """
 
     virtual_bus: VirtualBus
-    models: Mapping[str, PModel]
+    devices: Mapping[str, PDevice]
 
 
 class Connection(NamedTuple):
@@ -58,44 +54,30 @@ class Connection(NamedTuple):
     slot: Callable[..., None]
 
 
-class Presenter(PPresenter):
-    """A boilerplate base class for quick presenter development.
+class Presenter(PPresenter, ABC):
+    """Presenter base class.
 
-    Users may subclass from this presenter and provide their
-    initialization logic directly.
-
-    Example usage:
-
-    ```python
-    from sunflare.presenter import Presenter
-
-
-    class MyPresenter(Presenter):
-        def __init__(
-            self,
-            models: Mapping[str, PModel],
-            virtual_bus: VirtualBus,
-            custom_param: str,
-        ) -> None:
-            super().__init__(models, virtual_bus)
-            self.custom_param = custom_param
-            # any other initialization code...
-    ```
+    Classes that do not directly inherit from it
+    will need to match the `__init__` signature
+    to ensure that at runtime Redsun registers
+    them as virtual subclasses.
 
     Parameters
     ----------
-    models : ``Mapping[str, PModel]``
-        Reference to the models used in the presenter.
+    devices : ``Mapping[str, PDevice]``
+        Reference to the devices used in the presenter.
     virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
+    kwargs : ``Any``, optional
+        Additional keyword arguments for presenter subclasses.
+        These are parsed from the session configuration file.
     """
 
+    @abstractmethod
     def __init__(
-        self,
-        models: Mapping[str, PModel],
-        virtual_bus: VirtualBus,
+        self, devices: Mapping[str, PDevice], virtual_bus: VirtualBus, /, **kwargs: Any
     ) -> None:
-        self.models = models
+        self.devices = devices
         self.virtual_bus = virtual_bus
 
 
@@ -119,11 +101,11 @@ class Sender(Presenter):
 
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
             signals = ["sigRegisteredSignal"]
-            super().__init__(models, virtual_bus, signals=signals)
+            super().__init__(devices, virtual_bus, signals=signals)
             # any other initialization code...
     ```
 
@@ -135,8 +117,8 @@ class Sender(Presenter):
 
     Parameters
     ----------
-    models : ``Mapping[str, PModel]``
-        Reference to the models used in the presenter.
+    devices : ``Mapping[str, PDevice]``
+        Reference to the devices used in the presenter.
     virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     signals : ``Sequence[str]``, keyword-only, optional
@@ -151,13 +133,13 @@ class Sender(Presenter):
 
     def __init__(
         self,
-        models: Mapping[str, PModel],
+        devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
         *,
         signals: Sequence[str] | None = None,
     ) -> None:
         self.signals = signals
-        super().__init__(models, virtual_bus)
+        super().__init__(devices, virtual_bus)
 
     def registration_phase(self) -> None:
         """Register the signals defined in ``self.signals``.
@@ -183,7 +165,7 @@ class Receiver(Presenter):
     class MyPresenter(Receiver):
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
             connection_map = {
@@ -195,7 +177,7 @@ class Receiver(Presenter):
                     Connection("sigControllerSignal", self.controller_slot),
                 ],
             }
-            super().__init__(models, virtual_bus, connection_map=connection_map)
+            super().__init__(devices, virtual_bus, connection_map=connection_map)
             # any other initialization code...
 
         def widget_slot(self, *args, **kwargs) -> None:
@@ -218,8 +200,8 @@ class Receiver(Presenter):
 
     Parameters
     ----------
-    models : ``Mapping[str, PModel]``
-        Reference to the models used in the presenter.
+    devices : ``Mapping[str, PDevice]``
+        Reference to the devices used in the presenter.
     virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     connection_map : ``Mapping[str, list[Connection]]``, optional
@@ -234,15 +216,15 @@ class Receiver(Presenter):
 
     def __init__(
         self,
-        models: Mapping[str, PModel],
+        devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
         *,
         connection_map: Mapping[str, list[Connection]] | None = None,
     ) -> None:
         self.connection_map = connection_map
-        super().__init__(models, virtual_bus)
+        super().__init__(devices, virtual_bus)
 
-    def connection_phase(self) -> None:
+    def connect_to_virtual(self) -> None:
         """Connect the signals defined in ``self.connection_map``.
 
         This method is called from Redsun during
@@ -272,7 +254,7 @@ class SenderReceiver(Presenter):
 
         def __init__(
             self,
-            models: Mapping[str, PModel],
+            devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
             signals = ["sigRegisteredSignal"]
@@ -285,7 +267,7 @@ class SenderReceiver(Presenter):
                     Connection("sigControllerSignal", self.controller_slot),
                 ],
             }
-            super().__init__(models, virtual_bus, signals=signals, connection_map=connection_map)
+            super().__init__(devices, virtual_bus, signals=signals, connection_map=connection_map)
             # any other initialization code...
 
         def widget_slot(self, *args, **kwargs) -> None:
@@ -306,8 +288,8 @@ class SenderReceiver(Presenter):
 
     Parameters
     ----------
-    models : ``Mapping[str, PModel]``
-        Reference to the models used in the presenter.
+    devices : ``Mapping[str, PDevice]``
+        Reference to the devices used in the presenter.
     virtual_bus : `sunflare.virtual.VirtualBus`
         Reference to the virtual bus.
     signals : ``Sequence[str]``, optional
@@ -327,7 +309,7 @@ class SenderReceiver(Presenter):
 
     def __init__(
         self,
-        models: Mapping[str, PModel],
+        devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
         *,
         signals: Sequence[str] | None = None,
@@ -335,17 +317,10 @@ class SenderReceiver(Presenter):
     ) -> None:
         self.signals = signals
         self.connection_map = connection_map
-        super().__init__(models, virtual_bus)
-
-    def registration_phase(self) -> None:
-        """Register the signals defined in ``self.signals``.
-
-        This method is called from Redsun during
-        application initialization.
-        """
+        super().__init__(devices, virtual_bus)
         self.virtual_bus.register_signals(self, self.signals)
 
-    def connection_phase(self) -> None:
+    def connect_to_virtual(self) -> None:
         """Connect the signals defined in ``self.connection_map``.
 
         This method is called from Redsun during

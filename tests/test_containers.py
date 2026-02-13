@@ -19,11 +19,11 @@ from sunflare.containers import (
 )
 from sunflare.containers._registry import ParameterInfo, PlanSignature
 from sunflare.virtual import VirtualBus
-from sunflare.model import PModel
+from sunflare.device import PDevice
 
 
 @runtime_checkable
-class DetectorProtocol(PModel, Protocol):
+class DetectorProtocol(PDevice, Protocol):
     """A protocol for detector devices."""
 
     @property
@@ -39,7 +39,7 @@ class DetectorProtocol(PModel, Protocol):
 
 
 @runtime_checkable
-class MotorProtocol(PModel, Protocol):
+class MotorProtocol(PDevice, Protocol):
     """A protocol for motor devices."""
 
     @property
@@ -60,7 +60,7 @@ class MotorProtocol(PModel, Protocol):
 
 
 @runtime_checkable
-class SampleProtocol(PModel, Protocol):
+class SampleProtocol(PDevice, Protocol):
     """A protocol for sample handling devices."""
 
     @property
@@ -238,10 +238,10 @@ class ExperimentController:
 
     def __init__(
         self,
-        models: dict[str, PModel],
+        devices: dict[str, PDevice],
         virtual_bus: VirtualBus,
     ) -> None:
-        self.models = models
+        self.devices = devices
         self.virtual_bus = virtual_bus
 
 
@@ -249,8 +249,8 @@ def test_containers_function() -> None:
     """Test the registration of plans and protocols."""
 
     bus = VirtualBus()
-    models: dict[str, PModel] = {}
-    mock_controller = ExperimentController(models, bus)
+    devices: dict[str, PDevice] = {}
+    mock_controller = ExperimentController(devices, bus)
 
     # register plans and protocols
     register_protocols(
@@ -303,8 +303,8 @@ def test_containers_function() -> None:
 def test_containers_wrong_return_type() -> None:
     """Test that plans without return type raise TypeError."""
     bus = VirtualBus()
-    models: dict[str, PModel] = {}
-    mock_controller = ExperimentController(models, bus)
+    devices: dict[str, PDevice] = {}
+    mock_controller = ExperimentController(devices, bus)
 
     def no_return_type_gen(detector: DetectorProtocol):
         yield

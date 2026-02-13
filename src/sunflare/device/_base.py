@@ -2,28 +2,28 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ._protocols import PModel
+from ._protocols import PDevice
 
 if TYPE_CHECKING:
     from bluesky.protocols import Descriptor, Reading
 
-__all__ = ["Model"]
+__all__ = ["Device"]
 
 
-class Model(PModel):
-    """A boilerplate base class for quick model development.
+class Device(PDevice):
+    """A boilerplate base class for quick device development.
 
-    Users may subclass from this model and implement their own
+    Users may subclass from this device and implement their own
     configuration properties and methods.
 
     Example usage:
 
     ```python
-    from sunflare.model import Model
+    from sunflare.device import Device
     from attrs import define
 
 
-    class MyModel(Model):
+    class MyDevice(Device):
         def __init__(self, name: str, some_param: str, another_param: bool) -> None:
             super().__init__(name)
             self.some_param = some_param
@@ -58,14 +58,14 @@ class Model(PModel):
     Parameters
     ----------
     name : ``str``
-        Name of the model. Serves as a unique identifier for the object created from it.
+        Name of the device. Serves as a unique identifier for the object created from it.
     """
 
     def __init__(self, name: str) -> None:
         self._name = name
 
     def describe_configuration(self) -> dict[str, Descriptor]:
-        """Provide a description of the model configuration.
+        """Provide a description of the device configuration.
 
         Subclasses should override this method to provide their own
         configuration description compatible with the Bluesky event model.
@@ -73,12 +73,12 @@ class Model(PModel):
         Returns
         -------
         dict[``str``, `event_model.DataKey`]
-            A dictionary with the description of each field of the model configuration.
+            A dictionary with the description of each field of the device configuration.
         """
         return {}
 
     def read_configuration(self) -> dict[str, Reading[Any]]:
-        """Provide a description of the model configuration.
+        """Provide a description of the device configuration.
 
         Subclasses should override this method to provide their own
         configuration reading compatible with the Bluesky event model.
@@ -86,7 +86,7 @@ class Model(PModel):
         Returns
         -------
         dict[``str``, `bluesky.protocols.Descriptor`]
-            A dictionary with the description of each field of the model configuration.
+            A dictionary with the description of each field of the device configuration.
         """
         return {}
 

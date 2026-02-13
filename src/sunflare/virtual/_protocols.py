@@ -8,7 +8,7 @@ class HasShutdown(Protocol):  # pragma: no cover
 
     !!! tip
         This protocol is optional and only available for
-        ``Presenters``. ``Widgets`` and ``Models`` will not
+        ``Presenters``. ``Widgets`` and ``Devices`` will not
         be affected by this protocol.
     """
 
@@ -23,51 +23,17 @@ class HasShutdown(Protocol):  # pragma: no cover
 
 
 @runtime_checkable
-class HasRegistration(Protocol):  # pragma: no cover
-    """Protocol marking your class as capable of emitting signals.
-
-    !!! tip
-        This protocol is optional and only available for
-        ``Presenters`` and ``Widgets``. ``Models``
-        will not be affected by this protocol.
-    """
-
-    @abstractmethod
-    def registration_phase(self) -> None:
-        r"""Register the signals listed in this method to expose them to the virtual bus.
-
-        At application start-up, controllers can't know what signals are available from other controllers. \
-        This method is called after all controllers are initialized to allow them to register their signals. \
-        Presenters may be able to register further signals even after this phase (but not before the `connection_phase` ended). \
-        
-        Only signals defined in your object can be registered.
-        
-        An implementation example:
-
-        ```python
-        def registration_phase(self) -> None:
-            # you can register all signals...
-            self.virtual_bus.register_signals(self)
-            
-            # ... or only a selection of them
-            self.virtual_bus.register_signals(self, only=["signal"])
-        ```
-        """
-        ...
-
-
-@runtime_checkable
-class HasConnection(Protocol):  # pragma: no cover
-    """Protocol marking your class as requesting connection to other signals.
+class VirtualAware(Protocol):  # pragma: no cover
+    """Protocol marking a class as aware of the virtual bus and able to connect to it.
 
     !!! tip
         This protocol is optional and only usable with
-        ``Presenters`` and ``Views``. ``Models``
+        ``Presenters`` and ``Views``. ``Devices``
         will not be affected by this protocol.
     """
 
     @abstractmethod
-    def connection_phase(self) -> None:
+    def connect_to_virtual(self) -> None:
         """Connect to other objects via the virtual bus.
 
         At application start-up, objects within Redsun can't know what signals are available from other parts of the session.
@@ -79,7 +45,7 @@ class HasConnection(Protocol):  # pragma: no cover
         An implementation example:
 
         ```python
-        def connection_phase(self) -> None:
+        def connect_to_virtual(self) -> None:
             # you can connect signals from another controller to your local slots...
             self.virtual_bus["OtherController"]["signal"].connect(self._my_slot)
 

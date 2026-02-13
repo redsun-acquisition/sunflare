@@ -1,10 +1,9 @@
 from ._bus import Signal, VirtualBus
-from ._protocols import HasConnection, HasRegistration, HasShutdown
+from ._protocols import HasShutdown, VirtualAware
 
 __all__ = [
     "VirtualBus",
     "Signal",
-    "HasConnection",
-    "HasRegistration",
     "HasShutdown",
+    "VirtualAware",
 ]
