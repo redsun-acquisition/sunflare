@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 @runtime_checkable
-class ViewProtocol(Protocol):
+class PView(Protocol):
     """Minimmal protocol a view component should implement.
 
     Attributes

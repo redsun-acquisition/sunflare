@@ -1,3 +1,3 @@
-from ._protocols import ViewProtocol
+from ._protocols import PView
 
-__all__ = ["ViewProtocol"]
+__all__ = ["PView"]
