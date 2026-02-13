@@ -131,18 +131,6 @@ def test_complex_device() -> None:
     assert reading["pixel_size"]["value"] == (2.5, 2.5)
 
 
-def test_device_defaults() -> None:
-    """Test Device with default configuration methods."""
-    device = Device("minimal_device")
-
-    assert device.name == "minimal_device"
-    assert device.parent is None
-
-    # Default methods should return empty dicts
-    assert device.describe_configuration() == {}
-    assert device.read_configuration() == {}
-
-
 def test_device_protocol_compliance() -> None:
     """Test that Device instances comply with PDevice protocol."""
     device = SimpleDevice("protocol_test")

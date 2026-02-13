@@ -1,59 +1,37 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import abc
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
-from ._protocols import PDevice
+from bluesky.protocols import Configurable, HasName, HasParent
 
 if TYPE_CHECKING:
     from bluesky.protocols import Descriptor, Reading
 
-__all__ = ["Device"]
+__all__ = ["PDevice", "Device"]
 
 
-class Device(PDevice):
-    """A boilerplate base class for quick device development.
+@runtime_checkable
+class PDevice(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cover
+    """Minimal required protocol for a recognizable device in Redsun.
+
+    Exposes the following Bluesky protocols:
+
+    - [`bluesky.protocols.HasName`]()
+    - [`bluesky.protocols.HasParent`]()
+    - [`bluesky.protocols.Configurable`]()
+
+    Devices should implement their configuration properties directly
+    and provide implementations of `describe_configuration()` and
+    `read_configuration()` methods as required by the Configurable protocol.
+    """
+
+
+class Device(PDevice, abc.ABC):
+    """Base class for devices.
 
     Users may subclass from this device and implement their own
     configuration properties and methods.
-
-    Example usage:
-
-    ```python
-    from sunflare.device import Device
-    from attrs import define
-
-
-    class MyDevice(Device):
-        def __init__(self, name: str, some_param: str, another_param: bool) -> None:
-            super().__init__(name)
-            self.some_param = some_param
-            self.another_param = another_param
-
-        def describe_configuration(self) -> dict[str, Descriptor]:
-            return {
-                "some_param": {
-                    "source": self.name,
-                    "dtype": "string",
-                    "shape": [],
-                },
-                "another_param": {
-                    "source": self.name,
-                    "dtype": "boolean",
-                    "shape": [],
-                },
-            }
-
-        def read_configuration(self) -> dict[str, Reading[Any]]:
-            import time
-
-            return {
-                "some_param": {"value": self.some_param, "timestamp": time.time()},
-                "another_param": {
-                    "value": self.another_param,
-                    "timestamp": time.time(),
-                },
-            }
-    ```
 
     Parameters
     ----------
@@ -61,9 +39,11 @@ class Device(PDevice):
         Name of the device. Serves as a unique identifier for the object created from it.
     """
 
+    @abc.abstractmethod
     def __init__(self, name: str) -> None:
         self._name = name
 
+    @abc.abstractmethod
     def describe_configuration(self) -> dict[str, Descriptor]:
         """Provide a description of the device configuration.
 
@@ -75,8 +55,9 @@ class Device(PDevice):
         dict[``str``, `event_model.DataKey`]
             A dictionary with the description of each field of the device configuration.
         """
-        return {}
+        raise NotImplementedError
 
+    @abc.abstractmethod
     def read_configuration(self) -> dict[str, Reading[Any]]:
         """Provide a description of the device configuration.
 
@@ -88,12 +69,14 @@ class Device(PDevice):
         dict[``str``, `bluesky.protocols.Descriptor`]
             A dictionary with the description of each field of the device configuration.
         """
-        return {}
+        raise NotImplementedError
 
     @property
     def name(self) -> str:
+        """The name of the device, serving as a unique identifier."""
         return self._name
 
     @property
     def parent(self) -> None:
+        """Parent of the device. Always returns None for compliance with `HasParent` protocol."""
         return None
