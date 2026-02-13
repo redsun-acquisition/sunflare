@@ -20,7 +20,6 @@ from sunflare.containers import (
 from sunflare.containers._registry import ParameterInfo, PlanSignature
 from sunflare.virtual import VirtualBus
 from sunflare.model import PModel
-from sunflare.config import PPresenterInfo, PresenterInfo, PModelInfo
 
 
 @runtime_checkable
@@ -79,26 +78,6 @@ class SampleProtocol(PModel, Protocol):
     def current_sample(self) -> str | None:
         """ID of currently loaded sample."""
         ...
-
-
-@runtime_checkable
-class StructuredProtocol(Protocol):
-    """A protocol that does not inherit from PModel."""
-
-    def __init__(self, name: str, model_info: PModelInfo) -> None: ...
-
-    def read_configuration(self) -> dict[str, Any]: ...
-
-    def describe_configuration(self) -> dict[str, Any]: ...
-
-    @property
-    def name(self) -> str: ...
-
-    @property
-    def model_info(self) -> PModelInfo: ...
-
-    @property
-    def parent(self) -> None: ...
 
 
 def simple_scan_plan(
@@ -259,11 +238,9 @@ class ExperimentController:
 
     def __init__(
         self,
-        ctrl_info: PPresenterInfo,
         models: dict[str, PModel],
         virtual_bus: VirtualBus,
     ) -> None:
-        self.ctrl_info = ctrl_info
         self.models = models
         self.virtual_bus = virtual_bus
 
@@ -273,17 +250,15 @@ def test_containers_function() -> None:
 
     bus = VirtualBus()
     models: dict[str, PModel] = {}
-    mock_controller = ExperimentController(
-        PresenterInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
-    )
+    mock_controller = ExperimentController(models, bus)
 
     # register plans and protocols
     register_protocols(
         mock_controller,
-        [DetectorProtocol, MotorProtocol, SampleProtocol, StructuredProtocol],
+        [DetectorProtocol, MotorProtocol, SampleProtocol],
     )
 
-    assert len(get_protocols()[mock_controller]) == 4, (
+    assert len(get_protocols()[mock_controller]) == 3, (
         "Protocol registry should not be empty"
     )
 
@@ -329,9 +304,7 @@ def test_containers_wrong_return_type() -> None:
     """Test that plans without return type raise TypeError."""
     bus = VirtualBus()
     models: dict[str, PModel] = {}
-    mock_controller = ExperimentController(
-        PresenterInfo(plugin_name="test_name", plugin_id="test_id"), models, bus
-    )
+    mock_controller = ExperimentController(models, bus)
 
     def no_return_type_gen(detector: DetectorProtocol):
         yield

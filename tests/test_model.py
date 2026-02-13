@@ -1,249 +1,153 @@
-import os
-from typing import Any, cast
-
+import time
 import pytest
-import yaml
-from attrs import asdict
-from mocks import MockDetector, MockDetectorInfo, MockMotor, MockMotorInfo
-
-from sunflare.model import PModel
-from sunflare.config import RedSunSessionInfo
+from bluesky.protocols import Descriptor, Reading
+from typing import Any
+from sunflare.model import Model, PModel
 
 
-def test_detector_model(config_path: str) -> None:
-    """Test the detector model info."""
-    truth_dict: dict[str, Any] = {
-        "First mock detector": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_detector",
-            "sensor_size": [10, 10],
-        },
-        "Second mock detector": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_detector",
-            "sensor_size": [10, 10],
-            "exposure_egu": "s",
-        },
-    }
+class SimpleModel(Model):
+    """A simple test model with configuration."""
 
-    truth_configs: dict[str, MockDetectorInfo] = {
-        name: MockDetectorInfo(**cfg_info) for name, cfg_info in truth_dict.items()
-    }
+    def __init__(self, name: str, value: int = 42) -> None:
+        super().__init__(name)
+        self.value = value
 
-    config_file = os.path.join(config_path, "detector_instance.yaml")
-    config_dict = yaml.safe_load(open(config_file))
-
-    config_dict["models"] = {
-        name: MockDetectorInfo(**info) for name, info in config_dict["models"].items()
-    }
-
-    session = RedSunSessionInfo(**config_dict)
-
-    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(
-        session.models.items(), truth_configs.items()
-    ):
-        detector = MockDetector(name=name, cfg_info=cfg_info)
-        assert isinstance(detector, PModel)
-        assert detector.name == truth_name
-        assert detector.parent is None
-        assert detector.model_info == truth_cfg_info
-
-        reading = detector.read_configuration()
-        truth = {"sensor_size": {"value": (10, 10), "timestamp": 0}}
-        assert reading["sensor_size"]["value"] == truth["sensor_size"]["value"]
-        assert reading["sensor_size"]["timestamp"] == truth["sensor_size"]["timestamp"]
-        descriptor = detector.describe_configuration()
-        truth = {
-            "sensor_size": {"dtype": "array", "shape": [2], "source": "model_info"}
+    def describe_configuration(self) -> dict[str, Descriptor]:
+        return {
+            "value": {
+                "source": self.name,
+                "dtype": "integer",
+                "shape": [],
+            }
         }
-        assert descriptor["sensor_size"]["dtype"] == truth["sensor_size"]["dtype"]
-        assert descriptor["sensor_size"]["shape"] == truth["sensor_size"]["shape"]
-        assert descriptor["sensor_size"]["source"] == truth["sensor_size"]["source"]
+
+    def read_configuration(self) -> dict[str, Reading[Any]]:
+        return {
+            "value": {
+                "value": self.value,
+                "timestamp": time.time(),
+            }
+        }
 
 
-def test_broken_detector_model() -> None:
-    """Test the detector model info."""
-    test_config: dict[str, Any] = {
-        "plugin_name": "mocks",
-        "plugin_id": "mock_detector",
-        "sensor_size": [10, 10, 100],
-        "pixel_size": [1, 1, 1],
-    }
+class ComplexModel(Model):
+    """A more complex test model with multiple configuration fields."""
 
-    with pytest.raises(ValueError):
-        MockDetectorInfo(**test_config)
+    def __init__(
+        self,
+        name: str,
+        sensor_size: tuple[int, int] = (10, 10),
+        pixel_size: tuple[float, float] = (1.0, 1.0),
+    ) -> None:
+        super().__init__(name)
+        self.sensor_size = sensor_size
+        self.pixel_size = pixel_size
 
-    test_config = {
-        "plugin_name": "mocks",
-        "plugin_id": "mock_detector",
-        "sensor_size": [0, 10],
-        "pixel_size": [1, 1, 1],
-    }
+    def describe_configuration(self) -> dict[str, Descriptor]:
+        return {
+            "sensor_size": {
+                "source": self.name,
+                "dtype": "array",
+                "shape": [2],
+            },
+            "pixel_size": {
+                "source": self.name,
+                "dtype": "array",
+                "shape": [2],
+                "units": "μm",
+            },
+        }
 
-    with pytest.raises(ValueError):
-        MockDetectorInfo(**test_config)
-
-    test_config = {
-        "plugin_name": "mocks",
-        "plugin_id": "mock_detector",
-        "sensor_size": [10, 10],
-        "pixel_size": [1, 1],
-    }
-
-    with pytest.raises(ValueError):
-        MockDetectorInfo(**test_config)
-
-    test_config = {
-        "plugin_name": "mocks",
-        "plugin_id": "mock_detector",
-        "sensor_size": [10, 10],
-        "pixel_size": [0, 1, 1],
-    }
-
-    with pytest.raises(ValueError):
-        MockDetectorInfo(**test_config)
-
-
-def test_motor_model(config_path: str) -> None:
-    """Test the motor model info."""
-    truth_dict: dict[str, Any] = {
-        "Single axis motor": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_motor",
-            "axes": ["X"],
-        },
-        "Double axis motor": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_motor",
-            "axes": ["X", "Y"],
-            "step_egu": "mm",
-        },
-    }
-
-    truth_configs = {
-        name: MockMotorInfo(**cfg_info) for name, cfg_info in truth_dict.items()
-    }
-
-    config_file = os.path.join(config_path, "motor_instance.yaml")
-    config_dict = RedSunSessionInfo.load_yaml(config_file)
-    config_dict["models"] = {
-        name: MockMotorInfo(**info) for name, info in config_dict["models"].items()
-    }
-    session = RedSunSessionInfo(**config_dict)
-
-    for (name, cfg_info), (truth_name, truth_cfg_info) in zip(
-        session.models.items(), truth_configs.items()
-    ):
-        cfg = cast(MockMotorInfo, cfg_info)
-        motor = MockMotor(name=name, cfg_info=cfg)
-        assert isinstance(motor, PModel)
-        assert motor.name == truth_name
-        assert motor.parent is None
-        assert motor.model_info == truth_cfg_info
+    def read_configuration(self) -> dict[str, Reading[Any]]:
+        timestamp = time.time()
+        return {
+            "sensor_size": {
+                "value": self.sensor_size,
+                "timestamp": timestamp,
+            },
+            "pixel_size": {
+                "value": self.pixel_size,
+                "timestamp": timestamp,
+            },
+        }
 
 
-def test_broken_motor_model() -> None:
-    test_config: dict[str, Any] = {
-        "plugin_name": "mocks",
-        "plugin_id": "mock_motor",
-        "axes": [1, 2],
-    }
+def test_simple_model() -> None:
+    """Test basic Model functionality."""
+    model = SimpleModel("test_model")
 
-    with pytest.raises(ValueError):
-        MockMotorInfo(**test_config)
+    assert isinstance(model, PModel)
+    assert model.name == "test_model"
+    assert model.parent is None
+    assert model.value == 42
 
-    test_config = {
-        "plugin_name": "mocks",
-        "plugin_id": "mock_motor",
-        "axes": ["x", "a", "b"],
-    }
+    # Test describe_configuration
+    descriptor = model.describe_configuration()
+    assert "value" in descriptor
+    assert descriptor["value"]["source"] == "test_model"
+    assert descriptor["value"]["dtype"] == "integer"
+    assert descriptor["value"]["shape"] == []
 
-    with pytest.raises(ValueError):
-        MockMotorInfo(**test_config)
-
-    test_config = {"plugin_name": "mocks", "plugin_id": "mock_motor", "axes": []}
-
-    with pytest.raises(ValueError):
-        MockMotorInfo(**test_config)
+    # Test read_configuration
+    reading = model.read_configuration()
+    assert "value" in reading
+    assert reading["value"]["value"] == 42
+    assert isinstance(reading["value"]["timestamp"], float)
 
 
-def test_multi_model(config_path: str) -> None:
-    """Test the multi model info."""
-    truth_dict: dict[str, Any] = {
-        "First mock detector": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_detector",
-            "sensor_size": [10, 10],
-        },
-        "Second mock detector": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_detector",
-            "sensor_size": [10, 10],
-            "exposure_egu": "s",
-        },
-        "Single axis motor": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_motor",
-            "axes": ["X"],
-        },
-        "Double axis motor": {
-            "plugin_name": "mocks",
-            "plugin_id": "mock_motor",
-            "axes": ["X", "Y"],
-            "step_egu": "mm",
-        },
-    }
+def test_model_with_custom_value() -> None:
+    """Test Model with custom initialization."""
+    model = SimpleModel("custom_model", value=100)
 
-    truth_config_detectors: dict[str, MockDetectorInfo] = {
-        name: MockDetectorInfo(**cfg_info)
-        for name, cfg_info in truth_dict.items()
-        if "mock_detector" in cfg_info["plugin_id"]
-    }
+    assert model.name == "custom_model"
+    assert model.value == 100
 
-    truth_configs_motors: dict[str, MockMotorInfo] = {
-        name: MockMotorInfo(**cfg_info)
-        for name, cfg_info in truth_dict.items()
-        if "mock_motor" in cfg_info["plugin_id"]
-    }
+    reading = model.read_configuration()
+    assert reading["value"]["value"] == 100
 
-    config_file = os.path.join(config_path, "multi_model_instance.yaml")
-    config_dict = RedSunSessionInfo.load_yaml(config_file)
-    for name, cfg_info in config_dict["models"].items():
-        if "mock_detector" in cfg_info["plugin_id"]:
-            config_dict["models"][name] = MockDetectorInfo(**cfg_info)
-        else:
-            config_dict["models"][name] = MockMotorInfo(**cfg_info)
 
-    session = RedSunSessionInfo(**config_dict)
+def test_complex_model() -> None:
+    """Test more complex Model with multiple fields."""
+    model = ComplexModel("complex_model", sensor_size=(20, 30), pixel_size=(2.5, 2.5))
 
-    for (name, det_info), (truth_name, det_cfg_info) in zip(
-        session.models.items(), truth_config_detectors.items()
-    ):
-        if "detector" in name:
-            detector = MockDetector(
-                name=name, cfg_info=cast(MockDetectorInfo, det_info)
-            )
-            assert detector.name == truth_name
-            assert detector.parent is None
-            assert detector.model_info == det_cfg_info
-            doc = detector.model_info.read_configuration()
-            bs_config = {key: doc[key]["value"] for key in doc}
-            truth = asdict(det_cfg_info)
-            truth.pop("plugin_name")
-            truth.pop("plugin_id")
-            assert bs_config == truth
+    assert isinstance(model, PModel)
+    assert model.name == "complex_model"
+    assert model.sensor_size == (20, 30)
+    assert model.pixel_size == (2.5, 2.5)
 
-    for (name, mot_info), (truth_name, mot_cfg_info) in zip(
-        session.models.items(), truth_configs_motors.items()
-    ):
-        if "motor" in name:
-            motor = MockMotor(name=name, cfg_info=cast(MockMotorInfo, mot_info))
-            assert motor.name == truth_name
-            assert motor.parent is None
-            assert motor.model_info == mot_cfg_info
-            doc = motor.model_info.read_configuration()
-            bs_config = {key: doc[key]["value"] for key in doc}
-            truth = asdict(det_cfg_info)
-            truth.pop("plugin_name")
-            truth.pop("plugin_id")
-            assert bs_config == truth
+    # Test describe_configuration
+    descriptor = model.describe_configuration()
+    assert "sensor_size" in descriptor
+    assert "pixel_size" in descriptor
+    assert descriptor["sensor_size"]["dtype"] == "array"
+    assert descriptor["sensor_size"]["shape"] == [2]
+    assert descriptor["pixel_size"]["units"] == "μm"
+
+    # Test read_configuration
+    reading = model.read_configuration()
+    assert reading["sensor_size"]["value"] == (20, 30)
+    assert reading["pixel_size"]["value"] == (2.5, 2.5)
+
+
+def test_model_defaults() -> None:
+    """Test Model with default configuration methods."""
+    model = Model("minimal_model")
+
+    assert model.name == "minimal_model"
+    assert model.parent is None
+
+    # Default methods should return empty dicts
+    assert model.describe_configuration() == {}
+    assert model.read_configuration() == {}
+
+
+def test_model_protocol_compliance() -> None:
+    """Test that Model instances comply with PModel protocol."""
+    model = SimpleModel("protocol_test")
+
+    # Check protocol compliance
+    assert isinstance(model, PModel)
+    assert hasattr(model, "name")
+    assert hasattr(model, "parent")
+    assert hasattr(model, "describe_configuration")
+    assert hasattr(model, "read_configuration")

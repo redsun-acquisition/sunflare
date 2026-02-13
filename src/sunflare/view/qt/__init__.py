@@ -10,7 +10,6 @@ from sunflare.view import ViewProtocol
 if TYPE_CHECKING:
     from typing import Any
 
-    from sunflare.config import PViewInfo
     from sunflare.virtual import VirtualBus
 
 QWidgetMeta = type(QWidget)
@@ -29,8 +28,6 @@ class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
 
     Parameters
     ----------
-    view_info : ViewInfo
-        View information.
     virtual_bus : VirtualBus
         Virtual bus for the Redsun session.
     """
@@ -38,13 +35,11 @@ class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
     @abstractmethod
     def __init__(
         self,
-        view_info: PViewInfo,
         virtual_bus: VirtualBus,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.view_info = view_info
         self.virtual_bus = virtual_bus
 
 

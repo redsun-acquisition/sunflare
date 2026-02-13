@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from bluesky.protocols import Configurable, HasName, HasParent
 from typing_extensions import Protocol, runtime_checkable
-
-if TYPE_CHECKING:
-    from sunflare.config import PModelInfo
 
 __all__ = ["PModel"]
 
@@ -21,13 +17,8 @@ class PModel(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cov
     - [`bluesky.protocols.HasName`]()
     - [`bluesky.protocols.HasParent`]()
     - [`bluesky.protocols.Configurable`]()
+
+    Models should implement their configuration properties directly
+    and provide implementations of `describe_configuration()` and
+    `read_configuration()` methods as required by the Configurable protocol.
     """
-
-    @property
-    @abstractmethod
-    def model_info(self) -> PModelInfo:
-        """The associated model information.
-
-        It can return a subclass of `sunflare.config.ModelInfo`.
-        """
-        ...

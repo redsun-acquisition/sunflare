@@ -1,88 +1,98 @@
-from typing import Any, Generic, TypeVar
+from __future__ import annotations
 
-from bluesky.protocols import Descriptor, Reading, SyncOrAsync
-
-from sunflare.config import ModelInfo
+from typing import TYPE_CHECKING, Any
 
 from ._protocols import PModel
 
-MI = TypeVar("MI", bound=ModelInfo)
+if TYPE_CHECKING:
+    from bluesky.protocols import Descriptor, Reading
+
+__all__ = ["Model"]
 
 
-class Model(PModel, Generic[MI]):
+class Model(PModel):
     """A boilerplate base class for quick model development.
 
-    Users may subclass from this model and provide their custom
-    `sunflare.config.ModelInfo` implementation.
+    Users may subclass from this model and implement their own
+    configuration properties and methods.
 
     Example usage:
 
     ```python
     from sunflare.model import Model
-    from sunflare.config import ModelInfo
     from attrs import define
 
 
-    @define
-    class MyModelInfo(ModelInfo):
-        str_param: str
-        bool_param: bool
-        # any other parameters...
+    class MyModel(Model):
+        def __init__(self, name: str, some_param: str, another_param: bool) -> None:
+            super().__init__(name)
+            self.some_param = some_param
+            self.another_param = another_param
 
+        def describe_configuration(self) -> dict[str, Descriptor]:
+            return {
+                "some_param": {
+                    "source": self.name,
+                    "dtype": "string",
+                    "shape": [],
+                },
+                "another_param": {
+                    "source": self.name,
+                    "dtype": "boolean",
+                    "shape": [],
+                },
+            }
 
-    class MyModel(Model[MyModelInfo]):
-        def __init__(self, name: str, model_info: MyModelInfo) -> None:
-            super().__init__(name, model_info)
-            # any other initialization code...
+        def read_configuration(self) -> dict[str, Reading[Any]]:
+            import time
+
+            return {
+                "some_param": {"value": self.some_param, "timestamp": time.time()},
+                "another_param": {
+                    "value": self.another_param,
+                    "timestamp": time.time(),
+                },
+            }
     ```
 
     Parameters
     ----------
     name : ``str``
         Name of the model. Serves as a unique identifier for the object created from it.
-    model_info : ``MI``
-        Instance of `sunflare.config.ModelInfo` subclass.
     """
 
-    def __init__(self, name: str, model_info: MI) -> None:
+    def __init__(self, name: str) -> None:
         self._name = name
-        self._model_info = model_info
 
-    def describe_configuration(self) -> SyncOrAsync[dict[str, Descriptor]]:
+    def describe_configuration(self) -> dict[str, Descriptor]:
         """Provide a description of the model configuration.
 
-        Inspects the local ``model_info`` object and
-        returns a descriptor dictionary compatible
-        with the Bluesky event model.
+        Subclasses should override this method to provide their own
+        configuration description compatible with the Bluesky event model.
 
         Returns
         -------
         dict[``str``, `event_model.DataKey`]
             A dictionary with the description of each field of the model configuration.
         """
-        return self._model_info.describe_configuration()
+        return {}
 
-    def read_configuration(self) -> SyncOrAsync[dict[str, Reading[Any]]]:
+    def read_configuration(self) -> dict[str, Reading[Any]]:
         """Provide a description of the model configuration.
 
-        Inspects the local ``model_info`` object and
-        returns a reading dictionary compatible
-        with the Bluesky event model.
+        Subclasses should override this method to provide their own
+        configuration reading compatible with the Bluesky event model.
 
         Returns
         -------
         dict[``str``, `bluesky.protocols.Descriptor`]
             A dictionary with the description of each field of the model configuration.
         """
-        return self._model_info.read_configuration()
+        return {}
 
     @property
     def name(self) -> str:
         return self._name
-
-    @property
-    def model_info(self) -> MI:
-        return self._model_info
 
     @property
     def parent(self) -> None:

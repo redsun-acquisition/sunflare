@@ -1,181 +1,139 @@
-from pathlib import Path
-from typing import Mapping
-
-from mocks import MockController, MockControllerInfo
-
-from sunflare.config import PresenterInfo, RedSunSessionInfo
-from sunflare.virtual import HasConnection, HasRegistration
-from sunflare.presenter import (
-    Connection,
-    Presenter,
-    PPresenter,
-    Receiver,
-    Sender,
-    SenderReceiver,
-)
+import pytest
+from collections.abc import Mapping
 from sunflare.model import PModel
+from sunflare.presenter import Presenter, Receiver, Sender, SenderReceiver, Connection
 from sunflare.virtual import Signal, VirtualBus
 
 
-def test_protocol_controller(config_path: Path, bus: VirtualBus) -> None:
-    config_file = config_path / "controller_instance.yaml"
-
-    config = RedSunSessionInfo.load_yaml(str(config_file))
-    config_ctrl: dict[str, PresenterInfo] = {
-        name: MockControllerInfo(**input)
-        for name, input in config["controllers"].items()
-    }
-
-    assert len(config_ctrl) == 1
-
-    for _, ctrl in config_ctrl.items():
-        controller = MockController(ctrl, {}, bus)
-        assert isinstance(controller, PPresenter)
-        assert controller.info == ctrl
-        assert len(controller.plans) == 2
-        assert controller.info.plugin_name == "mocks"
-        assert controller.info.plugin_id == "mock_controller"
+@pytest.fixture
+def virtual_bus() -> VirtualBus:
+    return VirtualBus()
 
 
-def test_base_controller(bus: VirtualBus) -> None:
-    class TestController(Presenter[PresenterInfo]):
-        # changing the name of __init__ parameters does not
-        # affect the protocol behavior
+@pytest.fixture
+def models() -> dict[str, PModel]:
+    return {}
+
+
+def test_base_presenter(models: Mapping[str, PModel], virtual_bus: VirtualBus) -> None:
+    """Test basic Presenter functionality."""
+
+    class TestController(Presenter):
         def __init__(
             self,
-            info: PresenterInfo,
-            test_models: Mapping[str, PModel],
-            bus: VirtualBus,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(info, test_models, bus)
+            super().__init__(models, virtual_bus)
 
-    ctrl_info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
-    ctrl = TestController(ctrl_info, {}, bus)
+    controller = TestController(models, virtual_bus)
 
-    assert isinstance(ctrl, PPresenter)
+    assert controller.models == models
+    assert controller.virtual_bus == virtual_bus
 
 
-def test_sender_controller(bus: VirtualBus) -> None:
-    cnt = 0
+def test_sender_presenter(
+    models: Mapping[str, PModel], virtual_bus: VirtualBus
+) -> None:
+    """Test Sender functionality."""
 
-    def mock_slot() -> None:
-        nonlocal cnt
-        cnt += 1
-
-    class TestController(Sender[PresenterInfo]):
-        dummySignal = Signal()
+    class TestController(Sender):
+        sigTestSignal = Signal(str)
+        sigAnotherSignal = Signal(int)
 
         def __init__(
             self,
-            info: PresenterInfo,
-            test_models: Mapping[str, PModel],
-            bus: VirtualBus,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(info, test_models, bus)
+            super().__init__(models, virtual_bus, signals=["sigTestSignal"])
 
-    info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
-    ctrl = TestController(info, {}, bus)
+    controller = TestController(models, virtual_bus)
+    controller.registration_phase()
 
-    assert isinstance(ctrl, PPresenter)
-    assert isinstance(ctrl, HasRegistration)
-
-    ctrl.registration_phase()
-
-    assert len(bus.signals) == 1
-    assert len(bus.signals[ctrl.__class__.__name__]) == 1
-    assert bus.signals[ctrl.__class__.__name__]["dummySignal"] == ctrl.dummySignal
-
-    bus.signals[ctrl.__class__.__name__]["dummySignal"].connect(mock_slot)
-
-    ctrl.dummySignal.emit()
-
-    assert cnt == 1
+    assert "TestController" in virtual_bus.signals
+    assert "sigTestSignal" in virtual_bus.signals["TestController"]
+    assert "sigAnotherSignal" not in virtual_bus.signals["TestController"]
 
 
-def test_receiver_controller(bus: VirtualBus) -> None:
-    cnt = 0
+def test_receiver_presenter(
+    models: Mapping[str, PModel], virtual_bus: VirtualBus
+) -> None:
+    """Test Receiver functionality."""
 
-    class DummySender(Sender[PresenterInfo]):
-        dummySignal = Signal()
+    class DummySender(Sender):
+        sigDummySignal = Signal(str)
 
         def __init__(
             self,
-            info: PresenterInfo,
-            test_models: Mapping[str, PModel],
-            bus: VirtualBus,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(info, test_models, bus)
+            super().__init__(models, virtual_bus, signals=["sigDummySignal"])
 
-    class TestController(Receiver[PresenterInfo]):
+    class TestController(Receiver):
         def __init__(
             self,
-            info: PresenterInfo,
-            test_models: Mapping[str, PModel],
-            bus: VirtualBus,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
         ) -> None:
             connection_map = {
-                "DummySender": [Connection(signal="dummySignal", slot=self.mock_slot)]
+                "DummySender": [Connection("sigDummySignal", self.dummy_slot)]
             }
-            super().__init__(info, test_models, bus, connection_map=connection_map)
+            super().__init__(models, virtual_bus, connection_map=connection_map)
+            self.received_value = None
 
-        def mock_slot(self) -> None:
-            nonlocal cnt
-            cnt += 1
+        def dummy_slot(self, value: str) -> None:
+            self.received_value = value
 
-    info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
-    sender = DummySender(info, {}, bus)
-    ctrl = TestController(info, {}, bus)
-
-    assert isinstance(ctrl, PPresenter)
-    assert isinstance(ctrl, HasConnection)
-
+    sender = DummySender(models, virtual_bus)
     sender.registration_phase()
-    ctrl.connection_phase()
 
-    assert len(bus.signals) == 1
-    assert len(bus.signals["DummySender"]) == 1
-    assert bus.signals["DummySender"]["dummySignal"] == sender.dummySignal
+    receiver = TestController(models, virtual_bus)
+    receiver.connection_phase()
 
-    sender.dummySignal.emit()
-
-    assert cnt == 1
+    # Emit signal and check reception
+    sender.sigDummySignal.emit("test_value")
+    assert receiver.received_value == "test_value"
 
 
-def test_sender_receiver(bus: VirtualBus) -> None:
-    cnt = 0
+def test_sender_receiver_presenter(
+    models: Mapping[str, PModel], virtual_bus: VirtualBus
+) -> None:
+    """Test SenderReceiver functionality."""
 
-    class TestController(SenderReceiver[PresenterInfo]):
-        dummySignal = Signal()
+    class TestController(SenderReceiver):
+        sigOutgoing = Signal(int)
+        sigOtherOutgoing = Signal(str)
 
         def __init__(
             self,
-            info: PresenterInfo,
-            test_models: Mapping[str, PModel],
-            bus: VirtualBus,
+            models: Mapping[str, PModel],
+            virtual_bus: VirtualBus,
         ) -> None:
-            # connect to myself...
-            # ... for testing, ya know
             connection_map = {
-                "TestController": [
-                    Connection(signal="dummySignal", slot=self.mock_slot)
-                ]
+                "TestController": [Connection("sigOutgoing", self.incoming_slot)]
             }
-            super().__init__(info, test_models, bus, connection_map=connection_map)
+            super().__init__(
+                models,
+                virtual_bus,
+                signals=["sigOutgoing", "sigOtherOutgoing"],
+                connection_map=connection_map,
+            )
+            self.received_value = None
 
-        def mock_slot(self) -> None:
-            nonlocal cnt
-            cnt += 1
+        def incoming_slot(self, value: int) -> None:
+            self.received_value = value
 
-    info = PresenterInfo(plugin_name="mocks", plugin_id="mock_controller")
-    ctrl = TestController(info, {}, bus)
+    controller = TestController(models, virtual_bus)
+    controller.registration_phase()
+    controller.connection_phase()
 
-    assert isinstance(ctrl, PPresenter)
-    assert isinstance(ctrl, HasRegistration)
-    assert isinstance(ctrl, HasConnection)
+    # Check signals are registered
+    assert "TestController" in virtual_bus.signals
+    assert "sigOutgoing" in virtual_bus.signals["TestController"]
+    assert "sigOtherOutgoing" in virtual_bus.signals["TestController"]
 
-    ctrl.registration_phase()
-    ctrl.connection_phase()
-
-    assert len(bus.signals) == 1
-    assert len(bus.signals["TestController"]) == 1
-    assert bus.signals["TestController"]["dummySignal"] == ctrl.dummySignal
+    # Test signal emission and reception
+    controller.sigOutgoing.emit(42)
+    assert controller.received_value == 42
