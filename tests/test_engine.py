@@ -158,6 +158,7 @@ def test_engine_wrapper_construction(RE: RunEngine) -> None:
 
 
 def test_engine_wrapper_run(RE: RunEngine) -> None:
+    RE._call_returns_result = False
     fut = RE(count([det1], num=5))
 
     wait([fut])
@@ -169,7 +170,6 @@ def test_engine_wrapper_run(RE: RunEngine) -> None:
 
 
 def test_engine_wrapper_run_with_result(RE: RunEngine) -> None:
-    RE._call_returns_result = True
     fut = RE(count([det1], num=5))
 
     wait([fut])
