@@ -48,10 +48,10 @@ def test_sender_presenter(
             devices: Mapping[str, PDevice],
             virtual_bus: VirtualBus,
         ) -> None:
-            super().__init__(devices, virtual_bus, signals=["sigTestSignal"])
+            signals = ["sigTestSignal"]
+            super().__init__(devices, virtual_bus, signals)
 
     controller = TestController(devices, virtual_bus)
-    controller.registration_phase()
 
     assert "TestController" in virtual_bus.signals
     assert "sigTestSignal" in virtual_bus.signals["TestController"]
@@ -82,14 +82,13 @@ def test_receiver_presenter(
             connection_map = {
                 "DummySender": [Connection("sigDummySignal", self.dummy_slot)]
             }
-            super().__init__(devices, virtual_bus, connection_map=connection_map)
+            super().__init__(devices, virtual_bus, connection_map)
             self.received_value = None
 
         def dummy_slot(self, value: str) -> None:
             self.received_value = value
 
     sender = DummySender(devices, virtual_bus)
-    sender.registration_phase()
 
     receiver = TestController(devices, virtual_bus)
     receiver.connect_to_virtual()
@@ -116,12 +115,8 @@ def test_sender_receiver_presenter(
             connection_map = {
                 "TestController": [Connection("sigOutgoing", self.incoming_slot)]
             }
-            super().__init__(
-                devices,
-                virtual_bus,
-                signals=["sigOutgoing", "sigOtherOutgoing"],
-                connection_map=connection_map,
-            )
+            signals = ["sigOutgoing", "sigOtherOutgoing"]
+            super().__init__(devices, virtual_bus, signals, connection_map)
             self.received_value = None
 
         def incoming_slot(self, value: int) -> None:

@@ -135,18 +135,12 @@ class Sender(Presenter):
         self,
         devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
-        *,
         signals: Sequence[str] | None = None,
+        /,
+        **kwargs: Any,
     ) -> None:
         self.signals = signals
-        super().__init__(devices, virtual_bus)
-
-    def registration_phase(self) -> None:
-        """Register the signals defined in ``self.signals``.
-
-        This method is called from Redsun during
-        application initialization.
-        """
+        super().__init__(devices, virtual_bus, kwargs=kwargs)
         self.virtual_bus.register_signals(self, self.signals)
 
 
@@ -207,6 +201,8 @@ class Receiver(Presenter):
     connection_map : ``Mapping[str, list[Connection]]``, optional
         Mapping of emitters to a list of connections.
         Default is ``None`` (no connections).
+    **kwargs : ``Any``, optional
+        Additional keyword arguments for presenter subclasses.
 
     Attributes
     ----------
@@ -218,11 +214,12 @@ class Receiver(Presenter):
         self,
         devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
-        *,
         connection_map: Mapping[str, list[Connection]] | None = None,
+        /,
+        **kwargs: Any,
     ) -> None:
         self.connection_map = connection_map
-        super().__init__(devices, virtual_bus)
+        super().__init__(devices, virtual_bus, kwargs=kwargs)
 
     def connect_to_virtual(self) -> None:
         """Connect the signals defined in ``self.connection_map``.
@@ -311,9 +308,10 @@ class SenderReceiver(Presenter):
         self,
         devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
-        *,
         signals: Sequence[str] | None = None,
         connection_map: Mapping[str, list[Connection]] | None = None,
+        /,
+        **kwargs: Any,
     ) -> None:
         self.signals = signals
         self.connection_map = connection_map
