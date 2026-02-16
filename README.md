@@ -5,12 +5,12 @@
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Sunflare
+# `sunflare`
 
 > [!WARNING]
 > This project is still in alpha stage and very unstable. Use at your own risk.
 
-Sunflare is a Software Development Kit (SDK) which provides common, reusable components for building plugins which can interact with [Redsun].
+`sunflare` is a software development kit (SDK) which provides common, reusable components for building plugins which can interact with [`redsun`].
 
 The aim is to provide reusable patterns in developing software applications for scientific device orchestration leveraging the [Bluesky] hardware interface and data model.
 

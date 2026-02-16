@@ -9,7 +9,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 
 ## Unreleased
 
-### Changed
+### [0.9.0] - 16-02-2025
 
 - Fully reworked the package to remove the need of `config.py`
 - Renamed `Model` to `Device` for more idiomatic representation of said layer
@@ -321,6 +321,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.9.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.6.3...v0.7.0
 [0.6.3]: https://github.com/redsun-acquisition/sunflare/compare/v0.6.2...v0.6.3
