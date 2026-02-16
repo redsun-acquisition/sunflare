@@ -16,6 +16,6 @@ The aim is to provide reusable patterns in developing software applications for 
 
 For more information, see the [documentation].
 
-[redsun]: https://redsun-acquisition.github.io/redsun/
+[`redsun`]: https://redsun-acquisition.github.io/redsun/
 [documentation]: https://redsun-acquisition.github.io/sunflare/
 [bluesky]: https://blueskyproject.io/bluesky/main/index.html
