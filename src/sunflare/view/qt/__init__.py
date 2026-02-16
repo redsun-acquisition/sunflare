@@ -5,47 +5,49 @@ from typing import TYPE_CHECKING
 
 from qtpy.QtWidgets import QWidget
 
-from sunflare.view import ViewProtocol
+from sunflare.view import View
 
 if TYPE_CHECKING:
     from typing import Any
 
-    from sunflare.config import PViewInfo
     from sunflare.virtual import VirtualBus
 
-QWidgetMeta = type(QWidget)
 
-
-# Create a common metaclass that inherits from both metaclasses.
-# This apparently seem to work when launching redsun empty, but
-# it has not been tested yet; anyway we keep mypy happy by ignoring it
-# https://stackoverflow.com/a/76681565/4437552
-class _QWidgetBaseMeta(QWidgetMeta, ViewProtocol):  # type: ignore[valid-type,misc]
-    """Common metaclass for QWidget and ViewProtocol."""
-
-
-class BaseQtWidget(QWidget, metaclass=_QWidgetBaseMeta):
-    """Qt base widget class that implemenents the ViewProtocol.
+class QtView(QWidget):
+    """Abstract base Qt widget implementing the View protocol.
 
     Parameters
     ----------
-    view_info : ViewInfo
-        View information.
     virtual_bus : VirtualBus
-        Virtual bus for the Redsun session.
+        Main virtual bus for the Redsun instance.
+    kwargs : ``Any``, optional
+        Additional keyword arguments for view subclasses.
+
+    !!! note
+        For `QtView` subclasses, `kwargs` are kept for consistency,
+        but they're not passed to `super().__init__` since `QWidget` does not accept them.
     """
 
     @abstractmethod
     def __init__(
         self,
-        view_info: PViewInfo,
         virtual_bus: VirtualBus,
-        *args: Any,
+        /,
         **kwargs: Any,
     ) -> None:
-        super().__init__(*args, **kwargs)
-        self.view_info = view_info
         self.virtual_bus = virtual_bus
+        super().__init__()
 
 
-__all__ = ["BaseQtWidget"]
+# working with mixing QWidget with
+# a non-Qt cooperative class causes MRO issues;
+# our best bet is to just register the class
+# as a virtual subclass of View and avoid direct inheritance;
+# furthermore mypy complains that QWidget has
+# __init__ marked as abstract method and causes it not to be
+# directly instantiable; we can just ignore this
+# as it is the duty of the concrete subclasses to directly
+# implement __init__ and call super().__init__ to ensure proper initialization
+View.register(QtView)  # type: ignore[type-abstract]
+
+__all__ = ["QtView"]

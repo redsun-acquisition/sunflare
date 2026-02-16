@@ -51,17 +51,17 @@ It is recommended to install the package in a virtual environment.
     mamba activate sunflare-env
     ```
 
-## Install Sunflare
+## Install `sunflare`
 
 You can install the package from [PyPI](https://pypi.org/project/sunflare/) or directly from the GitHub [repository](https://github.com/redsun-acquisition/sunflare).
 
 === "PyPI"
 
     ```bash
-    pip install -U sunflare
-
-    # Or if you're using uv
     uv pip install sunflare
+
+    # ... or without uv
+    pip install -U sunflare
     ```
 
 === "GitHub (Development)"
@@ -69,10 +69,14 @@ You can install the package from [PyPI](https://pypi.org/project/sunflare/) or d
     ```bash
     git clone https://github.com/redsun-acquisition/sunflare.git
     cd sunflare
-    pip install -e .
+
+    uv sync
+
+    # ... or without uv
+    pip install -e .[dev]
     ```
 
-## Install Development Dependencies
+## Install development dependencies
 
 If you're contributing to Sunflare or want to run tests locally, install the development dependencies via [PEP-735](https://peps.python.org/pep-0735/) dependency groups.
 
@@ -89,8 +93,8 @@ If you're contributing to Sunflare or want to run tests locally, install the dev
     pip install -e .[dev]
     ```
 
-## Next Steps
+## Next steps
 
-- Learn how to [build the documentation](build-docs.md)
-- Learn how to [run tests](run-tests.md)
-- Check out the [tutorials](../tutorials/index.md) to get started with Sunflare
+- [Build the documentation](build-docs.md)
+- [Run tests](run-tests.md)
+- [Check the tutorials](../tutorials/index.md) to get started with Sunflare

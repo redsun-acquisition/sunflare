@@ -14,11 +14,6 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
-__all__ = [
-    "Signal",
-    "VirtualBus",
-]
-
 K = TypeVar("K")
 V = TypeVar("V")
 
@@ -27,6 +22,8 @@ CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
 
 SignalCache: TypeAlias = dict[str, SignalInstance]
 """Cache type for signals of a specific class."""
+
+__all__ = ["Signal", "VirtualBus", "CallbackType", "SignalCache"]
 
 
 class VirtualBus(Loggable):
@@ -99,7 +96,7 @@ class VirtualBus(Loggable):
 
         Parameters
         ----------
-        callback : ``CallbackType``
+        callback : CallbackType
             The document callback to register.
 
         Raises

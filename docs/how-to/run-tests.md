@@ -1,4 +1,4 @@
-# Run Tests
+# Run tests
 
 This guide shows you how to run the Sunflare test suite and generate coverage reports.
 
@@ -6,7 +6,7 @@ This guide shows you how to run the Sunflare test suite and generate coverage re
 
 Make sure you have [installed Sunflare with development dependencies](installation.md#install-development-dependencies).
 
-## Run All Tests
+## Run all tests
 
 You can run the tests by running the following command from the project root:
 
@@ -14,7 +14,7 @@ You can run the tests by running the following command from the project root:
 pytest
 ```
 
-## Generate Coverage Report
+## Generate coverage reports
 
 You can obtain a test coverage report by running:
 
@@ -24,9 +24,9 @@ pytest --cov=sunflare --cov-report=html
 
 This will generate an `htmlcov/` directory with the test coverage report. Open `htmlcov/index.html` in your browser to view it.
 
-## Run Tests on Multiple Python Versions
+## Run tests on multiple Python versions
 
-Sunflare provides a `noxfile.py` to run tests with `nox` on all supported Python versions.
+`sunflare` provides a `noxfile.py` to run tests with `nox` on all supported Python versions.
 
 If you use `uv`, you can run tests as follows:
 
@@ -40,22 +40,8 @@ nox -s tests
 
 This will test against all supported Python versions (3.10, 3.11, 3.12, 3.13).
 
-## Run Specific Tests
 
-To run specific test files or test functions:
-
-```bash
-# Run a specific test file
-pytest tests/test_config.py
-
-# Run a specific test function
-pytest tests/test_config.py::test_function_name
-
-# Run tests matching a pattern
-pytest -k "test_model"
-```
-
-## Verbose Output
+## Verbose output
 
 For more detailed output, use the `-v` flag:
 
@@ -73,6 +59,6 @@ pytest -x
 
 ## Next Steps
 
-- Learn how to [build the documentation](build-docs.md)
-- Understand [Sunflare's architecture](../explanation/architecture/index.md)
-- Check the [API reference](../reference/api/config.md)
+- [Build the documentation](build-docs.md)
+- [`sunflare` architecture](../explanation/architecture/index.md)
+- [API reference](../reference/api/config.md)

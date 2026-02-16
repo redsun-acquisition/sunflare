@@ -52,9 +52,9 @@ class ContextualAdapter(_LoggerAdapter):
 
     Parameters
     ----------
-    logger: ``logging.Logger``
+    logger: logging.Logger
         Logger instance to wrap.
-    obj: ``Any``
+    obj: Any
         The object to add context to.
     """
 
@@ -123,10 +123,7 @@ config = {
     },
 }
 
-# Set configuration
 logging.config.dictConfig(config)
-
-# base logger for the session
 logger = logging.getLogger("redsun")
 
 
