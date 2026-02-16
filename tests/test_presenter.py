@@ -1,8 +1,8 @@
 import pytest
 from collections.abc import Mapping
 from sunflare.device import PDevice
-from sunflare.presenter import Presenter, Connection
-from sunflare.virtual import Signal, VirtualBus
+from sunflare.presenter import Presenter
+from sunflare.virtual import VirtualBus
 
 
 @pytest.fixture
