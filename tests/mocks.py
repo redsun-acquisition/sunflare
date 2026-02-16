@@ -1,170 +1,121 @@
-from functools import partial
-from typing import Any, Mapping
+"""Mock classes for sunflare tests.
 
-from attrs import define, field, validators
-from bluesky.plan_stubs import close_run, open_run, read, rel_set
+These mocks demonstrate how plugins can define their own configuration
+using attrs (or any validation library) without inheriting from
+framework-provided info base classes.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from functools import partial
+from typing import Any
+
+from bluesky.plan_stubs import close_run, open_run
+from bluesky.protocols import Descriptor, Reading
 from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 
-from sunflare.config import PresenterInfo, ModelInfo, ViewInfo
+from sunflare.device import Device, PDevice
 from sunflare.presenter import PPresenter
-from sunflare.model import PModel, Model
 from sunflare.virtual import Signal, VirtualBus
 
 
-class ReadableModel(PModel):
-    def read(self) -> dict[str, Any]:
-        raise NotImplementedError
+class MockDetector(Device):
+    """Mock detector device."""
+
+    def __init__(
+        self,
+        name: str,
+        *,
+        sensor_size: tuple[int, int] = (1024, 1024),
+        exposure_egu: str = "ms",
+        pixel_size: tuple[int, int, int] = (1, 1, 1),
+    ) -> None:
+        super().__init__(name)
+        self.sensor_size = sensor_size
+        self.exposure_egu = exposure_egu
+        self.pixel_size = pixel_size
+
+    def describe_configuration(self) -> dict[str, Descriptor]:
+        return {
+            "sensor_size": {
+                "source": f"{self.name}.sensor_size",
+                "dtype": "array",
+                "shape": [2],
+            }
+        }
+
+    def read_configuration(self) -> dict[str, Reading[Any]]:
+        return {
+            "sensor_size": {
+                "value": self.sensor_size,
+                "timestamp": 0.0,
+            }
+        }
 
 
-class SettableModel(PModel):
-    def set(value: Any) -> None:
-        raise NotImplementedError
+class MockMotor(Device):
+    """Mock motor device."""
 
+    def __init__(
+        self,
+        name: str,
+        *,
+        step_egu: str = "\u03bcm",
+        axes: list[str] | None = None,
+    ) -> None:
+        super().__init__(name)
+        self.step_egu = step_egu
+        self.axes = axes or ["X"]
 
-@define
-class MockDetectorInfo(ModelInfo):
-    sensor_size: tuple[int, int] = field(converter=tuple[int, int])
-    exposure_egu: str = field(default="ms", converter=str)
-    pixel_size: tuple[int, int, int] = field(
-        default=(1, 1, 1), converter=tuple[int, int, int]
-    )
+    def describe_configuration(self) -> dict[str, Descriptor]:
+        return {
+            "step_egu": {
+                "source": f"{self.name}.step_egu",
+                "dtype": "string",
+                "shape": [],
+            }
+        }
 
-    @sensor_size.validator
-    def _validate_size(self, _: str, value: tuple[int, int]) -> None:
-        """Check that the sensor size is a tuple of two positive integers."""
-        if any([x <= 0 for x in value]):
-            raise ValueError("Sensor size must be a tuple of positive integers.")
-        if len(value) != 2:
-            raise ValueError("Sensor size must be a tuple of two integers.")
-
-    @pixel_size.validator
-    def _validate_pixels_size(self, _: str, value: tuple[int, int, int]) -> None:
-        """Check that the pixel size is a tuple of three positive integers."""
-        if any([x <= 0 for x in value]):
-            raise ValueError("Pixel size must be a tuple of positive integers.")
-        if len(value) != 3:
-            raise ValueError("Pixel size must be a tuple of three integers.")
-
-
-def _convert_axes(value: list[Any]) -> list[str]:
-    """Convert a list of elements to a list of strings."""
-    return [str(x) for x in value]
-
-
-@define
-class MockMotorInfo(ModelInfo):
-    step_egu: str = field(default="μm", validator=validators.instance_of(str))
-    axes: list[str] = field(factory=list, converter=_convert_axes)
-
-    @axes.validator
-    def _validate_axes(self, _: str, value: list[str]) -> None:
-        """Check that all the elements of the axes are list of capital letter strings."""
-        if not all([x.isalpha() for x in value]):
-            raise ValueError("Axes must be a list of strings.")
-        if len(value) == 0:
-            raise ValueError("Axes must be a list of strings.")
-        if not all([len(x) == 1 for x in value]):
-            raise ValueError("Axes must be a list of single characters.")
-        if not all([x.isupper() for x in value]):
-            raise ValueError("Axes must be a list of capital letters.")
-
-
-@define
-class MockControllerInfo(PresenterInfo):
-    integer: int = field(validator=validators.instance_of(int))
-    floating: float = field(validator=validators.instance_of(float))
-    boolean: bool = field(validator=validators.instance_of(bool))
-    string: str = field(validator=validators.instance_of(str))
-
-
-@define
-class MockWidgetInfo(ViewInfo):
-    gui_int_param: int = field(validator=validators.instance_of(int))
-    gui_choices: list[str] = field(factory=list, validator=validators.instance_of(list))
-
-
-class MockDetector(ReadableModel, Model[MockDetectorInfo]):
-    """Mock detector model."""
-
-    def __init__(self, name: str, cfg_info: MockDetectorInfo) -> None:
-        super().__init__(name=name, model_info=cfg_info)
-
-    def read(self) -> dict[str, Any]:
-        raise NotImplementedError
-
-
-class MockMotor(SettableModel, Model[MockMotorInfo]):
-    """Mock motor model."""
-
-    def __init__(self, name: str, cfg_info: MockMotorInfo) -> None:
-        self._name = name
-        self._cfg_info = cfg_info
-
-    def set(value: Any) -> None:
-        raise NotImplementedError
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def parent(self) -> None:
-        return None
-
-    @property
-    def model_info(self) -> MockMotorInfo:
-        return self._cfg_info
-
-
-mock_detector_info = MockDetectorInfo(
-    plugin_name="mocks",
-    plugin_id="mock_detector",
-    sensor_size=(1024, 1024),
-    exposure_egu="ms",
-    pixel_size=(1, 1, 1),
-)
-
-mock_motor_info = MockMotorInfo(
-    plugin_name="mocks", plugin_id="mock_motor", step_egu="μm", axes=["X", "Y", "Z"]
-)
-
-mock_motor = MockMotor("motor", mock_motor_info)
-mock_detector = MockDetector("detector", mock_detector_info)
+    def read_configuration(self) -> dict[str, Reading[Any]]:
+        return {
+            "step_egu": {
+                "value": self.step_egu,
+                "timestamp": 0.0,
+            }
+        }
 
 
 class MockController(PPresenter):
+    """Mock controller/presenter."""
+
     sigBar = Signal()
     sigNewPlan = Signal(object)
 
     def __init__(
         self,
-        info: MockControllerInfo,
-        models: Mapping[str, PModel],
+        devices: Mapping[str, PDevice],
         virtual_bus: VirtualBus,
+        /,
+        **kwargs: Any,
     ) -> None:
-        self.models = models
-        self.info = info
-        self.engine = RunEngine({})
+        self.devices = devices
         self.virtual_bus = virtual_bus
+        self.engine = RunEngine({})
         self.plans: list[partial[MsgGenerator[Any]]] = []
 
         def mock_plan_no_device() -> MsgGenerator[Any]:
             yield from [open_run(), close_run()]
 
-        def mock_plan_device(
-            det: ReadableModel, mot: SettableModel
-        ) -> MsgGenerator[Any]:
-            yield from open_run()
-            yield from read(det)
-            yield from rel_set(mot, 1)
-            yield from close_run()
-
         self.plans.append(partial(mock_plan_no_device))
-        self.plans.append(partial(mock_plan_device, mock_detector, mock_motor))
 
     def registration_phase(self) -> None: ...
 
     def connection_phase(self) -> None: ...
 
     def shutdown(self) -> None: ...
+
+
+mock_detector = MockDetector("detector", sensor_size=(1024, 1024))
+mock_motor = MockMotor("motor", step_egu="\u03bcm", axes=["X", "Y", "Z"])

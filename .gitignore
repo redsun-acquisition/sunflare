@@ -119,3 +119,6 @@ wheelhouse/
 
 # local versioning doc folders
 docs_build/
+
+# model agent files
+.claude/

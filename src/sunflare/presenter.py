@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, NamedTuple, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from sunflare.device import PDevice
     from sunflare.virtual import VirtualBus
 
-__all__ = ["PPresenter", "Connection", "Presenter"]
+__all__ = ["PPresenter", "Presenter"]
 
 
 @runtime_checkable
@@ -31,25 +31,6 @@ class PPresenter(Protocol):  # pragma: no cover
 
     virtual_bus: VirtualBus
     devices: Mapping[str, PDevice]
-
-
-class Connection(NamedTuple):
-    """Connection tuple.
-
-    Provides a type-hinted helper
-    for describing a connection between
-    a virtual bus signal and a local slot.
-
-    Attributes
-    ----------
-    signal : ``str``
-        Signal name.
-    slot : ``Callable[..., None]``
-        Slot to connect to.
-    """
-
-    signal: str
-    slot: Callable[..., None]
 
 
 class Presenter(PPresenter, ABC):

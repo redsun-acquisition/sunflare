@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from abc import abstractmethod
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from typing_extensions import Protocol, runtime_checkable
+if TYPE_CHECKING:
+    from dependency_injector.containers import DynamicContainer
 
 
+@runtime_checkable
 class HasShutdown(Protocol):  # pragma: no cover
     """Protocol marking your class as capable of shutting down.
 
@@ -23,13 +28,59 @@ class HasShutdown(Protocol):  # pragma: no cover
 
 
 @runtime_checkable
+class IsProvider(Protocol):  # pragma: no cover
+    """Protocol marking a class as a provider of dependencies.
+
+    !!! tip
+        This protocol is optional and only available for
+        ``Presenters``. ``Widgets`` and ``Devices`` will not
+        be affected by this protocol.
+    """
+
+    @abstractmethod
+    def register_providers(self, container: DynamicContainer) -> None:
+        """Register providers in the dependency injection container.
+
+        This method is invoked after the presenter is built,
+        allowing to register providers in the DI container before any view is built.
+
+        !!! tip
+            This protocol is optional and only available for ``Presenters``.
+            ``Views`` and ``Devices`` will not be affected by this protocol.
+        """
+        ...
+
+
+@runtime_checkable
+class IsInjectable(Protocol):  # pragma: no cover
+    """Protocol marking a class as injectable with dependencies from the container.
+
+    !!! tip
+        This protocol is optional and only available for ``Views``.
+        ``Presenters`` and ``Devices`` will not be affected by this protocol.
+    """
+
+    @abstractmethod
+    def inject_dependencies(self, container: DynamicContainer) -> None:
+        """Inject dependencies from the container.
+
+        This method is invoked after the view is built object is built,
+        allowing to inject dependencies from the container
+        in order to customize the view after its construction.
+        """
+        ...
+
+
+@runtime_checkable
 class VirtualAware(Protocol):  # pragma: no cover
     """Protocol marking a class as aware of the virtual bus and able to connect to it.
 
     !!! tip
-        This protocol is optional and only usable with
-        ``Presenters`` and ``Views``. ``Devices``
-        will not be affected by this protocol.
+        This protocol is optional and only usable with ``Presenters`` and ``Views``.
+        ``Devices`` will not be affected by this protocol.
+
+    !!! note
+        In the future, this may be extended to support ``Devices`` as well.
     """
 
     @abstractmethod
