@@ -2261,7 +2261,6 @@ wheels = [
 name = "sunflare"
 source = { editable = "." }
 dependencies = [
-    { name = "attrs" },
     { name = "bluesky" },
     { name = "dependency-injector" },
     { name = "psygnal" },
@@ -2283,6 +2282,7 @@ pyside = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "attrs" },
     { name = "griffe-fieldz" },
     { name = "mike" },
     { name = "mkdocs-material" },
@@ -2308,7 +2308,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "attrs", specifier = ">=25.4.0" },
     { name = "bluesky", specifier = ">=1.14.6" },
     { name = "dependency-injector", specifier = ">=4.48.3" },
     { name = "magicgui", marker = "extra == 'pyqt'", specifier = ">=0.10.1" },
@@ -2325,6 +2324,7 @@ provides-extras = ["pyqt", "pyside"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "attrs", specifier = ">=25.4.0" },
     { name = "griffe-fieldz", specifier = ">=0.4.0" },
     { name = "mike", specifier = ">=2.1.3" },
     { name = "mkdocs-material", specifier = ">=9.7.1" },

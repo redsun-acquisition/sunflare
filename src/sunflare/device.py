@@ -37,11 +37,14 @@ class Device(PDevice, abc.ABC):
     ----------
     name : ``str``
         Name of the device. Serves as a unique identifier for the object created from it.
+    kwargs : ``Any``, optional
+        Additional keyword arguments for device subclasses.
     """
 
     @abc.abstractmethod
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, /, **kwargs: Any) -> None:
         self._name = name
+        super().__init__(**kwargs)
 
     @abc.abstractmethod
     def describe_configuration(self) -> dict[str, Descriptor]:

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from typing import Any
 
-    from sunflare.device import PDevice
+    from sunflare.device import Device
     from sunflare.virtual import VirtualBus
 
 __all__ = ["PPresenter", "Presenter"]
@@ -23,14 +23,14 @@ class PPresenter(Protocol):  # pragma: no cover
 
     Attributes
     ----------
-    devices : Mapping[str, PDevice]
+    devices : Mapping[str, Device]
         Reference to the devices used in the presenter.
     virtual_bus : VirtualBus
         Reference to the virtual bus.
     """
 
     virtual_bus: VirtualBus
-    devices: Mapping[str, PDevice]
+    devices: Mapping[str, Device]
 
 
 class Presenter(PPresenter, ABC):
@@ -54,7 +54,8 @@ class Presenter(PPresenter, ABC):
 
     @abstractmethod
     def __init__(
-        self, devices: Mapping[str, PDevice], virtual_bus: VirtualBus, /, **kwargs: Any
+        self, devices: Mapping[str, Device], virtual_bus: VirtualBus, /, **kwargs: Any
     ) -> None:
         self.devices = devices
         self.virtual_bus = virtual_bus
+        super().__init__(**kwargs)

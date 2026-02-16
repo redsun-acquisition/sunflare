@@ -16,10 +16,16 @@ if TYPE_CHECKING:
 class QtView(QWidget):
     """Abstract base Qt widget implementing the View protocol.
 
-    ``QtView`` does not directly inherit from :class:`~sunflare.view.View`
-    to avoid MRO conflicts with Qt's cooperative ``__init__`` chain.
-    It is registered as a virtual subclass of ``View`` so that
-    ``isinstance(qt_view, View)`` returns ``True``.
+    Parameters
+    ----------
+    virtual_bus : VirtualBus
+        Main virtual bus for the Redsun instance.
+    kwargs : ``Any``, optional
+        Additional keyword arguments for view subclasses.
+
+    !!! note
+        For `QtView` subclasses, `kwargs` are kept for consistency,
+        but they're not passed to `super().__init__` since `QWidget` does not accept them.
     """
 
     @abstractmethod

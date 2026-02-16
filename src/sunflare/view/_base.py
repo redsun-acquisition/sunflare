@@ -25,12 +25,15 @@ class PView(Protocol):
 class View(PView, ABC):
     """Base view class.
 
-    Classes that do not directly inherit from it
-    will need to match the ``__init__`` signature
-    to ensure that at runtime Redsun registers
-    them as valid view components.
+    Parameters
+    ----------
+    virtual_bus : VirtualBus
+        Main virtual bus for the Redsun instance.
+    kwargs : ``Any``, optional
+        Additional keyword arguments for view subclasses.
     """
 
     @abstractmethod
     def __init__(self, virtual_bus: VirtualBus, /, **kwargs: Any) -> None:
         self.virtual_bus = virtual_bus
+        super().__init__(**kwargs)
