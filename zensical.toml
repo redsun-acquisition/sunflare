@@ -8,10 +8,8 @@ site_dir = "site"
 repo_url = "https://github.com/redsun-acquisition/sunflare"
 repo_name = "redsun-acquisition/sunflare"
 
-# Custom CSS
 extra_css = ["stylesheets/custom.css"]
 
-# Theme configuration
 [project.theme]
 variant = "modern"
 features = [
@@ -29,11 +27,9 @@ features = [
     "toc.follow",
 ]
 
-# Icon configuration
 [project.theme.icon]
 repo = "fontawesome/brands/github"
 
-# Palette configuration (theme switching)
 [[project.theme.palette]]
 media = "(prefers-color-scheme)"
 toggle = { icon = "material/brightness-auto", name = "Switch to light mode" }
@@ -52,7 +48,6 @@ primary = "red"
 accent = "red"
 toggle = { icon = "material/brightness-4", name = "Switch to system preference" }
 
-# Navigation structure
 nav = [
     { "Home" = "index.md" },
     { "Tutorials" = [
@@ -83,12 +78,9 @@ nav = [
     ]},
 ]
 
-# Plugins
 [project.plugins.search]
 [project.plugins.autorefs]
 [project.plugins.mkdocstrings]
-
-# Python handler configuration
 [project.plugins.mkdocstrings.handlers.python]
 paths = ["src/sunflare"]
 inventories = [
@@ -113,7 +105,6 @@ filters = ["!^_", "!^__"]
 [project.plugins.mkdocstrings.handlers.python.options.extensions]
 griffe_fieldz = { add_fields_to = "docstring-attributes", include_inherited = false, include_private = false, remove_fields_from_members = true, strip_annotated = true }
 
-# Markdown Extensions
 [project.markdown_extensions]
 abbr = {}
 admonition = {}
@@ -136,7 +127,6 @@ smart_enable = "all"
 [project.markdown_extensions.pymdownx.caret]
 [project.markdown_extensions.pymdownx.details]
 
-# Emoji configuration
 [project.markdown_extensions.pymdownx.emoji]
 emoji_index = "zensical.extensions.emoji.twemoji"
 emoji_generator = "zensical.extensions.emoji.to_svg"
@@ -151,7 +141,6 @@ pygments_lang_class = true
 [project.markdown_extensions.pymdownx.mark]
 [project.markdown_extensions.pymdownx.smartsymbols]
 
-# Mermaid diagram support
 [project.markdown_extensions.pymdownx.superfences]
 custom_fences = [
     { name = "mermaid", class = "mermaid" }
@@ -165,7 +154,6 @@ custom_checkbox = true
 
 [project.markdown_extensions.pymdownx.tilde]
 
-# Extra configuration - Social links (SINTASSI CORRETTA)
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/redsun-acquisition/sunflare"

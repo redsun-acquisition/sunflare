@@ -23,6 +23,8 @@ CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
 SignalCache: TypeAlias = dict[str, SignalInstance]
 """Cache type for signals of a specific class."""
 
+__all__ = ["Signal", "VirtualBus", "CallbackType", "SignalCache"]
+
 
 class VirtualBus(Loggable):
     """Data exchange layer.
