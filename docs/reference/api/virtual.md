@@ -1,3 +1,0 @@
-# `sunflare.virtual`
-
-::: sunflare.virtual

@@ -5,23 +5,20 @@
 In Python, parent classes can provide *abstract methods*, functions without actual executable code but instead serving as a customizable template.
 
 ```mermaid
-:config: { "theme": "neutral", "fontFamily": "Courier New" }
-:align: center
+classDiagram
+    class Animal{
+        +int paws
+        fly()*void
+        talk()*void
+        how_many_paws() int
+    }
+    class Duck {
+        fly() void
+        talk() void
+    }
 
-    classDiagram
-        class Animal{
-            +int paws
-            fly()*void
-            talk()*void
-            how_many_paws() int
-        }
-        class Duck {
-            fly() void
-            talk() void
-        }
-
-        Animal <|-- Duck : inherits from
-        note for Animal "Duck inherits from Animal"
+    Animal <|-- Duck : inherits from
+    note for Animal "Duck inherits from Animal"
 ```
 
 The diagram shows an example this: `Animal` provides an interface with both _abstract_ and normal methods, while `Duck` provides an implementation for the _abstract_ methods. In Python, this would be equivalent to:

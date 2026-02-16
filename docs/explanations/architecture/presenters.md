@@ -2,7 +2,7 @@
 
 `Presenters` represent the execution logic of your system.
 
-Where `Models` are "workers" (as they instruct your device to perform a certain task), `Presenters` **can be** "orchestrators", in the sense that they define the sequence of actions that workers must perform through Bluesky [plans].
+Where `Devices` are "workers" (as they instruct your device to perform a certain task), `Presenters` **can be** "orchestrators", in the sense that they define the sequence of actions that workers must perform through Bluesky [plans].
 
 We highlight "**can be**" because `Presenters` are not limited to that:
 
@@ -13,13 +13,14 @@ We highlight "**can be**" because `Presenters` are not limited to that:
 
 `Presenters` are meant to communicate between each other via the [`VirtualBus`][sunflare.virtual.VirtualBus], which takes care of redirecting information (commands and/or documents) to the appropriate destination (whether it is another `Presenter` or a `View`).
 
-All controllers must implement the [`PPresenter`][sunflare.presenter.PPresenter] interface to be recognized by Redsun.
+All presenters must implement the [`PPresenter`][sunflare.presenter.PPresenter] interface to be recognized by Redsun.
 
-The [`PPresenter`][sunflare.presenter.PPresenter] requires three things in its initialization:
+The [`PPresenter`][sunflare.presenter.PPresenter] requires two things in its initialization:
 
-- a reference to a subclass of [`PresenterInfo`][sunflare.config.PresenterInfo], to provide additional parameters;
-- a `Mapping[str, PModel]` of the allocated models in the session;
-- a reference to the [`VirtualBus`][sunflare.virtual.VirtualBus] in order to provide a communication point with other controllers and widgets.
+- a `Mapping[str, Device]` of the allocated devices in the session;
+- a reference to the [`VirtualBus`][sunflare.virtual.VirtualBus] in order to provide a communication point with other presenters and widgets.
+
+Additional parameters can be passed via keyword arguments, which are parsed from the session configuration file.
 
 [plans]: https://blueskyproject.io/bluesky/main/plans.html
 [documents]: https://blueskyproject.io/bluesky/main/documents.html

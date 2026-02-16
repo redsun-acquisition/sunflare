@@ -1,5 +1,4 @@
 import time
-import pytest
 from bluesky.protocols import Descriptor, Reading
 from typing import Any
 from sunflare.device import Device, PDevice

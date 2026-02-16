@@ -1,6 +1,6 @@
 # Virtual bus
 
-The [`VirtualBus`][sunflare.virtual.VirtualBus] is a class encapsulating different communication mechanism to allow different controllers and widget to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the [`psygnal`](https://psygnal.readthedocs.io/en/stable/) package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.
+The [`VirtualBus`][sunflare.virtual.VirtualBus] is a class encapsulating different communication mechanism to allow different presenters and widgets to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the [`psygnal`](https://psygnal.readthedocs.io/en/stable/) package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.
 
 ## Signal connection
 
@@ -66,7 +66,7 @@ class Receiver:
 
 With this modifications, `Emitter` has informed the `VirtualBus` of the existence of `sigSender`, and `Receiver` can retrieve `sigSender` from `Emitter` to connect the signal to its slot `receiver_slot`.
 
-This enforces a specific call order: all `Emitter`-like object must call the `registration_phase` method before any `Receiver`-like´object can call the `connection_phase` method, otherwise there will be a mismatch.
+This enforces a specific call order: all `Emitter`-like object must call the `registration_phase` method before any `Receiver`-like object can call the `connection_phase` method, otherwise there will be a mismatch.
 
 !!! note
     If a `Receiver`-like object tries to connect to a non-defined signal, your application will not crash, but there will be simply no connection enstablished with your slots.

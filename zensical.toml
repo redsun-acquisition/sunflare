@@ -1,0 +1,175 @@
+[project]
+site_name = "sunflare"
+site_url = "https://redsun-acquisition.github.io/sunflare/"
+site_description = "Redsun component toolkit"
+site_author = "Jacopo Abramo"
+docs_dir = "docs"
+site_dir = "site"
+repo_url = "https://github.com/redsun-acquisition/sunflare"
+repo_name = "redsun-acquisition/sunflare"
+
+# Custom CSS
+extra_css = ["stylesheets/custom.css"]
+
+# Theme configuration
+[project.theme]
+variant = "modern"
+features = [
+    "navigation.tabs",
+    "navigation.sections",
+    "navigation.indexes",
+    "navigation.top",
+    "navigation.footer",
+    "search.suggest",
+    "search.highlight",
+    "search.share",
+    "content.code.copy",
+    "content.code.annotate",
+    "content.tabs.link",
+    "toc.follow",
+]
+
+# Icon configuration
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+# Palette configuration (theme switching)
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle = { icon = "material/brightness-auto", name = "Switch to light mode" }
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+primary = "red"
+accent = "red"
+toggle = { icon = "material/brightness-7", name = "Switch to dark mode" }
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+primary = "red"
+accent = "red"
+toggle = { icon = "material/brightness-4", name = "Switch to system preference" }
+
+# Navigation structure
+nav = [
+    { "Home" = "index.md" },
+    { "Tutorials" = [
+        "tutorials/index.md",
+        { "OOP Crash Course" = [
+            "tutorials/oop-crash-course/index.md",
+            { "Inheritance" = "tutorials/oop-crash-course/inheritance.md" },
+        ]},
+    ]},
+    { "How-to guides" = [
+        "how-to/index.md",
+        { "Installation" = "how-to/installation.md" },
+        { "Build documentation" = "how-to/build-docs.md" },
+        { "Run tests" = "how-to/run-tests.md" },
+    ]},
+    { "Reference" = [
+        "reference/index.md"
+    ]},
+    { "Explanations" = [
+        "explanation/index.md",
+        { "Statement of need" = "explanation/statement.md" },
+        { "Architecture" = [
+            "explanation/architecture/index.md",
+            { "Devices" = "explanation/architecture/devices.md" },
+            { "Presenters" = "explanation/architecture/presenters.md" },
+            { "Virtual bus" = "explanation/architecture/virtual.md" },
+        ]},
+    ]},
+]
+
+# Plugins
+[project.plugins.search]
+[project.plugins.autorefs]
+[project.plugins.mkdocstrings]
+
+# Python handler configuration
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["src/sunflare"]
+inventories = [
+    "https://psygnal.readthedocs.io/en/latest/objects.inv",
+    "https://docs.python.org/3/objects.inv",
+    "https://blueskyproject.io/bluesky/main/objects.inv"
+]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "numpy"
+show_source = true
+show_root_heading = false
+show_root_full_path = false
+show_signature_annotations = true
+separate_signature = true
+members_order = "source"
+group_by_category = true
+show_symbol_type_heading = true
+show_symbol_type_toc = true
+filters = ["!^_", "!^__"]
+
+[project.plugins.mkdocstrings.handlers.python.options.extensions]
+griffe_fieldz = { add_fields_to = "docstring-attributes", include_inherited = false, include_private = false, remove_fields_from_members = true, strip_annotated = true }
+
+# Markdown Extensions
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+tables = {}
+
+[project.markdown_extensions.toc]
+permalink = true
+toc_depth = 3
+
+[project.markdown_extensions.pymdownx.arithmatex]
+generic = true
+
+[project.markdown_extensions.pymdownx.betterem]
+smart_enable = "all"
+
+[project.markdown_extensions.pymdownx.caret]
+[project.markdown_extensions.pymdownx.details]
+
+# Emoji configuration
+[project.markdown_extensions.pymdownx.emoji]
+emoji_index = "zensical.extensions.emoji.twemoji"
+emoji_generator = "zensical.extensions.emoji.to_svg"
+
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+line_spans = "__span"
+pygments_lang_class = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.keys]
+[project.markdown_extensions.pymdownx.mark]
+[project.markdown_extensions.pymdownx.smartsymbols]
+
+# Mermaid diagram support
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid" }
+]
+
+[project.markdown_extensions.pymdownx.tabbed]
+alternate_style = true
+
+[project.markdown_extensions.pymdownx.tasklist]
+custom_checkbox = true
+
+[project.markdown_extensions.pymdownx.tilde]
+
+# Extra configuration - Social links (SINTASSI CORRETTA)
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/redsun-acquisition/sunflare"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/sunflare/"

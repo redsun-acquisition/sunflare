@@ -17,6 +17,7 @@ Dates are specified in the format `DD-MM-YYYY`.
   - Exception to these are the `name` and `virtual_bus` keyword
     - `name` is used to uniquely identify each device
     - `virtual_bus` is provided to the `Presenter` and `View` layers when a container is built
+- Switch documentation to use `zensical`
 
 ## [0.8.0] - 21-12-2025
 

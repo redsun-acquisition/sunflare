@@ -34,7 +34,7 @@ class IsProvider(Protocol):  # pragma: no cover
     !!! tip
         This protocol is optional and only available for
         ``Presenters``. ``Widgets`` and ``Devices`` will not
-        be affected by this protocol.
+        be affected by it.
     """
 
     @abstractmethod
@@ -46,7 +46,7 @@ class IsProvider(Protocol):  # pragma: no cover
 
         !!! tip
             This protocol is optional and only available for ``Presenters``.
-            ``Views`` and ``Devices`` will not be affected by this protocol.
+            ``Views`` and ``Devices`` will not be affected by it.
         """
         ...
 
@@ -57,7 +57,7 @@ class IsInjectable(Protocol):  # pragma: no cover
 
     !!! tip
         This protocol is optional and only available for ``Views``.
-        ``Presenters`` and ``Devices`` will not be affected by this protocol.
+        ``Presenters`` and ``Devices`` will not be affected by it.
     """
 
     @abstractmethod
@@ -77,7 +77,7 @@ class VirtualAware(Protocol):  # pragma: no cover
 
     !!! tip
         This protocol is optional and only usable with ``Presenters`` and ``Views``.
-        ``Devices`` will not be affected by this protocol.
+        ``Devices`` will not be affected by it.
 
     !!! note
         In the future, this may be extended to support ``Devices`` as well.

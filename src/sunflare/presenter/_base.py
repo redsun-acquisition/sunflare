@@ -23,7 +23,7 @@ class PPresenter(Protocol):  # pragma: no cover
 
     Attributes
     ----------
-    devices : Mapping[str, Device]
+    devices : Mapping[str, sunflare.device.Device]
         Reference to the devices used in the presenter.
     virtual_bus : VirtualBus
         Reference to the virtual bus.
@@ -43,11 +43,11 @@ class Presenter(PPresenter, ABC):
 
     Parameters
     ----------
-    devices : ``Mapping[str, PDevice]``
+    devices : Mapping[str, sunflare.device.Device]
         Reference to the devices used in the presenter.
-    virtual_bus : `sunflare.virtual.VirtualBus`
+    virtual_bus : sunflare.virtual.VirtualBus
         Reference to the virtual bus.
-    kwargs : ``Any``, optional
+    kwargs : Any, optional
         Additional keyword arguments for presenter subclasses.
         These are parsed from the session configuration file.
     """

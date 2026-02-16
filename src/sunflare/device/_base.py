@@ -8,23 +8,10 @@ from bluesky.protocols import Configurable, HasName, HasParent
 if TYPE_CHECKING:
     from bluesky.protocols import Descriptor, Reading
 
-__all__ = ["PDevice", "Device"]
-
 
 @runtime_checkable
 class PDevice(HasName, HasParent, Configurable[Any], Protocol):  # pragma: no cover
-    """Minimal required protocol for a recognizable device in Redsun.
-
-    Exposes the following Bluesky protocols:
-
-    - [`bluesky.protocols.HasName`]()
-    - [`bluesky.protocols.HasParent`]()
-    - [`bluesky.protocols.Configurable`]()
-
-    Devices should implement their configuration properties directly
-    and provide implementations of `describe_configuration()` and
-    `read_configuration()` methods as required by the Configurable protocol.
-    """
+    """Minimal required protocol for a recognizable device in Redsun."""
 
 
 class Device(PDevice, abc.ABC):
@@ -35,9 +22,9 @@ class Device(PDevice, abc.ABC):
 
     Parameters
     ----------
-    name : ``str``
+    name : str
         Name of the device. Serves as a unique identifier for the object created from it.
-    kwargs : ``Any``, optional
+    kwargs : Any, optional
         Additional keyword arguments for device subclasses.
     """
 
@@ -55,7 +42,7 @@ class Device(PDevice, abc.ABC):
 
         Returns
         -------
-        dict[``str``, `event_model.DataKey`]
+        dict[str, Descriptor]
             A dictionary with the description of each field of the device configuration.
         """
         raise NotImplementedError
@@ -69,8 +56,8 @@ class Device(PDevice, abc.ABC):
 
         Returns
         -------
-        dict[``str``, `bluesky.protocols.Descriptor`]
-            A dictionary with the description of each field of the device configuration.
+        dict[str, Reading[Any]]
+            A dictionary with the reading of each field of the device configuration.
         """
         raise NotImplementedError
 
@@ -81,5 +68,5 @@ class Device(PDevice, abc.ABC):
 
     @property
     def parent(self) -> None:
-        """Parent of the device. Always returns None for compliance with `HasParent` protocol."""
+        """Parent of the device. Always returns None for compliance with [`HasParent`]() protocol."""
         return None

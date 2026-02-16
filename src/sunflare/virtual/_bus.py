@@ -14,11 +14,6 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
-__all__ = [
-    "Signal",
-    "VirtualBus",
-]
-
 K = TypeVar("K")
 V = TypeVar("V")
 
@@ -99,7 +94,7 @@ class VirtualBus(Loggable):
 
         Parameters
         ----------
-        callback : ``CallbackType``
+        callback : CallbackType
             The document callback to register.
 
         Raises
