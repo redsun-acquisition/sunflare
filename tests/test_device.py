@@ -119,8 +119,8 @@ def test_complex_device() -> None:
 
     # Test describe_configuration
     descriptor = device.describe_configuration()
-    assert "sensor_size" in descriptor
-    assert "pixel_size" in descriptor
+    assert "sensor_size" in descriptor.keys()
+    assert "pixel_size" in descriptor.keys()
     assert descriptor["sensor_size"]["dtype"] == "array"
     assert descriptor["sensor_size"]["shape"] == [2]
     assert descriptor["pixel_size"]["units"] == "μm"
