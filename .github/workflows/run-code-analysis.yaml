@@ -18,14 +18,14 @@ jobs:
       - uses: actions/checkout@v6
       - uses: astral-sh/ruff-action@v3
         with:
-          version: 0.9.3
+          version: 0.14.14
           args: "check --fix"
           src: "src/sunflare"
 
   mypy-pyqt:
     strategy:
         matrix:
-            python-version: ["3.12"]
+            python-version: ["3.13"]
             frontend: ["pyside", "pyqt"]
             os: [ubuntu-latest]
 
