@@ -12,36 +12,36 @@
         <meta name="author" content="Jacopo Abramo">
       
       
-        <link rel="canonical" href="https://redsun-acquisition.github.io/sunflare/tutorials/oop-crash-course/">
+        <link rel="canonical" href="https://redsun-acquisition.github.io/sunflare/explanations/architecture/virtual/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../presenters/">
       
       
-        <link rel="next" href="./inheritance/">
+        <link rel="next" href="../../../how-to/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="zensical-0.0.23">
     
     
       
-        <title>O.O.P. crash course - sunflare</title>
+        <title>Virtual bus - sunflare</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.1e989742.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.1e989742.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
 
@@ -60,9 +60,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/custom.css">
+      <link rel="stylesheet" href="../../../stylesheets/custom.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#oop-crash-course" class="md-skip">
+        <a href="#virtual-bus" class="md-skip">
           Skip to content
         </a>
       
@@ -101,7 +101,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="sunflare" class="md-header__button md-logo" aria-label="sunflare" data-md-component="logo">
+    <a href="../../.." title="sunflare" class="md-header__button md-logo" aria-label="sunflare" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
@@ -121,7 +121,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              O.O.P. crash course
+              Virtual bus
             
           </span>
         </div>
@@ -215,7 +215,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   sunflare
@@ -229,11 +229,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../explanations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
           
   
   Explanations
@@ -252,7 +254,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../how-to/" class="md-tabs__link">
+        <a href="../../../how-to/" class="md-tabs__link">
           
   
   How to
@@ -271,7 +273,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../reference/" class="md-tabs__link">
+        <a href="../../../reference/" class="md-tabs__link">
           
   
   Reference
@@ -286,13 +288,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../tutorials/" class="md-tabs__link">
           
   
   Tutorials
@@ -325,7 +325,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="sunflare" class="md-nav__button md-logo" aria-label="sunflare" data-md-component="logo">
+    <a href="../../.." title="sunflare" class="md-nav__button md-logo" aria-label="sunflare" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
@@ -355,7 +355,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -379,6 +379,8 @@
       
   
   
+    
+  
   
   
     
@@ -396,20 +398,23 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../explanations/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -427,13 +432,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -453,7 +458,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/statement/" class="md-nav__link">
+      <a href="../../statement/" class="md-nav__link">
         
   
   
@@ -478,8 +483,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -496,18 +503,21 @@
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
             
   
   
@@ -525,7 +535,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -543,7 +553,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/architecture/devices/" class="md-nav__link">
+      <a href="../devices/" class="md-nav__link">
         
   
   
@@ -571,7 +581,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/architecture/in-process-device/" class="md-nav__link">
+      <a href="../in-process-device/" class="md-nav__link">
         
   
   
@@ -599,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/architecture/presenters/" class="md-nav__link">
+      <a href="../presenters/" class="md-nav__link">
         
   
   
@@ -624,10 +634,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../explanations/architecture/virtual/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Virtual bus
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
@@ -643,6 +680,38 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#signal-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal connection
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -699,7 +768,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../how-to/" class="md-nav__link ">
+            <a href="../../../how-to/" class="md-nav__link ">
               
   
   
@@ -743,7 +812,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../how-to/build-docs/" class="md-nav__link">
+      <a href="../../../how-to/build-docs/" class="md-nav__link">
         
   
   
@@ -771,7 +840,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../how-to/installation/" class="md-nav__link">
+      <a href="../../../how-to/installation/" class="md-nav__link">
         
   
   
@@ -799,7 +868,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../how-to/run-tests/" class="md-nav__link">
+      <a href="../../../how-to/run-tests/" class="md-nav__link">
         
   
   
@@ -861,7 +930,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../reference/" class="md-nav__link ">
+            <a href="../../../reference/" class="md-nav__link ">
               
   
   
@@ -905,7 +974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/api/" class="md-nav__link">
+      <a href="../../../reference/api/" class="md-nav__link">
         
   
   
@@ -933,7 +1002,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/changelog/" class="md-nav__link">
+      <a href="../../../reference/changelog/" class="md-nav__link">
         
   
   
@@ -965,8 +1034,6 @@
       
   
   
-    
-  
   
   
     
@@ -982,23 +1049,20 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../../tutorials/" class="md-nav__link ">
               
   
   
@@ -1016,13 +1080,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1039,8 +1103,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1058,21 +1120,18 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="././" class="md-nav__link md-nav__link--active">
+            <a href="../../../tutorials/oop-crash-course/" class="md-nav__link ">
               
   
   
@@ -1090,13 +1149,13 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_5_2" id="__nav_5_2_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1116,7 +1175,7 @@
   
   
     <li class="md-nav__item">
-      <a href="./inheritance/" class="md-nav__link">
+      <a href="../../../tutorials/oop-crash-course/inheritance/" class="md-nav__link">
         
   
   
@@ -1173,6 +1232,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#signal-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal connection
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1189,10 +1267,84 @@
   
 
 
-<h1 id="oop-crash-course">O.O.P. crash course<a class="headerlink" href="#oop-crash-course" title="Permanent link">&para;</a></h1>
-<p>This sections offers a <strong>very quick</strong> crash course in commonly used programming patterns in the <a href="https://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a> paradigm.</p>
-<p>Python is a multi-paradigm language (meaning that it leverages OOP but also other paradigms), but the Redsun ecosystem mostly focuses on this paradigm.</p>
-<p>We will use <em>Unified Modeling Language</em> (<a href="https://en.wikipedia.org/wiki/Unified_Modeling_Language">UML</a>) diagrams made with <a href="https://mermaid.js.org/">mermaid</a> for visual representation of these patterns.</p>
+<h1 id="virtual-bus">Virtual bus<a class="headerlink" href="#virtual-bus" title="Permanent link">&para;</a></h1>
+<p>The <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;VirtualBus&lt;/span&gt;" href="../../../reference/api/#sunflare.virtual.VirtualBus"><code>VirtualBus</code></a> is a class encapsulating different communication mechanism to allow different presenters and widgets to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the <a href="https://psygnal.readthedocs.io/en/stable/"><code>psygnal</code></a> package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.</p>
+<h2 id="signal-connection">Signal connection<a class="headerlink" href="#signal-connection" title="Permanent link">&para;</a></h2>
+<p>The <code>VirtualBus</code> allows to create a connection between objects living in different plugins.</p>
+<p>Suppose you have the following example:</p>
+<div class="language-python highlight"><span class="filename">emitter_plugin.py</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Emitter</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">sigSender</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="language-python highlight"><span class="filename">receiver_plugin.py</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Receiver</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">receiver_slot</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I received&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+</span></code></pre></div>
+<p>In a normal scenario where you have access to the codebase of both <code>Emitter</code> and <code>Receiver</code>, you would simply do the following:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">emitter</span> <span class="o">=</span> <span class="n">Emitter</span><span class="p">()</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">()</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">emitter</span><span class="o">.</span><span class="n">sigSender</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">receiver</span><span class="o">.</span><span class="n">receiver_slot</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">emitter</span><span class="o">.</span><span class="n">sigSender</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># prints &quot;I received 10&quot;</span>
+</span></code></pre></div>
+<p>Redsun operates by dinamically loading plugins, which means that <code>Emitter</code> and <code>Receiver</code> may come from different packages.</p>
+<p>The <code>VirtualBus</code> takes care of giving a common exposure and retrieval point between different plugins. The catch is that to be able to share a connection, <code>Emitter</code> and <code>Receiver</code> must be adapted to talk to the bus:</p>
+<div class="language-python highlight"><span class="filename">emitter_plugin.py</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sunflare.virtual</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualBus</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Emitter</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">sigSender</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_bus</span><span class="p">:</span> <span class="n">VirtualBus</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_bus</span> <span class="o">=</span> <span class="n">virtual_bus</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">registration_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_bus</span><span class="o">.</span><span class="n">register_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="language-python highlight"><span class="filename">receiver_plugin.py</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sunflare.virtual</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualBus</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Receiver</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">virtual_bus</span><span class="p">:</span> <span class="n">VirtualBus</span><span class="p">):</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_bus</span> <span class="o">=</span> <span class="n">virtual_bus</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">receiver_slot</span><span class="p">(</span><span class="n">param</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I received&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">connection_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_bus</span><span class="p">[</span><span class="s2">&quot;Emitter&quot;</span><span class="p">][</span><span class="s2">&quot;sigSender&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_slot</span><span class="p">)</span>
+</span></code></pre></div>
+<p>With this modifications, <code>Emitter</code> has informed the <code>VirtualBus</code> of the existence of <code>sigSender</code>, and <code>Receiver</code> can retrieve <code>sigSender</code> from <code>Emitter</code> to connect the signal to its slot <code>receiver_slot</code>.</p>
+<p>This enforces a specific call order: all <code>Emitter</code>-like object must call the <code>registration_phase</code> method before any <code>Receiver</code>-like object can call the <code>connection_phase</code> method, otherwise there will be a mismatch.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a <code>Receiver</code>-like object tries to connect to a non-defined signal, your application will not crash, but there will be simply no connection enstablished with your slots.</p>
+</div>
+<p>As a user, you only need to provide these two methods to ensure a safe connection. When Redsun is launched, it takes care of calling <code>registration_phase</code> and <code>connection_phase</code> in the correct order to ensure a safe connection.</p>
+<div class="admonition warning">
+<p class="admonition-title">Using Sunflare without Redsun</p>
+<p>If you're using Sunflare in a non-Redsun application, you'll have to:</p>
+<ul>
+<li>create an instance of <code>VirtualBus</code>;</li>
+<li>ensure <code>Emitter</code> objects call their <code>registration_phase</code> method before <code>Receiver</code> objects call their <code>connection_phase</code> method.</li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sunflare.virtual</span><span class="w"> </span><span class="kn">import</span> <span class="n">VirtualBus</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">bus</span> <span class="o">=</span> <span class="n">VirtualBus</span><span class="p">()</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">emitter</span> <span class="o">=</span> <span class="n">Emitter</span><span class="p">(</span><span class="n">bus</span><span class="p">)</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">receiver</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">bus</span><span class="p">)</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># Register signals first</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">emitter</span><span class="o">.</span><span class="n">registration_phase</span><span class="p">()</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="c1"># Then connect to them</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">receiver</span><span class="o">.</span><span class="n">connection_phase</span><span class="p">()</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="c1"># ... run your application</span>
+</span></code></pre></div>
+</div>
 
 
 
@@ -1232,7 +1384,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Tutorials">
+          <a href="../presenters/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Presenters">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
@@ -1242,20 +1394,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Tutorials
+                Presenters
               </div>
             </div>
           </a>
         
         
           
-          <a href="./inheritance/" class="md-footer__link md-footer__link--next" aria-label="Next: Inheritance">
+          <a href="../../../how-to/" class="md-footer__link md-footer__link--next" aria-label="Next: How-to guides">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Inheritance
+                How-to guides
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1320,10 +1472,10 @@
       
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.sections","navigation.indexes","navigation.top","navigation.footer","search.suggest","search.highlight","search.share","content.code.copy","content.code.annotate","content.tabs.link","toc.follow"],"search":"../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../..","features":["navigation.tabs","navigation.sections","navigation.indexes","navigation.top","navigation.footer","search.suggest","search.highlight","search.share","content.code.copy","content.code.annotate","content.tabs.link","toc.follow"],"search":"../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5fcf0de6.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.5fcf0de6.min.js"></script>
       
     
   </body>

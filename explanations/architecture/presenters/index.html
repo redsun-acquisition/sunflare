@@ -12,36 +12,36 @@
         <meta name="author" content="Jacopo Abramo">
       
       
-        <link rel="canonical" href="https://redsun-acquisition.github.io/sunflare/tutorials/oop-crash-course/">
+        <link rel="canonical" href="https://redsun-acquisition.github.io/sunflare/explanations/architecture/presenters/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../in-process-device/">
       
       
-        <link rel="next" href="./inheritance/">
+        <link rel="next" href="../virtual/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="zensical-0.0.23">
     
     
       
-        <title>O.O.P. crash course - sunflare</title>
+        <title>Presenters - sunflare</title>
       
     
     
       
         
       
-      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.1e989742.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.1e989742.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.dfe2e883.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.dfe2e883.min.css">
       
       
 
@@ -60,9 +60,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/custom.css">
+      <link rel="stylesheet" href="../../../stylesheets/custom.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -87,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#oop-crash-course" class="md-skip">
+        <a href="#presenters" class="md-skip">
           Skip to content
         </a>
       
@@ -101,7 +101,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="sunflare" class="md-header__button md-logo" aria-label="sunflare" data-md-component="logo">
+    <a href="../../.." title="sunflare" class="md-header__button md-logo" aria-label="sunflare" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
@@ -121,7 +121,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              O.O.P. crash course
+              Presenters
             
           </span>
         </div>
@@ -215,7 +215,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   sunflare
@@ -229,11 +229,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../explanations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
           
   
   Explanations
@@ -252,7 +254,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../how-to/" class="md-tabs__link">
+        <a href="../../../how-to/" class="md-tabs__link">
           
   
   How to
@@ -271,7 +273,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../reference/" class="md-tabs__link">
+        <a href="../../../reference/" class="md-tabs__link">
           
   
   Reference
@@ -286,13 +288,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../tutorials/" class="md-tabs__link">
           
   
   Tutorials
@@ -325,7 +325,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="sunflare" class="md-nav__button md-logo" aria-label="sunflare" data-md-component="logo">
+    <a href="../../.." title="sunflare" class="md-nav__button md-logo" aria-label="sunflare" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
@@ -355,7 +355,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -379,6 +379,8 @@
       
   
   
+    
+  
   
   
     
@@ -396,20 +398,23 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../explanations/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -427,13 +432,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -453,7 +458,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/statement/" class="md-nav__link">
+      <a href="../../statement/" class="md-nav__link">
         
   
   
@@ -478,8 +483,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -496,18 +503,21 @@
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
             
   
   
@@ -525,7 +535,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -543,7 +553,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/architecture/devices/" class="md-nav__link">
+      <a href="../devices/" class="md-nav__link">
         
   
   
@@ -571,7 +581,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/architecture/in-process-device/" class="md-nav__link">
+      <a href="../in-process-device/" class="md-nav__link">
         
   
   
@@ -596,10 +606,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../explanations/architecture/presenters/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
@@ -615,6 +634,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -627,7 +647,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../explanations/architecture/virtual/" class="md-nav__link">
+      <a href="../virtual/" class="md-nav__link">
         
   
   
@@ -699,7 +719,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../how-to/" class="md-nav__link ">
+            <a href="../../../how-to/" class="md-nav__link ">
               
   
   
@@ -743,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../how-to/build-docs/" class="md-nav__link">
+      <a href="../../../how-to/build-docs/" class="md-nav__link">
         
   
   
@@ -771,7 +791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../how-to/installation/" class="md-nav__link">
+      <a href="../../../how-to/installation/" class="md-nav__link">
         
   
   
@@ -799,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../how-to/run-tests/" class="md-nav__link">
+      <a href="../../../how-to/run-tests/" class="md-nav__link">
         
   
   
@@ -861,7 +881,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../reference/" class="md-nav__link ">
+            <a href="../../../reference/" class="md-nav__link ">
               
   
   
@@ -905,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/api/" class="md-nav__link">
+      <a href="../../../reference/api/" class="md-nav__link">
         
   
   
@@ -933,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/changelog/" class="md-nav__link">
+      <a href="../../../reference/changelog/" class="md-nav__link">
         
   
   
@@ -965,8 +985,6 @@
       
   
   
-    
-  
   
   
     
@@ -982,23 +1000,20 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../../tutorials/" class="md-nav__link ">
               
   
   
@@ -1016,13 +1031,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1039,8 +1054,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1058,21 +1071,18 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="././" class="md-nav__link md-nav__link--active">
+            <a href="../../../tutorials/oop-crash-course/" class="md-nav__link ">
               
   
   
@@ -1090,13 +1100,13 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_5_2" id="__nav_5_2_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1116,7 +1126,7 @@
   
   
     <li class="md-nav__item">
-      <a href="./inheritance/" class="md-nav__link">
+      <a href="../../../tutorials/oop-crash-course/inheritance/" class="md-nav__link">
         
   
   
@@ -1189,10 +1199,24 @@
   
 
 
-<h1 id="oop-crash-course">O.O.P. crash course<a class="headerlink" href="#oop-crash-course" title="Permanent link">&para;</a></h1>
-<p>This sections offers a <strong>very quick</strong> crash course in commonly used programming patterns in the <a href="https://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a> paradigm.</p>
-<p>Python is a multi-paradigm language (meaning that it leverages OOP but also other paradigms), but the Redsun ecosystem mostly focuses on this paradigm.</p>
-<p>We will use <em>Unified Modeling Language</em> (<a href="https://en.wikipedia.org/wiki/Unified_Modeling_Language">UML</a>) diagrams made with <a href="https://mermaid.js.org/">mermaid</a> for visual representation of these patterns.</p>
+<h1 id="presenters">Presenters<a class="headerlink" href="#presenters" title="Permanent link">&para;</a></h1>
+<p><code>Presenters</code> represent the execution logic of your system.</p>
+<p>Where <code>Devices</code> are "workers" (as they instruct your device to perform a certain task), <code>Presenters</code> <strong>can be</strong> "orchestrators", in the sense that they define the sequence of actions that workers must perform through Bluesky <a href="https://blueskyproject.io/bluesky/main/plans.html">plans</a>.</p>
+<p>We highlight "<strong>can be</strong>" because <code>Presenters</code> are not limited to that:</p>
+<ul>
+<li>they can consume Bluesky <a href="https://blueskyproject.io/bluesky/main/documents.html">documents</a> for on-the-fly processing, intermediate storage or redirection to a GUI (i.e. computing the FFT of an image and sending it to the GUI for display);</li>
+<li>they can provide manual control for device task execution and/or configuration;</li>
+<li>in comparison to plans (which represents an experimental procedure), one may wish to - for example - manually move a motor stage from the GUI, or change the exposure time of a camera; the <code>Presenter</code> in this case acts as a middle-man between the GUI and the device, directly calling Bluesky methods and bypassing the <code>RunEngine</code>;</li>
+<li>they can act as communication points with external applications to trigger actions via a custom communication protocol (or wait for possible commands incoming by said applications).</li>
+</ul>
+<p><code>Presenters</code> are meant to communicate between each other via the <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;VirtualBus&lt;/span&gt;" href="../../../reference/api/#sunflare.virtual.VirtualBus"><code>VirtualBus</code></a>, which takes care of redirecting information (commands and/or documents) to the appropriate destination (whether it is another <code>Presenter</code> or a <code>View</code>).</p>
+<p>All presenters must implement the <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;PPresenter&lt;/span&gt;" href="../../../reference/api/#sunflare.presenter.PPresenter"><code>PPresenter</code></a> interface to be recognized by Redsun.</p>
+<p>The <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;PPresenter&lt;/span&gt;" href="../../../reference/api/#sunflare.presenter.PPresenter"><code>PPresenter</code></a> requires two things in its initialization:</p>
+<ul>
+<li>a <code>Mapping[str, Device]</code> of the allocated devices in the session;</li>
+<li>a reference to the <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;VirtualBus&lt;/span&gt;" href="../../../reference/api/#sunflare.virtual.VirtualBus"><code>VirtualBus</code></a> in order to provide a communication point with other presenters and widgets.</li>
+</ul>
+<p>Additional parameters can be passed via keyword arguments, which are parsed from the session configuration file.</p>
 
 
 
@@ -1232,7 +1256,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Tutorials">
+          <a href="../in-process-device/" class="md-footer__link md-footer__link--prev" aria-label="Previous: In-process devices">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
@@ -1242,20 +1266,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Tutorials
+                In-process devices
               </div>
             </div>
           </a>
         
         
           
-          <a href="./inheritance/" class="md-footer__link md-footer__link--next" aria-label="Next: Inheritance">
+          <a href="../virtual/" class="md-footer__link md-footer__link--next" aria-label="Next: Virtual bus">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Inheritance
+                Virtual bus
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1320,10 +1344,10 @@
       
       
       
-      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.sections","navigation.indexes","navigation.top","navigation.footer","search.suggest","search.highlight","search.share","content.code.copy","content.code.annotate","content.tabs.link","toc.follow"],"search":"../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../..","features":["navigation.tabs","navigation.sections","navigation.indexes","navigation.top","navigation.footer","search.suggest","search.highlight","search.share","content.code.copy","content.code.annotate","content.tabs.link","toc.follow"],"search":"../../../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5fcf0de6.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.5fcf0de6.min.js"></script>
       
     
   </body>
