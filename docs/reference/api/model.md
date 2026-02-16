@@ -1,3 +1,3 @@
-# `sunflare.model` module
+# `sunflare.device` module
 
-::: sunflare.model
+::: sunflare.device

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## Unreleased
+
+### Changed
+
+- Fully reworked the package to remove the need of `config.py`
+- Renamed `Model` to `Device` for more idiomatic representation of said layer
+- All objects of all layers are now meant to be created using keyword-arguments parameters
+  - Exception to these are the `name` and `virtual_bus` keyword
+    - `name` is used to uniquely identify each device
+    - `virtual_bus` is provided to the `Presenter` and `View` layers when a container is built
+
 ## [0.8.0] - 21-12-2025
 
 ### Removed
