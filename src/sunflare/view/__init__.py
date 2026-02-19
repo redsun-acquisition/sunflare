@@ -2,7 +2,7 @@ from enum import Enum, unique
 
 from ._base import PView, View
 
-__all__ = ["PView", "View"]
+__all__ = ["PView", "View", "ViewPosition"]
 
 
 @unique
