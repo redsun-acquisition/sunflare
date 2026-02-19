@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 if TYPE_CHECKING:
     from typing import Any
 
+    from sunflare.view import ViewPosition
     from sunflare.virtual import VirtualBus
 
 
@@ -20,6 +21,11 @@ class PView(Protocol):
     """
 
     virtual_bus: VirtualBus
+
+    @property
+    @abstractmethod
+    def view_position(self) -> ViewPosition:
+        """Position of the view component in the main view of the UI."""
 
 
 class View(PView, ABC):
@@ -37,3 +43,8 @@ class View(PView, ABC):
     def __init__(self, virtual_bus: VirtualBus, /, **kwargs: Any) -> None:
         self.virtual_bus = virtual_bus
         super().__init__(**kwargs)
+
+    @property
+    @abstractmethod
+    def view_position(self) -> ViewPosition:
+        """Position of the view component in the main view of the UI."""

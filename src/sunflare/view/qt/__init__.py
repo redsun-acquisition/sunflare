@@ -10,6 +10,7 @@ from sunflare.view import View
 if TYPE_CHECKING:
     from typing import Any
 
+    from sunflare.view import ViewPosition
     from sunflare.virtual import VirtualBus
 
 
@@ -37,6 +38,11 @@ class QtView(QWidget):
     ) -> None:
         self.virtual_bus = virtual_bus
         super().__init__()
+
+    @property
+    @abstractmethod
+    def view_position(self) -> ViewPosition:
+        """Position of the view component in the main view of the UI."""
 
 
 # working with mixing QWidget with
