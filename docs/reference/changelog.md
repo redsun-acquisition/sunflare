@@ -7,9 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
-## Unreleased
+## [0.9.1] - 19-02-2026
 
-### [0.9.0] - 16-02-2025
+### Changed
+
+- Moved `ViewPositionTypes` (renamed to `ViewPosition`) from app layer to `sunflare.view`
+
+### Added
+
+- Added smoke tests for view layer
+
+### Fixed
+
+- Updated changelog format with missing fields of Keep a Changelog
+
+## [0.9.0] - 16-02-2026
+
+### Changed
 
 - Fully reworked the package to remove the need of `config.py`
 - Renamed `Model` to `Device` for more idiomatic representation of said layer
@@ -321,6 +335,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.9.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.6.3...v0.7.0
