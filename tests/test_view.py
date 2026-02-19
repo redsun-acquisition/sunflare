@@ -9,7 +9,7 @@ def test_qtview_subclassing() -> None:
 
     # PView is a data protocol (no methods);
     # QtView still defines "position" as abstract
-    # property, hence it'll fail;
+    # property, hence isinstance() will fail too...
     # we hope that this PView won't cause breakages...
     assert issubclass(QtView, View)
 
