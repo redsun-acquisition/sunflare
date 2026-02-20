@@ -652,7 +652,7 @@
   <span class="md-ellipsis">
     
   
-    Virtual bus
+    Virtual container
   
 
     
@@ -992,8 +992,6 @@
           
         
       
-        
-      
     
     
     
@@ -1028,11 +1026,6 @@
 
             </a>
             
-              
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
           </div>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
@@ -1046,111 +1039,6 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../tutorials/oop-crash-course/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Oop crash course
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Oop crash course
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/oop-crash-course/inheritance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inheritance
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
               
             
           </ul>
@@ -1198,25 +1086,25 @@
 
 
 <h1 id="statement-of-need">Statement of need<a class="headerlink" href="#statement-of-need" title="Permanent link">&para;</a></h1>
-<p>The goal of Sunflare is to provide shared and recognizable programming patterns accross the entire Redsun ecosystem.
-As Redsun heavily leverages the concept of plugins, there is a need to provide a clear representation and a shared communication channel between the plugins that in the end build the desired application.</p>
+<p>The goal of <code>sunflare</code> is to provide shared and recognizable programming patterns accross the entire <code>redsun</code> ecosystem.
+<code>redsun</code> heavily leverages the concept of components, and there is a need to provide a clear representation and a shared communication channel between the plugins that in the end build the desired application.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Framework structure</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block"></div>
 </div>
 </div>
 <pre class="mermaid"><code>graph LR
-    sunflare --&gt;|builds| plugins
+    sunflare --&gt;|builds| components
     sunflare --&gt;|builds| redsun
-    plugins --&gt;|used in| redsun</code></pre>
-<p>The diagram shows the relationship between Redsun, Sunflare and the custom plugins. Effectively, Redsun is nothing more than "glue" code that constructs your custom application. What it does is:</p>
+    components --&gt;|used in| redsun</code></pre>
+<p>The diagram shows the relationship between <code>redsun</code>, <code>sunflare</code> and the custom components. Effectively, <code>redsun</code> is nothing more than "glue" code that constructs your custom application. What it does is:</p>
 <ul>
-<li>retrieve the user plugins via <a href="https://packaging.python.org/en/latest/specifications/entry-points/">Python entry points</a>;</li>
-<li>build said plugins and catch any possible exception throw by them;</li>
-<li>build the final application and connecting all the plugins together.</li>
+<li>retrieve the user components via <a href="https://packaging.python.org/en/latest/specifications/entry-points/">Python entry points</a>;</li>
+<li>build these components and catch any possible exception throw by them;</li>
+<li>build the final application and connecting all the components together.</li>
 </ul>
-<p>This approach ensures that Sunflare can be reused as a standalone package to provide reusable code to create custom control interfaces for your device, which fit the Bluesky <a href="https://blueskyproject.io/bluesky/main/msg.html">message protocol</a> and <a href="https://blueskyproject.io/event-model/main/explanations/data-model.html">data model</a>.</p>
-<p>Furthermore, if you have an existing package for hardware control, <code>sunflare</code> can be used to create a wrapper for your classes which can then "talk" the Bluesky language.</p>
+<p>This approach ensures that <code>sunflare</code> can be reused as a standalone package to provide reusable code to create custom control interfaces for your device, which fit the <code>bluesky</code> <a href="https://blueskyproject.io/bluesky/main/msg.html">message protocol</a> and <a href="https://blueskyproject.io/event-model/main/explanations/data-model.html">data model</a>.</p>
+<p>Furthermore, if you have an existing package for hardware control, <code>sunflare</code> can be used to create a wrapper for your classes which can then "talk" the <code>bluesky</code> language.</p>
 
 
 
