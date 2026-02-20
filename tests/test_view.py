@@ -1,4 +1,4 @@
-from sunflare.virtual import VirtualContainer, IsInjectable
+from sunflare.virtual import VirtualContainer, IsInjectable, IsProvider
 from sunflare.view import View, ViewPosition, PView
 from sunflare.view.qt import QtView
 from qtpy import QtWidgets as QtW
@@ -27,6 +27,27 @@ def test_base_view(bus: VirtualContainer) -> None:
     assert issubclass(TestView, View)
     assert view.name == "my_view"
     assert view.view_position == ViewPosition.CENTER
+
+
+def test_presenter_is_provider(bus: VirtualContainer) -> None:
+    """Test that a presenter can optionally implement IsProvider."""
+
+    class ProviderView(QtView):
+        def __init__(
+            self,
+            name: str,
+        ) -> None:
+            super().__init__(name)
+
+        def register_providers(self, container: VirtualContainer) -> None:
+            pass  # would register DI providers here
+
+    app = QtW.QApplication.instance() or QtW.QApplication([])
+    assert app is not None
+
+    controller = ProviderView("view")
+    assert isinstance(controller, IsProvider)
+    controller.register_providers(bus)
 
 
 def test_view_is_injectable(bus: VirtualContainer) -> None:

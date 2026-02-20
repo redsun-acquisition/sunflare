@@ -2,7 +2,7 @@ import pytest
 from collections.abc import Mapping
 from sunflare.device import Device
 from sunflare.presenter import Presenter
-from sunflare.virtual import VirtualContainer, IsProvider
+from sunflare.virtual import VirtualContainer, IsProvider, IsInjectable
 
 
 @pytest.fixture
@@ -27,7 +27,9 @@ def test_base_presenter(devices: Mapping[str, Device]) -> None:
     assert controller.devices == devices
 
 
-def test_presenter_is_provider(devices: Mapping[str, Device], bus: VirtualContainer) -> None:
+def test_presenter_is_provider(
+    devices: Mapping[str, Device], bus: VirtualContainer
+) -> None:
     """Test that a presenter can optionally implement IsProvider."""
 
     class ProviderController(Presenter, IsProvider):
@@ -44,3 +46,24 @@ def test_presenter_is_provider(devices: Mapping[str, Device], bus: VirtualContai
     controller = ProviderController("ctrl", devices)
     assert isinstance(controller, IsProvider)
     controller.register_providers(bus)
+
+
+def test_presenter_is_injectable(
+    devices: Mapping[str, Device], bus: VirtualContainer
+) -> None:
+    """Test that a presenter can be registered as a provider in the virtual container."""
+
+    class InjectableController(Presenter):
+        def __init__(
+            self,
+            name: str,
+            devices: Mapping[str, Device],
+        ) -> None:
+            super().__init__(name, devices)
+
+        def inject_dependencies(self, container: VirtualContainer) -> None:
+            pass  # would inject dependencies here
+
+    controller = InjectableController("ctrl", devices)
+    assert isinstance(controller, Presenter)
+    assert isinstance(controller, IsInjectable)

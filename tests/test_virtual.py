@@ -88,7 +88,9 @@ def test_virtual_container_psygnal_connection(bus: VirtualContainer) -> None:
     second_owner.inject_dependencies(bus)
 
     # first owner can now connect to second owner's signal
-    bus.signals["SecondMockOwner"]["sigSecondSignal"].connect(first_owner.second_to_first)
+    bus.signals["SecondMockOwner"]["sigSecondSignal"].connect(
+        first_owner.second_to_first
+    )
 
     assert "FirstMockOwner" in bus.signals
     assert "SecondMockOwner" in bus.signals
