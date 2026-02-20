@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.10.1] - 20-02-2026
+
+### Fixed
+
+- `VirtualContainer.register_signals` now collects all signals into a single batch before calling `add_kwargs`, preventing each per-signal call from overwriting the previous one in the `Factory` kwargs store.
+
 ## [0.10.0] - 20-02-2026
 
 ### Changed
