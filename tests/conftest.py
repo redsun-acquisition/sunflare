@@ -4,7 +4,7 @@ from typing import Generator
 import pytest
 
 from sunflare.engine import RunEngine
-from sunflare.virtual import VirtualBus
+from sunflare.virtual import VirtualContainer
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def RE() -> RunEngine:
 
 
 @pytest.fixture(scope="function")
-def bus() -> Generator[VirtualBus, None, None]:
-    bus = VirtualBus()
+def bus() -> Generator[VirtualContainer, None, None]:
+    container = VirtualContainer()
 
-    yield bus
+    yield container

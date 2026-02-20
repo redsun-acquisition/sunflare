@@ -1,9 +1,4 @@
-"""Mock classes for sunflare tests.
-
-These mocks demonstrate how plugins can define their own configuration
-using attrs (or any validation library) without inheriting from
-framework-provided info base classes.
-"""
+"""Mock classes for sunflare tests."""
 
 from __future__ import annotations
 
@@ -18,7 +13,7 @@ from bluesky.utils import MsgGenerator
 
 from sunflare.device import Device, PDevice
 from sunflare.presenter import PPresenter
-from sunflare.virtual import Signal, VirtualBus
+from sunflare.virtual import Signal, VirtualContainer, IsProvider
 
 
 class MockDetector(Device):
@@ -87,21 +82,21 @@ class MockMotor(Device):
         }
 
 
-class MockController(PPresenter):
-    """Mock controller/presenter."""
+class MockController(PPresenter, IsProvider):
+    """Mock controller/presenter that optionally provides dependencies."""
 
     sigBar = Signal()
     sigNewPlan = Signal(object)
 
     def __init__(
         self,
+        name: str,
         devices: Mapping[str, PDevice],
-        virtual_bus: VirtualBus,
         /,
         **kwargs: Any,
     ) -> None:
+        self.name = name
         self.devices = devices
-        self.virtual_bus = virtual_bus
         self.engine = RunEngine({})
         self.plans: list[partial[MsgGenerator[Any]]] = []
 
@@ -110,9 +105,9 @@ class MockController(PPresenter):
 
         self.plans.append(partial(mock_plan_no_device))
 
-    def registration_phase(self) -> None: ...
+    def register_providers(self, container: VirtualContainer) -> None: ...
 
-    def connection_phase(self) -> None: ...
+    def inject_dependencies(self, container: VirtualContainer) -> None: ...
 
     def shutdown(self) -> None: ...
 

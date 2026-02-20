@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from sunflare.virtual import Signal, VirtualBus
+from sunflare.virtual import Signal, VirtualContainer, IsProvider, IsInjectable
 from event_model import DocumentRouter
 
 logger = logging.getLogger("redsun")
@@ -37,53 +37,42 @@ class MockCallback:
 
 
 class MockMethodCallback:
-    """Mock class with a regular method callback for testing bound methods."""
-
     def process_document(self, name: str, doc: dict) -> None:
         logger.debug(f"MockMethodCallback.process_document received {name} document")
 
 
-def test_virtual_bus_no_object(bus: VirtualBus) -> None:
-    """Test that trying to access a non-existent signal raises an error."""
-
-    logger = logging.getLogger("redsun")
-    logger.setLevel(logging.DEBUG)
-
+def test_virtual_container_no_object(bus: VirtualContainer) -> None:
+    """Test that accessing a non-existent signal key raises KeyError."""
     with pytest.raises(KeyError):
         bus.signals["MockOwner"]
 
 
-def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
-    """Tests the connection of signals in the virtual bus."""
+def test_virtual_container_psygnal_connection(bus: VirtualContainer) -> None:
+    """Tests signal registration and cross-component connection via VirtualContainer."""
 
-    class FirstMockOwner:
+    class FirstMockOwner(IsProvider):
         sigFirstSignal = Signal(int)
 
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
+        def __init__(self, container: VirtualContainer) -> None:
+            self.container = container
+            self.name = "FirstMockOwner"
 
-        def registration_phase(self) -> None:
-            self.bus.register_signals(self)
-
-        def connection_phase(self) -> None:
-            self.bus.signals["SecondMockOwner"]["sigSecondSignal"].connect(
-                self.second_to_first
-            )
+        def register_providers(self, container: VirtualContainer) -> None:
+            container.register_signals(self)
 
         def second_to_first(self, x: int) -> None:
             assert x == 5
 
-    class SecondMockOwner:
+    class SecondMockOwner(IsInjectable):
         sigSecondSignal = Signal(int)
 
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
+        def __init__(self, container: VirtualContainer) -> None:
+            self.container = container
+            self.name = "SecondMockOwner"
 
-        def registration_phase(self) -> None:
-            self.bus.register_signals(self)
-
-        def connection_phase(self) -> None:
-            self.bus.signals["FirstMockOwner"]["sigFirstSignal"].connect(
+        def inject_dependencies(self, container: VirtualContainer) -> None:
+            container.register_signals(self)
+            container.signals["FirstMockOwner"]["sigFirstSignal"].connect(
                 self.first_to_second
             )
 
@@ -93,11 +82,15 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     first_owner = FirstMockOwner(bus)
     second_owner = SecondMockOwner(bus)
 
-    first_owner.registration_phase()
-    second_owner.registration_phase()
+    # provider registers its own signals first
+    first_owner.register_providers(bus)
+    # injectable registers its signals and connects to provider's signals
+    second_owner.inject_dependencies(bus)
 
-    first_owner.connection_phase()
-    second_owner.connection_phase()
+    # first owner can now connect to second owner's signal
+    bus.signals["SecondMockOwner"]["sigSecondSignal"].connect(
+        first_owner.second_to_first
+    )
 
     assert "FirstMockOwner" in bus.signals
     assert "SecondMockOwner" in bus.signals
@@ -106,8 +99,8 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     second_owner.sigSecondSignal.emit(5)
 
 
-def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
-    """Test "register_signals" using the 'only' parameter."""
+def test_virtual_container_psygnal_connection_only(bus: VirtualContainer) -> None:
+    """Test 'register_signals' using the 'only' parameter."""
 
     def callback(x: int) -> None:
         assert x == 5
@@ -115,6 +108,10 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
     class MockOwner:
         sigSignalOne = Signal(int)
         sigSignalTwo = Signal(int)
+
+        @property
+        def name(self) -> str:
+            return "MockOwner"
 
     owner = MockOwner()
 
@@ -129,8 +126,8 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
     owner.sigSignalOne.emit(5)
 
 
-def test_virtual_bus_callback_registration(bus: VirtualBus) -> None:
-    """Test registering callbacks to the virtual bus."""
+def test_virtual_container_callback_registration(bus: VirtualContainer) -> None:
+    """Test registering callbacks to the virtual container."""
 
     with pytest.raises(TypeError):
 
@@ -143,31 +140,45 @@ def test_virtual_bus_callback_registration(bus: VirtualBus) -> None:
         non_callable = 42
         bus.register_callbacks(non_callable)
 
-    # Regular function - key should be function name
-    bus.register_callbacks(simple_callback)
+    bus.register_callbacks("simple_callback", simple_callback)
     assert len(bus.callbacks) == 1
     assert "simple_callback" in bus.callbacks
 
-    # DocumentRouter subclass - key should be class name
     router = MockRouter()
-    bus.register_callbacks(router)
+    bus.register_callbacks("MockRouter", router)
     assert len(bus.callbacks) == 2
     assert "MockRouter" in bus.callbacks
 
-    # Callable object (instance with __call__) - key should be class name
     mock_callback = MockCallback()
-    bus.register_callbacks(mock_callback)
+    bus.register_callbacks("MockCallback", mock_callback)
     assert len(bus.callbacks) == 3
     assert "MockCallback" in bus.callbacks
 
-    # Bound method - key should be method name
     method_callback = MockMethodCallback()
-    bus.register_callbacks(method_callback.process_document)
+    bus.register_callbacks("process_document", method_callback.process_document)
     assert len(bus.callbacks) == 4
     assert "process_document" in bus.callbacks
 
-    # Bound __call__ method - key should be class name
-    another_callable = MockCallback()
-    bus.register_callbacks(another_callable.__call__)
-    assert len(bus.callbacks) == 4  # same key as Test 3, so count stays the same
-    assert "MockCallback" in bus.callbacks
+
+def test_is_provider_protocol(bus: VirtualContainer) -> None:
+    """Test IsProvider structural protocol check."""
+
+    class MyPresenter(IsProvider):
+        def register_providers(self, container: VirtualContainer) -> None:
+            pass
+
+    p = MyPresenter()
+    assert isinstance(p, IsProvider)
+    p.register_providers(bus)
+
+
+def test_is_injectable_protocol(bus: VirtualContainer) -> None:
+    """Test IsInjectable structural protocol check."""
+
+    class MyView(IsInjectable):
+        def inject_dependencies(self, container: VirtualContainer) -> None:
+            pass
+
+    v = MyView()
+    assert isinstance(v, IsInjectable)
+    v.inject_dependencies(bus)

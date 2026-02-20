@@ -1,26 +1,28 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from sunflare.view import ViewPosition
-    from sunflare.virtual import VirtualBus
 
 
 @runtime_checkable
 class PView(Protocol):
-    """Minimmal protocol a view component should implement.
+    """Minimal protocol a view component should implement.
 
     Attributes
     ----------
-    virtual_bus : VirtualBus
-        Main virtual bus for the Redsun instance.
+    name : str
+        Identity key of the view.
+
+    Notes
+    -----
+    Access to the virtual container is optional and should be acquired
+    by implementing :class:`~sunflare.virtual.IsInjectable`.
     """
 
-    virtual_bus: VirtualBus
+    name: str
 
     @property
     @abstractmethod
@@ -33,15 +35,20 @@ class View(PView, ABC):
 
     Parameters
     ----------
-    virtual_bus : VirtualBus
-        Main virtual bus for the Redsun instance.
+    name : str
+        Identity key of the view. Passed as positional-only argument.
     kwargs : ``Any``, optional
         Additional keyword arguments for view subclasses.
     """
 
     @abstractmethod
-    def __init__(self, virtual_bus: VirtualBus, /, **kwargs: Any) -> None:
-        self.virtual_bus = virtual_bus
+    def __init__(
+        self,
+        name: str,
+        /,
+        **kwargs: Any,
+    ) -> None:
+        self.name = name
         super().__init__(**kwargs)
 
     @property
