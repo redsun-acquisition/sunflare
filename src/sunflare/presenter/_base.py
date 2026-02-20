@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from sunflare.device import Device
-    from sunflare.virtual import VirtualBus
+    from sunflare.virtual import VirtualContainer
 
 __all__ = ["PPresenter", "Presenter"]
 
@@ -17,36 +17,33 @@ __all__ = ["PPresenter", "Presenter"]
 class PPresenter(Protocol):  # pragma: no cover
     """Presenter protocol class.
 
-    Provides the interface for a class
-    that Redsun can recognize as a presenter by
-    implementing the defined attributes.
-
     Attributes
     ----------
+    name : str
+        Identity key of the presenter in the virtual container.
     devices : Mapping[str, sunflare.device.Device]
         Reference to the devices used in the presenter.
-    virtual_bus : VirtualBus
-        Reference to the virtual bus.
+    virtual_container : VirtualContainer
+        Reference to the virtual container.
     """
 
-    virtual_bus: VirtualBus
+    name: str
+    virtual_container: VirtualContainer
     devices: Mapping[str, Device]
 
 
 class Presenter(PPresenter, ABC):
     """Presenter base class.
 
-    Classes that do not directly inherit from it
-    will need to match the `__init__` signature
-    to ensure that at runtime Redsun registers
-    them as virtual subclasses.
-
     Parameters
     ----------
+    name : str
+        Identity key of the presenter in the virtual container.
+        Passed as positional-only argument.
     devices : Mapping[str, sunflare.device.Device]
         Reference to the devices used in the presenter.
-    virtual_bus : sunflare.virtual.VirtualBus
-        Reference to the virtual bus.
+    virtual_container : sunflare.virtual.VirtualContainer
+        Reference to the virtual container.
     kwargs : Any, optional
         Additional keyword arguments for presenter subclasses.
         These are parsed from the session configuration file.
@@ -54,8 +51,14 @@ class Presenter(PPresenter, ABC):
 
     @abstractmethod
     def __init__(
-        self, devices: Mapping[str, Device], virtual_bus: VirtualBus, /, **kwargs: Any
+        self,
+        name: str,
+        devices: Mapping[str, Device],
+        virtual_container: VirtualContainer,
+        /,
+        **kwargs: Any,
     ) -> None:
+        self.name = name
         self.devices = devices
-        self.virtual_bus = virtual_bus
+        self.virtual_container = virtual_container
         super().__init__(**kwargs)

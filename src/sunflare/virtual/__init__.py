@@ -1,13 +1,12 @@
-from ._bus import CallbackType, Signal, SignalCache, VirtualBus
-from ._protocols import HasShutdown, IsInjectable, IsProvider, VirtualAware
+from ._container import CallbackType, Signal, SignalCache, VirtualContainer
+from ._protocols import HasShutdown, IsInjectable, IsProvider
 
 __all__ = [
     "SignalCache",
     "CallbackType",
-    "VirtualBus",
+    "VirtualContainer",
     "Signal",
     "HasShutdown",
-    "VirtualAware",
     "IsInjectable",
     "IsProvider",
 ]

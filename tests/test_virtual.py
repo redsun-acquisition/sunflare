@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from sunflare.virtual import Signal, VirtualBus
+from sunflare.virtual import Signal, VirtualContainer
 from event_model import DocumentRouter
 
 logger = logging.getLogger("redsun")
@@ -43,30 +43,26 @@ class MockMethodCallback:
         logger.debug(f"MockMethodCallback.process_document received {name} document")
 
 
-def test_virtual_bus_no_object(bus: VirtualBus) -> None:
+def test_virtual_container_no_object(bus: VirtualContainer) -> None:
     """Test that trying to access a non-existent signal raises an error."""
-
-    logger = logging.getLogger("redsun")
-    logger.setLevel(logging.DEBUG)
-
     with pytest.raises(KeyError):
         bus.signals["MockOwner"]
 
 
-def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
-    """Tests the connection of signals in the virtual bus."""
+def test_virtual_container_psygnal_connection(bus: VirtualContainer) -> None:
+    """Tests the connection of signals in the virtual container."""
 
     class FirstMockOwner:
         sigFirstSignal = Signal(int)
 
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
+        def __init__(self, container: VirtualContainer) -> None:
+            self.container = container
 
         def registration_phase(self) -> None:
-            self.bus.register_signals(self)
+            self.container.register_signals(self)
 
         def connection_phase(self) -> None:
-            self.bus.signals["SecondMockOwner"]["sigSecondSignal"].connect(
+            self.container.signals["SecondMockOwner"]["sigSecondSignal"].connect(
                 self.second_to_first
             )
 
@@ -76,14 +72,14 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     class SecondMockOwner:
         sigSecondSignal = Signal(int)
 
-        def __init__(self, bus: VirtualBus) -> None:
-            self.bus = bus
+        def __init__(self, container: VirtualContainer) -> None:
+            self.container = container
 
         def registration_phase(self) -> None:
-            self.bus.register_signals(self)
+            self.container.register_signals(self)
 
         def connection_phase(self) -> None:
-            self.bus.signals["FirstMockOwner"]["sigFirstSignal"].connect(
+            self.container.signals["FirstMockOwner"]["sigFirstSignal"].connect(
                 self.first_to_second
             )
 
@@ -106,8 +102,8 @@ def test_virtual_bus_psygnal_connection(bus: VirtualBus) -> None:
     second_owner.sigSecondSignal.emit(5)
 
 
-def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
-    """Test "register_signals" using the 'only' parameter."""
+def test_virtual_container_psygnal_connection_only(bus: VirtualContainer) -> None:
+    """Test 'register_signals' using the 'only' parameter."""
 
     def callback(x: int) -> None:
         assert x == 5
@@ -129,8 +125,8 @@ def test_virtual_bus_psygnal_connection_only(bus: VirtualBus) -> None:
     owner.sigSignalOne.emit(5)
 
 
-def test_virtual_bus_callback_registration(bus: VirtualBus) -> None:
-    """Test registering callbacks to the virtual bus."""
+def test_virtual_container_callback_registration(bus: VirtualContainer) -> None:
+    """Test registering callbacks to the virtual container."""
 
     with pytest.raises(TypeError):
 

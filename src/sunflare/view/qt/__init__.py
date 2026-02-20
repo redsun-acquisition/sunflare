@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from sunflare.view import ViewPosition
-    from sunflare.virtual import VirtualBus
+    from sunflare.virtual import VirtualContainer
 
 
 class QtView(QWidget):
@@ -19,8 +19,11 @@ class QtView(QWidget):
 
     Parameters
     ----------
-    virtual_bus : VirtualBus
-        Main virtual bus for the Redsun instance.
+    name : str
+        Identity key of the view in the virtual container.
+        Passed as positional-only argument.
+    virtual_container : VirtualContainer
+        Main virtual container for the Redsun instance.
     kwargs : ``Any``, optional
         Additional keyword arguments for view subclasses.
 
@@ -32,11 +35,13 @@ class QtView(QWidget):
     @abstractmethod
     def __init__(
         self,
-        virtual_bus: VirtualBus,
+        name: str,
+        virtual_container: VirtualContainer,
         /,
         **kwargs: Any,
     ) -> None:
-        self.virtual_bus = virtual_bus
+        self.name = name
+        self.virtual_container = virtual_container
         super().__init__()
 
     @property
@@ -45,15 +50,6 @@ class QtView(QWidget):
         """Position of the view component in the main view of the UI."""
 
 
-# working with mixing QWidget with
-# a non-Qt cooperative class causes MRO issues;
-# our best bet is to just register the class
-# as a virtual subclass of View and avoid direct inheritance;
-# furthermore mypy complains that QWidget has
-# __init__ marked as abstract method and causes it not to be
-# directly instantiable; we can just ignore this
-# as it is the duty of the concrete subclasses to directly
-# implement __init__ and call super().__init__ to ensure proper initialization
 View.register(QtView)  # type: ignore[type-abstract]
 
 __all__ = ["QtView"]

@@ -7,20 +7,23 @@ if TYPE_CHECKING:
     from typing import Any
 
     from sunflare.view import ViewPosition
-    from sunflare.virtual import VirtualBus
+    from sunflare.virtual import VirtualContainer
 
 
 @runtime_checkable
 class PView(Protocol):
-    """Minimmal protocol a view component should implement.
+    """Minimal protocol a view component should implement.
 
     Attributes
     ----------
-    virtual_bus : VirtualBus
-        Main virtual bus for the Redsun instance.
+    name : str
+        Identity key of the view in the virtual container.
+    virtual_container : VirtualContainer
+        Main virtual container for the Redsun instance.
     """
 
-    virtual_bus: VirtualBus
+    name: str
+    virtual_container: VirtualContainer
 
     @property
     @abstractmethod
@@ -33,15 +36,25 @@ class View(PView, ABC):
 
     Parameters
     ----------
-    virtual_bus : VirtualBus
-        Main virtual bus for the Redsun instance.
+    name : str
+        Identity key of the view in the virtual container.
+        Passed as positional-only argument.
+    virtual_container : VirtualContainer
+        Main virtual container for the Redsun instance.
     kwargs : ``Any``, optional
         Additional keyword arguments for view subclasses.
     """
 
     @abstractmethod
-    def __init__(self, virtual_bus: VirtualBus, /, **kwargs: Any) -> None:
-        self.virtual_bus = virtual_bus
+    def __init__(
+        self,
+        name: str,
+        virtual_container: VirtualContainer,
+        /,
+        **kwargs: Any,
+    ) -> None:
+        self.name = name
+        self.virtual_container = virtual_container
         super().__init__(**kwargs)
 
     @property
