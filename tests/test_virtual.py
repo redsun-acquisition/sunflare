@@ -57,6 +57,7 @@ def test_virtual_container_psygnal_connection(bus: VirtualContainer) -> None:
 
         def __init__(self, container: VirtualContainer) -> None:
             self.container = container
+            self.name = "FirstMockOwner"
 
         def registration_phase(self) -> None:
             self.container.register_signals(self)
@@ -74,6 +75,7 @@ def test_virtual_container_psygnal_connection(bus: VirtualContainer) -> None:
 
         def __init__(self, container: VirtualContainer) -> None:
             self.container = container
+            self.name = "SecondMockOwner"
 
         def registration_phase(self) -> None:
             self.container.register_signals(self)
@@ -112,6 +114,10 @@ def test_virtual_container_psygnal_connection_only(bus: VirtualContainer) -> Non
         sigSignalOne = Signal(int)
         sigSignalTwo = Signal(int)
 
+        @property
+        def name(self) -> str:
+            return "MockOwner"
+
     owner = MockOwner()
 
     bus.register_signals(owner, only=["sigSignalOne"])
@@ -140,30 +146,24 @@ def test_virtual_container_callback_registration(bus: VirtualContainer) -> None:
         bus.register_callbacks(non_callable)
 
     # Regular function - key should be function name
-    bus.register_callbacks(simple_callback)
+    bus.register_callbacks("simple_callback", simple_callback)
     assert len(bus.callbacks) == 1
     assert "simple_callback" in bus.callbacks
 
     # DocumentRouter subclass - key should be class name
     router = MockRouter()
-    bus.register_callbacks(router)
+    bus.register_callbacks("MockRouter", router)
     assert len(bus.callbacks) == 2
     assert "MockRouter" in bus.callbacks
 
     # Callable object (instance with __call__) - key should be class name
     mock_callback = MockCallback()
-    bus.register_callbacks(mock_callback)
+    bus.register_callbacks("MockCallback", mock_callback)
     assert len(bus.callbacks) == 3
     assert "MockCallback" in bus.callbacks
 
     # Bound method - key should be method name
     method_callback = MockMethodCallback()
-    bus.register_callbacks(method_callback.process_document)
+    bus.register_callbacks("process_document", method_callback.process_document)
     assert len(bus.callbacks) == 4
     assert "process_document" in bus.callbacks
-
-    # Bound __call__ method - key should be class name
-    another_callable = MockCallback()
-    bus.register_callbacks(another_callable.__call__)
-    assert len(bus.callbacks) == 4  # same key as Test 3, so count stays the same
-    assert "MockCallback" in bus.callbacks
