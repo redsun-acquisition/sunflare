@@ -131,11 +131,14 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
                 if isinstance(getattr(owner_class, name, None), Signal)
             ]
 
+        batch: dict[str, SignalInstance] = {}
         for name in only:
             signal_descriptor = getattr(owner_class, name, None)
             if isinstance(signal_descriptor, Signal):
                 signal_instance = getattr(owner, name)
-                self._signals.add_kwargs(**{cache_entry: {name: signal_instance}})
+                batch[name] = signal_instance
+        if batch:
+            self._signals.add_kwargs(**{cache_entry: batch})
 
     def register_callbacks(self, name: str, callback: CallbackType) -> None:
         """Register a document callback in the virtual container.
