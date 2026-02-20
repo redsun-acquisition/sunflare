@@ -182,3 +182,37 @@ def test_is_injectable_protocol(bus: VirtualContainer) -> None:
     v = MyView()
     assert isinstance(v, IsInjectable)
     v.inject_dependencies(bus)
+
+
+def test_virtual_container_configuration(bus: VirtualContainer) -> None:
+    """Test that configuration can be set and read back from VirtualContainer."""
+    from sunflare.virtual import RedSunConfig
+
+    assert bus.configuration is None
+
+    cfg: RedSunConfig = {
+        "schema_version": 1.0,
+        "session": "test-session",
+        "frontend": "pyqt",
+    }
+    bus.configuration = cfg
+
+    assert bus.configuration is not None
+    assert bus.configuration["schema_version"] == 1.0
+    assert bus.configuration["session"] == "test-session"
+    assert bus.configuration["frontend"] == "pyqt"
+
+
+def test_redsun_config_required_fields() -> None:
+    """Test RedSunConfig TypedDict structure."""
+    from sunflare.virtual import RedSunConfig
+
+    # Valid config - all required fields present
+    cfg: RedSunConfig = {
+        "schema_version": 2.0,
+        "session": "my-session",
+        "frontend": "pyside",
+    }
+    assert cfg["schema_version"] == 2.0
+    assert cfg["session"] == "my-session"
+    assert cfg["frontend"] == "pyside"

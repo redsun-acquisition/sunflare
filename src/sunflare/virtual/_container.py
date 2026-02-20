@@ -17,6 +17,11 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
+if TYPE_CHECKING:
+    from bluesky.protocols import HasName
+
+    from sunflare.virtual._config import RedSunConfig
+
 K = TypeVar("K")
 V = TypeVar("V")
 
@@ -26,9 +31,6 @@ CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
 __all__ = ["Signal", "VirtualContainer"]
 
 SignalCache: TypeAlias = dict[str, SignalInstance]
-
-if TYPE_CHECKING:
-    from bluesky.protocols import HasName
 
 
 class VirtualContainer(dic.DynamicContainer, Loggable):
@@ -40,6 +42,28 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
 
     _signals = dip.Factory(dict[str, SignalCache])
     _callbacks = dip.Factory(dict[str, CallbackType])
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._configuration: RedSunConfig | None = None
+
+    # ------------------------------------------------------------------
+    # Configuration
+    # ------------------------------------------------------------------
+
+    @property
+    def configuration(self) -> RedSunConfig | None:
+        """Application configuration.
+
+        Populated by the application layer at build time.
+        Contains only the base fields (``schema_version``, ``session``,
+        ``frontend``); component sections are not forwarded here.
+        """
+        return self._configuration
+
+    @configuration.setter
+    def configuration(self, value: RedSunConfig) -> None:
+        self._configuration = value
 
     def register_signals(
         self, owner: HasName, name: str | None = None, only: Iterable[str] | None = None
