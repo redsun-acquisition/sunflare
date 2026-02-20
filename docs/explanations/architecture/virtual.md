@@ -45,7 +45,9 @@ class MyComponent:
         container.register_signals(self, only=["mySignal"])
 
         # you can register your callbacks; by default the owner's name attribute
-        # is used as the registry key
+        # is used as the registry key; if your component subclasses DocumentRouter
+        # directly, it is accepted as-is without signature inspection since the
+        # interface is guaranteed by the base class
         container.register_callbacks(self)
 
         # you can override the registry key with an explicit name
