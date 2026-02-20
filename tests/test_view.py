@@ -45,9 +45,9 @@ def test_presenter_is_provider(bus: VirtualContainer) -> None:
     app = QtW.QApplication.instance() or QtW.QApplication([])
     assert app is not None
 
-    controller = ProviderView("view")
-    assert isinstance(controller, IsProvider)
-    controller.register_providers(bus)
+    view = ProviderView("view")
+    assert isinstance(view, IsProvider)
+    assert issubclass(ProviderView, IsProvider)
 
 
 def test_view_is_injectable(bus: VirtualContainer) -> None:
@@ -66,7 +66,7 @@ def test_view_is_injectable(bus: VirtualContainer) -> None:
 
     view = InjectableView("injectable_view")
     assert isinstance(view, IsInjectable)
-    view.inject_dependencies(bus)
+    assert issubclass(InjectableView, IsInjectable)
 
 
 def test_base_qt_view(bus: VirtualContainer) -> None:

@@ -32,7 +32,7 @@ def test_presenter_is_provider(
 ) -> None:
     """Test that a presenter can optionally implement IsProvider."""
 
-    class ProviderController(Presenter, IsProvider):
+    class ProviderController(Presenter):
         def __init__(
             self,
             name: str,
@@ -45,6 +45,7 @@ def test_presenter_is_provider(
 
     controller = ProviderController("ctrl", devices)
     assert isinstance(controller, IsProvider)
+    assert issubclass(ProviderController, IsProvider)
     controller.register_providers(bus)
 
 
@@ -67,3 +68,4 @@ def test_presenter_is_injectable(
     controller = InjectableController("ctrl", devices)
     assert isinstance(controller, Presenter)
     assert isinstance(controller, IsInjectable)
+    assert issubclass(InjectableController, IsInjectable)
