@@ -9,36 +9,49 @@ logger = logging.getLogger("redsun")
 logger.setLevel(logging.DEBUG)
 
 
-def simple_callback(name: str, doc: dict) -> None:
-    logger.debug(f"received {name} document")
-
-
 class MockRouter(DocumentRouter):
+    """DocumentRouter subclass — the primary callback form."""
+
+    name = "mock_router"
+
     def __init__(self) -> None:
         super().__init__()
-        self.received_docs: list[tuple[str, dict]] = []
 
-    def event(self, doc: dict) -> None:
+    def event(self, doc: dict) -> None:  # type: ignore[override]
         logger.debug("MockRouter received event document")
 
-    def start(self, doc: dict) -> None:
+    def start(self, doc: dict) -> None:  # type: ignore[override]
         logger.debug("MockRouter received start document")
 
-    def stop(self, doc: dict) -> None:
+    def stop(self, doc: dict) -> None:  # type: ignore[override]
         logger.debug("MockRouter received stop document")
 
-    def descriptor(self, doc: dict) -> None:
+    def descriptor(self, doc: dict) -> None:  # type: ignore[override]
         logger.debug("MockRouter received descriptor document")
 
 
-class MockCallback:
+class MockCallable:
+    """Non-router callable with the correct (str, Document) signature."""
+
+    name = "mock_callable"
+
     def __call__(self, name: str, doc: dict) -> None:
-        logger.debug(f"MockCallback received {name} document")
+        logger.debug(f"MockCallable received {name} document")
 
 
-class MockMethodCallback:
-    def process_document(self, name: str, doc: dict) -> None:
-        logger.debug(f"MockMethodCallback.process_document received {name} document")
+class MockBadCallable:
+    """Callable whose signature does not match (str, Document)."""
+
+    name = "mock_bad_callable"
+
+    def __call__(self, name: str) -> None:  # missing doc argument
+        pass
+
+
+class MockNonCallable:
+    """Object that is not callable at all."""
+
+    name = "mock_non_callable"
 
 
 def test_virtual_container_no_object(bus: VirtualContainer) -> None:
@@ -126,38 +139,40 @@ def test_virtual_container_psygnal_connection_only(bus: VirtualContainer) -> Non
     owner.sigSignalOne.emit(5)
 
 
-def test_virtual_container_callback_registration(bus: VirtualContainer) -> None:
-    """Test registering callbacks to the virtual container."""
-
-    with pytest.raises(TypeError):
-
-        def wrong_callback(name: str) -> None:
-            pass
-
-        bus.register_callbacks(wrong_callback)
-
-    with pytest.raises(TypeError):
-        non_callable = 42
-        bus.register_callbacks(non_callable)
-
-    bus.register_callbacks("simple_callback", simple_callback)
-    assert len(bus.callbacks) == 1
-    assert "simple_callback" in bus.callbacks
-
+def test_register_callbacks_document_router(bus: VirtualContainer) -> None:
+    """DocumentRouter subclass is registered under owner.name."""
     router = MockRouter()
-    bus.register_callbacks("MockRouter", router)
-    assert len(bus.callbacks) == 2
-    assert "MockRouter" in bus.callbacks
+    bus.register_callbacks(router)
+    assert "mock_router" in bus.callbacks
+    assert bus.callbacks["mock_router"] is router
 
-    mock_callback = MockCallback()
-    bus.register_callbacks("MockCallback", mock_callback)
-    assert len(bus.callbacks) == 3
-    assert "MockCallback" in bus.callbacks
 
-    method_callback = MockMethodCallback()
-    bus.register_callbacks("process_document", method_callback.process_document)
-    assert len(bus.callbacks) == 4
-    assert "process_document" in bus.callbacks
+def test_register_callbacks_callable_object(bus: VirtualContainer) -> None:
+    """Object with a compatible __call__ signature is accepted."""
+    cb = MockCallable()
+    bus.register_callbacks(cb)
+    assert "mock_callable" in bus.callbacks
+    assert bus.callbacks["mock_callable"] is cb
+
+
+def test_register_callbacks_name_override(bus: VirtualContainer) -> None:
+    """Explicit name parameter is used as registry key instead of owner.name."""
+    router = MockRouter()
+    bus.register_callbacks(router, name="custom_key")
+    assert "custom_key" in bus.callbacks
+    assert bus.callbacks["custom_key"] is router
+
+
+def test_register_callbacks_rejects_non_callable(bus: VirtualContainer) -> None:
+    """Non-callable owner that is not a DocumentRouter raises TypeError."""
+    with pytest.raises(TypeError, match="not callable"):
+        bus.register_callbacks(MockNonCallable())
+
+
+def test_register_callbacks_rejects_wrong_signature(bus: VirtualContainer) -> None:
+    """Callable owner with wrong __call__ signature raises TypeError."""
+    with pytest.raises(TypeError, match="not compatible"):
+        bus.register_callbacks(MockBadCallable())
 
 
 def test_is_provider_protocol(bus: VirtualContainer) -> None:
