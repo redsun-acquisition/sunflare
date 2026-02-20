@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Iterable,
@@ -31,6 +32,17 @@ CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
 __all__ = ["Signal", "VirtualContainer"]
 
 SignalCache: TypeAlias = dict[str, SignalInstance]
+"""Cache type for storing signal instances registered from component classes."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class _FrozenConfig:
+    """Frozen configuration dataclass."""
+
+    schema_version: float
+    frontend: str
+    session: str
+    metadata: dict[str, object]
 
 
 class VirtualContainer(dic.DynamicContainer, Loggable):
@@ -42,28 +54,44 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
 
     _signals = dip.Factory(dict[str, SignalCache])
     _callbacks = dip.Factory(dict[str, CallbackType])
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._configuration: RedSunConfig | None = None
-
-    # ------------------------------------------------------------------
-    # Configuration
-    # ------------------------------------------------------------------
+    _config = dip.Singleton(_FrozenConfig)
 
     @property
-    def configuration(self) -> RedSunConfig | None:
-        """Application configuration.
+    def schema_version(self) -> float:
+        """The plugin schema version specified in the configuration."""
+        return self._config().schema_version
 
-        Populated by the application layer at build time.
-        Contains only the base fields (``schema_version``, ``session``,
-        ``frontend``); component sections are not forwarded here.
+    @property
+    def frontend(self) -> str:
+        """The frontend toolkit identifier specified in the configuration."""
+        return self._config().frontend
+
+    @property
+    def session(self) -> str:
+        """The session display name specified in the configuration."""
+        return self._config().session
+
+    @property
+    def metadata(self) -> dict[str, object]:
+        """The session metadata specified in the configuration."""
+        return self._config().metadata
+
+    def _set_configuration(self, config: RedSunConfig) -> None:
+        """Set the application configuration.
+
+        Private for use by the application layer at build time.
+
+        Parameters
+        ----------
+        config : RedSunConfig
+            The application configuration to set.
         """
-        return self._configuration
-
-    @configuration.setter
-    def configuration(self, value: RedSunConfig) -> None:
-        self._configuration = value
+        self._config.set_kwargs(
+            schema_version=config["schema_version"],
+            frontend=config["frontend"],
+            session=config.get("session", "redsun"),
+            metadata=config.get("metadata", {}),
+        )
 
     def register_signals(
         self, owner: HasName, name: str | None = None, only: Iterable[str] | None = None

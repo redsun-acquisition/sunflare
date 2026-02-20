@@ -163,56 +163,51 @@ def test_virtual_container_callback_registration(bus: VirtualContainer) -> None:
 def test_is_provider_protocol(bus: VirtualContainer) -> None:
     """Test IsProvider structural protocol check."""
 
-    class MyPresenter(IsProvider):
+    class MyPresenter:
         def register_providers(self, container: VirtualContainer) -> None:
             pass
 
     p = MyPresenter()
     assert isinstance(p, IsProvider)
-    p.register_providers(bus)
+    assert issubclass(MyPresenter, IsProvider)
 
 
 def test_is_injectable_protocol(bus: VirtualContainer) -> None:
     """Test IsInjectable structural protocol check."""
 
-    class MyView(IsInjectable):
+    class MyView:
         def inject_dependencies(self, container: VirtualContainer) -> None:
             pass
 
     v = MyView()
     assert isinstance(v, IsInjectable)
-    v.inject_dependencies(bus)
+    assert issubclass(MyView, IsInjectable)
 
 
 def test_virtual_container_configuration(bus: VirtualContainer) -> None:
     """Test that configuration can be set and read back from VirtualContainer."""
-    from sunflare.virtual import RedSunConfig
 
-    assert bus.configuration is None
+    bus._set_configuration(
+        {"schema_version": 1.0, "session": "redsun", "frontend": "unknown"}
+    )
 
-    cfg: RedSunConfig = {
-        "schema_version": 1.0,
-        "session": "test-session",
-        "frontend": "pyqt",
-    }
-    bus.configuration = cfg
+    assert bus.session == "redsun"
+    assert bus.schema_version == 1.0
+    assert bus.frontend == "unknown"
+    assert bus.metadata == {}
 
-    assert bus.configuration is not None
-    assert bus.configuration["schema_version"] == 1.0
-    assert bus.configuration["session"] == "test-session"
-    assert bus.configuration["frontend"] == "pyqt"
+    bus._config.reset()
 
+    bus._set_configuration(
+        {
+            "schema_version": 2.0,
+            "session": "test-session",
+            "frontend": "pyqt",
+            "metadata": {"key": "value"},
+        }
+    )
 
-def test_redsun_config_required_fields() -> None:
-    """Test RedSunConfig TypedDict structure."""
-    from sunflare.virtual import RedSunConfig
-
-    # Valid config - all required fields present
-    cfg: RedSunConfig = {
-        "schema_version": 2.0,
-        "session": "my-session",
-        "frontend": "pyside",
-    }
-    assert cfg["schema_version"] == 2.0
-    assert cfg["session"] == "my-session"
-    assert cfg["frontend"] == "pyside"
+    assert bus.schema_version == 2.0
+    assert bus.session == "test-session"
+    assert bus.frontend == "pyqt"
+    assert bus.metadata == {"key": "value"}
