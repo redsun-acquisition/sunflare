@@ -2,7 +2,7 @@ import pytest
 from collections.abc import Mapping
 from sunflare.device import Device
 from sunflare.presenter import Presenter
-from sunflare.virtual import VirtualContainer
+from sunflare.virtual import VirtualContainer, IsProvider
 
 
 @pytest.fixture
@@ -10,7 +10,7 @@ def devices() -> dict[str, Device]:
     return {}
 
 
-def test_base_presenter(devices: Mapping[str, Device], bus: VirtualContainer) -> None:
+def test_base_presenter(devices: Mapping[str, Device]) -> None:
     """Test basic Presenter functionality."""
 
     class TestController(Presenter):
@@ -18,12 +18,29 @@ def test_base_presenter(devices: Mapping[str, Device], bus: VirtualContainer) ->
             self,
             name: str,
             devices: Mapping[str, Device],
-            virtual_container: VirtualContainer,
         ) -> None:
-            super().__init__(name, devices, virtual_container)
+            super().__init__(name, devices)
 
-    controller = TestController("ctrl", devices, bus)
+    controller = TestController("ctrl", devices)
 
     assert controller.name == "ctrl"
     assert controller.devices == devices
-    assert controller.virtual_container == bus
+
+
+def test_presenter_is_provider(devices: Mapping[str, Device], bus: VirtualContainer) -> None:
+    """Test that a presenter can optionally implement IsProvider."""
+
+    class ProviderController(Presenter, IsProvider):
+        def __init__(
+            self,
+            name: str,
+            devices: Mapping[str, Device],
+        ) -> None:
+            super().__init__(name, devices)
+
+        def register_providers(self, container: VirtualContainer) -> None:
+            pass  # would register DI providers here
+
+    controller = ProviderController("ctrl", devices)
+    assert isinstance(controller, IsProvider)
+    controller.register_providers(bus)

@@ -13,7 +13,7 @@ from bluesky.utils import MsgGenerator
 
 from sunflare.device import Device, PDevice
 from sunflare.presenter import PPresenter
-from sunflare.virtual import Signal, VirtualContainer
+from sunflare.virtual import Signal, VirtualContainer, IsProvider
 
 
 class MockDetector(Device):
@@ -82,8 +82,8 @@ class MockMotor(Device):
         }
 
 
-class MockController(PPresenter):
-    """Mock controller/presenter."""
+class MockController(PPresenter, IsProvider):
+    """Mock controller/presenter that optionally provides dependencies."""
 
     sigBar = Signal()
     sigNewPlan = Signal(object)
@@ -92,13 +92,11 @@ class MockController(PPresenter):
         self,
         name: str,
         devices: Mapping[str, PDevice],
-        virtual_container: VirtualContainer,
         /,
         **kwargs: Any,
     ) -> None:
         self.name = name
         self.devices = devices
-        self.virtual_container = virtual_container
         self.engine = RunEngine({})
         self.plans: list[partial[MsgGenerator[Any]]] = []
 
@@ -107,9 +105,9 @@ class MockController(PPresenter):
 
         self.plans.append(partial(mock_plan_no_device))
 
-    def registration_phase(self) -> None: ...
+    def register_providers(self, container: VirtualContainer) -> None: ...
 
-    def connection_phase(self) -> None: ...
+    def inject_dependencies(self, container: VirtualContainer) -> None: ...
 
     def shutdown(self) -> None: ...
 

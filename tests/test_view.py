@@ -1,63 +1,70 @@
-from sunflare.virtual import VirtualContainer
+from sunflare.virtual import VirtualContainer, IsInjectable
 from sunflare.view import View, ViewPosition, PView
 from sunflare.view.qt import QtView
 from qtpy import QtWidgets as QtW
 
 
 def test_qtview_subclassing() -> None:
-    """Test that QtView is a subclass of View and PView."""
+    """Test that QtView is a virtual subclass of View."""
     assert issubclass(QtView, View)
 
 
 def test_base_view(bus: VirtualContainer) -> None:
-    """Test basic View functionality."""
+    """Test basic View functionality — no virtual_container required."""
 
     class TestView(View):
-        def __init__(
-            self,
-            name: str,
-            virtual_container: VirtualContainer,
-        ) -> None:
-            super().__init__(name, virtual_container)
+        def __init__(self, name: str) -> None:
+            super().__init__(name)
 
         @property
         def view_position(self) -> ViewPosition:
             return ViewPosition.CENTER
 
-    view = TestView("my_view", bus)
+    view = TestView("my_view")
 
     assert isinstance(view, View)
     assert isinstance(view, PView)
     assert issubclass(TestView, View)
     assert view.name == "my_view"
-    assert view.virtual_container == bus
     assert view.view_position == ViewPosition.CENTER
+
+
+def test_view_is_injectable(bus: VirtualContainer) -> None:
+    """Test that a view can optionally implement IsInjectable."""
+
+    class InjectableView(View, IsInjectable):
+        def __init__(self, name: str) -> None:
+            super().__init__(name)
+
+        @property
+        def view_position(self) -> ViewPosition:
+            return ViewPosition.LEFT
+
+        def inject_dependencies(self, container: VirtualContainer) -> None:
+            pass  # would pull providers from container here
+
+    view = InjectableView("injectable_view")
+    assert isinstance(view, IsInjectable)
+    view.inject_dependencies(bus)
 
 
 def test_base_qt_view(bus: VirtualContainer) -> None:
     """Test basic QtView functionality."""
 
     class TestQtView(QtView):
-        def __init__(
-            self,
-            name: str,
-            virtual_container: VirtualContainer,
-        ) -> None:
-            super().__init__(name, virtual_container)
+        def __init__(self, name: str) -> None:
+            super().__init__(name)
 
         @property
         def view_position(self) -> ViewPosition:
             return ViewPosition.CENTER
 
     app = QtW.QApplication.instance() or QtW.QApplication([])
+    assert app is not None
 
-    assert app is not None, "A QApplication instance is required to run this test."
-
-    view = TestQtView("qt_view", bus)
+    view = TestQtView("qt_view")
 
     assert isinstance(view, View)
     assert isinstance(view, PView)
-    assert issubclass(TestQtView, View)
     assert view.name == "qt_view"
-    assert view.virtual_container == bus
     assert view.view_position == ViewPosition.CENTER

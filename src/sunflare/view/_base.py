@@ -1,13 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from sunflare.view import ViewPosition
-    from sunflare.virtual import VirtualContainer
 
 
 @runtime_checkable
@@ -17,13 +14,15 @@ class PView(Protocol):
     Attributes
     ----------
     name : str
-        Identity key of the view in the virtual container.
-    virtual_container : VirtualContainer
-        Main virtual container for the Redsun instance.
+        Identity key of the view.
+
+    Notes
+    -----
+    Access to the virtual container is optional and should be acquired
+    by implementing :class:`~sunflare.virtual.IsInjectable`.
     """
 
     name: str
-    virtual_container: VirtualContainer
 
     @property
     @abstractmethod
@@ -37,10 +36,7 @@ class View(PView, ABC):
     Parameters
     ----------
     name : str
-        Identity key of the view in the virtual container.
-        Passed as positional-only argument.
-    virtual_container : VirtualContainer
-        Main virtual container for the Redsun instance.
+        Identity key of the view. Passed as positional-only argument.
     kwargs : ``Any``, optional
         Additional keyword arguments for view subclasses.
     """
@@ -49,12 +45,10 @@ class View(PView, ABC):
     def __init__(
         self,
         name: str,
-        virtual_container: VirtualContainer,
         /,
         **kwargs: Any,
     ) -> None:
         self.name = name
-        self.virtual_container = virtual_container
         super().__init__(**kwargs)
 
     @property
