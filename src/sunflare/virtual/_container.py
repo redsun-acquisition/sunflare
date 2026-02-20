@@ -173,14 +173,14 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
             )
 
         try:
-            inspect.signature(callback.__call__).bind(None, None)  # type: ignore[union-attr]
+            inspect.signature(callback.__call__).bind(None, None)
         except TypeError as e:
             raise TypeError(
                 f"{callback!r} is callable but its signature is not compatible "
                 "with the expected (str, Document) callback interface."
             ) from e
 
-        return callback  # type: ignore[return-value]
+        return callback
 
     def register_callbacks(
         self,
@@ -226,15 +226,11 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
         """
         if callback_map is not None:
             for key, callback in callback_map.items():
-                self._callbacks.add_kwargs(
-                    **{key: self._validate_callback(callback)}
-                )
+                self._callbacks.add_kwargs(**{key: self._validate_callback(callback)})
             return
 
         cache_entry = name if name is not None else owner.name
-        self._callbacks.add_kwargs(
-            **{cache_entry: self._validate_callback(owner)}
-        )
+        self._callbacks.add_kwargs(**{cache_entry: self._validate_callback(owner)})
 
     # ------------------------------------------------------------------
     # Properties
