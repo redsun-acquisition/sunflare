@@ -193,8 +193,7 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
         Accepts any object that is a valid ``CallbackType`` and exposes a
         ``name`` attribute used as the registry key.  Two forms are supported:
 
-        * A :class:`event_model.DocumentRouter` subclass instance -- routers
-          are callable with ``(name, doc)`` by design and are accepted as-is.
+        * A [DocumentRouter][event_model.DocumentRouter] subclass instance;
         * Any other object that implements ``__call__(self, name, doc)`` with
           the correct two-parameter signature.
 
@@ -231,10 +230,6 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
 
         cache_entry = name if name is not None else owner.name
         self._callbacks.add_kwargs(**{cache_entry: self._validate_callback(owner)})
-
-    # ------------------------------------------------------------------
-    # Properties
-    # ------------------------------------------------------------------
 
     @property
     def callbacks(self) -> dict[str, CallbackType]:
