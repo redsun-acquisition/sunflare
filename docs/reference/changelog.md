@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.10.2] - 20-02-2026
+
+### Changed
+
+- `VirtualContainer.register_callbacks` now mirrors the `register_signals` API: accepts an `owner` object whose `name` attribute is used as the registry key, with an optional `name` override parameter. Both `DocumentRouter` subclass instances and any callable with a compatible `(str, Document)` signature are accepted. Non-callable or wrong-signature owners raise `TypeError`.
+
 ## [0.10.1] - 20-02-2026
 
 ### Fixed
