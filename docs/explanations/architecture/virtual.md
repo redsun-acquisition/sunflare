@@ -28,6 +28,9 @@ class MyComponent:
     def my_callback(name: str, document: Document) -> None
         # a callback a RunEngine can consume
 
+    def my_other_callback(name: str, document: Document) -> None
+        # a second callback from the same owner
+
     def register_providers(self, container: VirtualContainer) -> None:
         # register a signal via "register signals", which can be accessed via
         # container.signals["MyComponent"]["mySignal"]
@@ -41,8 +44,22 @@ class MyComponent:
         # you wish to register, hiding the others
         container.register_signals(self, only=["mySignal"])
 
-        # you can register your callbacks
-        container.register_callbacks("my-callback", self.my_callback)
+        # you can register your callbacks; by default the owner's name attribute
+        # is used as the registry key; if your component subclasses DocumentRouter
+        # directly, it is accepted as-is without signature inspection since the
+        # interface is guaranteed by the base class
+        container.register_callbacks(self)
+
+        # you can override the registry key with an explicit name
+        container.register_callbacks(self, name="my-callback")
+
+        # if you need to expose more than one callback from the same owner,
+        # use the callback_map parameter; each entry is registered independently
+        # under its own key, and the owner-level name is ignored
+        container.register_callbacks(self, callback_map={
+            "live-data": self.my_callback,
+            "scan-meta": self.my_other_callback,
+        })
 
         # you can dynamically register objects the other components can get access to,
         # using the dependency_injector.providers module

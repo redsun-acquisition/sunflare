@@ -140,40 +140,94 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
         if batch:
             self._signals.add_kwargs(**{cache_entry: batch})
 
-    def register_callbacks(self, name: str, callback: CallbackType) -> None:
-        """Register a document callback in the virtual container.
-
-        Allows other components of the system access to specific document
-        routers through the ``callbacks`` property.
+    @staticmethod
+    def _validate_callback(callback: object) -> CallbackType:
+        """Validate that *callback* is an acceptable ``CallbackType``.
 
         Parameters
         ----------
-        name: str
-            Name to register the callback under.
-        callback : CallbackType
-            The document callback to register.
+        callback :
+            The object to validate.
+
+        Returns
+        -------
+        CallbackType
+            The validated callback, unchanged.
 
         Raises
         ------
         TypeError
-            If the provided callback is not callable or does not accept the
-            correct parameters.
+            If *callback* is not callable, or if it is a callable but
+            its call signature is not compatible with ``(str, Document)``.
         """
+        if isinstance(callback, DocumentRouter):
+            return callback
+
         if not callable(callback):
-            raise TypeError(f"{callback} is not callable.")
+            raise TypeError(
+                f"{callback!r} is not callable. "
+                "A callback must be a DocumentRouter subclass instance or a "
+                "callable accepting (str, Document) arguments."
+            )
+
         try:
-            inspect.signature(callback).bind(None, None)
+            inspect.signature(callback.__call__).bind(None, None)
         except TypeError as e:
             raise TypeError(
-                "The callback function must accept exactly two parameters: "
-                "'name' (str) and 'document' (Document)."
+                f"{callback!r} is callable but its signature is not compatible "
+                "with the expected (str, Document) callback interface."
             ) from e
 
-        self._callbacks.add_kwargs(**{name: callback})
+        return callback
 
-    # ------------------------------------------------------------------
-    # Properties
-    # ------------------------------------------------------------------
+    def register_callbacks(
+        self,
+        owner: HasName,
+        name: str | None = None,
+        callback_map: dict[str, CallbackType] | None = None,
+    ) -> None:
+        """Register one or more document callbacks in the virtual container.
+
+        Accepts any object that is a valid ``CallbackType`` and exposes a
+        ``name`` attribute used as the registry key.  Two forms are supported:
+
+        * A [DocumentRouter][event_model.DocumentRouter] subclass instance;
+        * Any other object that implements ``__call__(self, name, doc)`` with
+          the correct two-parameter signature.
+
+        When *callback_map* is provided the owner itself is not registered;
+        instead each entry in the mapping is validated and registered
+        independently under its own key, allowing a single owner to expose
+        multiple callbacks.
+
+        Parameters
+        ----------
+        owner : HasName
+            The component registering callbacks.  Must expose a ``name``
+            attribute.  When *callback_map* is ``None``, *owner* itself is
+            registered as the callback.
+        name : str | None
+            Override for the registry key used when registering *owner*
+            directly.  Ignored when *callback_map* is provided.
+            Defaults to ``owner.name``.
+        callback_map : dict[str, CallbackType] | None
+            Optional mapping of registry key to callback object.  When
+            supplied, each value is validated and registered under its
+            corresponding key; *name* is ignored.
+
+        Raises
+        ------
+        TypeError
+            If a callback is not callable or its signature is incompatible
+            with ``(str, Document)``.
+        """
+        if callback_map is not None:
+            for key, callback in callback_map.items():
+                self._callbacks.add_kwargs(**{key: self._validate_callback(callback)})
+            return
+
+        cache_entry = name if name is not None else owner.name
+        self._callbacks.add_kwargs(**{cache_entry: self._validate_callback(owner)})
 
     @property
     def callbacks(self) -> dict[str, CallbackType]:
