@@ -1,97 +1,92 @@
-# Virtual bus
+# Virtual container
 
-The [`VirtualBus`][sunflare.virtual.VirtualBus] is a class encapsulating different communication mechanism to allow different presenters and widgets to exchange controls and/or data streams. It provides a "Qt-like" mechanism of signal connection through the [`psygnal`](https://psygnal.readthedocs.io/en/stable/) package, where objects can dinamically register signals and connect to remote slots for communication in the main thread.
+At application construction, `redsun` creates a [`VirtualContainer`][sunflare.virtual.VirtualContainer], a shared resource container which provides the following things:
 
-## Signal connection
+- a registration point for [`psygnal.Signals`][psygnal.Signal] declared in your component;
+- a registration point for `bluesky`-compliant callbacks to consume documents produced by a `RunEngine` during a plan execution;
+- a way to dynamically registering any kind of resource to make them available to the rest of the application, giving control to the single component to expose whatever additional information it can provide or should be able to retrieve.
 
-The `VirtualBus` allows to create a connection between objects living in different plugins.
+Additionally it provides a view of the configuration file app-level fields, described in [`RedSunConfig`][sunflare.virtual.RedSunConfig].
 
-Suppose you have the following example:
+## Provider components
 
-```python title="emitter_plugin.py"
-class Emitter:
-    sigSender = Signal(int)
-```
-
-```python title="receiver_plugin.py"
-class Receiver:
-
-    def receiver_slot(param: int) -> None:
-        print("I received", param)
-```
-
-In a normal scenario where you have access to the codebase of both `Emitter` and `Receiver`, you would simply do the following:
+Components that may wish to inject one of the above functionalities must implement the [`IsProvider`][sunflare.virtual.IsProvider] protocol, by adding the following method:
 
 ```python
-emitter = Emitter()
-receiver = Receiver()
 
-emitter.sigSender.connect(receiver.receiver_slot)
-emitter.sigSender.emit(10)
+from sunflare.virtual import VirtualContainer
+from dependency_injector import providers
+from event_model.documents import Document
 
-# prints "I received 10"
+class MyComponent:
+
+    mySignal: Signal()
+    myOtherSignal: Signal(int)
+
+    my_provider: dict[str, Any] = {}
+
+    def my_callback(name: str, document: Document) -> None
+        # a callback a RunEngine can consume
+
+    def register_providers(self, container: VirtualContainer) -> None:
+        # register a signal via "register signals", which can be accessed via
+        # container.signals["MyComponent"]["mySignal"]
+        container.register_signals(self)
+
+        # you can also provide an alias for the component to be cached
+        container.register_signals(self, "my-component")
+
+        # you can selectively specify which signal to expose via the "only" keyword
+        # and provide an iterable object containing names matching the signal attributes
+        # you wish to register, hiding the others
+        container.register_signals(self, only=["mySignal"])
+
+        # you can register your callbacks
+        container.register_callbacks("my-callback", self.my_callback)
+
+        # you can dynamically register objects the other components can get access to,
+        # using the dependency_injector.providers module
+        container.my_object = providers.Object(self.my_provider)
+
 ```
 
-Redsun operates by dinamically loading plugins, which means that `Emitter` and `Receiver` may come from different packages.
+[`python-dependency-injector`](https://python-dependency-injector.ets-labs.org/index.html) offers a great deal of options of what kind of resource to shared with other components. Refer to its documentation for more information.
 
-The `VirtualBus` takes care of giving a common exposure and retrieval point between different plugins. The catch is that to be able to share a connection, `Emitter` and `Receiver` must be adapted to talk to the bus:
+## Injected components
 
-```python title="emitter_plugin.py"
-from sunflare.virtual import VirtualBus
+Through the `VirtualContainer`, objects provided by other components may be retrieved by implementing the [`IsInjectable`][sunflare.virtual.IsInjectable] protocol.
 
-class Emitter:
-    sigSender = Signal(int)
+```python
 
-    def __init__(self, virtual_bus: VirtualBus) -> None:
-        self.virtual_bus = virtual_bus
+from sunflare.virtual import VirtualContainer
+from dependency_injector import providers
+from event_model.documents import Document
 
-    def registration_phase(self) -> None:
-        self.virtual_bus.register_signals(self)
+class MyOtherComponent:
+
+    def my_slot(self) -> None:
+        ...
+
+    def inject_dependencies(self, container: VirtualContainer) -> None:
+        # get the currently cached signals so you can connect them
+        # to your own slots, to provide event-based communication
+        # between components; be sure to handle the case
+        # where the component might not be existent
+        container.signals["MyComponent"]["MySignal"].connect(self.my_slot)
+
+        # get the currently available callbacks so you can consume RunEngine documents;
+        # this is useful when your component contains a RunEngine itself and you wish
+        # to dispatch documents to other components
+        callback = container.callbacks["my-callback"]
+        self.engine.subscribe(callback)
+
+        # get any object registered by other components
+        object_from_component = container.my_object()
 ```
-
-```python title="receiver_plugin.py"
-from sunflare.virtual import VirtualBus
-
-class Receiver:
-
-    def __init__(self, virtual_bus: VirtualBus):
-        self.virtual_bus = virtual_bus
-
-    def receiver_slot(param: int) -> None:
-        print("I received", param)
-
-    def connection_phase(self) -> None:
-        self.virtual_bus["Emitter"]["sigSender"].connect(self.receiver_slot)
-```
-
-With this modifications, `Emitter` has informed the `VirtualBus` of the existence of `sigSender`, and `Receiver` can retrieve `sigSender` from `Emitter` to connect the signal to its slot `receiver_slot`.
-
-This enforces a specific call order: all `Emitter`-like object must call the `registration_phase` method before any `Receiver`-like object can call the `connection_phase` method, otherwise there will be a mismatch.
 
 !!! note
-    If a `Receiver`-like object tries to connect to a non-defined signal, your application will not crash, but there will be simply no connection enstablished with your slots.
 
-As a user, you only need to provide these two methods to ensure a safe connection. When Redsun is launched, it takes care of calling `registration_phase` and `connection_phase` in the correct order to ensure a safe connection.
-
-!!! warning "Using Sunflare without Redsun"
-    If you're using Sunflare in a non-Redsun application, you'll have to:
-
-    - create an instance of `VirtualBus`;
-    - ensure `Emitter` objects call their `registration_phase` method before `Receiver` objects call their `connection_phase` method.
-
-    ```python
-    from sunflare.virtual import VirtualBus
-
-    bus = VirtualBus()
-
-    emitter = Emitter(bus)
-    receiver = Receiver(bus)
-
-    # Register signals first
-    emitter.registration_phase()
-
-    # Then connect to them
-    receiver.connection_phase()
-
-    # ... run your application
-    ```
+    Dynamically registering objects via `container.my_object = providers.Object()` or any other provider
+    does not allow other components to be aware of the type hints associated with that injected object;
+    it is the responsibility of component developers to document whatever object is stored in the virtual
+    container and what type does it represent.

@@ -1,3 +1,5 @@
 # Tutorials
 
-- **[OOP Crash Course](oop-crash-course/index.md)**
+!!! Warning
+
+    This section is a work-in-progress. We appreciate your patience!

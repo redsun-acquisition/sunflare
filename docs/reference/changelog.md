@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.10.0] - 20-02-2026
+
+### Changed
+
+- Replaced `VirtualBus` with `VirtualContainer` for more flexible injection mechanism
+  - `VirtualContainer` the functionalities `VirtualBus` but additionally allows to exchange any kind of object via `python-dependency-injector`
+- `RedSunConfig` moved from `redsun` to `sunflare` to be used as component-level metadata storage from the application layer
+
 ## [0.9.1] - 19-02-2026
 
 ### Changed

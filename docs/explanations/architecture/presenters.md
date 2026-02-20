@@ -17,8 +17,8 @@ All presenters must implement the [`PPresenter`][sunflare.presenter.PPresenter] 
 
 The [`PPresenter`][sunflare.presenter.PPresenter] requires two things in its initialization:
 
+- a `name` which to be used as a unique identifier for the `Presenter` object
 - a `Mapping[str, Device]` of the allocated devices in the session;
-- a reference to the [`VirtualBus`][sunflare.virtual.VirtualBus] in order to provide a communication point with other presenters and widgets.
 
 Additional parameters can be passed via keyword arguments, which are parsed from the session configuration file.
 
