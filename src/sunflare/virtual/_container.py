@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Iterable,
@@ -17,6 +18,11 @@ from psygnal import Signal, SignalInstance
 
 from sunflare.log import Loggable
 
+if TYPE_CHECKING:
+    from bluesky.protocols import HasName
+
+    from sunflare.virtual._config import RedSunConfig
+
 K = TypeVar("K")
 V = TypeVar("V")
 
@@ -26,9 +32,17 @@ CallbackType: TypeAlias = Callable[[str, Document], None] | DocumentRouter
 __all__ = ["Signal", "VirtualContainer"]
 
 SignalCache: TypeAlias = dict[str, SignalInstance]
+"""Cache type for storing signal instances registered from component classes."""
 
-if TYPE_CHECKING:
-    from bluesky.protocols import HasName
+
+@dataclass(frozen=True, kw_only=True)
+class _FrozenConfig:
+    """Frozen configuration dataclass."""
+
+    schema_version: float
+    frontend: str
+    session: str
+    metadata: dict[str, object]
 
 
 class VirtualContainer(dic.DynamicContainer, Loggable):
@@ -40,6 +54,44 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
 
     _signals = dip.Factory(dict[str, SignalCache])
     _callbacks = dip.Factory(dict[str, CallbackType])
+    _config = dip.Singleton(_FrozenConfig)
+
+    @property
+    def schema_version(self) -> float:
+        """The plugin schema version specified in the configuration."""
+        return self._config().schema_version
+
+    @property
+    def frontend(self) -> str:
+        """The frontend toolkit identifier specified in the configuration."""
+        return self._config().frontend
+
+    @property
+    def session(self) -> str:
+        """The session display name specified in the configuration."""
+        return self._config().session
+
+    @property
+    def metadata(self) -> dict[str, object]:
+        """The session metadata specified in the configuration."""
+        return self._config().metadata
+
+    def _set_configuration(self, config: RedSunConfig) -> None:
+        """Set the application configuration.
+
+        Private for use by the application layer at build time.
+
+        Parameters
+        ----------
+        config : RedSunConfig
+            The application configuration to set.
+        """
+        self._config.set_kwargs(
+            schema_version=config["schema_version"],
+            frontend=config["frontend"],
+            session=config.get("session", "redsun"),
+            metadata=config.get("metadata", {}),
+        )
 
     def register_signals(
         self, owner: HasName, name: str | None = None, only: Iterable[str] | None = None
