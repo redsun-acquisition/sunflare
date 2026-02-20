@@ -184,6 +184,34 @@ def test_is_injectable_protocol(bus: VirtualContainer) -> None:
     assert issubclass(MyView, IsInjectable)
 
 
+def test_register_signals_all_signals_survive(bus: VirtualContainer) -> None:
+    """All signals on a class are registered when register_signals is called.
+
+    Regression test: previously register_signals called add_kwargs inside a
+    per-signal loop, causing each call to overwrite the previous entry for the
+    same owner key in the Factory kwargs store.  Only the last signal survived.
+    """
+
+    class MultiSignalOwner:
+        sigFirst = Signal(int)
+        sigSecond = Signal(str)
+        sigThird = Signal()
+
+        @property
+        def name(self) -> str:
+            return "MultiSignalOwner"
+
+    owner = MultiSignalOwner()
+    bus.register_signals(owner)
+
+    assert "MultiSignalOwner" in bus.signals
+    registered = bus.signals["MultiSignalOwner"]
+    assert "sigFirst" in registered
+    assert "sigSecond" in registered
+    assert "sigThird" in registered
+    assert len(registered) == 3
+
+
 def test_virtual_container_configuration(bus: VirtualContainer) -> None:
     """Test that configuration can be set and read back from VirtualContainer."""
 
