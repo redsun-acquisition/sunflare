@@ -46,8 +46,8 @@ The external application should not interact directly with the `handler` object;
     from bluesky.protocols import Reading, Descriptor
 
     class MyDevice(Device):
-        def __init__(self, name: str, **kwargs) -> None:
-            super().__init__(name, **kwargs)
+        def __init__(self, name: str, /, **kwargs) -> None:
+            super().__init__(name, /, **kwargs)
 
             # unpack the parameters you need
             # to initialize DeviceHandler,
@@ -79,7 +79,7 @@ from sunflare.device import Device
 from device_package import CameraHandler, MotorHandler
 
 class MyDevice(Device):
-    def __init__(self, name: str, **kwargs) -> None:
+    def __init__(self, name: str, /, **kwargs) -> None:
         super().__init__(name, **kwargs)
 
         self.__motor_handler = MotorHandler(**kwargs.get("motor_parameters", {}))
@@ -117,7 +117,7 @@ Using aggregation to control your device interface may be impractical if `Device
     from bluesky.protocols import Reading, Descriptor
 
     class MyDevice(Device, DeviceHandler):
-        def __init__(self, name: str, **kwargs) -> None:
+        def __init__(self, name: str, /, **kwargs) -> None:
             super().__init__(name, **kwargs)
 
         def configure(self) -> None:
@@ -125,12 +125,23 @@ Using aggregation to control your device interface may be impractical if `Device
             super().configure()
 
         def read_configuration(self) -> dict[str, Reading]:
-            # here goes your implementation;
-            return super().read_configuration()
+            # get the current configuration values
+            config = super().get_settings_values()
+
+            # whatever output is returned, it must
+            # be converted to a dictionary of readings
+
+            return super().describe_configuration()
 
         def describe_configuration(self) -> dict[str, Descriptor]:
-            # here goes your implementation;
-            return super().describe_configuration()
+            # first get whatever description your device provides
+            config = super().get_settings_description()
+
+            # whatever output is returned, it must
+            # be converted to be a dictionary of descriptors
+            reading = convert_to_reading(config) # your implementation
+
+            return reading
     ```
 
 Just like in the aggregated API, your device can also inherit from multiple classes. Again, it is your responsibility (as developer) to ensure that the appropriate Bluesky protocols are invoked on the correct device.

@@ -6,4 +6,4 @@
 
 - [Devices](architecture/devices.md)
 - [Presenters](architecture/presenters.md)
-- [Virtual bus](architecture/virtual.md)
+- [Virtual container](architecture/virtual.md)

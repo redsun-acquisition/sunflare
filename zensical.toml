@@ -52,10 +52,6 @@ nav = [
     { "Home" = "index.md" },
     { "Tutorials" = [
         "tutorials/index.md",
-        { "OOP Crash Course" = [
-            "tutorials/oop-crash-course/index.md",
-            { "Inheritance" = "tutorials/oop-crash-course/inheritance.md" },
-        ]},
     ]},
     { "How-to guides" = [
         "how-to/index.md",
