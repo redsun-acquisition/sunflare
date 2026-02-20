@@ -157,9 +157,7 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
         Raises
         ------
         TypeError
-            If *callback* is not callable.
-        TypeError
-            If *callback* is not a :class:`~event_model.DocumentRouter` and
+            If *callback* is not callable, or if it is a callable but
             its call signature is not compatible with ``(str, Document)``.
         """
         if isinstance(callback, DocumentRouter):
