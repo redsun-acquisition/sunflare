@@ -343,6 +343,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.10.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.7.0...v0.8.0
