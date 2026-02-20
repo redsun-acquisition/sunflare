@@ -140,10 +140,55 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
         if batch:
             self._signals.add_kwargs(**{cache_entry: batch})
 
+    @staticmethod
+    def _validate_callback(callback: object) -> CallbackType:
+        """Validate that *callback* is an acceptable ``CallbackType``.
+
+        Parameters
+        ----------
+        callback :
+            The object to validate.
+
+        Returns
+        -------
+        CallbackType
+            The validated callback, unchanged.
+
+        Raises
+        ------
+        TypeError
+            If *callback* is not callable.
+        TypeError
+            If *callback* is not a :class:`~event_model.DocumentRouter` and
+            its call signature is not compatible with ``(str, Document)``.
+        """
+        if isinstance(callback, DocumentRouter):
+            return callback
+
+        if not callable(callback):
+            raise TypeError(
+                f"{callback!r} is not callable. "
+                "A callback must be a DocumentRouter subclass instance or a "
+                "callable accepting (str, Document) arguments."
+            )
+
+        try:
+            inspect.signature(callback.__call__).bind(None, None)  # type: ignore[union-attr]
+        except TypeError as e:
+            raise TypeError(
+                f"{callback!r} is callable but its signature is not compatible "
+                "with the expected (str, Document) callback interface."
+            ) from e
+
+        return callback  # type: ignore[return-value]
+
     def register_callbacks(
-        self, owner: HasName, name: str | None = None
+        self,
+        owner: HasName,
+        name: str | None = None,
+        callback_map: dict[str, CallbackType] | None = None,
     ) -> None:
-        """Register a document callback in the virtual container.
+        """Register one or more document callbacks in the virtual container.
 
         Accepts any object that is a valid ``CallbackType`` and exposes a
         ``name`` attribute used as the registry key.  Two forms are supported:
@@ -153,55 +198,43 @@ class VirtualContainer(dic.DynamicContainer, Loggable):
         * Any other object that implements ``__call__(self, name, doc)`` with
           the correct two-parameter signature.
 
-        The ``name`` parameter mirrors :meth:`register_signals`: it overrides
-        the key used in the registry, falling back to ``owner.name`` when
-        omitted.
+        When *callback_map* is provided the owner itself is not registered;
+        instead each entry in the mapping is validated and registered
+        independently under its own key, allowing a single owner to expose
+        multiple callbacks.
 
         Parameters
         ----------
         owner : HasName
-            The callback object to register.  Must expose a ``name``
-            attribute (or have ``name`` provided explicitly) and be callable
-            with ``(str, Document)`` arguments.
+            The component registering callbacks.  Must expose a ``name``
+            attribute.  When *callback_map* is ``None``, *owner* itself is
+            registered as the callback.
         name : str | None
-            An optional name to use as the registry key.  If not provided,
-            ``owner.name`` is used.
+            Override for the registry key used when registering *owner*
+            directly.  Ignored when *callback_map* is provided.
+            Defaults to ``owner.name``.
+        callback_map : dict[str, CallbackType] | None
+            Optional mapping of registry key to callback object.  When
+            supplied, each value is validated and registered under its
+            corresponding key; *name* is ignored.
 
         Raises
         ------
         TypeError
-            If ``owner`` is not callable.
-        TypeError
-            If ``owner`` is not a :class:`~event_model.DocumentRouter` and
-            its ``__call__`` signature is not compatible with
-            ``(str, Document)``.
+            If a callback is not callable or its signature is incompatible
+            with ``(str, Document)``.
         """
-        cache_entry = name if name is not None else owner.name
-
-        if isinstance(owner, DocumentRouter):
-            # DocumentRouter subclasses are guaranteed to have the right
-            # interface; no further signature inspection needed.
-            self._callbacks.add_kwargs(**{cache_entry: owner})
+        if callback_map is not None:
+            for key, callback in callback_map.items():
+                self._callbacks.add_kwargs(
+                    **{key: self._validate_callback(callback)}
+                )
             return
 
-        if not callable(owner):
-            raise TypeError(
-                f"{owner!r} is not callable. "
-                "The owner must be a DocumentRouter subclass instance or a "
-                "callable accepting (str, Document) arguments."
-            )
-
-        # Validate the __call__ signature. We bind two positional sentinels
-        # to catch both missing-argument and too-many-argument errors.
-        try:
-            inspect.signature(owner.__call__).bind(None, None)
-        except TypeError as e:
-            raise TypeError(
-                f"{owner!r} is callable but its signature is not compatible "
-                "with the expected (str, Document) callback interface."
-            ) from e
-
-        self._callbacks.add_kwargs(**{cache_entry: owner})
+        cache_entry = name if name is not None else owner.name
+        self._callbacks.add_kwargs(
+            **{cache_entry: self._validate_callback(owner)}
+        )
 
     # ------------------------------------------------------------------
     # Properties

@@ -175,6 +175,32 @@ def test_register_callbacks_rejects_wrong_signature(bus: VirtualContainer) -> No
         bus.register_callbacks(MockBadCallable())
 
 
+def test_register_callbacks_callback_map(bus: VirtualContainer) -> None:
+    """callback_map registers multiple callbacks under independent keys."""
+    router = MockRouter()
+    cb = MockCallable()
+
+    bus.register_callbacks(
+        router,
+        callback_map={"router_key": router, "callable_key": cb},
+    )
+
+    assert "router_key" in bus.callbacks
+    assert "callable_key" in bus.callbacks
+    assert bus.callbacks["router_key"] is router
+    assert bus.callbacks["callable_key"] is cb
+
+
+def test_register_callbacks_callback_map_rejects_invalid(bus: VirtualContainer) -> None:
+    """callback_map validates each entry and raises TypeError on bad values."""
+    router = MockRouter()
+    with pytest.raises(TypeError):
+        bus.register_callbacks(
+            router,
+            callback_map={"good": router, "bad": MockBadCallable()},
+        )
+
+
 def test_is_provider_protocol(bus: VirtualContainer) -> None:
     """Test IsProvider structural protocol check."""
 
