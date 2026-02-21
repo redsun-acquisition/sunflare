@@ -1,3 +1,5 @@
+"""Base classes for sunflare devices."""
+
 from __future__ import annotations
 
 import abc
@@ -7,8 +9,6 @@ from bluesky.protocols import Configurable, HasName, HasParent
 
 if TYPE_CHECKING:
     from bluesky.protocols import Descriptor, Reading
-
-    from sunflare.storage import StorageProxy
 
 
 @runtime_checkable
@@ -28,18 +28,7 @@ class Device(PDevice, abc.ABC):
         Name of the device. Serves as a unique identifier for the object created from it.
     kwargs : Any, optional
         Additional keyword arguments for device subclasses.
-
-    Attributes
-    ----------
-    storage : StorageProxy | None
-        Storage backend injected by the container at build time.
-        ``None`` when no storage backend is configured for the session.
-        The descriptor is installed by :mod:`sunflare.storage` on first
-        import; ``sunflare.device`` carries no runtime import from
-        ``sunflare.storage``.
     """
-
-    storage: StorageProxy | None  # descriptor installed by sunflare.storage
 
     @abc.abstractmethod
     def __init__(self, name: str, /, **kwargs: Any) -> None:

@@ -32,7 +32,22 @@ from sunflare.storage._proxy import StorageDescriptor
 
 
 class _MinimalDevice(Device):
-    """Minimal concrete Device for testing the storage descriptor."""
+    """Minimal concrete Device with no storage declared."""
+
+    def __init__(self, name: str, /) -> None:
+        super().__init__(name)
+
+    def describe_configuration(self) -> dict[str, Descriptor]:
+        return {}
+
+    def read_configuration(self) -> dict[str, Reading[Any]]:
+        return {}
+
+
+class _StorageDevice(Device):
+    """Device that explicitly opts into storage via StorageDescriptor."""
+
+    storage = StorageDescriptor()
 
     def __init__(self, name: str, /) -> None:
         super().__init__(name)
@@ -77,36 +92,43 @@ class _ConcreteWriter(Writer):
 
 
 class TestStorageDescriptor:
-    def test_descriptor_installed_on_device(self) -> None:
-        """Importing sunflare.storage must attach StorageDescriptor to Device."""
-        assert isinstance(Device.__dict__.get("storage"), StorageDescriptor)
+    def test_descriptor_not_on_base_device(self) -> None:
+        """Device base class must not have storage — it is opt-in."""
+        assert "storage" not in Device.__dict__
+
+    def test_descriptor_on_subclass(self) -> None:
+        """Subclasses that declare StorageDescriptor must have it in __dict__."""
+        assert isinstance(_StorageDevice.__dict__.get("storage"), StorageDescriptor)
 
     def test_default_is_none(self) -> None:
-        device = _MinimalDevice("dev")
+        device = _StorageDevice("dev")
         assert device.storage is None
 
     def test_set_and_get(self) -> None:
-        device = _MinimalDevice("dev")
+        device = _StorageDevice("dev")
         mock_proxy = MagicMock(spec=StorageProxy)
         device.storage = mock_proxy
         assert device.storage is mock_proxy
 
     def test_set_none_resets(self) -> None:
-        device = _MinimalDevice("dev")
+        device = _StorageDevice("dev")
         device.storage = MagicMock(spec=StorageProxy)
         device.storage = None
         assert device.storage is None
 
     def test_independent_per_instance(self) -> None:
         """Each device instance must have its own storage slot."""
-        dev_a = _MinimalDevice("a")
-        dev_b = _MinimalDevice("b")
-        mock = MagicMock(spec=StorageProxy)
-        dev_a.storage = mock
+        dev_a = _StorageDevice("a")
+        dev_b = _StorageDevice("b")
+        dev_a.storage = MagicMock(spec=StorageProxy)
         assert dev_b.storage is None
 
     def test_class_access_returns_descriptor(self) -> None:
-        assert isinstance(Device.storage, StorageDescriptor)
+        assert isinstance(_StorageDevice.storage, StorageDescriptor)
+
+    def test_device_without_storage_has_no_attribute(self) -> None:
+        device = _MinimalDevice("dev")
+        assert not hasattr(device, "storage")
 
 
 # ---------------------------------------------------------------------------

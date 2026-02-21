@@ -12,24 +12,25 @@ This subpackage provides the dependency-free primitives for storage:
   :class:`AutoIncrementFilenameProvider` — concrete filename strategies
 - :class:`StaticPathProvider` — concrete path provider
 - :class:`StorageProxy` — protocol implemented by all storage backends
-- :class:`StorageDescriptor` — descriptor that manages ``device.storage``
+- :class:`StorageDescriptor` — descriptor for declaring ``storage`` on a device
 
 Concrete backend classes (e.g. ``ZarrWriter``) are internal
 implementation details and are not exported from this package.
 The application container is responsible for selecting and instantiating
 the correct backend based on the session configuration.
 
-Wiring
-------
-Importing this module attaches a :class:`StorageDescriptor` instance to
-:class:`~sunflare.device.Device` as the ``storage`` attribute.  This
-keeps ``sunflare.device`` free of any runtime import from
-``sunflare.storage`` — the dependency runs in one direction only.
+Devices that require storage declare it explicitly in their class body:
+
+.. code-block:: python
+
+    from sunflare.storage import StorageDescriptor
+
+    class MyDetector(Device):
+        storage = StorageDescriptor()
 """
 
 from __future__ import annotations
 
-from sunflare.device._base import Device as _Device
 from sunflare.storage._base import FrameSink, SourceInfo, Writer
 from sunflare.storage._path import (
     AutoIncrementFilenameProvider,
@@ -41,8 +42,6 @@ from sunflare.storage._path import (
     UUIDFilenameProvider,
 )
 from sunflare.storage._proxy import StorageDescriptor, StorageProxy
-
-_Device.storage = StorageDescriptor()  # type: ignore[assignment]
 
 __all__ = [
     # base
