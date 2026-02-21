@@ -42,8 +42,7 @@ from sunflare.storage._path import (
 )
 from sunflare.storage._proxy import StorageDescriptor, StorageProxy
 
-if not isinstance(getattr(_Device, "storage", None), StorageDescriptor):
-    _Device.storage = StorageDescriptor()  # type: ignore[assignment]
+_Device.storage = StorageDescriptor()  # type: ignore[assignment]
 
 __all__ = [
     # base
