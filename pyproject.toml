@@ -35,12 +35,11 @@ dependencies = [
     "psygnal>=0.15.1",
     "typing-extensions>=4.15.0",
     "dependency-injector>=4.48.3",
-    "acquire-zarr>=0.6.0",
 ]
 
 [dependency-groups]
 dev = [
-    "sunflare[pyqt]",
+    "sunflare[pyqt,zarr]",
     "mypy>=1.19.1",
     "myst-parser>=4.0.1",
     "ophyd>=1.11.0",
@@ -61,6 +60,9 @@ dev = [
 ]
 
 [project.optional-dependencies]
+zarr = [
+    "acquire-zarr>=0.6.0",
+]
 pyqt = [
     "magicgui>=0.10.1",
     "pyqt6>=6.10.2",

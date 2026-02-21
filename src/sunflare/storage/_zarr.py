@@ -4,13 +4,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from acquire_zarr import (
-    ArraySettings,
-    Dimension,
-    DimensionType,
-    StreamSettings,
-    ZarrStream,
-)
+try:
+    from acquire_zarr import (
+        ArraySettings,
+        Dimension,
+        DimensionType,
+        StreamSettings,
+        ZarrStream,
+    )
+
+    _ACQUIRE_ZARR_AVAILABLE = True
+except ImportError:
+    _ACQUIRE_ZARR_AVAILABLE = False
 
 from sunflare.storage._base import FrameSink, Writer
 
@@ -43,6 +48,11 @@ class ZarrWriter(Writer):
     """
 
     def __init__(self, name: str, path_provider: PathProvider) -> None:
+        if not _ACQUIRE_ZARR_AVAILABLE:
+            raise ImportError(
+                "ZarrWriter requires the 'acquire-zarr' package. "
+                "Install it with: pip install sunflare[zarr]"
+            )
         super().__init__(name)
         self._path_provider = path_provider
         self._stream_settings = StreamSettings()

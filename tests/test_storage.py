@@ -356,3 +356,18 @@ class TestStorageProxyProtocol:
     def test_writer_satisfies_proxy(self) -> None:
         """Writer must structurally satisfy StorageProxy."""
         assert issubclass(_ConcreteWriter, StorageProxy)  # type: ignore[arg-type]
+
+
+class TestZarrWriterImportGuard:
+    def test_import_error_without_acquire_zarr(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """ZarrWriter.__init__ must raise ImportError when acquire-zarr is absent."""
+        import sunflare.storage._zarr as zarr_mod
+
+        monkeypatch.setattr(zarr_mod, "_ACQUIRE_ZARR_AVAILABLE", False)
+        fp = StaticFilenameProvider("scan")
+        pp = StaticPathProvider(fp, base_uri="file:///data")
+        with pytest.raises(ImportError, match="acquire-zarr"):
+            from sunflare.storage import ZarrWriter
+            ZarrWriter("test", pp)
