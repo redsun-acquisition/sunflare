@@ -7,7 +7,7 @@ from bluesky.protocols import Configurable, HasName, HasParent
 
 if TYPE_CHECKING:
     from bluesky.protocols import Descriptor, Reading
-    from sunflare.storage._proxy import StorageProxy
+    from sunflare.storage import StorageProxy
 
 
 @runtime_checkable
