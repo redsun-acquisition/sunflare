@@ -24,7 +24,7 @@ keeps ``sunflare.device`` free of any runtime import from
 
 from __future__ import annotations
 
-from sunflare.storage._base import SourceInfo, Writer
+from sunflare.storage._base import FrameSink, SourceInfo, Writer
 from sunflare.storage._path import (
     AutoIncrementFilenameProvider,
     FilenameProvider,
@@ -53,6 +53,7 @@ __all__ = [
     # base
     "Writer",
     "SourceInfo",
+    "FrameSink",
     # path
     "PathInfo",
     "FilenameProvider",

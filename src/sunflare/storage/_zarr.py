@@ -12,26 +12,23 @@ from acquire_zarr import (
     ZarrStream,
 )
 
-from sunflare.storage._base import Writer
+from sunflare.storage._base import FrameSink, Writer
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     import numpy as np
     import numpy.typing as npt
 
-    from sunflare.storage._base import SinkGenerator
     from sunflare.storage._path import PathProvider
 
 
 class ZarrWriter(Writer):
     """Zarr storage backend using ``acquire-zarr``.
 
-    Writes detector frames to a Zarr v3 store.  Multiple devices can share
+    Writes detector frames to a Zarr v3 store.  Multiple devices share
     one ``ZarrWriter`` instance; each device is assigned its own array
     within the store, keyed by device name.
 
-    The store URI and filename are resolved by the :class:`~sunflare.storage.PathProvider`
+    The store URI is resolved by the :class:`~sunflare.storage.PathProvider`
     supplied at construction time.  Devices call
     :meth:`~sunflare.storage.Writer.prepare` without any path arguments —
     path resolution is entirely internal.
@@ -57,12 +54,12 @@ class ZarrWriter(Writer):
         """Return the MIME type for Zarr storage."""
         return "application/x-zarr"
 
-    def prepare(self, name: str, capacity: int = 0) -> SinkGenerator:
+    def prepare(self, name: str, capacity: int = 0) -> FrameSink:
         """Prepare Zarr storage for *name* and return a frame sink.
 
         Resolves the store path via the :class:`~sunflare.storage.PathProvider`,
         pre-declares spatial and temporal dimensions for the source, and
-        primes the frame sink generator.
+        returns a :class:`FrameSink` bound to *name*.
 
         Parameters
         ----------
@@ -73,8 +70,8 @@ class ZarrWriter(Writer):
 
         Returns
         -------
-        SinkGenerator
-            A primed generator; push frames via ``sink.send(frame)``.
+        FrameSink
+            Bound sink; call ``sink.write(frame)`` to push frames.
         """
         path_info = self._path_provider(name)
         self._store_path = path_info.store_uri
@@ -116,16 +113,11 @@ class ZarrWriter(Writer):
         return super().prepare(name, capacity)
 
     def kickoff(self) -> None:
-        """Open the Zarr stream for writing.
-
-        No-op if the stream is already open.
-        """
+        """Open the Zarr stream for writing.  No-op if already open."""
         if self.is_open:
             return
-
         self._stream_settings.arrays = list(self._array_settings.values())
         self._stream = ZarrStream(self._stream_settings)
-
         super().kickoff()
 
     def _finalize(self) -> None:
@@ -133,13 +125,5 @@ class ZarrWriter(Writer):
         self._stream.close()
 
     def _write_frame(self, name: str, frame: npt.NDArray[np.generic]) -> None:
-        """Append *frame* to the Zarr stream under the array key for *name*.
-
-        Parameters
-        ----------
-        name :
-            Source name; routes the write to the correct array.
-        frame :
-            Frame data to append.
-        """
+        """Append *frame* to the Zarr stream under the array key for *name*."""
         self._stream.append(frame, key=name)

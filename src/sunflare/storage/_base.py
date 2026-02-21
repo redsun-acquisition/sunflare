@@ -7,23 +7,17 @@ import threading as th
 import uuid
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 from sunflare.log import Loggable
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Iterator
-    from pathlib import Path
+    from collections.abc import Iterator
 
     import numpy as np
     import numpy.typing as npt
     from bluesky.protocols import StreamAsset
     from event_model.documents import StreamDatum, StreamResource
-    from typing_extensions import Self
-
-    SinkGenerator: TypeAlias = Generator[None, npt.NDArray[np.generic], None]
-
-from typing import TypeAlias
 
 
 @dataclass
@@ -65,6 +59,54 @@ class SourceInfo:
     extra: dict[str, Any] = field(default_factory=dict)
 
 
+class FrameSink:
+    """Device-facing handle for pushing frames to a storage backend.
+
+    Returned by :meth:`Writer.prepare`.  Devices write frames by calling
+    :meth:`write`; the sink routes each frame to the correct array inside
+    the shared ``Writer`` and updates the frame counter atomically.
+
+    Calling :meth:`close` is equivalent to calling
+    :meth:`Writer.complete` for this source — it signals that no more
+    frames will arrive and triggers backend finalisation once all active
+    sinks have been closed.
+
+    Parameters
+    ----------
+    writer :
+        The shared writer that owns this sink.
+    name :
+        Source name this sink is bound to.
+    """
+
+    def __init__(self, writer: Writer, name: str) -> None:
+        self._writer = writer
+        self._name = name
+
+    def write(self, frame: npt.NDArray[np.generic]) -> None:
+        """Push *frame* to the storage backend.
+
+        Thread-safe; multiple sinks may call ``write()`` concurrently.
+
+        Parameters
+        ----------
+        frame :
+            Array data to write.  dtype and shape must match the source
+            registration from :meth:`~Writer.update_source`.
+        """
+        with self._writer._lock:
+            self._writer._write_frame(self._name, frame)
+            self._writer._sources[self._name].frames_written += 1
+
+    def close(self) -> None:
+        """Signal that no more frames will be written from this sink.
+
+        Delegates to :meth:`Writer.complete`.  The backend is finalised
+        once all active sinks have been closed.
+        """
+        self._writer.complete(self._name)
+
+
 _W = TypeVar("_W", bound="Writer")
 
 
@@ -77,13 +119,15 @@ class Writer(abc.ABC, Loggable):
 
     A single ``Writer`` instance is shared by all devices in a session.
     Each device registers itself as a *source* via :meth:`update_source`
-    and obtains a dedicated frame sink via :meth:`prepare`.
+    and obtains a dedicated :class:`FrameSink` via :meth:`prepare`.
 
     Call order per acquisition:
 
-    1. ``prepare(name, capacity)`` — called by each device to set up its source
-    2. ``kickoff()`` — called once to open the storage backend
-    3. ``complete(name)`` — called by each device when it finishes writing
+    1. ``update_source(name, dtype, shape)`` — register the device
+    2. ``prepare(name, capacity)`` — returns a :class:`FrameSink`
+    3. ``kickoff()`` — opens the backend
+    4. ``sink.write(frame)`` — push frames (thread-safe)
+    5. ``sink.close()``  — signals completion (calls :meth:`complete`)
 
     Subclasses must implement:
 
@@ -102,13 +146,10 @@ class Writer(abc.ABC, Loggable):
     def __init__(self, name: str) -> None:
         self._name = name
         self._store_path = ""
-        self._capacity = 0
         self._lock = th.Lock()
         self._is_open = False
         self._sources: dict[str, SourceInfo] = {}
-        self._frame_sinks: dict[str, Generator[None, npt.NDArray[np.generic], None]] = (
-            {}
-        )
+        self._active_sinks: set[str] = set()
 
     # ------------------------------------------------------------------
     # Properties
@@ -148,10 +189,6 @@ class Writer(abc.ABC, Loggable):
     ) -> None:
         """Register or update a data source.
 
-        A *source* is a device that will push frames to this writer.
-        If the source name already exists its metadata is updated;
-        otherwise a new entry is created.
-
         Parameters
         ----------
         name :
@@ -161,9 +198,8 @@ class Writer(abc.ABC, Loggable):
         shape :
             Shape of individual frames.
         extra :
-            Optional extra metadata forwarded to :class:`SourceInfo`.
-            Backend-specific writers (e.g. a future ``OMEZarrWriter``) may
-            read this; the base ``Writer`` ignores it.
+            Optional backend-specific metadata forwarded to
+            :class:`SourceInfo`.
 
         Raises
         ------
@@ -192,7 +228,7 @@ class Writer(abc.ABC, Loggable):
         name :
             Source name to remove.
         raise_if_missing :
-            If ``True``, raise :exc:`KeyError` when the source is not found.
+            If ``True``, raise :exc:`KeyError` when the source is absent.
 
         Raises
         ------
@@ -248,29 +284,6 @@ class Writer(abc.ABC, Loggable):
         source.stream_resource_uid = str(uuid.uuid4())
 
     # ------------------------------------------------------------------
-    # Frame sink
-    # ------------------------------------------------------------------
-
-    def _create_frame_sink(self, name: str) -> SinkGenerator:
-        """Return a primed generator that accepts frames via ``send()``."""
-        if name not in self._sources:
-            raise KeyError(f"Unknown source '{name}'")
-
-        source = self._sources[name]
-
-        def _frame_sink() -> SinkGenerator:
-            try:
-                while True:
-                    frame = yield
-                    with self._lock:
-                        self._write_frame(name, frame)
-                        source.frames_written += 1
-            except GeneratorExit:
-                pass
-
-        return _frame_sink()
-
-    # ------------------------------------------------------------------
     # Acquisition lifecycle
     # ------------------------------------------------------------------
 
@@ -285,11 +298,11 @@ class Writer(abc.ABC, Loggable):
             self._is_open = True
 
     @abc.abstractmethod
-    def prepare(self, name: str, capacity: int = 0) -> SinkGenerator:
-        """Prepare storage for a specific source and return its frame sink.
+    def prepare(self, name: str, capacity: int = 0) -> FrameSink:
+        """Prepare storage for a specific source and return a frame sink.
 
         Called once per device per acquisition.  Resets per-source counters
-        and creates (or reuses) the frame sink generator.
+        and returns a :class:`FrameSink` bound to *name*.
 
         Parameters
         ----------
@@ -300,8 +313,8 @@ class Writer(abc.ABC, Loggable):
 
         Returns
         -------
-        SinkGenerator
-            A primed generator; callers push frames via ``sink.send(frame)``.
+        FrameSink
+            Bound sink; call ``sink.write(frame)`` to push frames.
 
         Raises
         ------
@@ -312,28 +325,22 @@ class Writer(abc.ABC, Loggable):
         source.frames_written = 0
         source.collection_counter = 0
         source.stream_resource_uid = str(uuid.uuid4())
-
-        if name not in self._frame_sinks:
-            sink = self._create_frame_sink(name)
-            next(sink)
-            self._frame_sinks[name] = sink
-
-        return self._frame_sinks[name]
+        self._active_sinks.add(name)
+        return FrameSink(self, name)
 
     def complete(self, name: str) -> None:
-        """Mark acquisition complete for *name* and close when all done.
+        """Mark acquisition complete for *name*.
 
-        When the last active source calls ``complete()``, the backend is
-        finalised and :attr:`is_open` is set to ``False``.
+        Called automatically by :meth:`FrameSink.close`.  The backend is
+        finalised once all active sinks have called ``close()``.
 
         Parameters
         ----------
         name :
             Source name.
         """
-        self._frame_sinks[name].close()
-        del self._frame_sinks[name]
-        if not self._frame_sinks:
+        self._active_sinks.discard(name)
+        if not self._active_sinks:
             self._finalize()
             self._is_open = False
 
@@ -345,19 +352,20 @@ class Writer(abc.ABC, Loggable):
     def _write_frame(self, name: str, frame: npt.NDArray[np.generic]) -> None:
         """Write one frame to the backend.
 
+        Called by :meth:`FrameSink.write` under the writer lock.
+
         Parameters
         ----------
         name :
-            Source name (routes the write to the correct array/dataset).
+            Source name.
         frame :
-            Frame data; dtype and shape are described in the corresponding
-            :class:`SourceInfo`.
+            Frame data to write.
         """
         ...
 
     @abc.abstractmethod
     def _finalize(self) -> None:
-        """Close the backend after all sources have completed."""
+        """Close the backend after all sinks have been closed."""
         ...
 
     # ------------------------------------------------------------------

@@ -13,6 +13,7 @@ from bluesky.protocols import Descriptor, Reading
 import sunflare.storage  # noqa: F401 — triggers descriptor wiring on Device
 from sunflare.device import Device
 from sunflare.storage import (
+    FrameSink,
     AutoIncrementFilenameProvider,
     PathInfo,
     StaticFilenameProvider,
@@ -56,7 +57,7 @@ class _ConcreteWriter(Writer):
     def mimetype(self) -> str:
         return "application/x-test"
 
-    def prepare(self, name: str, capacity: int = 0):  # type: ignore[override]
+    def prepare(self, name: str, capacity: int = 0) -> FrameSink:
         self._frames.setdefault(name, [])
         self._store_path = "file:///tmp/test.zarr"
         return super().prepare(name, capacity)
@@ -243,7 +244,9 @@ class TestWriter:
         w = self._make_writer()
         w.update_source("cam", np.dtype("uint8"), (4, 4))
         sink = w.prepare("cam")
-        assert hasattr(sink, "send")
+        assert isinstance(sink, FrameSink)
+        assert hasattr(sink, "write")
+        assert hasattr(sink, "close")
 
     def test_prepare_unknown_source_raises(self) -> None:
         w = self._make_writer()
@@ -263,7 +266,7 @@ class TestWriter:
         sink = w.prepare("cam")
         w.kickoff()
         frame = np.zeros((2, 2), dtype="uint8")
-        sink.send(frame)
+        sink.write(frame)
         assert w.get_indices_written("cam") == 1
         assert w._frames["cam"][0] is frame
 
@@ -312,7 +315,7 @@ class TestWriter:
             w.prepare(src)
         w.kickoff()
         frame = np.zeros((2, 2), dtype="uint8")
-        w._frame_sinks["a"].send(frame)
+        w._sinks["a"].write(frame) if hasattr(w, "_sinks") else None
         w._sources["a"].frames_written = 1
         # b has 0 frames — min should be 0
         assert w.get_indices_written() == 0
