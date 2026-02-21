@@ -48,9 +48,9 @@ class ZarrWriter(Writer):
 
     Parameters
     ----------
-    name :
+    name : str
         Unique name for this writer (used for logging).
-    path_provider :
+    path_provider : PathProvider
         Callable that returns [`PathInfo`][sunflare.storage.PathInfo] for each
         device.  Called once per device per
         [`prepare`][sunflare.storage.Writer.prepare] invocation.
@@ -83,9 +83,9 @@ class ZarrWriter(Writer):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name (device name).
-        capacity :
+        capacity : int
             Maximum frames (`0` = unlimited).
 
         Returns

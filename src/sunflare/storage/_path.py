@@ -21,19 +21,19 @@ class PathInfo:
 
     Attributes
     ----------
-    store_uri :
+    store_uri : str
         URI of the store root.  For local Zarr this is a `file://` URI;
         for remote storage it may be `s3://` or similar.
         Example: `"file:///data/scan001.zarr"`.
-    array_key :
+    array_key : str
         Key (array name) within the store for this device's data.
         Defaults to the device name.
-    capacity :
+    capacity : int
         Maximum number of frames to accept.  `0` means unlimited.
-    mimetype_hint :
+    mimetype_hint : str
         MIME type hint for the backend.  Consumers may use this to select
         the correct reader.
-    extra :
+    extra : dict[str, Any]
         Optional backend-specific metadata (e.g. OME-Zarr axis labels,
         physical units).  Base writers ignore this field.
     """
@@ -54,7 +54,7 @@ class FilenameProvider(Protocol):
 
         Parameters
         ----------
-        device_name :
+        device_name : str | None
             Name of the device requesting a filename.  Implementations may
             ignore this if the filename is device-agnostic.
 
@@ -80,7 +80,7 @@ class PathProvider(Protocol):
 
         Parameters
         ----------
-        device_name :
+        device_name : str | None
             Name of the device requesting path information.
 
         Returns
@@ -96,7 +96,7 @@ class StaticFilenameProvider:
 
     Parameters
     ----------
-    filename :
+    filename : str
         The filename string to return on every call.
     """
 
@@ -125,15 +125,15 @@ class AutoIncrementFilenameProvider:
 
     Parameters
     ----------
-    base :
+    base : str
         Optional base prefix for the filename.
-    max_digits :
+    max_digits : int
         Zero-padding width for the counter.
-    start :
+    start : int
         Initial counter value.
-    step :
+    step : int
         Increment per call.
-    delimiter :
+    delimiter : str
         Separator between *base* and counter.
     """
 
@@ -169,13 +169,13 @@ class StaticPathProvider:
 
     Parameters
     ----------
-    filename_provider :
+    filename_provider : FilenameProvider
         Callable that returns a filename for each device.
-    base_uri :
+    base_uri : str
         Base URI for the store root (e.g. `"file:///data"`).
-    mimetype_hint :
+    mimetype_hint : str
         MIME type hint forwarded to [`PathInfo`][sunflare.storage.PathInfo].
-    capacity :
+    capacity : int
         Default frame capacity forwarded to [`PathInfo`][sunflare.storage.PathInfo].
     """
 

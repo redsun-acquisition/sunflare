@@ -34,23 +34,23 @@ class SourceInfo:
 
     Attributes
     ----------
-    name :
+    name : str
         Name of the data source (e.g. the device name).
-    dtype :
+    dtype : np.dtype[np.generic]
         NumPy data type of the source frames.
-    shape :
+    shape : tuple[int, ...]
         Shape of individual frames from the source.
-    data_key :
+    data_key : str
         Bluesky data key for stream documents.
-    mimetype :
+    mimetype : str
         MIME type hint for the storage backend.
-    frames_written :
+    frames_written : int
         Running count of frames written so far.
-    collection_counter :
+    collection_counter : int
         Frames reported in the current collection cycle.
-    stream_resource_uid :
+    stream_resource_uid : str
         UID of the current `StreamResource` document.
-    extra :
+    extra : dict[str, Any]
         Optional extra metadata for backend-specific use (e.g. OME-Zarr
         axis labels, physical units).  Base [`Writer`][sunflare.storage.Writer]
         ignores this field; specialised subclasses may read it.
@@ -82,9 +82,9 @@ class FrameSink:
 
     Parameters
     ----------
-    writer :
+    writer : Writer
         The shared writer that owns this sink.
-    name :
+    name : str
         Source name this sink is bound to.
     """
 
@@ -99,7 +99,7 @@ class FrameSink:
 
         Parameters
         ----------
-        frame :
+        frame : npt.NDArray[np.generic]
             Array data to write.  dtype and shape must match the source
             registration from [`Writer.update_source`][sunflare.storage.Writer.update_source].
         """
@@ -150,7 +150,7 @@ class Writer(abc.ABC, Loggable):
 
     Parameters
     ----------
-    name :
+    name : str
         Unique name for this writer instance (used for logging).
     """
 
@@ -202,13 +202,13 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name (typically the device name).
-        dtype :
+        dtype : np.dtype[np.generic]
             NumPy data type of the frames.
-        shape :
+        shape : tuple[int, ...]
             Shape of individual frames.
-        extra :
+        extra : dict[str, Any] | None
             Optional backend-specific metadata forwarded to
             [`SourceInfo`][sunflare.storage.SourceInfo].
 
@@ -236,9 +236,9 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name to remove.
-        raise_if_missing :
+        raise_if_missing : bool
             If `True`, raise `KeyError` when the source is absent.
 
         Raises
@@ -264,7 +264,7 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str | None
             Source name.  If `None`, returns the minimum across all
             sources (useful for synchronisation checks).
 
@@ -287,7 +287,7 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name to reset.
         """
         source = self._sources[name]
@@ -318,9 +318,9 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name.
-        capacity :
+        capacity : int
             Maximum frames to accept (`0` = unlimited).
 
         Returns
@@ -349,7 +349,7 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name.
         """
         self._active_sinks.discard(name)
@@ -370,9 +370,9 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name.
-        frame :
+        frame : npt.NDArray[np.generic]
             Frame data to write.
         """
         ...
@@ -395,9 +395,9 @@ class Writer(abc.ABC, Loggable):
 
         Parameters
         ----------
-        name :
+        name : str
             Source name.
-        indices_written :
+        indices_written : int
             Number of frames to report in this call.
 
         Yields
