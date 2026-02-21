@@ -25,6 +25,7 @@ Devices that require storage declare it explicitly in their class body:
 
     from sunflare.storage import StorageDescriptor
 
+
     class MyDetector(Device):
         storage = StorageDescriptor()
 """
