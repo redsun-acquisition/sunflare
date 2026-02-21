@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class SourceInfo:
     """Metadata for a registered data source.
 
-    Parameters
+    Attributes
     ----------
     name :
         Name of the data source (e.g. the device name).

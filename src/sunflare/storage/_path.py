@@ -19,17 +19,17 @@ from typing import Any, Protocol, runtime_checkable
 class PathInfo:
     """Where and how a storage backend should write data for one device.
 
-    Parameters
+    Attributes
     ----------
     store_uri :
-        URI of the store root.  For local Zarr this is a ``file://`` URI;
-        for remote storage it may be ``s3://`` or similar.
-        Example: ``"file:///data/scan001.zarr"``.
+        URI of the store root.  For local Zarr this is a `file://` URI;
+        for remote storage it may be `s3://` or similar.
+        Example: `"file:///data/scan001.zarr"`.
     array_key :
         Key (array name) within the store for this device's data.
         Defaults to the device name.
     capacity :
-        Maximum number of frames to accept.  ``0`` means unlimited.
+        Maximum number of frames to accept.  `0` means unlimited.
     mimetype_hint :
         MIME type hint for the backend.  Consumers may use this to select
         the correct reader.
@@ -47,22 +47,22 @@ class PathInfo:
 
 @runtime_checkable
 class FilenameProvider(Protocol):
-    """Callable that produces a filename (without extension) for a device.
-
-    Parameters
-    ----------
-    device_name :
-        Name of the device requesting a filename.  Implementations may
-        ignore this if the filename is device-agnostic.
-
-    Returns
-    -------
-    str
-        A filename string without extension.
-    """
+    """Callable that produces a filename (without extension) for a device."""
 
     def __call__(self, device_name: str | None = None) -> str:
-        """Return a filename for the given device."""
+        """Return a filename for the given device.
+
+        Parameters
+        ----------
+        device_name :
+            Name of the device requesting a filename.  Implementations may
+            ignore this if the filename is device-agnostic.
+
+        Returns
+        -------
+        str
+            A filename string without extension.
+        """
         ...
 
 
@@ -73,20 +73,21 @@ class PathProvider(Protocol):
     Implementations are **picklable** — they carry no open file handles
     or mutable process-local state, so they can be safely forwarded to
     subprocess or remote workers.
-
-    Parameters
-    ----------
-    device_name :
-        Name of the device requesting path information.
-
-    Returns
-    -------
-    PathInfo
-        Complete path and storage metadata for the device.
     """
 
     def __call__(self, device_name: str | None = None) -> PathInfo:
-        """Return path information for the given device."""
+        """Return path information for the given device.
+
+        Parameters
+        ----------
+        device_name :
+            Name of the device requesting path information.
+
+        Returns
+        -------
+        PathInfo
+            Complete path and storage metadata for the device.
+        """
         ...
 
 
