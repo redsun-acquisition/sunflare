@@ -1,5 +1,9 @@
 # API reference
 
+::: sunflare.storage
+    options:
+      summary: true
+
 ::: sunflare.device
     options:
       summary: true
