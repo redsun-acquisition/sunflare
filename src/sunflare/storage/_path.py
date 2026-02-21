@@ -1,3 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# The design of this module is heavily inspired by ophyd-async
+# (https://github.com/bluesky/ophyd-async), developed by the Bluesky collaboration.
+# ophyd-async is licensed under the BSD 3-Clause License.
+# No source code from ophyd-async has been copied; the PathProvider / FilenameProvider
+# composable pattern was studied and independently re-implemented for sunflare,
+# with URI-based paths to support non-POSIX backends such as S3.
+
 """Path and filename providers for storage backends."""
 
 from __future__ import annotations

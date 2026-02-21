@@ -1,3 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# The design of this module is heavily inspired by ophyd-async
+# (https://github.com/bluesky/ophyd-async), developed by the Bluesky collaboration.
+# ophyd-async is licensed under the BSD 3-Clause License.
+# No source code from ophyd-async has been copied; the StorageProxy protocol and
+# opt-in descriptor pattern were studied and independently re-implemented for sunflare.
+
 """StorageProxy protocol and StorageDescriptor for device-side storage access."""
 
 from __future__ import annotations

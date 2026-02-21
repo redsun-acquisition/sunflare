@@ -1,3 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# The design of this module is heavily inspired by ophyd-async
+# (https://github.com/bluesky/ophyd-async), developed by the Bluesky collaboration.
+# ophyd-async is licensed under the BSD 3-Clause License.
+# No source code from ophyd-async has been copied; the backend writer pattern
+# was studied and independently re-implemented using acquire-zarr for sunflare.
+
 """Zarr-based storage writer using acquire-zarr."""
 
 from __future__ import annotations

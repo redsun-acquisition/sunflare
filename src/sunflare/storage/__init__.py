@@ -1,3 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# The design of this subpackage is heavily inspired by ophyd-async
+# (https://github.com/bluesky/ophyd-async), developed by the Bluesky collaboration.
+# ophyd-async is licensed under the BSD 3-Clause License.
+# No source code from ophyd-async has been copied; the architectural patterns
+# (shared writer, path providers, FrameSink, StorageProxy protocol) were
+# studied and independently re-implemented to fit the sunflare/redsun model.
+
 """Storage infrastructure for sunflare devices.
 
 This subpackage provides the dependency-free primitives for storage:
