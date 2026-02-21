@@ -10,7 +10,6 @@ import numpy as np
 import pytest
 from bluesky.protocols import Descriptor, Reading
 
-import sunflare.storage  # noqa: F401 — triggers descriptor wiring on Device
 from sunflare.device import Device
 from sunflare.storage import (
     FrameSink,
