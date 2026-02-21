@@ -24,12 +24,12 @@ if TYPE_CHECKING:
 class StorageProxy(Protocol):
     """Protocol that devices use to interact with a storage backend.
 
-    Both local :class:`~sunflare.storage.Writer` instances and future
+    Both local [`Writer`][sunflare.storage.Writer] instances and future
     remote proxy objects implement this protocol, so device code is
     identical regardless of where storage lives.
 
-    Devices access the backend via their ``storage`` attribute, which is
-    ``None`` when no backend has been configured for the session.
+    Devices access the backend via their `storage` attribute, which is
+    `None` when no backend has been configured for the session.
     """
 
     def update_source(
@@ -43,7 +43,7 @@ class StorageProxy(Protocol):
         ...
 
     def prepare(self, name: str, capacity: int = 0) -> FrameSink:
-        """Prepare the backend for *name* and return a :class:`FrameSink`."""
+        """Prepare the backend for *name* and return a [`FrameSink`][sunflare.storage.FrameSink]."""
         ...
 
     def kickoff(self) -> None:
@@ -68,23 +68,23 @@ class StorageProxy(Protocol):
 
 
 class StorageDescriptor:
-    """Descriptor that manages the ``storage`` slot on a device.
+    """Descriptor that manages the `storage` slot on a device.
 
-    Stores the :class:`StorageProxy` (or ``None``) in the instance
-    ``__dict__`` under the key ``_storage``.
+    Stores the [`StorageProxy`][sunflare.storage.StorageProxy] (or `None`)
+    in the instance `__dict__` under the key `_storage`.
 
     This descriptor is public so users can reference it explicitly in
     custom device classes:
 
-    .. code-block:: python
+    ```python
+    from sunflare.storage import StorageDescriptor
 
-        from sunflare.storage import StorageDescriptor
 
+    class MyDevice(Device):
+        storage = StorageDescriptor()
+    ```
 
-        class MyDevice(Device):
-            storage = StorageDescriptor()
-
-    :class:`~sunflare.device.Device` already carries a pre-installed
+    [`Device`][sunflare.device.Device] already carries a pre-installed
     instance, so most users never need to add it manually.
     """
 

@@ -34,24 +34,26 @@ if TYPE_CHECKING:
 
 
 class ZarrWriter(Writer):
-    """Zarr storage backend using ``acquire-zarr``.
+    """Zarr storage backend using `acquire-zarr`.
 
     Writes detector frames to a Zarr v3 store.  Multiple devices share
-    one ``ZarrWriter`` instance; each device is assigned its own array
+    one `ZarrWriter` instance; each device is assigned its own array
     within the store, keyed by device name.
 
-    The store URI is resolved by the :class:`~sunflare.storage.PathProvider`
+    The store URI is resolved by the
+    [`PathProvider`][sunflare.storage.PathProvider]
     supplied at construction time.  Devices call
-    :meth:`~sunflare.storage.Writer.prepare` without any path arguments —
-    path resolution is entirely internal.
+    [`Writer.prepare`][sunflare.storage.Writer.prepare] without any path
+    arguments — path resolution is entirely internal.
 
     Parameters
     ----------
     name :
         Unique name for this writer (used for logging).
     path_provider :
-        Callable that returns :class:`~sunflare.storage.PathInfo` for each
-        device.  Called once per device per :meth:`prepare` invocation.
+        Callable that returns [`PathInfo`][sunflare.storage.PathInfo] for each
+        device.  Called once per device per
+        [`prepare`][sunflare.storage.Writer.prepare] invocation.
     """
 
     def __init__(self, name: str, path_provider: PathProvider) -> None:
@@ -74,21 +76,22 @@ class ZarrWriter(Writer):
     def prepare(self, name: str, capacity: int = 0) -> FrameSink:
         """Prepare Zarr storage for *name* and return a frame sink.
 
-        Resolves the store path via the :class:`~sunflare.storage.PathProvider`,
+        Resolves the store path via the
+        [`PathProvider`][sunflare.storage.PathProvider],
         pre-declares spatial and temporal dimensions for the source, and
-        returns a :class:`FrameSink` bound to *name*.
+        returns a [`FrameSink`][sunflare.storage.FrameSink] bound to *name*.
 
         Parameters
         ----------
         name :
             Source name (device name).
         capacity :
-            Maximum frames (``0`` = unlimited).
+            Maximum frames (`0` = unlimited).
 
         Returns
         -------
         FrameSink
-            Bound sink; call ``sink.write(frame)`` to push frames.
+            Bound sink; call `sink.write(frame)` to push frames.
         """
         path_info = self._path_provider(name)
         self._store_path = path_info.store_uri

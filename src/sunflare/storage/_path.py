@@ -68,7 +68,7 @@ class FilenameProvider(Protocol):
 
 @runtime_checkable
 class PathProvider(Protocol):
-    """Callable that produces :class:`PathInfo` for a device.
+    """Callable that produces [`PathInfo`][sunflare.storage.PathInfo] for a device.
 
     Implementations are **picklable** — they carry no open file handles
     or mutable process-local state, so they can be safely forwarded to
@@ -161,21 +161,21 @@ class AutoIncrementFilenameProvider:
 
 
 class StaticPathProvider:
-    """Provides :class:`PathInfo` rooted at a fixed base URI.
+    """Provides [`PathInfo`][sunflare.storage.PathInfo] rooted at a fixed base URI.
 
-    Composes a :class:`FilenameProvider` (for the array key / filename)
-    with a fixed ``base_uri`` (for the store location).
+    Composes a [`FilenameProvider`][sunflare.storage.FilenameProvider]
+    (for the array key / filename) with a fixed *base_uri* (for the store location).
 
     Parameters
     ----------
     filename_provider :
         Callable that returns a filename for each device.
     base_uri :
-        Base URI for the store root (e.g. ``"file:///data"``).
+        Base URI for the store root (e.g. `"file:///data"`).
     mimetype_hint :
-        MIME type hint forwarded to :class:`PathInfo`.
+        MIME type hint forwarded to [`PathInfo`][sunflare.storage.PathInfo].
     capacity :
-        Default frame capacity forwarded to :class:`PathInfo`.
+        Default frame capacity forwarded to [`PathInfo`][sunflare.storage.PathInfo].
     """
 
     def __init__(
@@ -191,7 +191,7 @@ class StaticPathProvider:
         self._capacity = capacity
 
     def __call__(self, device_name: str | None = None) -> PathInfo:
-        """Return :class:`PathInfo` for *device_name*."""
+        """Return [`PathInfo`][sunflare.storage.PathInfo] for *device_name*."""
         filename = self._filename_provider(device_name)
         store_uri = f"{self._base_uri}/{filename}"
         array_key = device_name or filename

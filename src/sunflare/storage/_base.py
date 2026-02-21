@@ -49,11 +49,11 @@ class SourceInfo:
     collection_counter :
         Frames reported in the current collection cycle.
     stream_resource_uid :
-        UID of the current ``StreamResource`` document.
+        UID of the current `StreamResource` document.
     extra :
         Optional extra metadata for backend-specific use (e.g. OME-Zarr
-        axis labels, physical units).  Base ``Writer`` ignores this field;
-        specialised subclasses may read it.
+        axis labels, physical units).  Base [`Writer`][sunflare.storage.Writer]
+        ignores this field; specialised subclasses may read it.
     """
 
     name: str
@@ -70,14 +70,15 @@ class SourceInfo:
 class FrameSink:
     """Device-facing handle for pushing frames to a storage backend.
 
-    Returned by :meth:`Writer.prepare`.  Devices write frames by calling
-    :meth:`write`; the sink routes each frame to the correct array inside
-    the shared ``Writer`` and updates the frame counter atomically.
+    Returned by [`Writer.prepare`][sunflare.storage.Writer.prepare].
+    Devices write frames by calling [`write`][sunflare.storage.FrameSink.write];
+    the sink routes each frame to the correct array inside the shared
+    [`Writer`][sunflare.storage.Writer] and updates the frame counter atomically.
 
-    Calling :meth:`close` is equivalent to calling
-    :meth:`Writer.complete` for this source — it signals that no more
-    frames will arrive and triggers backend finalisation once all active
-    sinks have been closed.
+    Calling [`close`][sunflare.storage.FrameSink.close] is equivalent to calling
+    [`Writer.complete`][sunflare.storage.Writer.complete] for this source — it
+    signals that no more frames will arrive and triggers backend finalisation
+    once all active sinks have been closed.
 
     Parameters
     ----------
@@ -94,13 +95,13 @@ class FrameSink:
     def write(self, frame: npt.NDArray[np.generic]) -> None:
         """Push *frame* to the storage backend.
 
-        Thread-safe; multiple sinks may call ``write()`` concurrently.
+        Thread-safe; multiple sinks may call `write` concurrently.
 
         Parameters
         ----------
         frame :
             Array data to write.  dtype and shape must match the source
-            registration from :meth:`~Writer.update_source`.
+            registration from [`Writer.update_source`][sunflare.storage.Writer.update_source].
         """
         with self._writer._lock:
             self._writer._write_frame(self._name, frame)
@@ -109,8 +110,8 @@ class FrameSink:
     def close(self) -> None:
         """Signal that no more frames will be written from this sink.
 
-        Delegates to :meth:`Writer.complete`.  The backend is finalised
-        once all active sinks have been closed.
+        Delegates to [`Writer.complete`][sunflare.storage.Writer.complete].
+        The backend is finalised once all active sinks have called `close`.
         """
         self._writer.complete(self._name)
 
@@ -121,29 +122,31 @@ _W = TypeVar("_W", bound="Writer")
 class Writer(abc.ABC, Loggable):
     """Abstract base class for data writers.
 
-    This interface loosely follows the Bluesky ``Flyable`` protocol while
-    remaining generic — methods do not need to return a ``Status`` object;
+    This interface loosely follows the Bluesky `Flyable` protocol while
+    remaining generic — methods do not need to return a `Status` object;
     that is left to the device that owns the writer.
 
-    A single ``Writer`` instance is shared by all devices in a session.
-    Each device registers itself as a *source* via :meth:`update_source`
-    and obtains a dedicated :class:`FrameSink` via :meth:`prepare`.
+    A single `Writer` instance is shared by all devices in a session.
+    Each device registers itself as a *source* via
+    [`update_source`][sunflare.storage.Writer.update_source] and obtains
+    a dedicated [`FrameSink`][sunflare.storage.FrameSink] via
+    [`prepare`][sunflare.storage.Writer.prepare].
 
     Call order per acquisition:
 
-    1. ``update_source(name, dtype, shape)`` — register the device
-    2. ``prepare(name, capacity)`` — returns a :class:`FrameSink`
-    3. ``kickoff()`` — opens the backend
-    4. ``sink.write(frame)`` — push frames (thread-safe)
-    5. ``sink.close()``  — signals completion (calls :meth:`complete`)
+    1. `update_source(name, dtype, shape)` — register the device
+    2. `prepare(name, capacity)` — returns a [`FrameSink`][sunflare.storage.FrameSink]
+    3. `kickoff()` — opens the backend
+    4. `sink.write(frame)` — push frames (thread-safe)
+    5. `sink.close()` — signals completion (calls [`complete`][sunflare.storage.Writer.complete])
 
     Subclasses must implement:
 
-    - :attr:`mimetype` — MIME type string for this backend
-    - :meth:`prepare` — source-specific setup; must call ``super().prepare()``
-    - :meth:`kickoff` — open the backend; must call ``super().kickoff()``
-    - :meth:`_write_frame` — write one frame to the backend
-    - :meth:`_finalize` — close the backend when all sources are complete
+    - [`mimetype`][sunflare.storage.Writer.mimetype] — MIME type string for this backend
+    - [`prepare`][sunflare.storage.Writer.prepare] — source-specific setup; must call `super().prepare()`
+    - [`kickoff`][sunflare.storage.Writer.kickoff] — open the backend; must call `super().kickoff()`
+    - `_write_frame` — write one frame to the backend
+    - `_finalize` — close the backend when all sources are complete
 
     Parameters
     ----------
@@ -207,7 +210,7 @@ class Writer(abc.ABC, Loggable):
             Shape of individual frames.
         extra :
             Optional backend-specific metadata forwarded to
-            :class:`SourceInfo`.
+            [`SourceInfo`][sunflare.storage.SourceInfo].
 
         Raises
         ------
@@ -236,14 +239,14 @@ class Writer(abc.ABC, Loggable):
         name :
             Source name to remove.
         raise_if_missing :
-            If ``True``, raise :exc:`KeyError` when the source is absent.
+            If `True`, raise `KeyError` when the source is absent.
 
         Raises
         ------
         RuntimeError
             If the writer is currently open.
         KeyError
-            If ``raise_if_missing`` is ``True`` and the source is absent.
+            If *raise_if_missing* is `True` and the source is absent.
         """
         if self._is_open:
             raise RuntimeError("Cannot clear sources while writer is open.")
@@ -262,7 +265,7 @@ class Writer(abc.ABC, Loggable):
         Parameters
         ----------
         name :
-            Source name.  If ``None``, returns the minimum across all
+            Source name.  If `None`, returns the minimum across all
             sources (useful for synchronisation checks).
 
         Raises
@@ -299,7 +302,8 @@ class Writer(abc.ABC, Loggable):
     def kickoff(self) -> None:
         """Open the storage backend for a new acquisition.
 
-        Subclasses must call ``super().kickoff()`` to set :attr:`is_open`.
+        Subclasses must call `super().kickoff()` to set
+        [`is_open`][sunflare.storage.Writer.is_open].
         Subsequent calls while already open must be no-ops.
         """
         if not self._is_open:
@@ -310,24 +314,25 @@ class Writer(abc.ABC, Loggable):
         """Prepare storage for a specific source and return a frame sink.
 
         Called once per device per acquisition.  Resets per-source counters
-        and returns a :class:`FrameSink` bound to *name*.
+        and returns a [`FrameSink`][sunflare.storage.FrameSink] bound to *name*.
 
         Parameters
         ----------
         name :
             Source name.
         capacity :
-            Maximum frames to accept (``0`` = unlimited).
+            Maximum frames to accept (`0` = unlimited).
 
         Returns
         -------
         FrameSink
-            Bound sink; call ``sink.write(frame)`` to push frames.
+            Bound sink; call `sink.write(frame)` to push frames.
 
         Raises
         ------
         KeyError
-            If *name* has not been registered via :meth:`update_source`.
+            If *name* has not been registered via
+            [`update_source`][sunflare.storage.Writer.update_source].
         """
         source = self._sources[name]
         source.frames_written = 0
@@ -339,8 +344,8 @@ class Writer(abc.ABC, Loggable):
     def complete(self, name: str) -> None:
         """Mark acquisition complete for *name*.
 
-        Called automatically by :meth:`FrameSink.close`.  The backend is
-        finalised once all active sinks have called ``close()``.
+        Called automatically by [`FrameSink.close`][sunflare.storage.FrameSink.close].
+        The backend is finalised once all active sinks have called `close`.
 
         Parameters
         ----------
@@ -360,7 +365,8 @@ class Writer(abc.ABC, Loggable):
     def _write_frame(self, name: str, frame: npt.NDArray[np.generic]) -> None:
         """Write one frame to the backend.
 
-        Called by :meth:`FrameSink.write` under the writer lock.
+        Called by [`FrameSink.write`][sunflare.storage.FrameSink.write]
+        under the writer lock.
 
         Parameters
         ----------
@@ -385,7 +391,7 @@ class Writer(abc.ABC, Loggable):
         name: str,
         indices_written: int,
     ) -> Iterator[StreamAsset]:
-        """Yield ``StreamResource`` and ``StreamDatum`` documents for *name*.
+        """Yield `StreamResource` and `StreamDatum` documents for *name*.
 
         Parameters
         ----------
@@ -397,7 +403,7 @@ class Writer(abc.ABC, Loggable):
         Yields
         ------
         StreamAsset
-            Tuples of ``("stream_resource", doc)`` or ``("stream_datum", doc)``.
+            Tuples of `("stream_resource", doc)` or `("stream_datum", doc)`.
 
         Raises
         ------
