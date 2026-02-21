@@ -1,9 +1,9 @@
 """Storage infrastructure for sunflare devices.
 
-This subpackage provides:
+This subpackage provides the dependency-free primitives for storage:
 
 - :class:`Writer` — abstract base class for storage backends
-- :class:`ZarrWriter` — Zarr v3 backend using ``acquire-zarr``
+- :class:`FrameSink` — device-facing handle for pushing frames
 - :class:`SourceInfo` — per-device frame metadata
 - :class:`PathInfo` — storage path and configuration for one device
 - :class:`FilenameProvider` — protocol for filename callables
@@ -13,6 +13,11 @@ This subpackage provides:
 - :class:`StaticPathProvider` — concrete path provider
 - :class:`StorageProxy` — protocol implemented by all storage backends
 - :class:`StorageDescriptor` — descriptor that manages ``device.storage``
+
+Concrete backend classes (e.g. ``ZarrWriter``) are internal
+implementation details and are not exported from this package.
+The application container is responsible for selecting and instantiating
+the correct backend based on the session configuration.
 
 Wiring
 ------
@@ -24,13 +29,6 @@ keeps ``sunflare.device`` free of any runtime import from
 
 from __future__ import annotations
 
-# ---------------------------------------------------------------------------
-# Attach StorageDescriptor to Device
-#
-# This is done here — inside sunflare.storage — so that sunflare.device has
-# no runtime import from sunflare.storage.  The descriptor is installed once
-# when this module is first imported, which happens at container build time.
-# ---------------------------------------------------------------------------
 from sunflare.device._base import Device as _Device
 from sunflare.storage._base import FrameSink, SourceInfo, Writer
 from sunflare.storage._path import (
@@ -43,7 +41,6 @@ from sunflare.storage._path import (
     UUIDFilenameProvider,
 )
 from sunflare.storage._proxy import StorageDescriptor, StorageProxy
-from sunflare.storage._zarr import ZarrWriter
 
 if not isinstance(getattr(_Device, "storage", None), StorageDescriptor):
     _Device.storage = StorageDescriptor()  # type: ignore[assignment]
@@ -64,6 +61,4 @@ __all__ = [
     # proxy / descriptor
     "StorageProxy",
     "StorageDescriptor",
-    # backends
-    "ZarrWriter",
 ]

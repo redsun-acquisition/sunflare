@@ -22,7 +22,6 @@ from sunflare.storage import (
     StorageProxy,
     UUIDFilenameProvider,
     Writer,
-    ZarrWriter,
 )
 from sunflare.storage._proxy import StorageDescriptor
 
@@ -364,10 +363,10 @@ class TestZarrWriterImportGuard:
     ) -> None:
         """ZarrWriter.__init__ must raise ImportError when acquire-zarr is absent."""
         import sunflare.storage._zarr as zarr_mod
+        from sunflare.storage._zarr import ZarrWriter
 
         monkeypatch.setattr(zarr_mod, "_ACQUIRE_ZARR_AVAILABLE", False)
         fp = StaticFilenameProvider("scan")
         pp = StaticPathProvider(fp, base_uri="file:///data")
         with pytest.raises(ImportError, match="acquire-zarr"):
-            from sunflare.storage import ZarrWriter
             ZarrWriter("test", pp)
