@@ -11,8 +11,8 @@ from bluesky.protocols import Descriptor, Reading
 
 from sunflare.device import Device
 from sunflare.storage import (
-    FrameSink,
     AutoIncrementFilenameProvider,
+    FrameSink,
     PathInfo,
     StaticFilenameProvider,
     StaticPathProvider,
@@ -21,7 +21,6 @@ from sunflare.storage import (
     UUIDFilenameProvider,
     Writer,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -126,6 +125,45 @@ class TestStorageDescriptor:
     def test_device_without_storage_has_no_attribute(self) -> None:
         device = _MinimalDevice("dev")
         assert not hasattr(device, "storage")
+
+    def test_set_name_derives_private_attribute(self) -> None:
+        """__set_name__ must store the backing attribute as _{descriptor_name}."""
+
+        class _NamedDevice(Device):
+            writer = StorageDescriptor()
+
+            def __init__(self, name: str, /) -> None:
+                super().__init__(name)
+
+            def describe_configuration(self) -> dict[str, Any]:
+                return {}
+
+            def read_configuration(self) -> dict[str, Any]:
+                return {}
+
+        assert _NamedDevice.writer._private_name == "_writer"
+        device = _NamedDevice("dev")
+        mock_proxy = MagicMock(spec=StorageProxy)
+        device.writer = mock_proxy
+        assert device.writer is mock_proxy
+
+    def test_works_on_slotted_class(self) -> None:
+        """StorageDescriptor must work on classes that define __slots__."""
+
+        class _SlottedDevice:
+            __slots__ = ("_name", "_storage")
+            storage = StorageDescriptor()
+
+            def __init__(self, name: str) -> None:
+                self._name = name
+
+        device = _SlottedDevice("slotted")
+        assert device.storage is None
+        mock_proxy = MagicMock(spec=StorageProxy)
+        device.storage = mock_proxy
+        assert device.storage is mock_proxy
+        device.storage = None
+        assert device.storage is None
 
 
 # ---------------------------------------------------------------------------

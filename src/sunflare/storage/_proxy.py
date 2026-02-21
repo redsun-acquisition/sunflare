@@ -70,8 +70,13 @@ class StorageProxy(Protocol):
 class StorageDescriptor:
     """Descriptor that manages the `storage` slot on a device.
 
-    Stores the [`StorageProxy`][sunflare.storage.StorageProxy] (or `None`)
-    in the instance `__dict__` under the key `_storage`.
+    The private attribute name is derived from the descriptor's own name
+    at class-creation time via `__set_name__` (e.g. a class attribute
+    named `storage` produces a backing attribute `_storage`).  Reading
+    and writing go through `object.__getattribute__` and
+    `object.__setattr__` rather than `__dict__` access, so the descriptor
+    works correctly on classes that define `__slots__` as long as the
+    backing slot is declared.
 
     This descriptor is public so users can reference it explicitly in
     custom device classes:
@@ -88,6 +93,14 @@ class StorageDescriptor:
     instance, so most users never need to add it manually.
     """
 
+    def __init__(self) -> None:
+        # Fallback name used when the descriptor is instantiated outside a
+        # class body (e.g. in tests) before __set_name__ is called.
+        self._private_name: str = "_storage"
+
+    def __set_name__(self, owner: type, name: str) -> None:
+        self._private_name = f"_{name}"
+
     @overload
     def __get__(self, obj: None, objtype: type) -> StorageDescriptor: ...
 
@@ -101,8 +114,11 @@ class StorageDescriptor:
     ) -> StorageDescriptor | StorageProxy | None:
         if obj is None:
             return self
-        result: StorageProxy | None = obj.__dict__.get("_storage", None)
+        try:
+            result: StorageProxy | None = object.__getattribute__(obj, self._private_name)
+        except AttributeError:
+            result = None
         return result
 
     def __set__(self, obj: Any, value: StorageProxy | None) -> None:
-        obj.__dict__["_storage"] = value
+        object.__setattr__(obj, self._private_name, value)
