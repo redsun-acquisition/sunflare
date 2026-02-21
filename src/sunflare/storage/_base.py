@@ -7,7 +7,7 @@ import threading as th
 import uuid
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from sunflare.log import Loggable
 

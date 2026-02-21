@@ -4,10 +4,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
-
-if TYPE_CHECKING:
-    pass
+from typing import Any, Protocol, runtime_checkable
 
 
 @dataclass
@@ -148,9 +145,7 @@ class AutoIncrementFilenameProvider:
     def __call__(self, device_name: str | None = None) -> str:
         """Return the next incremented filename."""
         if len(str(self._current)) > self._max_digits:
-            raise ValueError(
-                f"Counter exceeded maximum of {self._max_digits} digits"
-            )
+            raise ValueError(f"Counter exceeded maximum of {self._max_digits} digits")
         padded = f"{self._current:0{self._max_digits}}"
         name = f"{self._base}{self._delimiter}{padded}" if self._base else padded
         self._current += self._step

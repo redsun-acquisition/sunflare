@@ -5,9 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Protocol, overload, runtime_checkable
 
 if TYPE_CHECKING:
-    import numpy as np
     from collections.abc import Iterator
+
+    import numpy as np
     from bluesky.protocols import StreamAsset
+
     from sunflare.storage._base import FrameSink
 
 
@@ -70,6 +72,7 @@ class StorageDescriptor:
     .. code-block:: python
 
         from sunflare.storage import StorageDescriptor
+
 
         class MyDevice(Device):
             storage = StorageDescriptor()

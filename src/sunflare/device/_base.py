@@ -7,6 +7,7 @@ from bluesky.protocols import Configurable, HasName, HasParent
 
 if TYPE_CHECKING:
     from bluesky.protocols import Descriptor, Reading
+
     from sunflare.storage import StorageProxy
 
 

@@ -24,6 +24,14 @@ keeps ``sunflare.device`` free of any runtime import from
 
 from __future__ import annotations
 
+# ---------------------------------------------------------------------------
+# Attach StorageDescriptor to Device
+#
+# This is done here — inside sunflare.storage — so that sunflare.device has
+# no runtime import from sunflare.storage.  The descriptor is installed once
+# when this module is first imported, which happens at container build time.
+# ---------------------------------------------------------------------------
+from sunflare.device._base import Device as _Device
 from sunflare.storage._base import FrameSink, SourceInfo, Writer
 from sunflare.storage._path import (
     AutoIncrementFilenameProvider,
@@ -36,15 +44,6 @@ from sunflare.storage._path import (
 )
 from sunflare.storage._proxy import StorageDescriptor, StorageProxy
 from sunflare.storage._zarr import ZarrWriter
-
-# ---------------------------------------------------------------------------
-# Attach StorageDescriptor to Device
-#
-# This is done here — inside sunflare.storage — so that sunflare.device has
-# no runtime import from sunflare.storage.  The descriptor is installed once
-# when this module is first imported, which happens at container build time.
-# ---------------------------------------------------------------------------
-from sunflare.device._base import Device as _Device
 
 if not isinstance(getattr(_Device, "storage", None), StorageDescriptor):
     _Device.storage = StorageDescriptor()  # type: ignore[assignment]
