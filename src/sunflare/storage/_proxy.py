@@ -82,15 +82,13 @@ class StorageDescriptor:
     custom device classes:
 
     ```python
+    from sunflare.device import Device
     from sunflare.storage import StorageDescriptor
 
 
     class MyDevice(Device):
         storage = StorageDescriptor()
     ```
-
-    [`Device`][sunflare.device.Device] already carries a pre-installed
-    instance, so most users never need to add it manually.
     """
 
     def __init__(self) -> None:
@@ -115,7 +113,9 @@ class StorageDescriptor:
         if obj is None:
             return self
         try:
-            result: StorageProxy | None = object.__getattribute__(obj, self._private_name)
+            result: StorageProxy | None = object.__getattribute__(
+                obj, self._private_name
+            )
         except AttributeError:
             result = None
         return result
