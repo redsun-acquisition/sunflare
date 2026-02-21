@@ -1,3 +1,5 @@
+"""Base classes for sunflare devices."""
+
 from __future__ import annotations
 
 import abc

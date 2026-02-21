@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Dates are specified in the format `DD-MM-YYYY`.
 
+## [0.11.0] - 21-02-2026
+
+## Added
+
+- Added storage module migrated from mimir with the original concepts intact
+- Added minimal documentation on its usage
+
 ## [0.10.1] - 20-02-2026
 
 ### Fixed
@@ -353,6 +360,7 @@ Dates are specified in the format `DD-MM-YYYY`.
 - Alpha release;
 - Basic project infrastructure;
 
+[0.11.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.10.1...v0.11.0
 [0.10.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/redsun-acquisition/sunflare/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/redsun-acquisition/sunflare/compare/v0.9.0...v0.9.1

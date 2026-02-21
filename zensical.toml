@@ -70,6 +70,7 @@ nav = [
             { "Devices" = "explanation/architecture/devices.md" },
             { "Presenters" = "explanation/architecture/presenters.md" },
             { "Virtual bus" = "explanation/architecture/virtual.md" },
+            { "Storage" = "explanation/architecture/storage.md" },
         ]},
     ]},
 ]

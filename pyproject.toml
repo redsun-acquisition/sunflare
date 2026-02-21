@@ -39,7 +39,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "sunflare[pyqt]",
+    "sunflare[pyqt,zarr]",
     "mypy>=1.19.1",
     "myst-parser>=4.0.1",
     "ophyd>=1.11.0",
@@ -60,6 +60,9 @@ dev = [
 ]
 
 [project.optional-dependencies]
+zarr = [
+    "acquire-zarr>=0.6.0",
+]
 pyqt = [
     "magicgui>=0.10.1",
     "pyqt6>=6.10.2",
@@ -132,6 +135,7 @@ exclude_lines = [
 ]
 
 [tool.ruff]
+fix = true
 target-version = "py39"
 extend-exclude = ["docs"]
 
